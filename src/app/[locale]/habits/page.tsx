@@ -607,17 +607,17 @@ export default function HabitsPage() {
                                 <span className="text-4xl animate-bounce">✨</span>
                             </div>
                             <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">
-                                Belum Ada Habit
+                                {t('habits_empty_title') || 'Belum Ada Habit'}
                             </h3>
                             <p className="text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto mb-8 leading-relaxed">
-                                Mulai bangun rutinitas positif Anda hari ini. Tambahkan habit pertama Anda!
+                                {t('habits_empty_desc') || 'Mulai bangun rutinitas positif Anda hari ini. Tambahkan habit pertama Anda!'}
                             </p>
                             <button 
                                 onClick={openCreateModal} 
                                 className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2"
                             >
                                 <Plus className="w-4.5 h-4.5 stroke-[3]" />
-                                <span>Tambah Habit</span>
+                                <span>{t('habits_add_btn') || 'Tambah Habit'}</span>
                             </button>
                         </div>
                     ) : (
