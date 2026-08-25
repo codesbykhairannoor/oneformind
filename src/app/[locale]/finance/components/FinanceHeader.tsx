@@ -1,0 +1,172 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/routing';
+import { 
+    Download, 
+    Plus, 
+    FileText,
+    PieChart,
+    Sparkles
+} from 'lucide-react';
+import FinanceMonthPicker from './FinanceMonthPicker';
+
+export interface CurrencyOption {
+    code: string;
+    locale: string;
+    label: string;
+    icon: string;
+    symbol: string;
+}
+
+export const SUPPORTED_CURRENCIES: CurrencyOption[] = [
+    { code: 'IDR', locale: 'id-ID', label: 'Rupiah (Rp)', icon: '🇮🇩', symbol: 'Rp' },
+    { code: 'USD', locale: 'en-US', label: 'Dollar ($)', icon: '🇺🇸', symbol: '$' },
+    { code: 'GBP', locale: 'en-GB', label: 'Pound (£)', icon: '🇬🇧', symbol: '£' },
+    { code: 'EUR', locale: 'de-DE', label: 'Euro (€)', icon: '🇪🇺', symbol: '€' },
+    { code: 'JPY', locale: 'ja-JP', label: 'Yen (¥)', icon: '🇯🇵', symbol: '¥' },
+];
+
+interface FinanceHeaderProps {
+    selectedMonthKey: string;
+    onMonthChange: (val: number | string) => void;
+    onOpenTrxModal: () => void;
+    onOpenBudgetModal?: () => void;
+    onOpenBatchModal?: () => void;
+    activeCurrency: string;
+    onCurrencyChange: (code: string) => void;
+}
+
+export default function FinanceHeader({
+    selectedMonthKey,
+    onMonthChange,
+    onOpenTrxModal,
+    activeCurrency,
+    onCurrencyChange
+}: FinanceHeaderProps) {
+    const t = useTranslations();
+    const locale = useLocale();
+    
+    const [isExportOpen, setIsExportOpen] = useState(false);
+    const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+
+    const activeCurrencyObj = SUPPORTED_CURRENCIES.find(c => c.code === activeCurrency) || SUPPORTED_CURRENCIES[0];
+
+    return (
+        <div className="relative z-[60] transition-all bg-white dark:bg-slate-900 border-b shadow-sm dark:shadow-none border-slate-100 dark:border-slate-800 transition-colors duration-500">
+            <div className="flex flex-col items-stretch justify-between w-full min-w-0 gap-3 md:flex-row md:items-center px-3 sm:px-6 lg:px-8 py-4">
+                
+                <div className="flex items-center gap-2 w-full min-w-0 md:w-auto md:max-w-[min(100%,28rem)]">
+                    <Link 
+                        href="/finance/dashboard" 
+                        title="Finance Dashboard (Overview Tahunan)" 
+                        className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition-colors mr-3 shadow-sm"
+                    >
+                        <PieChart size={18} strokeWidth={2.5} />
+                    </Link>
+                    <p className="shrink-0 text-[13px] font-black capitalize tracking-wide text-slate-700 dark:text-slate-300 mr-2 pr-4">
+                        {t('finance_plan') || 'Finance Plan'}
+                    </p>
+                </div>
+
+                <div className="flex min-w-0 flex-wrap items-center justify-stretch w-full gap-2 md:w-auto md:flex-nowrap md:justify-end mt-1 md:mt-0">
+                    
+                    {/* Custom Month Picker — 1:1 from FinanceHeader.vue line 128 */}
+                    <FinanceMonthPicker 
+                        selectedMonthKey={selectedMonthKey} 
+                        onMonthChange={onMonthChange} 
+                    />
+
+                    {/* Currency Selector Dropdown — 1:1 from FinanceHeader.vue line 171-197 */}
+                    <div className="relative shrink-0 transition-colors duration-500">
+                        <button 
+                            onClick={() => { setIsCurrencyOpen(!isCurrencyOpen); setIsExportOpen(false); }}
+                            className="flex items-center justify-center h-11 px-2.5 transition border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl gap-1 hover:bg-white dark:hover:bg-slate-700 shadow-sm dark:shadow-none group transition-colors duration-300"
+                        >
+                            <span className="text-base">{activeCurrencyObj.icon}</span>
+                            <span className="text-[9px] font-black text-slate-600 dark:text-slate-300 capitalize">{activeCurrencyObj.code}</span>
+                        </button>
+
+                        {isCurrencyOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-700 p-1.5 z-[100] origin-top-right transition-colors duration-500">
+                                <div className="fixed inset-0 z-[-1]" onClick={() => setIsCurrencyOpen(false)}></div>
+                                <div className="relative z-10 space-y-0.5">
+                                    {SUPPORTED_CURRENCIES.map(c => (
+                                        <button 
+                                            key={c.code}
+                                            onClick={() => {
+                                                onCurrencyChange(c.code);
+                                                setIsCurrencyOpen(false);
+                                            }} 
+                                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-colors duration-300 ${activeCurrency === c.code ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'}`}
+                                        >
+                                            <span className="text-lg">{c.icon}</span>
+                                            <span className="text-[11px] font-bold">{c.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Export Actions — 1:1 from FinanceHeader.vue line 200 */}
+                    <div className="relative shrink-0 transition-colors duration-500">
+                        <button 
+                            onClick={() => { setIsExportOpen(!isExportOpen); setIsCurrencyOpen(false); }}
+                            className={`flex items-center justify-center h-11 px-3 transition border rounded-xl gap-2 shadow-sm dark:shadow-none group transition-colors duration-300 ${isExportOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700'}`}
+                        >
+                            <Download size={14} strokeWidth={3} className="text-slate-400 group-hover:text-indigo-500" />
+                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 tracking-tight hidden lg:inline">{t('export') || 'Export'}</span>
+                        </button>
+
+                        {isExportOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-700 p-1.5 z-[100] origin-top-right transition-colors duration-500">
+                                <div className="fixed inset-0 z-[-1]" onClick={() => setIsExportOpen(false)}></div>
+                                <div className="relative z-10 space-y-0.5">
+                                    <button className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item">
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover/item:scale-110 transition-transform">
+                                            <FileText size={14} strokeWidth={2.5} />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">Export Excel</p>
+                                            <p className="text-[9px] text-slate-400 font-medium">Buka di Excel / Sheets</p>
+                                        </div>
+                                    </button>
+                                    <button className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item">
+                                        <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover/item:scale-110 transition-transform">
+                                            <FileText size={14} strokeWidth={2.5} />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 text-left">Laporan Pajak</p>
+                                            <p className="text-[9px] text-slate-400 font-medium font-mono">Format Fiscal PDF</p>
+                                        </div>
+                                    </button>
+                                    <div className="h-px bg-slate-100 dark:bg-slate-700 mx-3 my-1"></div>
+                                    <button className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item">
+                                        <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover/item:scale-110 transition-transform">
+                                            <Sparkles size={14} strokeWidth={2.5} />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200">AI Financial Audit</p>
+                                            <p className="text-[9px] text-slate-400 font-medium">Auto-review dari asisten AI</p>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <button 
+                        onClick={onOpenTrxModal}
+                        className="flex items-center justify-center flex-1 h-11 px-3 md:px-6 transition shadow-lg dark:shadow-none bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-indigo-100 dark:shadow-indigo-900/40 gap-2 active:scale-95 whitespace-nowrap min-w-0 transition-colors duration-500"
+                    >
+                        <Plus size={16} strokeWidth={3} className="text-white" />
+                        <span className="text-[11px] font-bold text-white tracking-tight truncate">{t('btn_transaction') || 'Transaksi'}</span>
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    );
+}

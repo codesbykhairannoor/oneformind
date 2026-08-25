@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PlanType {
+  explorer
+  architect
+  quantum
+  legendary
+  trial
+}
+
+model User {
+  id                      String    @id @default(uuid())
+  name                    String
+  email                   String    @unique
+  username                String?   @unique
+  password                String?
+  googleId                String?
+  emailVerifiedAt         DateTime?
+  
+  // Profile settings
+  settings                Json      @default("{}")
+  avatarPath              String?
+  timezone                String?
+  cookieConsent           Boolean   @default(false)
+  
+  // Subscription & Plans
+  isPremium               Boolean   @default(false)
+  planType                PlanType  @default(explorer)
+  premiumUntil            DateTime?
+  hasUsedTrial            Boolean   @default(false)
+  
+  // Extended features
+  resumeText              String?   @db.Text
+  resumeFilename          String?
+  notificationPreferences Json      @default("{}")
+  onboardingCompleted     Boolean   @default(false)
+  onboardingData          Json      @default("{}")
+
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@map("users")
+}
