@@ -601,7 +601,27 @@ export default function HabitsPage() {
 
                 {/* HABIT MATRIX GRID (Matching HabitGrid.vue 1:1) */}
                 <div className="w-full md:max-w-[95%] mx-auto md:px-2 pt-2 md:pt-8 pb-12">
-                    
+                    {processedHabits.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white dark:bg-slate-900 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800 mx-4 md:mx-0">
+                            <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-500/10 rounded-[2rem] flex items-center justify-center text-indigo-500 mb-6 relative">
+                                <span className="text-4xl animate-bounce">✨</span>
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">
+                                Belum Ada Habit
+                            </h3>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto mb-8 leading-relaxed">
+                                Mulai bangun rutinitas positif Anda hari ini. Tambahkan habit pertama Anda!
+                            </p>
+                            <button 
+                                onClick={openCreateModal} 
+                                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2"
+                            >
+                                <Plus className="w-4.5 h-4.5 stroke-[3]" />
+                                <span>Tambah Habit</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <>
                     {/* MOBILE LAYOUT (<md) */}
                     <div className="md:hidden space-y-6">
                         <div className="relative">
@@ -809,6 +829,8 @@ export default function HabitsPage() {
 
                         </div>
                     </div>
+                    </>
+                    )}
                 </div>
 
 

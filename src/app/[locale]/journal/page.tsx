@@ -135,6 +135,7 @@ export default function JournalIndexPage() {
                     )}
 
                 </div>
+                </div>
             </GatedPage>
         </AuthenticatedLayout>
     );

@@ -48,7 +48,7 @@ export default function FinanceDashboardPage() {
             let sumExpense = 0;
                     
             // Fixed target for now, ideally fetched from user settings
-            const target = 15000000;
+            const target = 0;
             
             for (let i = 1; i <= 12; i++) {
                 const monthStr = `${currentYear}-${String(i).padStart(2, '0')}`;

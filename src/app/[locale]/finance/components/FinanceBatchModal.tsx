@@ -17,16 +17,19 @@ interface FinanceBatchModalProps {
     show: boolean;
     categories: { slug: string; name: string; icon: string; type: string }[];
     budgets?: any[];
+    transactions?: any[];
     onClose: () => void;
     onSubmitBatch: (date: string, rows: BatchRow[]) => void;
     onSwitchToSingle?: () => void;
     activeCurrency?: string;
+    currencyLocale?: string;
 }
 
 export default function FinanceBatchModal({
     show,
     categories,
     budgets = [],
+    transactions = [],
     onClose,
     onSubmitBatch,
     onSwitchToSingle,
@@ -63,7 +66,8 @@ export default function FinanceBatchModal({
     const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
 
     const activeSlugs = new Set([
-        ...budgets.map(b => b.category)
+        ...budgets.map(b => b.category),
+        ...transactions.map(t => t.category)
     ]);
 
     // For Batch Modal, we process available categories per row based on its type

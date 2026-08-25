@@ -66,7 +66,7 @@ export default function FinancePage() {
     const [savingsVault, setSavingsVault] = useState<SavingsVaultItem[]>([]);
 
     // ===== 7. INCOME TARGET =====
-    const [incomeTarget, setIncomeTarget] = useState(21472000);
+    const [incomeTarget, setIncomeTarget] = useState(0);
 
     // ===== 8. MODAL STATES =====
     const [showTrxModal, setShowTrxModal] = useState(false);
@@ -471,6 +471,7 @@ export default function FinancePage() {
                 show={showBatchModal}
                 categories={categories}
                 budgets={budgets}
+                transactions={transactions}
                 onClose={() => setShowBatchModal(false)}
                 onSubmitBatch={handleSaveBatchTrx}
                 onSwitchToSingle={() => { setShowBatchModal(false); setShowTrxModal(true); }}
