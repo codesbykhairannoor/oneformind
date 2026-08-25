@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link, useRouter } from '@/i18n/routing';
+import { useSession } from 'next-auth/react';
 import { ChevronDown, Check, Lock, Sparkles, Star } from 'lucide-react';
 
 export default function PricingPage() {
     const t = useTranslations();
     const locale = useLocale();
     const router = useRouter();
+    const { data: session } = useSession();
     const [isAnnual, setIsAnnual] = useState(true);
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -39,12 +41,17 @@ export default function PricingPage() {
     ];
 
     const handleCheckout = (planId: string) => {
+        if (session?.user) {
+            router.push(`/billing`);
+            return;
+        }
+
         const authString = localStorage.getItem('oneformind_auth');
         if (authString) {
             try {
                 const auth = JSON.parse(authString);
                 if (auth.isAuthenticated) {
-                    router.push(`/payment/status?status=success&plan=${planId}`);
+                    router.push(`/billing`);
                     return;
                 }
             } catch (e) {
@@ -55,7 +62,7 @@ export default function PricingPage() {
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout user={session?.user}>
             <main id="pricing-page" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500 overflow-x-hidden">
                 {/* HERO */}
                 <header style={{ marginBottom: '80px' }} className="pt-32 pb-16 px-6 relative text-center">

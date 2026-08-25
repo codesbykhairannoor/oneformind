@@ -46,13 +46,13 @@ export default function BillingPricingPage() {
 
         // 1. Show Payment Method Selection
         const result = await Swal.fire({
-            title: t('payment_select_title') || 'Pilih Metode Pembayaran',
-            text: t('payment_select_desc') || 'Silakan pilih metode pembayaran Anda.',
+            title: t('payment_select_title'),
+            text: t('payment_select_desc'),
             showCancelButton: true,
             showDenyButton: true,
-            confirmButtonText: 'Duitku (IDR)',
-            denyButtonText: 'PayPal (USD)',
-            cancelButtonText: 'Batal',
+            confirmButtonText: t('payment_btn_duitku'),
+            denyButtonText: t('payment_btn_paypal'),
+            cancelButtonText: t('payment_btn_cancel'),
             confirmButtonColor: '#4f46e5',
             denyButtonColor: '#0f172a',
         });
@@ -60,8 +60,8 @@ export default function BillingPricingPage() {
         if (result.isConfirmed) {
             // DUITKU FLOW
             Swal.fire({
-                title: 'Menyiapkan Pembayaran...',
-                html: 'Menghubungkan ke Duitku...',
+                title: t('payment_preparing'),
+                html: t('payment_connecting'),
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
@@ -85,8 +85,8 @@ export default function BillingPricingPage() {
         } else if (result.isDenied) {
             // PAYPAL FLOW
             Swal.fire({
-                title: 'Initializing PayPal...',
-                html: 'Please wait...',
+                title: t('payment_init_paypal'),
+                html: t('payment_wait'),
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
@@ -110,7 +110,7 @@ export default function BillingPricingPage() {
                     html: '<div id="paypal-button-container" class="mt-4 min-h-[150px]"></div>',
                     showConfirmButton: false,
                     showCancelButton: true,
-                    cancelButtonText: 'Tutup',
+                    cancelButtonText: t('payment_close'),
                     didOpen: () => {
                         paypal.Buttons!({
                             style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'paypal' },
@@ -126,8 +126,8 @@ export default function BillingPricingPage() {
                             },
                             onApprove: async (data) => {
                                 Swal.fire({
-                                    title: 'Processing...',
-                                    text: 'Verifying your payment...',
+                                    title: t('payment_processing'),
+                                    text: t('payment_verifying'),
                                     allowOutsideClick: false,
                                     didOpen: () => Swal.showLoading()
                                 });

@@ -5829,5 +5829,19 @@
     "neural_bridge_locked_desc": "Upgrade ke paket Architect atau lebih tinggi untuk mengakses analisis Neural AI secara real-time.",
     "habits_empty_title": "Belum Ada Habit",
     "habits_empty_desc": "Mulai bangun rutinitas positif Anda hari ini. Tambahkan habit pertama Anda!",
-    "habits_add_btn": "Tambah Habit"
+    "habits_add_btn": "Tambah Habit",
+    "payment_select_title": "Pilih Metode Pembayaran",
+    "payment_select_desc": "Silakan pilih metode pembayaran Anda.",
+    "payment_btn_duitku": "Duitku (IDR)",
+    "payment_btn_paypal": "PayPal (USD)",
+    "payment_btn_cancel": "Batal",
+    "payment_preparing": "Menyiapkan Pembayaran...",
+    "payment_connecting": "Menghubungkan ke Duitku...",
+    "payment_init_paypal": "Initializing PayPal...",
+    "payment_wait": "Silakan tunggu...",
+    "payment_close": "Tutup",
+    "payment_processing": "Memproses...",
+    "payment_verifying": "Memverifikasi pembayaran Anda...",
+    "payment_error_paypal": "Gagal memuat PayPal SDK",
+    "payment_error_order": "Gagal membuat invoice"
 }

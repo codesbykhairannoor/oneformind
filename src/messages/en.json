@@ -5841,5 +5841,19 @@
     "neural_bridge_locked_desc": "Upgrade to Architect or higher to access real-time Neural AI analysis.",
     "habits_empty_title": "No Habits Yet",
     "habits_empty_desc": "Start building your positive routines today. Add your first habit!",
-    "habits_add_btn": "Add Habit"
+    "habits_add_btn": "Add Habit",
+    "payment_select_title": "Select Payment Method",
+    "payment_select_desc": "Please choose how you would like to pay.",
+    "payment_btn_duitku": "Duitku (Local IDR)",
+    "payment_btn_paypal": "PayPal (Intl USD)",
+    "payment_btn_cancel": "Cancel",
+    "payment_preparing": "Preparing Payment...",
+    "payment_connecting": "Connecting to Duitku...",
+    "payment_init_paypal": "Initializing PayPal...",
+    "payment_wait": "Please wait...",
+    "payment_close": "Close",
+    "payment_processing": "Processing...",
+    "payment_verifying": "Verifying your payment...",
+    "payment_error_paypal": "Failed to load PayPal SDK",
+    "payment_error_order": "Failed to create invoice"
 }
