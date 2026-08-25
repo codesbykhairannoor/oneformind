@@ -18,7 +18,8 @@ import {
     Wallet,
     BookOpen,
     CalendarDays,
-import { HelpCircle } from 'lucide-react';
+    HelpCircle
+} from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function Dashboard() {
