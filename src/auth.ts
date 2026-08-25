@@ -6,9 +6,24 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { authConfig } from "./auth.config"
 
+const baseAdapter = PrismaAdapter(prisma)
+const customAdapter = {
+  ...baseAdapter,
+  getUserByAccount: async (provider_providerAccountId: { provider: string; providerAccountId: string }) => {
+    const account = await prisma.account.findUnique({
+      where: { provider_providerAccountId }
+    })
+    if (!account) return null
+    const user = await prisma.user.findUnique({
+      where: { id: account.userId }
+    })
+    return user || null
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(prisma),
+  adapter: customAdapter,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
