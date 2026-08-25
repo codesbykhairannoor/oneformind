@@ -22,31 +22,35 @@ export default function CalendarPage() {
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
 
-    // Initial Events State
-    const [events, setEvents] = useState<CalendarEvent[]>([
-        {
-            id: 1,
-            title: 'Full-Stack Life OS Launch Strategy',
-            start_date: todayStr,
-            end_date: todayStr,
-            start_time: '10:00',
-            end_time: '11:30',
-            is_all_day: false,
-            color: '#4f46e5',
-            description: 'Comprehensive review of all Next.js 16 modular features & 1:1 UI migrations.'
-        },
-        {
-            id: 2,
-            title: 'Deep Work Sprint: Goal & Calendar Suite',
-            start_date: todayStr,
-            end_date: todayStr,
-            start_time: '14:00',
-            end_time: '17:00',
-            is_all_day: false,
-            color: '#10b981',
-            description: 'Finalize pixel-perfect 1:1 Vue component translations to Next.js Client Components.'
-        }
-    ]);
+    const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await fetch('/api/calendar');
+                if (res.ok) {
+                    const data = await res.json();
+                    const mapped = data.map((e: any) => ({
+                        id: e.id,
+                        title: e.title,
+                        description: e.description || '',
+                        type: e.type,
+                        color: e.color,
+                        start_date: e.startDate.split('T')[0],
+                        end_date: e.endDate ? e.endDate.split('T')[0] : e.startDate.split('T')[0],
+                        start_time: e.startTime ? new Date(e.startTime).toISOString().substr(11, 5) : '',
+                        end_time: e.endTime ? new Date(e.endTime).toISOString().substr(11, 5) : '',
+                        is_all_day: e.isAllDay
+                    }));
+                    setEvents(mapped);
+                }
+            } catch (error) {
+                console.error('Failed to fetch calendar events:', error);
+            }
+        };
+
+        fetchEvents();
+    }, []);
 
     // Build Calendar Grid Days Generator
     const generateCalendarDays = (yearMonth: string): CalendarDayItem[] => {
@@ -154,23 +158,64 @@ export default function CalendarPage() {
         setIsDetailModalOpen(true);
     };
 
-    const handleSubmitEvent = (form: CalendarEvent) => {
-        if (form.id) {
-            setEvents(prev => prev.map(e => e.id === form.id ? { ...e, ...form } : e));
-        } else {
-            const newEv: CalendarEvent = {
-                ...form,
-                id: Date.now()
-            };
-            setEvents(prev => [...prev, newEv]);
+    const handleSubmitEvent = async (form: CalendarEvent) => {
+        try {
+            if (form.id) {
+                const res = await fetch(`/api/calendar/${form.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: form.title,
+                        description: form.description,
+                        type: 'event',
+                        color: form.color,
+                        startDate: form.start_date,
+                        endDate: form.end_date,
+                        isAllDay: form.is_all_day,
+                        startTime: form.start_time ? `1970-01-01T${form.start_time}:00.000Z` : null,
+                        endTime: form.end_time ? `1970-01-01T${form.end_time}:00.000Z` : null,
+                    })
+                });
+                if (res.ok) {
+                    setEvents(prev => prev.map(e => e.id === form.id ? { ...e, ...form } : e));
+                }
+            } else {
+                const res = await fetch('/api/calendar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: form.title,
+                        description: form.description,
+                        type: 'event',
+                        color: form.color,
+                        startDate: form.start_date,
+                        endDate: form.end_date,
+                        isAllDay: form.is_all_day,
+                        startTime: form.start_time ? `1970-01-01T${form.start_time}:00.000Z` : null,
+                        endTime: form.end_time ? `1970-01-01T${form.end_time}:00.000Z` : null,
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const newEv: CalendarEvent = { ...form, id: data.id };
+                    setEvents(prev => [...prev, newEv]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to save event:', error);
         }
         setIsEventModalOpen(false);
     };
 
-    const handleDeleteEvent = (id: number | string) => {
+    const handleDeleteEvent = async (id: number | string) => {
         if (typeof window !== 'undefined' && window.confirm('Hapus event ini dari kalender?')) {
-            setEvents(prev => prev.filter(e => e.id !== id));
-            setIsDetailModalOpen(false);
+            try {
+                await fetch(`/api/calendar/${id}`, { method: 'DELETE' });
+                setEvents(prev => prev.filter(e => e.id !== id));
+                setIsDetailModalOpen(false);
+            } catch (error) {
+                console.error('Failed to delete event:', error);
+            }
         }
     };
 

@@ -44,33 +44,26 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     useEffect(() => {
         if (!journalId) return;
 
-        const saved = localStorage.getItem('oneformind_journals');
-        if (saved) {
+        const fetchJournal = async () => {
             try {
-                const list = JSON.parse(saved);
-                const item = list.find((j: any) => String(j.id) === String(journalId));
-                if (item) {
-                    setTitle(item.title || '');
-                    setContent(item.content || '');
-                    setMood(item.mood || 'awesome');
-                    setImageUrl(item.imageUrl || null);
-                    return;
+                // Actually we just fetch all and find it since there's no single GET by ID currently,
+                // or we could fetch all and find. Let's do that for simplicity.
+                const res = await fetch('/api/journals');
+                if (res.ok) {
+                    const data = await res.json();
+                    const item = data.find((j: any) => String(j.id) === String(journalId));
+                    if (item) {
+                        setTitle(item.title || '');
+                        setContent(item.content || '');
+                        setMood(item.mood || 'awesome');
+                        setImageUrl(item.imagePath || null);
+                    }
                 }
-            } catch (e) {
-                console.error(e);
+            } catch (error) {
+                console.error('Failed to fetch journal:', error);
             }
-        }
-
-        // Fallbacks if not found in localStorage
-        if (journalId === '1') {
-            setTitle('Eksplorasi Arsitektur Next.js 16 & AI OS');
-            setContent('Hari ini berhasil menyusun modularisasi komponen Journal dan Study Portfolio dengan performa tinggi.');
-            setMood('awesome');
-        } else if (journalId === '2') {
-            setTitle('Refleksi Sesi Deep Work');
-            setContent('Fokus menyelesaikan perbaikan rute middleware dan memastikan semua halaman memuat cepat.');
-            setMood('good');
-        }
+        };
+        fetchJournal();
     }, [journalId]);
 
     const dateStr = new Date().toLocaleDateString('id-ID', {
@@ -104,19 +97,9 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
         { label: "Extra", value: "1.875rem" },
     ];
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!title && !content) return;
         setIsSaving(true);
-
-        const saved = localStorage.getItem('oneformind_journals');
-        let list = [];
-        if (saved) {
-            try {
-                list = JSON.parse(saved);
-            } catch (e) {
-                console.error(e);
-            }
-        }
 
         const sentimentMap: Record<string, string> = {
             awesome: 'Sentimen sangat positif dan berorientasi pada pencapaian tinggi (High Productivity & Optimism).',
@@ -125,37 +108,40 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
             sad: 'Kecenderungan sentimen melow, disarankan untuk istirahat sejenak.',
             angry: 'Tingkat stres tinggi, prioritaskan teknik pernapasan dalam.',
         };
+        const aiSentiment = sentimentMap[mood] || 'Sentimen netral.';
 
-        if (journalId) {
-            // Edit existing entry
-            list = list.map((j: any) => {
-                if (String(j.id) === String(journalId)) {
-                    return {
-                        ...j,
+        try {
+            if (journalId) {
+                // Edit existing entry
+                await fetch(`/api/journals/${journalId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
                         title,
                         content,
                         mood,
-                        imageUrl,
-                        ai_sentiment: sentimentMap[mood] || 'Sentimen netral.'
-                    };
-                }
-                return j;
-            });
-        } else {
-            // Add new entry
-            const newJournal = {
-                id: Date.now().toString(),
-                title: title || 'Untitled Entry',
-                content,
-                date: new Date().toISOString(),
-                mood,
-                imageUrl,
-                ai_sentiment: sentimentMap[mood] || 'Sentimen netral.'
-            };
-            list = [newJournal, ...list];
+                        imagePath: imageUrl,
+                        aiSentiment
+                    })
+                });
+            } else {
+                // Add new entry
+                await fetch('/api/journals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title || 'Untitled Entry',
+                        content,
+                        date: new Date().toISOString(),
+                        mood,
+                        imagePath: imageUrl,
+                        aiSentiment
+                    })
+                });
+            }
+        } catch (error) {
+            console.error('Failed to save journal:', error);
         }
-
-        localStorage.setItem('oneformind_journals', JSON.stringify(list));
 
         setTimeout(() => {
             setIsSaving(false);

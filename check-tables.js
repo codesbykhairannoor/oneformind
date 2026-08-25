@@ -20,12 +20,10 @@ async function getCols(tableName) {
 async function run() {
   try {
     const tables = [
-      'jobs',
-      'goals',
-      'goal_milestones',
-      'goal_contributions',
-      'academic_archives',
-      'academic_records'
+      'journals',
+      'calendar_events',
+      'events',
+      'dashboard'
     ];
     for (const t of tables) {
       await getCols(t);

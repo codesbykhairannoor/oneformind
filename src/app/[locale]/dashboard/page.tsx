@@ -48,59 +48,32 @@ export default function Dashboard() {
         plan_type: 'Architect',
     };
 
-    const synergy = {
+    const [synergy, setSynergy] = useState<any>({
         date_formatted: new Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-        habits: { completed: 4, total: 5, percent: 80 },
-        planner: { 
-            total: 3, 
-            upcoming: [
-                { id: 1, title: 'Team Sync & Product Alignment', start_time: '13:00' },
-                { id: 2, title: 'Code Review & Pull Requests', start_time: '15:30' },
-                { id: 3, title: 'Olahraga Sore & Jogging', start_time: '17:30' },
-            ]
-        },
-        finance: { expense: 1250000, income: 8500000 },
-        goals: { top_goal: { title: 'Launch OneForMind v2.0 Platform', percent: 75 } },
-        journal: { is_written: true, id: 1 },
-    };
+        habits: { completed: 0, total: 0, percent: 0 },
+        planner: { total: 0, upcoming: [] },
+        finance: { expense: 0, income: 0 },
+        goals: { top_goal: { title: 'Belum ada Goal', percent: 0 } },
+        journal: { is_written: false, id: null },
+    });
 
-    const [plannerData, setPlannerData] = useState<{ total: number, upcoming: any[] }>(synergy.planner);
+    const [plannerData, setPlannerData] = useState<{ total: number, upcoming: any[] }>({ total: 0, upcoming: [] });
 
     useEffect(() => {
-        const loadTasks = () => {
-            const savedTasks = localStorage.getItem('oneformind_planner_tasks');
-            if (savedTasks) {
-                try {
-                    const parsed = JSON.parse(savedTasks);
-                    if (Array.isArray(parsed)) {
-                        const today = new Date();
-                        const year = today.getFullYear();
-                        const month = String(today.getMonth() + 1).padStart(2, '0');
-                        const day = String(today.getDate()).padStart(2, '0');
-                        const todayStr = `${year}-${month}-${day}`;
-                        
-                        const todaysTasks = parsed.filter(t => t.date === todayStr && !t.completed);
-                        todaysTasks.sort((a, b) => a.start_time.localeCompare(b.start_time));
-                        
-                        setPlannerData({
-                            total: todaysTasks.length,
-                            upcoming: todaysTasks.slice(0, 4)
-                        });
-                    }
-                } catch(e) {}
+        const fetchDashboardData = async () => {
+            try {
+                const res = await fetch('/api/dashboard');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSynergy(prev => ({ ...prev, ...data }));
+                    setPlannerData(data.planner);
+                }
+            } catch (error) {
+                console.error('Failed to fetch dashboard data:', error);
             }
         };
 
-        loadTasks();
-        window.addEventListener('storage', loadTasks);
-        window.addEventListener('focus', loadTasks);
-        window.addEventListener('planner_updated', loadTasks);
-
-        return () => {
-            window.removeEventListener('storage', loadTasks);
-            window.removeEventListener('focus', loadTasks);
-            window.removeEventListener('planner_updated', loadTasks);
-        };
+        fetchDashboardData();
     }, []);
 
     const trend = [

@@ -12,48 +12,34 @@ import { Plus } from 'lucide-react';
 export default function JournalIndexPage() {
     const t = useTranslations();
 
-    // Initial Journal state
-    const [journals, setJournals] = useState<JournalItem[]>([
-        {
-            id: 1,
-            title: 'Eksplorasi Arsitektur Next.js 16 & AI OS',
-            content: 'Hari ini berhasil menyusun modularisasi komponen Journal dan Study Portfolio dengan performa tinggi...',
-            date: new Date().toISOString(),
-            mood: 'awesome',
-            ai_sentiment: 'Sentimen sangat positif dan berorientasi pada pencapaian tinggi (High Productivity & Optimism).'
-        },
-        {
-            id: 2,
-            title: 'Refleksi Sesi Deep Work',
-            content: 'Fokus menyelesaikan perbaikan rute middleware dan memastikan semua halaman memuat cepat.',
-            date: new Date(Date.now() - 86400000).toISOString(),
-            mood: 'good',
-            ai_sentiment: 'Fokus kerja mendalam dengan kestabilan emosi yang baik.'
-        }
-    ]);
-
+    const [journals, setJournals] = useState<JournalItem[]>([]);
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem('oneformind_journals');
-        if (saved) {
+        const fetchJournals = async () => {
             try {
-                setJournals(JSON.parse(saved));
-            } catch (e) {
-                console.error(e);
+                const res = await fetch('/api/journals');
+                if (res.ok) {
+                    const data = await res.json();
+                    const mapped = data.map((j: any) => ({
+                        id: j.id,
+                        title: j.title || '',
+                        content: j.content || '',
+                        date: j.date,
+                        mood: j.mood || 'awesome',
+                        ai_sentiment: j.aiSentiment || 'Sentimen netral.'
+                    }));
+                    setJournals(mapped);
+                }
+            } catch (error) {
+                console.error('Failed to fetch journals:', error);
+            } finally {
+                setHasMounted(true);
             }
-        } else {
-            // First time load: persist the default initial items to localStorage so that write page can load them!
-            localStorage.setItem('oneformind_journals', JSON.stringify(journals));
-        }
-        setHasMounted(true);
-    }, []);
+        };
 
-    useEffect(() => {
-        if (hasMounted) {
-            localStorage.setItem('oneformind_journals', JSON.stringify(journals));
-        }
-    }, [journals, hasMounted]);
+        fetchJournals();
+    }, []);
 
     const synergy = {
         tasks_completed: 12,
@@ -62,9 +48,14 @@ export default function JournalIndexPage() {
         expense_total: 150000
     };
 
-    const handleDelete = (id: number | string) => {
+    const handleDelete = async (id: number | string) => {
         if (typeof window !== 'undefined' && window.confirm(t('journal_confirm_delete') || 'Hapus Jurnal? Data ini akan hilang selamanya.')) {
-            setJournals(prev => prev.filter(j => j.id !== id));
+            try {
+                await fetch(`/api/journals/${id}`, { method: 'DELETE' });
+                setJournals(prev => prev.filter(j => j.id !== id));
+            } catch (error) {
+                console.error('Failed to delete journal:', error);
+            }
         }
     };
 
