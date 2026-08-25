@@ -47,11 +47,11 @@ export default function PlannerDashboard() {
         const dateStr = `${year}-${month}-${day}`;
         const isToday = date.toDateString() === new Date().toDateString();
         
-        const dayTasks = realTasks.filter(t => t.date.startsWith(dateStr));
+        const dayTasks = realTasks.filter((t: any) => t.date.startsWith(dateStr));
         const totalTasks = dayTasks.length;
-        const completedTasks = dayTasks.filter(t => t.isCompleted).length;
+        const completedTasks = dayTasks.filter((t: any) => t.isCompleted).length;
         
-        const tasksItems = dayTasks.map(t => ({
+        const tasksItems = dayTasks.map((t: any) => ({
             id: t.id,
             title: t.title,
             is_completed: t.isCompleted,
