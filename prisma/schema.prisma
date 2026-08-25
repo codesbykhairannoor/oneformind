@@ -53,6 +53,9 @@ model User {
   financeSavings          FinanceSaving[]
   financeTransactions     FinanceTransaction[]
   plannerTasks            PlannerTask[]
+  jobs                    Job[]
+  goals                   Goal[]
+  goalContributions       GoalContribution[]
 
   @@map("users")
 }
@@ -211,4 +214,83 @@ model PlannerTask {
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("planner_tasks")
+}
+
+model Job {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  title           String
+  company         String
+  status          String
+  salary          Decimal?   @db.Decimal
+  notes           String?
+  appliedDate     DateTime?  @map("applied_date") @db.Date
+  location        String?
+  jobUrl          String?    @map("job_url")
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("jobs")
+}
+
+model Goal {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  title           String
+  category        String?
+  type            String
+  targetValue     Decimal    @map("target_value") @db.Decimal
+  currentValue    Decimal    @map("current_value") @db.Decimal
+  startDate       DateTime?  @map("start_date") @db.Date
+  endDate         DateTime?  @map("end_date") @db.Date
+  specificDays    Json?      @map("specific_days")
+  status          String
+  coverImageUrl   String?    @map("cover_image_url")
+  reward          String?
+  priority        String     @default("medium")
+  coverImagePath  String?    @map("cover_image_path")
+  color           String?
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestones      GoalMilestone[]
+  contributions   GoalContribution[]
+
+  @@map("goals")
+}
+
+model GoalMilestone {
+  id              Int        @id @default(autoincrement())
+  goalId          Int        @map("goal_id")
+  title           String
+  completed       Boolean    @default(false)
+  order           Int        @default(0)
+  targetDate      DateTime?  @map("target_date") @db.Date
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  goal            Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@map("goal_milestones")
+}
+
+model GoalContribution {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  goalId          Int        @map("goal_id")
+  chainRuleId     Int?       @map("chain_rule_id")
+  sourceType      String     @map("source_type")
+  sourceId        Int        @map("source_id")
+  eventRef        String     @map("event_ref")
+  valueDelta      Decimal    @map("value_delta") @db.Decimal
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal            Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@map("goal_contributions")
 }

@@ -19,61 +19,43 @@ export default function GoalsPage() {
 
     const [hasMounted, setHasMounted] = useState(false);
 
-    // Initial Goals State
-    const [goals, setGoals] = useState<GoalItem[]>([
-        {
-            id: 1,
-            title: 'Membangun Arsitektur Full-Stack Life OS (Next.js 16)',
-            color: '#6366f1',
-            type: 'daily',
-            status: 'active',
-            priority: 'vital',
-            reward: 'Pergi liburan ke Bali 3 hari',
-            start_date: '2026-08-01',
-            end_date: '2026-09-30',
-            category: 'coding',
-            milestones: [
-                { id: 101, title: 'Implementasi 1:1 Study Academic Portfolio Suite', is_completed: true, completed: true },
-                { id: 102, title: 'Implementasi 1:1 Journal Engine & Voice Recognition', is_completed: true, completed: true },
-                { id: 103, title: 'Implementasi 1:1 Goal Tracker Suite & Modal System', is_completed: false, completed: false }
-            ]
-        },
-        {
-            id: 2,
-            title: 'Mencapai Tabungan Emergency Fund Rp 50.000.000',
-            color: '#10b981',
-            type: 'daily',
-            status: 'active',
-            priority: 'important',
-            reward: 'Upgrade Macbook Pro M3',
-            start_date: '2026-01-01',
-            end_date: '2026-12-31',
-            category: 'wealth',
-            milestones: [
-                { id: 201, title: 'Alokasikan 30% pendapatan tiap bulan', is_completed: true, completed: true },
-                { id: 202, title: 'Investasi di Reksa Dana Pasar Uang', is_completed: true, completed: true },
-                { id: 203, title: 'Evaluasi pengeluaran bulanan via Finance OS', is_completed: false, completed: false }
-            ]
-        }
-    ]);
+    const [goals, setGoals] = useState<GoalItem[]>([]);
 
     useEffect(() => {
-        const savedGoals = localStorage.getItem('oneformind_goals');
-        if (savedGoals) {
+        const fetchGoals = async () => {
             try {
-                setGoals(JSON.parse(savedGoals));
-            } catch (e) {
-                console.error(e);
+                const res = await fetch('/api/goals');
+                if (res.ok) {
+                    const data = await res.json();
+                    const mapped = data.map((g: any) => ({
+                        id: g.id,
+                        title: g.title,
+                        color: g.color || '#6366f1',
+                        type: g.type,
+                        status: g.status,
+                        priority: g.priority,
+                        reward: g.reward || '',
+                        start_date: g.startDate ? g.startDate.split('T')[0] : '',
+                        end_date: g.endDate ? g.endDate.split('T')[0] : '',
+                        category: g.category || '',
+                        milestones: (g.milestones || []).map((m: any) => ({
+                            id: m.id,
+                            title: m.title,
+                            is_completed: m.completed,
+                            completed: m.completed,
+                        })),
+                    }));
+                    setGoals(mapped);
+                }
+            } catch (error) {
+                console.error('Failed to fetch goals:', error);
+            } finally {
+                setHasMounted(true);
             }
-        }
-        setHasMounted(true);
-    }, []);
+        };
 
-    useEffect(() => {
-        if (hasMounted) {
-            localStorage.setItem('oneformind_goals', JSON.stringify(goals));
-        }
-    }, [goals, hasMounted]);
+        fetchGoals();
+    }, []);
 
     // Stats Calculation
     const activeGoals = goals.filter(g => g.status !== 'completed');
@@ -120,81 +102,126 @@ export default function GoalsPage() {
         setIsModalOpen(true);
     };
 
-    const handleSaveGoal = (form: GoalItem) => {
-        if (editingGoal) {
-            setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form } : g));
-        } else {
-            const newGoal: GoalItem = {
-                ...form,
-                id: Date.now()
-            };
-            setGoals(prev => [newGoal, ...prev]);
+    const handleSaveGoal = async (form: GoalItem) => {
+        try {
+            if (editingGoal) {
+                const res = await fetch(`/api/goals/${editingGoal.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: form.title, category: form.category, type: form.type,
+                        startDate: form.start_date, endDate: form.end_date, status: form.status,
+                        reward: form.reward, priority: form.priority, color: form.color
+                    })
+                });
+                if (res.ok) {
+                    setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form } : g));
+                }
+            } else {
+                const res = await fetch('/api/goals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: form.title, category: form.category, type: form.type || 'daily',
+                        startDate: form.start_date, endDate: form.end_date, status: 'active',
+                        reward: form.reward, priority: form.priority, color: form.color
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const newGoal: GoalItem = { ...form, id: data.id, milestones: [] };
+                    setGoals(prev => [newGoal, ...prev]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to save goal:', error);
         }
         setIsModalOpen(false);
     };
 
-    const handleDeleteGoal = (id: number | string) => {
+    const handleDeleteGoal = async (id: number | string) => {
         if (typeof window !== 'undefined' && window.confirm('Hapus Goal ini? Data akan hilang selamanya.')) {
-            setGoals(prev => prev.filter(g => g.id !== id));
+            try {
+                await fetch(`/api/goals/${id}`, { method: 'DELETE' });
+                setGoals(prev => prev.filter(g => g.id !== id));
+            } catch (error) {
+                console.error('Failed to delete goal:', error);
+            }
         }
     };
 
-    const handleCompleteGoal = (goal: GoalItem) => {
-        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'completed' } : g));
+    const handleCompleteGoal = async (goal: GoalItem) => {
+        try {
+            await fetch(`/api/goals/${goal.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'completed' }) });
+            setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'completed' } : g));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const handleMarkAsActive = (goal: GoalItem) => {
-        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'active' } : g));
+    const handleMarkAsActive = async (goal: GoalItem) => {
+        try {
+            await fetch(`/api/goals/${goal.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'active' }) });
+            setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'active' } : g));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const handleAddMilestone = (goal: GoalItem) => {
-        setGoals(prev => prev.map(g => {
-            if (g.id === goal.id) {
-                const newMs: Milestone = {
-                    id: Date.now(),
-                    title: 'Langkah Baru',
-                    is_completed: false,
-                    completed: false
-                };
-                return { ...g, milestones: [...(g.milestones || []), newMs] };
+    const handleAddMilestone = async (goal: GoalItem) => {
+        try {
+            const res = await fetch(`/api/goals/${goal.id}/milestones`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: 'Langkah Baru', completed: false, order: (goal.milestones?.length || 0) + 1 })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const newMs: Milestone = { id: data.id, title: data.title, is_completed: data.completed, completed: data.completed };
+                setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: [...(g.milestones || []), newMs] } : g));
             }
-            return g;
-        }));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const handleSaveMilestone = (goal: GoalItem, data: Milestone) => {
-        setGoals(prev => prev.map(g => {
-            if (g.id === goal.id) {
-                const updated = (g.milestones || []).map(m => m.id === data.id ? { ...m, ...data } : m);
-                return { ...g, milestones: updated };
-            }
-            return g;
-        }));
+    const handleSaveMilestone = async (goal: GoalItem, data: Milestone) => {
+        try {
+            await fetch(`/api/goals/${goal.id}/milestones/${data.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: data.title })
+            });
+            setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: (g.milestones || []).map(m => m.id === data.id ? { ...m, ...data } : m) } : g));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const handleToggleMilestone = (goal: GoalItem, m: Milestone) => {
-        setGoals(prev => prev.map(g => {
-            if (g.id === goal.id) {
-                const updated = (g.milestones || []).map(item => {
-                    if (item.id === m.id) {
-                        const nextState = !(item.is_completed || item.completed);
-                        return { ...item, is_completed: nextState, completed: nextState };
-                    }
-                    return item;
-                });
-                return { ...g, milestones: updated };
-            }
-            return g;
-        }));
+    const handleToggleMilestone = async (goal: GoalItem, m: Milestone) => {
+        const nextState = !(m.is_completed || m.completed);
+        try {
+            await fetch(`/api/goals/${goal.id}/milestones/${m.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: nextState })
+            });
+            setGoals(prev => prev.map(g => g.id === goal.id ? {
+                ...g, milestones: (g.milestones || []).map(item => item.id === m.id ? { ...item, is_completed: nextState, completed: nextState } : item)
+            } : g));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const handleDeleteMilestone = (goal: GoalItem, mId: number | string | null | undefined) => {
-        setGoals(prev => prev.map(g => {
-            if (g.id === goal.id) {
-                return { ...g, milestones: (g.milestones || []).filter(m => m.id !== mId) };
-            }
-            return g;
-        }));
+    const handleDeleteMilestone = async (goal: GoalItem, mId: number | string | null | undefined) => {
+        if (!mId) return;
+        try {
+            await fetch(`/api/goals/${goal.id}/milestones/${mId}`, { method: 'DELETE' });
+            setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: (g.milestones || []).filter(m => m.id !== mId) } : g));
+        } catch (error) {
+            console.error(error);
+        }
     };
     if (!hasMounted) {
         return (

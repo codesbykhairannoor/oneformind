@@ -14,19 +14,34 @@ export default function JobsPage() {
     const t = useTranslations();
 
     // Local Jobs State initialized with mock / persisted data
-    const [jobs, setJobs] = useState<JobRowItem[]>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('ofm_jobs_data');
-            if (saved) {
-                try { return JSON.parse(saved); } catch (e) {}
+    const [jobs, setJobs] = useState<JobRowItem[]>([]);
+
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const res = await fetch('/api/jobs');
+                if (res.ok) {
+                    const data = await res.json();
+                    const mapped = data.map((j: any) => ({
+                        id: j.id,
+                        _key: `db_${j.id}`,
+                        company: j.company,
+                        title: j.title,
+                        location: j.location || '',
+                        applied_date: j.appliedDate ? j.appliedDate.split('T')[0] : '',
+                        status: j.status,
+                        notes: j.notes || '',
+                        is_new: false,
+                        is_saving: false
+                    }));
+                    setJobs(mapped);
+                }
+            } catch (error) {
+                console.error('Failed to fetch jobs:', error);
             }
-        }
-        return [
-            { id: 1, _key: 'db_1', company: 'Google', title: 'Senior Frontend Engineer', location: 'Jakarta / Remote', applied_date: '2026-08-15', status: 'interview', notes: 'Technical Interview round 2' },
-            { id: 2, _key: 'db_2', company: 'Tokopedia', title: 'Product Designer', location: 'South Jakarta', applied_date: '2026-08-18', status: 'applied', notes: 'Submitted resume via careers site' },
-            { id: 3, _key: 'db_3', company: 'Gojek', title: 'Fullstack Engineer', location: 'Remote', applied_date: '2026-08-20', status: 'offer', notes: 'Offer letter received' },
-        ];
-    });
+        };
+        fetchJobs();
+    }, []);
 
     const [filters, setFilters] = useState<JobFilterParams>({ search: '', status: 'all', days: null });
     const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
@@ -45,11 +60,8 @@ export default function JobsPage() {
         }
     }, []);
 
-    const saveJobsToStorage = (updated: JobRowItem[]) => {
+    const updateJobsState = (updated: JobRowItem[]) => {
         setJobs(updated);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('ofm_jobs_data', JSON.stringify(updated));
-        }
     };
 
     const hasMasterCv = Boolean(masterCvText || masterCvFilename);
@@ -109,19 +121,66 @@ export default function JobsPage() {
             status: 'wishlist',
             is_saving: false
         };
-        saveJobsToStorage([newRow, ...jobs]);
+        updateJobsState([newRow, ...jobs]);
     };
 
     // Auto save row
-    const handleAutoSaveRow = (updatedJob: JobRowItem) => {
-        const updated = jobs.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? updatedJob : j);
-        saveJobsToStorage(updated);
+    const handleAutoSaveRow = async (updatedJob: JobRowItem) => {
+        // Optimistic UI update
+        const updatedList = jobs.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...updatedJob, is_saving: true } : j);
+        updateJobsState(updatedList);
+
+        try {
+            if (updatedJob.is_new) {
+                const res = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: updatedJob.title || 'Untitled',
+                        company: updatedJob.company || 'Unknown',
+                        status: updatedJob.status || 'wishlist',
+                        location: updatedJob.location,
+                        applied_date: updatedJob.applied_date,
+                        notes: updatedJob.notes
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    updateJobsState(jobs.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...updatedJob, id: data.id, _key: `db_${data.id}`, is_new: false, is_saving: false } : j));
+                }
+            } else {
+                const res = await fetch(`/api/jobs/${updatedJob.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: updatedJob.title,
+                        company: updatedJob.company,
+                        status: updatedJob.status,
+                        location: updatedJob.location,
+                        applied_date: updatedJob.applied_date,
+                        notes: updatedJob.notes
+                    })
+                });
+                if (res.ok) {
+                    updateJobsState(jobs.map(j => j.id === updatedJob.id ? { ...updatedJob, is_saving: false } : j));
+                }
+            }
+        } catch (error) {
+            console.error('Failed to save job:', error);
+            updateJobsState(jobs.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...updatedJob, is_saving: false } : j));
+        }
     };
 
     // Delete job
-    const handleDeleteJob = (id: number | string) => {
-        const updated = jobs.filter(j => j.id !== id);
-        saveJobsToStorage(updated);
+    const handleDeleteJob = async (id: number | string) => {
+        updateJobsState(jobs.filter(j => j.id !== id));
+        if (typeof id === 'number' || !String(id).startsWith('temp_')) {
+            try {
+                await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
+            } catch (error) {
+                console.error('Failed to delete job:', error);
+            }
+        }
     };
 
     // Open AI scan modal

@@ -11,17 +11,21 @@ async function getCols(tableName) {
     ORDER BY ordinal_position;
   `, [tableName]);
   console.log(`\n=== ${tableName.toUpperCase()} ===`);
+  if (res.rows.length === 0) {
+    console.log('  (table not found or empty)');
+  }
   res.rows.forEach(r => console.log(`  ${r.column_name} | ${r.data_type} | nullable: ${r.is_nullable}`));
 }
 
 async function run() {
   try {
     const tables = [
-      'finance_budgets',
-      'finance_categories',
-      'finance_savings',
-      'finance_transactions',
-      'planner_tasks'
+      'jobs',
+      'goals',
+      'goal_milestones',
+      'goal_contributions',
+      'academic_archives',
+      'academic_records'
     ];
     for (const t of tables) {
       await getCols(t);
