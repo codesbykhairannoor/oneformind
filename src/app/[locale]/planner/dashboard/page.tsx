@@ -18,10 +18,11 @@ export default function PlannerDashboard() {
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
     
-    const { data: realTasks } = useSWR(`/api/planner/tasks?month=${year}-${month}`, fetcher, {
+    const { data: rawTasks } = useSWR(`/api/planner/tasks?month=${year}-${month}`, fetcher, {
         fallbackData: [],
         keepPreviousData: true
     });
+    const realTasks: any[] = rawTasks || [];
 
     const monthNames = [
         "Januari", "Februari", "Maret", "April", "Mei", "Juni", 

@@ -220,7 +220,7 @@ export default function Dashboard() {
 
                                 {plannerData.upcoming.length > 0 ? (
                                     <div className="space-y-2">
-                                        {plannerData.upcoming.map((task, index) => (
+                                        {plannerData.upcoming.map((task: any, index: number) => (
                                             <div
                                                 key={task.id}
                                                 className="flex items-center justify-between gap-3 rounded-xl border border-transparent bg-slate-50/80 px-3 py-3 transition-all duration-300 hover:border-slate-200 dark:bg-white/[0.04] dark:hover:border-white/10 hover:translate-x-1"
