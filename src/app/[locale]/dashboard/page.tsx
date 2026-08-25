@@ -32,11 +32,29 @@ export default function Dashboard() {
     const isExplorer = false;
     const isAiEnabled = true;
 
-    const user = {
+    const [user, setUser] = useState({
         name: 'Alexander',
         email: 'alexander@oneformind.com',
         plan_type: 'Architect',
-    };
+    });
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem('oneformind_user_profile');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.name) {
+                    setUser((prev) => ({
+                        ...prev,
+                        name: parsed.name,
+                        email: parsed.email || prev.email,
+                    }));
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }, []);
 
     const synergy = {
         date_formatted: new Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),

@@ -55,6 +55,7 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
         };
         localStorage.setItem('oneformind_user_profile', JSON.stringify(userProfile));
         localStorage.setItem('oneformind_auth', JSON.stringify({ isAuthenticated: true, user: userProfile }));
+        window.dispatchEvent(new Event('auth_change'));
 
         setTimeout(() => {
             setIsProcessing(false);
@@ -74,6 +75,7 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
         };
         localStorage.setItem('oneformind_user_profile', JSON.stringify(userProfile));
         localStorage.setItem('oneformind_auth', JSON.stringify({ isAuthenticated: true, user: userProfile }));
+        window.dispatchEvent(new Event('auth_change'));
 
         setTimeout(() => {
             setIsProcessing(false);

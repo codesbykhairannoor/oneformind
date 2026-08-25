@@ -45,12 +45,45 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     const pathname = usePathname();
     const router = useRouter();
 
-    const user = initialUser || {
-        name: 'Alexander',
-        email: 'alexander@oneformind.com',
-        plan_type: 'Architect',
-        avatar_url: null,
-    };
+    const [user, setUser] = useState(() => {
+        return initialUser || {
+            name: 'Alexander',
+            email: 'alexander@oneformind.com',
+            plan_type: 'Architect',
+            avatar_url: null,
+        };
+    });
+
+    useEffect(() => {
+        const syncUser = () => {
+            try {
+                const saved = localStorage.getItem('oneformind_user_profile');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.name || parsed.email) {
+                        setUser((prev: any) => ({
+                            ...prev,
+                            name: parsed.name || prev.name,
+                            email: parsed.email || prev.email,
+                            headline: parsed.headline || prev.headline,
+                            bio: parsed.bio || prev.bio,
+                            avatar_url: parsed.avatarUrl || parsed.avatar_url || prev.avatar_url,
+                        }));
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        syncUser();
+        window.addEventListener('storage', syncUser);
+        window.addEventListener('auth_change', syncUser);
+        return () => {
+            window.removeEventListener('storage', syncUser);
+            window.removeEventListener('auth_change', syncUser);
+        };
+    }, []);
 
     const isExplorer = !user?.plan_type || user.plan_type.toLowerCase() === 'explorer';
 
@@ -196,6 +229,13 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
 
     const handleLogout = () => {
         setShowLogoutModal(false);
+        try {
+            localStorage.removeItem('oneformind_user_profile');
+            localStorage.removeItem('oneformind_auth');
+            window.dispatchEvent(new Event('auth_change'));
+        } catch (e) {
+            console.error(e);
+        }
         router.push('/login');
     };
 

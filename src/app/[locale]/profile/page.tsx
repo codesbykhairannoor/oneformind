@@ -69,6 +69,7 @@ export default function ProfilePage() {
             localStorage.setItem('oneformind_user_profile', JSON.stringify({
                 name, email, headline, bio, avatarUrl
             }));
+            window.dispatchEvent(new Event('auth_change'));
         }
     }, [name, email, headline, bio, avatarUrl, isLoaded]);
 

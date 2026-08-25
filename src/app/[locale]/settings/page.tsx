@@ -63,13 +63,23 @@ export default function SettingsPage() {
     });
 
     useEffect(() => {
-        const saved = localStorage.getItem('oneformind_user_settings');
-        if (saved) {
+        const savedSettings = localStorage.getItem('oneformind_user_settings');
+        if (savedSettings) {
             try {
-                const parsed = JSON.parse(saved);
+                const parsed = JSON.parse(savedSettings);
                 if (parsed && parsed.modules) {
                     setModules(prev => ({ ...prev, ...parsed.modules }));
                 }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        const savedProfile = localStorage.getItem('oneformind_user_profile');
+        if (savedProfile) {
+            try {
+                const parsed = JSON.parse(savedProfile);
+                if (parsed.name) setName(parsed.name);
+                if (parsed.email) setEmail(parsed.email);
             } catch (e) {
                 console.error(e);
             }
@@ -87,14 +97,23 @@ export default function SettingsPage() {
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
+        try {
+            const savedProfile = localStorage.getItem('oneformind_user_profile');
+            const existing = savedProfile ? JSON.parse(savedProfile) : {};
+            const updated = { ...existing, name, email };
+            localStorage.setItem('oneformind_user_profile', JSON.stringify(updated));
+            window.dispatchEvent(new Event('auth_change'));
+        } catch (e) {
+            console.error(e);
+        }
         setSavedMsg(true);
         setTimeout(() => setSavedMsg(false), 3000);
     };
 
     // Simulated premium user details
     const user = {
-        name: 'Alexander',
-        email: 'alexander@oneformind.com',
+        name,
+        email,
         plan_type: 'Architect',
         is_premium: true,
         premium_until: '2026-09-24T00:00:00Z',
