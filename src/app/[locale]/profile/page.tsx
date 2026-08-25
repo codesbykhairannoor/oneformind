@@ -46,9 +46,9 @@ export default function ProfilePage() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
 
-    // 2. Persistence with localStorage
     // 2. Load NextAuth Session
     const { data: session, status } = useSession();
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         if (status === 'authenticated' && session?.user) {
