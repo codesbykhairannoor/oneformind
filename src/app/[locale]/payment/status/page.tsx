@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { ShieldCheck, Check, Clock, X, ArrowRight } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 interface PaymentStatusPageProps {
     params: Promise<{ locale: string }>;
@@ -13,26 +14,27 @@ interface PaymentStatusPageProps {
 
 export default function PaymentStatusPage({ searchParams }: PaymentStatusPageProps) {
     const t = useTranslations();
+    const { data: session } = useSession();
     const [status, setStatus] = React.useState<string>('success');
     const [plan, setPlan] = React.useState<string>('Architect');
-    const [userName] = React.useState<string>('Alexander');
+    
+    const userName = session?.user?.name?.split(' ')[0] || 'Member';
 
     useEffect(() => {
         searchParams.then(resolved => {
-            const currentStatus = resolved.status || 'success';
+            let currentStatus = resolved.status || 'success';
             const currentPlan = resolved.plan || 'Architect';
+            
+            // Handle Duitku resultCode
+            const resultCode = (resolved as any).resultCode;
+            if (resultCode) {
+                if (resultCode === '00') currentStatus = 'success';
+                else if (resultCode === '01') currentStatus = 'pending';
+                else currentStatus = 'failed';
+            }
             
             setStatus(currentStatus);
             setPlan(currentPlan);
-
-            if (currentStatus === 'success') {
-                // Call API to upgrade user in DB
-                fetch('/api/payment/upgrade', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan: currentPlan })
-                }).catch(err => console.error('Failed to upgrade user:', err));
-            }
         });
     }, [searchParams]);
 

@@ -5,6 +5,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { Link, useRouter } from '@/i18n/routing';
 import { ChevronDown, Check, Lock, Sparkles, Star } from 'lucide-react';
+import Swal from 'sweetalert2';
+import { loadScript } from '@paypal/paypal-js';
 
 export default function BillingPricingPage() {
     const t = useTranslations();
@@ -38,9 +40,126 @@ export default function BillingPricingPage() {
         ['Calendar Timeline', '—', '✓', '✓'],
     ];
 
-    const handleCheckout = (planId: string) => {
-        // Authenticated user checkout goes directly to status page simulation
-        router.push(`/payment/status?status=success&plan=${planId}`);
+    const handleCheckout = async (planId: string) => {
+        const billing = isAnnual ? 'yearly' : 'monthly';
+        const plan = planId.toLowerCase();
+
+        // 1. Show Payment Method Selection
+        const result = await Swal.fire({
+            title: t('payment_select_title') || 'Pilih Metode Pembayaran',
+            text: t('payment_select_desc') || 'Silakan pilih metode pembayaran Anda.',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: 'Duitku (IDR)',
+            denyButtonText: 'PayPal (USD)',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#4f46e5',
+            denyButtonColor: '#0f172a',
+        });
+
+        if (result.isConfirmed) {
+            // DUITKU FLOW
+            Swal.fire({
+                title: 'Menyiapkan Pembayaran...',
+                html: 'Menghubungkan ke Duitku...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const res = await fetch('/api/payment/duitku/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan, billing })
+                });
+                
+                const data = await res.json();
+                if (res.ok && data.paymentUrl) {
+                    window.location.href = data.paymentUrl;
+                } else {
+                    throw new Error(data.error || 'Gagal membuat invoice');
+                }
+            } catch (err: any) {
+                Swal.fire('Error', err.message || 'Terjadi kesalahan sistem.', 'error');
+            }
+        } else if (result.isDenied) {
+            // PAYPAL FLOW
+            Swal.fire({
+                title: 'Initializing PayPal...',
+                html: 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'BAA4EY4bCAv5qA_E8fi83VMDyIwnokX_4Y1n6G_icl0T5moe4Lu0EMkIRg67CGU9sSNX_HlDrLRXjNMOss'; // Fallback to live ID if not set
+                const paypal = await loadScript({ 
+                    "client-id": clientId,
+                    currency: "USD",
+                    intent: "capture"
+                });
+
+                if (!paypal || !paypal.Buttons) {
+                    throw new Error("PayPal SDK failed to load");
+                }
+
+                Swal.close();
+
+                Swal.fire({
+                    title: 'Checkout with PayPal',
+                    html: '<div id="paypal-button-container" class="mt-4 min-h-[150px]"></div>',
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    cancelButtonText: 'Tutup',
+                    didOpen: () => {
+                        paypal.Buttons!({
+                            style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'paypal' },
+                            createOrder: async () => {
+                                const res = await fetch('/api/payment/paypal/checkout', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ plan, billing })
+                                });
+                                const data = await res.json();
+                                if (!res.ok || !data.id) throw new Error(data.error || 'Failed to create PayPal order');
+                                return data.id;
+                            },
+                            onApprove: async (data) => {
+                                Swal.fire({
+                                    title: 'Processing...',
+                                    text: 'Verifying your payment...',
+                                    allowOutsideClick: false,
+                                    didOpen: () => Swal.showLoading()
+                                });
+
+                                const res = await fetch('/api/payment/paypal/capture', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ token: data.orderID, plan, billing })
+                                });
+                                
+                                const captureData = await res.json();
+                                if (res.ok && captureData.success) {
+                                    window.location.href = '/id/payment/status?status=success&plan=' + plan;
+                                } else {
+                                    throw new Error(captureData.error || 'Verification failed');
+                                }
+                            },
+                            onError: (err) => {
+                                console.error("PayPal Error:", err);
+                                Swal.fire('Error', 'PayPal checkout failed.', 'error');
+                            }
+                        }).render('#paypal-button-container').catch(err => {
+                            console.error("Failed to render buttons:", err);
+                        });
+                    }
+                });
+
+            } catch (err: any) {
+                console.error(err);
+                Swal.fire('Error', err.message || 'Failed to initialize PayPal', 'error');
+            }
+        }
     };
 
     return (
