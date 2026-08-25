@@ -54,42 +54,16 @@ export default function FinancePage() {
     const [selectedMonthKey, setSelectedMonthKey] = useState(currentMonthStr);
 
     // ===== 3. CATEGORIES STATE =====
-    const [categories, setCategories] = useState<CategoryOption[]>([
-        { slug: 'gaji', name: 'Gaji Utama', icon: '💰', type: 'income' },
-        { slug: 'freelance', name: 'Freelance & Project', icon: '💻', type: 'income' },
-        { slug: 'investasi', name: 'Hasil Investasi', icon: '📈', type: 'income' },
-        { slug: 'makanan', name: 'Makanan & Minuman', icon: '🍳', type: 'expense' },
-        { slug: 'transportasi', name: 'Transportasi & Bensin', icon: '🚗', type: 'expense' },
-        { slug: 'tagihan', name: 'Tagihan & SaaS', icon: '⚡', type: 'expense' },
-        { slug: 'hiburan', name: 'Hiburan & Rekreasi', icon: '🎬', type: 'expense' },
-        { slug: 'belanja', name: 'Belanja Kebutuhan', icon: '🛍️', type: 'expense' }
-    ]);
+    const [categories, setCategories] = useState<CategoryOption[]>([]);
 
     // ===== 4. TRANSACTIONS STATE =====
-    const [transactions, setTransactions] = useState<TransactionItem[]>([
-        { id: 1, title: 'Gaji Utama Project Lead', amount: 15000000, type: 'income', category: 'gaji', date: `${currentMonthStr}-01`, notes: 'Gaji bulanan' },
-        { id: 2, title: 'Supermarket & Groceries', amount: 1250000, type: 'expense', category: 'makanan', date: `${currentMonthStr}-03`, notes: 'Belanja mingguan' },
-        { id: 3, title: 'Langganan Cloud Server', amount: 650000, type: 'expense', category: 'tagihan', date: `${currentMonthStr}-05` },
-        { id: 4, title: 'Bonus Client Freelance', amount: 4500000, type: 'income', category: 'freelance', date: `${currentMonthStr}-10` },
-        { id: 5, title: 'Servis Mobil & Bensin', amount: 850000, type: 'expense', category: 'transportasi', date: `${currentMonthStr}-12` },
-        { id: 6, title: 'Nonton Bioskop', amount: 150000, type: 'expense', category: 'hiburan', date: `${currentMonthStr}-14` },
-        { id: 7, title: 'Dividen Saham Q3', amount: 2200000, type: 'income', category: 'investasi', date: `${currentMonthStr}-15` }
-    ]);
+    const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
     // ===== 5. BUDGETS STATE =====
-    const [budgets, setBudgets] = useState([
-        { id: 1, category: 'makanan', limit: 3000000, icon: '🍳', spent: 0 },
-        { id: 2, category: 'transportasi', limit: 1500000, icon: '🚗', spent: 0 },
-        { id: 3, category: 'tagihan', limit: 2000000, icon: '⚡', spent: 0 },
-        { id: 4, category: 'hiburan', limit: 1000000, icon: '🎬', spent: 0 }
-    ]);
+    const [budgets, setBudgets] = useState<any[]>([]);
 
     // ===== 6. SAVINGS VAULT STATE =====
-    const [savingsVault, setSavingsVault] = useState<SavingsVaultItem[]>([
-        { id: 1, name: 'Dana Darurat 6 Bulan', target: 50000000, current: 32000000, icon: '🛡️', color: '#10b981' },
-        { id: 2, name: 'DP Rumah Impian', target: 150000000, current: 65000000, icon: '🏡', color: '#6366f1' },
-        { id: 3, name: 'Investasi Saham & ETF', target: 30000000, current: 18500000, icon: '📈', color: '#8b5cf6' }
-    ]);
+    const [savingsVault, setSavingsVault] = useState<SavingsVaultItem[]>([]);
 
     // ===== 7. INCOME TARGET =====
     const [incomeTarget, setIncomeTarget] = useState(21472000);
@@ -109,25 +83,50 @@ export default function FinancePage() {
     const [vaultTxType, setVaultTxType] = useState<'deposit' | 'withdraw'>('deposit');
     const [filterDate, setFilterDate] = useState('');
 
-    // Persistence
     const [isLoaded, setIsLoaded] = useState(false);
-    useEffect(() => {
-        const savedTrx = localStorage.getItem('oneformind_finance_transactions');
-        if (savedTrx) { try { const p = JSON.parse(savedTrx); if (Array.isArray(p) && p.length > 0) setTransactions(p); } catch (e) {} }
-        const savedCats = localStorage.getItem('oneformind_finance_categories');
-        if (savedCats) { try { const p = JSON.parse(savedCats); if (Array.isArray(p) && p.length > 0) setCategories(p); } catch (e) {} }
-        const savedVault = localStorage.getItem('oneformind_finance_savings');
-        if (savedVault) { try { const p = JSON.parse(savedVault); if (Array.isArray(p) && p.length > 0) setSavingsVault(p); } catch (e) {} }
-        setIsLoaded(true);
-    }, []);
+
+    const fetchData = async () => {
+        try {
+            const [txRes, catRes, budRes, savRes] = await Promise.all([
+                fetch(`/api/finance/transactions?month=${selectedMonthKey}`),
+                fetch(`/api/finance/categories`),
+                fetch(`/api/finance/budgets?month=${selectedMonthKey}`),
+                fetch(`/api/finance/savings`)
+            ]);
+
+            if (txRes.ok) {
+                const data = await txRes.json();
+                setTransactions(data.map((t: any) => ({
+                    ...t,
+                    amount: Number(t.amount),
+                    date: t.date.split('T')[0]
+                })));
+            }
+            if (catRes.ok) setCategories(await catRes.json());
+            if (budRes.ok) {
+                const data = await budRes.json();
+                setBudgets(data.map((b: any) => ({ ...b, limit: Number(b.limitAmount) })));
+            }
+            if (savRes.ok) {
+                const data = await savRes.json();
+                setSavingsVault(data.map((s: any) => ({
+                    ...s,
+                    name: s.title,
+                    target: Number(s.targetAmount),
+                    current: Number(s.currentAmount)
+                })));
+            }
+        } catch (e) {
+            console.error('Failed to fetch finance data:', e);
+        } finally {
+            setIsLoaded(true);
+        }
+    };
 
     useEffect(() => {
-        if (isLoaded) {
-            localStorage.setItem('oneformind_finance_transactions', JSON.stringify(transactions));
-            localStorage.setItem('oneformind_finance_categories', JSON.stringify(categories));
-            localStorage.setItem('oneformind_finance_savings', JSON.stringify(savingsVault));
-        }
-    }, [transactions, categories, savingsVault, isLoaded]);
+        setIsLoaded(false);
+        fetchData();
+    }, [selectedMonthKey]);
 
     // COMPUTED
     const currentMonthTransactions = transactions.filter(t => t.date.startsWith(selectedMonthKey));
@@ -158,45 +157,126 @@ export default function FinancePage() {
         setShowArchiveModal(true);
     };
 
-    const handleSaveSingleTrx = (data: any) => {
-        if (data.id) {
-            setTransactions(prev => prev.map(t => t.id === data.id ? data : t));
-        } else {
-            setTransactions(prev => [{ ...data, id: Date.now() }, ...prev]);
-        }
-    };
-
-    const handleSaveBatchTrx = (date: string, rows: any[]) => {
-        const newTrxs: TransactionItem[] = rows.map((r, i) => ({
-            id: Date.now() + i, date, type: r.type, amount: Number(r.amount), title: r.title, category: r.category || 'other'
-        }));
-        setTransactions(prev => [...newTrxs, ...prev]);
-    };
-
-    const handleDeleteTrx = (id: number) => {
-        setTransactions(prev => prev.filter(t => t.id !== id));
-    };
-
-    const handleSaveVault = (data: SavingVault) => {
-        if (data.id) {
-            setSavingsVault(prev => prev.map(s => s.id === data.id ? { ...s, name: data.title, target: Number(data.target_amount), icon: data.icon } : s));
-        } else {
-            setSavingsVault(prev => [...prev, { id: Date.now(), name: data.title, target: Number(data.target_amount), current: 0, icon: data.icon, color: '#6366f1' }]);
-        }
-    };
-
-    const handleVaultMutation = (amount: number, type: 'deposit' | 'withdraw') => {
-        if (!activeVault) return;
-        setSavingsVault(prev => prev.map(s => {
-            if (s.id === activeVault.id) {
-                return { ...s, current: type === 'deposit' ? s.current + amount : Math.max(0, s.current - amount) };
+    const handleSaveSingleTrx = async (data: any) => {
+        try {
+            if (data.id) {
+                const res = await fetch(`/api/finance/transactions/${data.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    const updated = await res.json();
+                    setTransactions(prev => prev.map(t => t.id === data.id ? { ...updated, amount: Number(updated.amount), date: updated.date.split('T')[0] } : t));
+                }
+            } else {
+                const res = await fetch('/api/finance/transactions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    const created = await res.json();
+                    setTransactions(prev => [{ ...created, amount: Number(created.amount), date: created.date.split('T')[0] }, ...prev]);
+                }
             }
-            return s;
-        }));
+        } catch (error) {
+            console.error('Failed to save transaction:', error);
+        }
     };
 
-    const handleAddAssetTransaction = (data: any) => {
-        setTransactions(prev => [{ ...data, id: Date.now() }, ...prev]);
+    const handleSaveBatchTrx = async (date: string, rows: any[]) => {
+        try {
+            const newTrxs: TransactionItem[] = [];
+            for (const r of rows) {
+                const res = await fetch('/api/finance/transactions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date, type: r.type, amount: Number(r.amount), title: r.title, category: r.category || 'other'
+                    })
+                });
+                if (res.ok) {
+                    const created = await res.json();
+                    newTrxs.push({ ...created, amount: Number(created.amount), date: created.date.split('T')[0] });
+                }
+            }
+            setTransactions(prev => [...newTrxs, ...prev]);
+        } catch (error) {
+            console.error('Failed to batch save transactions:', error);
+        }
+    };
+
+    const handleDeleteTrx = async (id: number) => {
+        try {
+            const res = await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setTransactions(prev => prev.filter(t => t.id !== id));
+            }
+        } catch (error) {
+            console.error('Failed to delete transaction:', error);
+        }
+    };
+
+    const handleSaveVault = async (data: SavingVault) => {
+        try {
+            if (data.id) {
+                const res = await fetch('/api/finance/savings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: data.id, title: data.title, targetAmount: Number(data.target_amount), icon: data.icon })
+                });
+                if (res.ok) {
+                    const updated = await res.json();
+                    setSavingsVault(prev => prev.map(s => s.id === data.id ? { ...s, name: updated.title, target: Number(updated.targetAmount), icon: updated.icon } : s));
+                }
+            } else {
+                const res = await fetch('/api/finance/savings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: data.title, targetAmount: Number(data.target_amount), icon: data.icon, color: '#6366f1' })
+                });
+                if (res.ok) {
+                    const created = await res.json();
+                    setSavingsVault(prev => [...prev, { id: created.id, name: created.title, target: Number(created.targetAmount), current: 0, icon: created.icon, color: created.color }]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to save vault:', error);
+        }
+    };
+
+    const handleVaultMutation = async (amount: number, type: 'deposit' | 'withdraw') => {
+        if (!activeVault) return;
+        try {
+            const newAmount = type === 'deposit' ? activeVault.current + amount : Math.max(0, activeVault.current - amount);
+            const res = await fetch('/api/finance/savings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: activeVault.id, currentAmount: newAmount })
+            });
+            if (res.ok) {
+                setSavingsVault(prev => prev.map(s => s.id === activeVault.id ? { ...s, current: newAmount } : s));
+            }
+        } catch (error) {
+            console.error('Failed to mutate vault:', error);
+        }
+    };
+
+    const handleAddAssetTransaction = async (data: any) => {
+        try {
+            const res = await fetch('/api/finance/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                const created = await res.json();
+                setTransactions(prev => [{ ...created, amount: Number(created.amount), date: created.date.split('T')[0] }, ...prev]);
+            }
+        } catch (error) {
+            console.error('Failed to add asset transaction:', error);
+        }
     };
 
     return (

@@ -48,6 +48,11 @@ model User {
   accounts                Account[]
   sessions                Session[]
   habits                  Habit[]
+  financeBudgets          FinanceBudget[]
+  financeCategories       FinanceCategory[]
+  financeSavings          FinanceSaving[]
+  financeTransactions     FinanceTransaction[]
+  plannerTasks            PlannerTask[]
 
   @@map("users")
 }
@@ -125,4 +130,85 @@ model HabitLog {
 
   @@unique([habitId, date])
   @@map("habit_logs")
+}
+
+model FinanceBudget {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  category        String
+  limitAmount     Decimal    @map("limit_amount") @db.Decimal
+  month           String
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finance_budgets")
+}
+
+model FinanceCategory {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  name            String
+  slug            String
+  type            String
+  icon            String
+  color           String?
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finance_categories")
+}
+
+model FinanceSaving {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  title           String
+  targetAmount    Decimal    @map("target_amount") @db.Decimal
+  currentAmount   Decimal    @map("current_amount") @db.Decimal
+  icon            String?
+  color           String?
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finance_savings")
+}
+
+model FinanceTransaction {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  title           String
+  amount          Decimal    @db.Decimal
+  type            String
+  category        String
+  date            DateTime   @db.Date
+  notes           String?
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finance_transactions")
+}
+
+model PlannerTask {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  date            DateTime   @db.Date
+  startTime       DateTime?  @map("start_time") @db.Time
+  endTime         DateTime?  @map("end_time") @db.Time
+  title           String
+  notes           String?
+  type            Int        @db.SmallInt
+  isCompleted     Boolean    @map("is_completed")
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("planner_tasks")
 }

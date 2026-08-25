@@ -104,36 +104,34 @@ export default function PlannerPage() {
         const savedStart = localStorage.getItem('planner_start_time');
         if (savedStart) setStartHour(parseInt(savedStart));
         
-        const savedTasks = localStorage.getItem('oneformind_planner_tasks');
-        if (savedTasks) {
+        const fetchTasks = async () => {
             try {
-                const parsed = JSON.parse(savedTasks);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    const hasToday = parsed.some(t => t.date === todayStr);
-                    if (!hasToday) {
-                        const merged = [...parsed, ...initialTasks];
-                        setTasks(merged);
-                        localStorage.setItem('oneformind_planner_tasks', JSON.stringify(merged));
-                    } else {
-                        setTasks(parsed);
-                    }
-                } else {
-                    setTasks(initialTasks);
-                    localStorage.setItem('oneformind_planner_tasks', JSON.stringify(initialTasks));
+                const res = await fetch(`/api/planner/tasks?date=${selectedDate}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setTasks(data.map((t: any) => ({
+                        id: t.id,
+                        date: t.date.split('T')[0],
+                        title: t.title,
+                        start_time: t.startTime ? t.startTime.substring(11, 16) : '',
+                        end_time: t.endTime ? t.endTime.substring(11, 16) : '',
+                        type: t.type,
+                        notes: t.notes || '',
+                        completed: t.isCompleted
+                    })));
                 }
-            } catch (e) {
-                setTasks(initialTasks);
+            } catch (error) {
+                console.error('Failed to fetch tasks:', error);
+            } finally {
+                setIsLoaded(true);
             }
-        } else {
-            setTasks(initialTasks);
-            localStorage.setItem('oneformind_planner_tasks', JSON.stringify(initialTasks));
-        }
-        
-        setIsLoaded(true);
+        };
+
+        fetchTasks();
 
         const clockInterval = setInterval(() => setNow(new Date()), 60000);
         return () => clearInterval(clockInterval);
-    }, []);
+    }, [selectedDate]);
 
     // Effect for loading specific date data when selectedDate changes
     useEffect(() => {
@@ -228,10 +226,9 @@ export default function PlannerPage() {
         }
     }, [taskStartTime, taskEndTime, editingTaskId, tasks, showTaskModal, selectedDate]);
 
-    const updateTasksAndSave = (updater: TaskItem[] | ((prev: TaskItem[]) => TaskItem[])) => {
+    const updateTasksState = (updater: TaskItem[] | ((prev: TaskItem[]) => TaskItem[])) => {
         setTasks(prev => {
             const newTasks = typeof updater === 'function' ? updater(prev) : updater;
-            localStorage.setItem('oneformind_planner_tasks', JSON.stringify(newTasks));
             window.dispatchEvent(new Event('planner_updated'));
             return newTasks;
         });
@@ -275,8 +272,23 @@ export default function PlannerPage() {
         return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     };
 
-    const toggleTask = (id: number) => {
-        updateTasksAndSave(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+    const toggleTask = async (id: number) => {
+        const task = tasks.find(t => t.id === id);
+        if (!task) return;
+        
+        updateTasksState(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+        
+        try {
+            await fetch(`/api/planner/tasks/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isCompleted: !task.completed })
+            });
+        } catch (error) {
+            console.error('Failed to toggle task:', error);
+            // Revert on error
+            updateTasksState(prev => prev.map(t => t.id === id ? { ...t, completed: task.completed } : t));
+        }
     };
 
     const openNewTaskModal = (defaultTime?: string) => {
@@ -328,7 +340,7 @@ export default function PlannerPage() {
         setShowTaskModal(true);
     };
 
-    const submitSingleTask = (e: React.FormEvent) => {
+    const submitSingleTask = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!taskTitle.trim()) return;
         
@@ -338,15 +350,38 @@ export default function PlannerPage() {
             return;
         }
 
-        if (editingTaskId) {
-            updateTasksAndSave(prev => prev.map(t => t.id === editingTaskId ? { ...t, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes } : t));
-        } else {
-            updateTasksAndSave(prev => [...prev, { id: Date.now(), date: selectedDate, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes, completed: false }]);
+        try {
+            if (editingTaskId) {
+                const res = await fetch(`/api/planner/tasks/${editingTaskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
+                    })
+                });
+                if (res.ok) {
+                    updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { ...t, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes } : t));
+                }
+            } else {
+                const res = await fetch('/api/planner/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: selectedDate, title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    updateTasksState(prev => [...prev, { id: data.id, date: selectedDate, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes, completed: false }]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to save task:', error);
         }
         setShowTaskModal(false);
     };
 
-    const handleMoveTask = (taskId: number, newStartTime: string) => {
+    const handleMoveTask = async (taskId: number, newStartTime: string) => {
         const task = tasks.find(t => t.id === taskId);
         if (!task) return;
         
@@ -367,11 +402,30 @@ export default function PlannerPage() {
             return;
         }
 
-        updateTasksAndSave(prev => prev.map(t => t.id === taskId ? { ...t, start_time: newStartTime, end_time: newEndTime } : t));
+        updateTasksState(prev => prev.map(t => t.id === taskId ? { ...t, start_time: newStartTime, end_time: newEndTime } : t));
+
+        try {
+            await fetch(`/api/planner/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ startTime: newStartTime, endTime: newEndTime })
+            });
+        } catch (error) {
+            console.error('Failed to move task:', error);
+            // Revert on error
+            updateTasksState(prev => prev.map(t => t.id === taskId ? { ...t, start_time: task.start_time, end_time: task.end_time } : t));
+        }
     };
 
-    const deleteTask = () => {
-        if (editingTaskId) updateTasksAndSave(prev => prev.filter(t => t.id !== editingTaskId));
+    const deleteTask = async () => {
+        if (editingTaskId) {
+            updateTasksState(prev => prev.filter(t => t.id !== editingTaskId));
+            try {
+                await fetch(`/api/planner/tasks/${editingTaskId}`, { method: 'DELETE' });
+            } catch (error) {
+                console.error('Failed to delete task:', error);
+            }
+        }
         setShowTaskModal(false);
     };
 
