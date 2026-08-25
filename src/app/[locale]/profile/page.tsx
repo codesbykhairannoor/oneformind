@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import ModalPortal from '@/components/ModalPortal';
 import {
     User,
     Mail,
@@ -311,7 +312,7 @@ export default function ProfilePage() {
 
                 {/* DELETE ACCOUNT CONFIRMATION MODAL */}
                 {showDeleteModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowDeleteModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 w-full max-w-md relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 text-center space-y-4">
                             <div className="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-2xl">⚠️</div>
@@ -344,7 +345,7 @@ export default function ProfilePage() {
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div></ModalPortal>
                 )}
 
             </div>

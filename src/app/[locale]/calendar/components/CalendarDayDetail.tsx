@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { X, Edit3, Trash2, Clock, ArrowRight } from 'lucide-react';
+import { Link } from '@/i18n/routing';
+import { X, Calendar as CalendarIcon, Clock, Plus, CheckCircle2, DollarSign, BookOpen, ArrowRight, Zap, Target, Award, ShieldAlert } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 import { CalendarDayItem, CalendarEvent } from './CalendarGrid';
 
 interface CalendarDayDetailProps {
@@ -56,7 +57,7 @@ export default function CalendarDayDetail({
 
     return (
         // 1:1 from CalendarDayDetail.vue line 57-238
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
             <div className="absolute inset-0 bg-slate-900/40 transition-opacity" onClick={onClose}></div>
 
             <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl dark:shadow-none overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/50 dark:ring-slate-800 transition-colors duration-500">
@@ -291,6 +292,6 @@ export default function CalendarDayDetail({
                     </div>
                 </div>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

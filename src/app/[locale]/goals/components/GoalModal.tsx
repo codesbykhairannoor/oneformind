@@ -154,7 +154,7 @@ export default function GoalModal({
 
     return (
         // 1:1 from GoalModal.vue line 153-375
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 transition-opacity" onClick={onClose}></div>
 
             <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh] transition-colors duration-500">
@@ -465,6 +465,6 @@ export default function GoalModal({
                 </div>
 
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

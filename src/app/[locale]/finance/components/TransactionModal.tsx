@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import FinanceDatePicker from './FinanceDatePicker';
+import ModalPortal from '@/components/ModalPortal';
 
 export interface TransactionModalItem {
     id?: number | string;
@@ -121,7 +122,7 @@ export default function TransactionModal({
 
     return (
         // 1:1 from TransactionModal.vue line 64-176
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
 
             <div className="relative z-10 w-full max-w-md bg-slate-50 dark:bg-slate-950 flex flex-col max-h-[85dvh] md:max-h-[85vh] transition-all duration-500 border border-slate-200 dark:border-slate-800 shadow-2xl dark:shadow-none rounded-[2.5rem] animate-in fade-in zoom-in-95 duration-200">
@@ -245,7 +246,7 @@ export default function TransactionModal({
                                     <span className="text-slate-400 dark:text-slate-600">📅</span>
                                 </button>
                                 {showDatePicker && (
-                                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                                    <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                                         <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowDatePicker(false)}></div>
                                         <FinanceDatePicker 
                                             show={true} 
@@ -257,7 +258,7 @@ export default function TransactionModal({
                                             currencyLocale={currencyLocale}
                                             className="relative z-10"
                                         />
-                                    </div>
+                                    </div></ModalPortal>
                                 )}
                             </div>
                         </div>
@@ -283,6 +284,6 @@ export default function TransactionModal({
                 </div>
 
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

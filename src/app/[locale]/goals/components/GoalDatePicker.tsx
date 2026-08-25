@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 
 interface GoalDatePickerProps {
     show: boolean;
@@ -134,5 +135,5 @@ export default function GoalDatePicker({ show, modelValue, teleport = false, onU
         </div>
     );
 
-    return pickerContent;
+    return teleport ? <ModalPortal>{pickerContent}</ModalPortal> : pickerContent;
 }

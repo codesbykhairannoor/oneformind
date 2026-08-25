@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, Check } from 'lucide-react';
+import { X, Calendar, Clock, AlignLeft, Tag, Palette } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 import GoalDatePicker from '../../goals/components/GoalDatePicker';
 import { CalendarEvent } from './CalendarGrid';
 
@@ -105,7 +106,7 @@ export default function CalendarEventModal({
 
     return (
         // 1:1 from CalendarEventModal.vue line 35-146
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6">
+        <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6">
             <div className="absolute inset-0 bg-slate-900/40 transition-opacity" onClick={onClose}></div>
 
             <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl dark:shadow-none w-full max-w-lg relative z-10 overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/50 dark:ring-slate-800 transition-colors duration-500">
@@ -251,6 +252,6 @@ export default function CalendarEventModal({
                     </button>
                 </div>
             </form>
-        </div>
+        </div></ModalPortal>
     );
 }

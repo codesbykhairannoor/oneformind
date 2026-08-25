@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import FinanceDatePicker from './FinanceDatePicker';
-import { Trash2, Plus } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
+import { Trash2, Plus, X, Calendar, Sparkles } from 'lucide-react';
 
 interface BatchRow {
     type: 'income' | 'expense';
@@ -106,7 +107,7 @@ export default function FinanceBatchModal({
 
     return (
         // 1:1 from FinanceBatchModal.vue line 77-292
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
 
             <div className="relative z-10 w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] flex flex-col max-h-[90vh] overflow-hidden transition-all duration-300 border border-slate-100 dark:border-slate-800 shadow-2xl dark:shadow-none animate-in fade-in zoom-in-95 duration-200">
@@ -131,7 +132,7 @@ export default function FinanceBatchModal({
                                     <span>📅</span>
                                 </button>
                                 {showDatePicker && (
-                                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                                    <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                                         <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowDatePicker(false)}></div>
                                         <FinanceDatePicker 
                                             show={true} 
@@ -140,7 +141,7 @@ export default function FinanceBatchModal({
                                             onClose={() => setShowDatePicker(false)}
                                             className="relative z-10"
                                         />
-                                    </div>
+                                    </div></ModalPortal>
                                 )}
                             </div>
                         </div>
@@ -305,6 +306,6 @@ export default function FinanceBatchModal({
                 </form>
 
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

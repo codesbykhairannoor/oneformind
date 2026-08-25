@@ -4,6 +4,7 @@ import React from 'react';
 import { X, CheckCircle2, Droplets, Inbox, Calendar, ArrowRight, Flame, Coffee, Circle, UtensilsCrossed, StickyNote } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
+import ModalPortal from '@/components/ModalPortal';
 
 interface TaskItem {
     id: number;
@@ -61,7 +62,7 @@ export default function DayPreviewModal({ show, day, onClose }: Props) {
     const meals = day?.meals || { breakfast: false, lunch: false, dinner: false };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
             
             <div 
                 className="absolute inset-0 bg-slate-900/80 dark:bg-slate-950/90 transition-all duration-300"
@@ -240,6 +241,6 @@ export default function DayPreviewModal({ show, day, onClose }: Props) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

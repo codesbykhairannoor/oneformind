@@ -7,6 +7,7 @@ import {
     Brain, Target, Loader2,
     BookOpen, FileText, Upload
 } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 
 interface EditMaterialModalProps {
     show: boolean;
@@ -89,7 +90,7 @@ export default function EditMaterialModal({
 
     return (
         // 1:1 from EditMaterialModal.vue line 144-371
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/90 backdrop-blur-md" onClick={onClose}></div>
 
@@ -249,6 +250,6 @@ export default function EditMaterialModal({
                     </button>
                 </div>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

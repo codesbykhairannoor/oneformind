@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { X, Upload, Link2 } from 'lucide-react';
 import { CourseRecord } from './CourseCard';
 import { ArchiveItem } from './ClassroomView';
+import ModalPortal from '@/components/ModalPortal';
 
 interface ArchiveModalProps {
     isOpen: boolean;
@@ -72,7 +73,7 @@ export default function ArchiveModal({
 
     return (
         // 1:1 from ArchiveModal.vue line 81-137
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 border border-slate-200 dark:border-slate-800 transform animate-in zoom-in-95 duration-300 relative">
                 <button
                     type="button"
@@ -164,6 +165,6 @@ export default function ArchiveModal({
                     </button>
                 </form>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 
 interface SemesterModalProps {
     isOpen: boolean;
@@ -36,7 +37,7 @@ export default function SemesterModal({
 
     return (
         // 1:1 from SemesterModal.vue line 30-52
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 border border-slate-200 dark:border-slate-800 transform animate-in zoom-in-95 duration-300 relative">
                 <button
                     type="button"
@@ -78,6 +79,6 @@ export default function SemesterModal({
                     </button>
                 </form>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

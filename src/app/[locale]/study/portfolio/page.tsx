@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import ModalPortal from '@/components/ModalPortal';
 import StudyCompetencyRadar from '../components/StudyCompetencyRadar';
 import StudyArchetypeMatches from '../components/StudyArchetypeMatches';
 import StudyMaterialList, { StudyMaterial } from '../components/StudyMaterialList';
@@ -270,7 +271,7 @@ export default function StudyPortfolioPage() {
 
                 {/* Premium Upload Modal */}
                 {isUploadModalOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-10">
+                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-10">
                         <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsUploadModalOpen(false)}></div>
                         <div className="relative w-full max-w-6xl max-h-full overflow-hidden bg-white dark:bg-slate-950 rounded-[4rem] shadow-2xl border border-white/10 flex flex-col animate-in zoom-in-95 duration-200">
                             <div className="sticky top-0 z-10 bg-white/95 dark:bg-slate-950/95 px-10 py-8 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between">
@@ -305,7 +306,7 @@ export default function StudyPortfolioPage() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div></ModalPortal>
                 )}
             </div>
         </AuthenticatedLayout>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import ModalPortal from '@/components/ModalPortal';
 import { X } from 'lucide-react';
 
 interface CategoryItem {
@@ -69,7 +70,7 @@ export default function CategoryModal({
 
     return (
         // 1:1 from CategoryModal.vue line 22-65
-        <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
             <div className="fixed inset-0 bg-slate-900/30 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}></div>
 
             <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2rem] shadow-2xl dark:shadow-none z-10 p-6 animate-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800 transition-all duration-500 relative">
@@ -181,6 +182,6 @@ export default function CategoryModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

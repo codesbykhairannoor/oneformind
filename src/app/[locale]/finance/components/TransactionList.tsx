@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { ChevronRight } from 'lucide-react';
 import FinanceDatePicker from './FinanceDatePicker';
+import ModalPortal from '@/components/ModalPortal';
 
 export interface TransactionItem {
     id: number;
@@ -150,7 +151,7 @@ export default function TransactionList({
 
                     {/* FinanceDatePicker popup — 1:1 from TransactionList.vue line 65-73 */}
                     {showFilterPicker && (
-                        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                        <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                             <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowFilterPicker(false)}></div>
                             <FinanceDatePicker
                                 show={true}
@@ -165,7 +166,7 @@ export default function TransactionList({
                                 currencyLocale={currencyLocale}
                                 className="relative z-10"
                             />
-                        </div>
+                        </div></ModalPortal>
                     )}
                 </div>
             </div>

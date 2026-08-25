@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import ModalPortal from '@/components/ModalPortal';
 
 interface TransactionItem {
     id: number;
@@ -73,7 +74,7 @@ export default function ArchiveModal({
     });
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
 
@@ -157,6 +158,6 @@ export default function ArchiveModal({
                 </div>
 
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

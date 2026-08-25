@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { Sparkles, X, Check, Loader2, Award } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
+import { Sparkles, X, FileText, ArrowRight, Wand2, RefreshCw, Loader2, Award } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 import { JobRowItem } from './JobTable';
 
 interface ResumeAiModalProps {
@@ -66,7 +68,7 @@ export default function ResumeAiModal({
 
     return (
         // 1:1 from ResumeAiModal.vue line 66-139
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
 
             <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
@@ -163,6 +165,6 @@ export default function ResumeAiModal({
                 </div>
 
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

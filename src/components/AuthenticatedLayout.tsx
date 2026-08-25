@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
+import ModalPortal from '@/components/ModalPortal';
 import {
     LayoutDashboard,
     Zap,
@@ -725,7 +726,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
 
             {/* 1:1 LOGOUT MODAL (Line 241-305) */}
             {showLogoutModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+                <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
                     <div className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60" onClick={() => setShowLogoutModal(false)}></div>
                     <div className="relative bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden">
                         <div className="p-8 text-center">
@@ -756,7 +757,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                             </button>
                         </div>
                     </div>
-                </div>
+                </div></ModalPortal>
             )}
 
             {/* 1:1 FLOATING AI COACH BUTTON (Line 307-343) */}

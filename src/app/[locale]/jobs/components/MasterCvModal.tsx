@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Briefcase, X, Plus, Check, Loader2, Sparkles } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 
 interface MasterCvModalProps {
     show: boolean;
@@ -68,7 +69,7 @@ export default function MasterCvModal({
 
     return (
         // 1:1 from MasterCvModal.vue line 97-195
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
             
             <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl p-8 border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
@@ -192,6 +193,6 @@ export default function MasterCvModal({
                     </div>
                 </div>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }

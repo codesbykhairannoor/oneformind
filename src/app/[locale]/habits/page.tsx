@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import ModalPortal from '@/components/ModalPortal';
 import { Line } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -971,7 +972,7 @@ export default function HabitsPage() {
 
                 {/* SINGLE HABIT MODAL (Matching HabitModals.vue 1:1) */}
                 {showCreateModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowCreateModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-8 w-full max-w-lg relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800">
                             
@@ -1081,12 +1082,12 @@ export default function HabitsPage() {
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div></ModalPortal>
                 )}
 
                 {/* BATCH HABIT MODAL (Matching HabitBatchModal.vue 1:1) */}
                 {showBatchModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowBatchModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-0 w-full max-w-2xl relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[85vh] flex flex-col overflow-hidden">
                             
@@ -1274,12 +1275,12 @@ export default function HabitsPage() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div></ModalPortal>
                 )}
 
                 {/* COPY HABIT MODAL (Matching HabitModals.vue 1:1) */}
                 {showCopyModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowCopyModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 w-full max-w-sm relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 text-center">
                             <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm border border-indigo-100">📂</div>
@@ -1292,12 +1293,12 @@ export default function HabitsPage() {
                                 <button onClick={() => setShowCopyModal(false)} className="flex-1 py-3.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition">Salin Sekarang</button>
                             </div>
                         </div>
-                    </div>
+                    </div></ModalPortal>
                 )}
 
                 {/* DELETE CONFIRMATION MODAL (Matching HabitModals.vue 1:1) */}
                 {showDeleteModal && habitToDelete && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowDeleteModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 w-full max-w-sm relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 text-center">
                             <div className="w-16 h-16 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm border border-rose-100">🗑️</div>
@@ -1310,7 +1311,7 @@ export default function HabitsPage() {
                                 <button onClick={executeDelete} className="flex-1 py-3 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg shadow-rose-200 dark:shadow-none transition">Hapus Permanen</button>
                             </div>
                         </div>
-                    </div>
+                    </div></ModalPortal>
                 )}
 
             </div>

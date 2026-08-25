@@ -8,6 +8,7 @@ import {
     FileSearch, Link2, Loader2
 } from 'lucide-react';
 import EditMaterialModal from './EditMaterialModal';
+import ModalPortal from '@/components/ModalPortal';
 
 export interface StudyMaterial {
     id: number | string;
@@ -305,7 +306,7 @@ export default function StudyMaterialList({
             />
 
             {showDeleteModal && (
-                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+                <ModalPortal><div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)}></div>
                     <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl border border-slate-200 dark:border-slate-800 text-center animate-in zoom-in-95 duration-200">
                         <div className="w-20 h-20 rounded-3xl bg-red-50 dark:bg-red-950/50 flex items-center justify-center mx-auto mb-6 text-red-500 shadow-inner">
@@ -334,7 +335,7 @@ export default function StudyMaterialList({
                             </button>
                         </div>
                     </div>
-                </div>
+                </div></ModalPortal>
             )}
         </div>
     );

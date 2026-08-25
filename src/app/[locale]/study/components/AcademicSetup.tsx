@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { GraduationCap, ChevronRight, X } from 'lucide-react';
+import { Sparkles, BookOpen, GraduationCap, CheckCircle2, ChevronRight, X } from 'lucide-react';
+import { Link } from '@/i18n/routing';
+import ModalPortal from '@/components/ModalPortal';
 
 interface AcademicSetupProps {
     user: Record<string, any>;
@@ -89,7 +90,7 @@ export default function AcademicSetup({
 
             {/* Setup Wizard Modal */}
             {showSetupModal && (
-                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+                <ModalPortal><div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
                     <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 transform animate-in zoom-in-95 duration-300 relative overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="bg-indigo-600 p-6 text-center relative shrink-0">
                             <button
@@ -187,7 +188,7 @@ export default function AcademicSetup({
                             </button>
                         </form>
                     </div>
-                </div>
+                </div></ModalPortal>
             )}
 
         </div>

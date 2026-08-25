@@ -5,6 +5,7 @@ import { BudgetItem } from './BudgetSidebar';
 import { SavingsVaultItem } from './SavingCard';
 import FinanceDatePicker from './FinanceDatePicker';
 import { useTranslations } from 'next-intl';
+import ModalPortal from '@/components/ModalPortal';
 
 interface ModalProps {
     isOpen: boolean;
@@ -16,7 +17,7 @@ interface ModalProps {
 const BaseModal = ({ isOpen, onClose, children, title }: ModalProps) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
             <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between p-6 md:p-8 border-b border-slate-100 dark:border-slate-800">
@@ -29,7 +30,7 @@ const BaseModal = ({ isOpen, onClose, children, title }: ModalProps) => {
                     {children}
                 </div>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 };
 
@@ -46,7 +47,7 @@ export const TransactionModal = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
             <div className="bg-slate-50 dark:bg-slate-950 flex flex-col w-full max-w-md max-h-[85dvh] md:max-h-[85vh] relative overflow-visible transition-all duration-500 border border-slate-200 dark:border-slate-800 shadow-2xl dark:shadow-none rounded-[2.5rem] animate-in fade-in zoom-in-95">
                 
@@ -126,7 +127,7 @@ export const TransactionModal = ({
                                 <span className="text-slate-400 dark:text-slate-600">📅</span>
                             </button>
                             {showDatePicker && (
-                                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                                <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                                     <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowDatePicker(false)}></div>
                                     <FinanceDatePicker 
                                         show={true}
@@ -135,7 +136,7 @@ export const TransactionModal = ({
                                         onClose={() => setShowDatePicker(false)}
                                         className="relative z-10"
                                     />
-                                </div>
+                                </div></ModalPortal>
                             )}
                         </div>
                     </div>
@@ -151,7 +152,7 @@ export const TransactionModal = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </div></ModalPortal>
     );
 };
 

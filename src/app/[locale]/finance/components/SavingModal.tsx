@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { X, CheckCircle2 } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 
 export interface SavingVault {
     id?: number | string;
@@ -87,7 +88,7 @@ export default function SavingModal({
 
     return (
         // 1:1 from SavingModal.vue line 80-151
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 transition-opacity" onClick={onClose}></div>
 
             <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[85dvh] md:max-h-[90vh]">
@@ -197,6 +198,6 @@ export default function SavingModal({
                 </form>
 
             </div>
-        </div>
+        </div></ModalPortal>
     );
 }
