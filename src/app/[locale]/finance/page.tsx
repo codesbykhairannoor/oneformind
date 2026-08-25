@@ -132,7 +132,7 @@ export default function FinancePage() {
     const currentMonthTransactions = transactions;
     const totalIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
     const totalExpense = currentMonthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
-    const balance = totalIncome - totalExpense;
+    const balance = incomeTarget + totalIncome - totalExpense;
 
     const expenseStats: Record<string, number> = {};
     const incomeStats: Record<string, number> = {};

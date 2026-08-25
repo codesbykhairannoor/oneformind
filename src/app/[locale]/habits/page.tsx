@@ -121,6 +121,14 @@ export default function HabitsPage() {
         setIsLoaded(false);
         fetchHabits();
         
+        // Fix for: BAGIAN HABIT TRACKER TANGGAL YG DIHIGLIGHT SALAH
+        // Reset selected mobile date to the 1st of the month if navigating to a different month
+        if (currentMonthKey !== initialMonthKey) {
+            setSelectedMobileDate(`${currentMonthKey}-01`);
+        } else {
+            setSelectedMobileDate(todayStr);
+        }
+
         const savedMood = localStorage.getItem('oneformind_mood');
         if (savedMood) {
             setSelectedMood(savedMood);
