@@ -11,6 +11,23 @@ export default function PlannerDashboard() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [selectedDayData, setSelectedDayData] = useState<any>(null);
+    const [realTasks, setRealTasks] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchMonthTasks = async () => {
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            try {
+                const res = await fetch(`/api/planner/tasks?month=${year}-${month}`);
+                if (res.ok) {
+                    setRealTasks(await res.json());
+                }
+            } catch (error) {
+                console.error("Failed to fetch planner tasks", error);
+            }
+        };
+        fetchMonthTasks();
+    }, [currentDate]);
 
     const monthNames = [
         "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
@@ -27,38 +44,51 @@ export default function PlannerDashboard() {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
     };
 
-    // Dummy Data Generation
-    const generateDummyData = (date: Date) => {
+    // Get Real Data for a Day
+    const getDayData = (date: Date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         const dateStr = `${year}-${month}-${day}`;
         const isToday = date.toDateString() === new Date().toDateString();
         
-        // Randomize data based on date for visual variety
-        const randomSeed = date.getDate();
+        const dayTasks = realTasks.filter(t => t.date.startsWith(dateStr));
+        const totalTasks = dayTasks.length;
+        const completedTasks = dayTasks.filter(t => t.isCompleted).length;
         
-        const totalTasks = (randomSeed % 3 === 0) ? 0 : 3 + (randomSeed % 4);
-        const completedTasks = isToday ? 2 : (totalTasks > 0 ? (randomSeed % totalTasks) + 1 : 0);
-        
-        const tasksItems = Array.from({ length: totalTasks }).map((_, i) => ({
-            id: i + 1,
-            title: `Tugas ${i + 1} (${dateStr})`,
-            is_completed: i < completedTasks,
-            type: (i % 3) + 1,
-            start_time: '09:00',
-            end_time: '10:00',
-            notes: i % 2 === 0 ? 'Catatan dummy...' : undefined
+        const tasksItems = dayTasks.map(t => ({
+            id: t.id,
+            title: t.title,
+            is_completed: t.isCompleted,
+            type: t.type,
+            start_time: t.startTime ? t.startTime.substring(11, 16) : '',
+            end_time: t.endTime ? t.endTime.substring(11, 16) : '',
+            notes: t.notes
         }));
 
-        const water = (randomSeed % 9); // 0 to 8
-        const inboxItems = randomSeed % 4 === 0 ? [] : ['Ide bisnis', 'Beli susu', 'Telepon klien'].slice(0, (randomSeed % 3) + 1);
-        
-        const meals = {
-            breakfast: randomSeed % 2 === 0 || isToday,
-            lunch: randomSeed % 3 !== 0 || isToday,
-            dinner: randomSeed % 4 !== 0,
-        };
+        // Try getting local storage data if exists
+        let water = 0;
+        let meals = null;
+        let inboxItems: any[] = [];
+        let notes = '';
+
+        if (typeof window !== 'undefined') {
+            const savedWater = localStorage.getItem(`oneformind_planner_water_${dateStr}`);
+            if (savedWater) water = parseInt(savedWater);
+
+            const savedMeals = localStorage.getItem(`oneformind_planner_meals_${dateStr}`);
+            if (savedMeals) {
+                try { meals = JSON.parse(savedMeals); } catch(e) {}
+            }
+
+            const savedInbox = localStorage.getItem(`oneformind_planner_inbox_${dateStr}`);
+            if (savedInbox) {
+                try { inboxItems = JSON.parse(savedInbox); } catch(e) {}
+            }
+
+            const savedNotes = localStorage.getItem(`oneformind_planner_notes_${dateStr}`);
+            if (savedNotes) notes = savedNotes;
+        }
 
         return {
             date,
@@ -67,9 +97,9 @@ export default function PlannerDashboard() {
             isToday,
             tasks: { completed: completedTasks, total: totalTasks, items: tasksItems },
             water,
-            inbox: { items: inboxItems.map(t => ({ title: t })) },
-            meals: randomSeed % 5 === 0 ? null : meals,
-            notes: randomSeed % 3 === 0 ? 'Hari ini sangat produktif, saya berhasil menyelesaikan beberapa tugas penting.' : ''
+            inbox: { items: inboxItems },
+            meals,
+            notes
         };
     };
 
@@ -88,24 +118,24 @@ export default function PlannerDashboard() {
         // Previous Month padding
         for (let i = 0; i < adjustedStartDay; i++) {
             const d = new Date(year, month, 1 - (adjustedStartDay - i));
-            days.push({ ...generateDummyData(d), isCurrentMonth: false });
+            days.push({ ...getDayData(d), isCurrentMonth: false });
         }
         
         // Current Month days
         for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
             const d = new Date(year, month, i);
-            days.push({ ...generateDummyData(d), isCurrentMonth: true });
+            days.push({ ...getDayData(d), isCurrentMonth: true });
         }
         
         // Next Month padding
         const remaining = 42 - days.length;
         for (let i = 1; i <= remaining; i++) {
             const d = new Date(year, month + 1, i);
-            days.push({ ...generateDummyData(d), isCurrentMonth: false });
+            days.push({ ...getDayData(d), isCurrentMonth: false });
         }
         
         return days;
-    }, [currentDate]);
+    }, [currentDate, realTasks]);
 
     const weekDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 

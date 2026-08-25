@@ -11,13 +11,28 @@ export async function GET(req: Request) {
   const userId = parseInt(session.user.id);
   const { searchParams } = new URL(req.url);
   const dateStr = searchParams.get('date');
+  const month = searchParams.get('month');
 
   try {
+    const whereClause: any = { userId };
+    if (dateStr) {
+      const startDate = new Date(`${dateStr}T00:00:00.000Z`);
+      const endDate = new Date(`${dateStr}T23:59:59.999Z`);
+      whereClause.date = {
+        gte: startDate,
+        lte: endDate,
+      };
+    } else if (month) {
+      const startDate = new Date(`${month}-01T00:00:00.000Z`);
+      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      whereClause.date = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
+
     const tasks = await prisma.plannerTask.findMany({
-      where: {
-        userId,
-        ...(dateStr ? { date: new Date(dateStr) } : {}),
-      },
+      where: whereClause,
       orderBy: [
         { startTime: 'asc' },
         { id: 'asc' }

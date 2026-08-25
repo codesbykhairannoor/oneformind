@@ -54,22 +54,11 @@ export default function PlannerPage() {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    const initialTasks: TaskItem[] = [
-        { id: 1, date: todayStr, title: 'Team Sync & Product Alignment', start_time: '13:00', end_time: '14:00', type: 1, notes: 'Bahas integrasi API', completed: false },
-        { id: 2, date: todayStr, title: 'Code Review & Pull Requests', start_time: '15:30', end_time: '17:00', type: 2, notes: '', completed: false },
-        { id: 3, date: todayStr, title: 'Olahraga Sore & Jogging', start_time: '17:30', end_time: '18:30', type: 3, notes: '', completed: false }
-    ];
-
-    const initialInbox: InboxTask[] = [
-        { id: 1, title: 'Beli kopi untuk tim', completed: false, type: 3 },
-        { id: 2, title: 'Cek email dari client', completed: false, type: 1 }
-    ];
-
-    const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
+    const [tasks, setTasks] = useState<TaskItem[]>([]);
     const [notes, setNotes] = useState('');
     const [meals, setMeals] = useState({ breakfast: '', lunch: '', dinner: '' });
     const [waterGlasses, setWaterGlasses] = useState(0);
-    const [taskInbox, setTaskInbox] = useState<InboxTask[]>(initialInbox);
+    const [taskInbox, setTaskInbox] = useState<InboxTask[]>([]);
     
     const [pomodoroTime, setPomodoroTime] = useState(25 * 60);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -154,11 +143,7 @@ export default function PlannerPage() {
         if (savedInbox) {
             try { setTaskInbox(JSON.parse(savedInbox)); } catch(e) { setTaskInbox([]); }
         } else {
-            if (selectedDate === todayStr) {
-                setTaskInbox(initialInbox);
-            } else {
-                setTaskInbox([]);
-            }
+            setTaskInbox([]);
         }
     }, [selectedDate, isLoaded]);
 
