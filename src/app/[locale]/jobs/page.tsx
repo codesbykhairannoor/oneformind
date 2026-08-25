@@ -52,12 +52,19 @@ export default function JobsPage() {
     const [masterCvText, setMasterCvText] = useState<string>('');
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const fn = localStorage.getItem('master_cv_name') || '';
-            const txt = localStorage.getItem('master_cv_text') || '';
-            setMasterCvFilename(fn);
-            setMasterCvText(txt);
-        }
+        const fetchUserResume = async () => {
+            try {
+                const res = await fetch('/api/user');
+                if (res.ok) {
+                    const data = await res.json();
+                    setMasterCvFilename(data.resumeFilename || '');
+                    setMasterCvText(data.resumeText || '');
+                }
+            } catch (err) {
+                console.error('Failed to fetch user resume:', err);
+            }
+        };
+        fetchUserResume();
     }, []);
 
     const updateJobsState = (updated: JobRowItem[]) => {
@@ -191,12 +198,17 @@ export default function JobsPage() {
 
     // Save master CV
     const handleSaveMasterCv = async (fileData: string, filename: string) => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('master_cv_preview', fileData);
-            localStorage.setItem('master_cv_name', filename);
-            localStorage.setItem('master_cv_text', `Master CV (${filename}) extracted data & intelligence preview.`);
-            setMasterCvFilename(filename);
-            setMasterCvText(`Master CV (${filename}) extracted data & intelligence preview.`);
+        const extractedText = `Master CV (${filename}) extracted data & intelligence preview.`;
+        setMasterCvFilename(filename);
+        setMasterCvText(extractedText);
+        try {
+            await fetch('/api/user', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resumeFilename: filename, resumeText: extractedText })
+            });
+        } catch (err) {
+            console.error('Failed to save resume to DB', err);
         }
     };
 

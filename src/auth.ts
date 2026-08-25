@@ -24,6 +24,37 @@ const customAdapter = {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: customAdapter,
+  callbacks: {
+    async session({ session, token }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+        (session.user as any).isPremium = token.isPremium ?? false;
+        (session.user as any).planType = token.planType ?? '';
+      }
+      return session;
+    },
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        token.sub = String(user.id);
+        token.isPremium = (user as any).isPremium ?? false;
+        token.planType = (user as any).planType ?? '';
+      }
+      // On session update or token refresh, re-fetch from DB
+      if (trigger === 'update' || (!token.planType && token.sub)) {
+        try {
+          const dbUser = await prisma.user.findUnique({ where: { id: parseInt(token.sub!) } });
+          if (dbUser) {
+            token.isPremium = dbUser.isPremium ?? false;
+            token.planType = dbUser.planType ?? '';
+          }
+        } catch {
+          // Silently continue if DB fetch fails
+        }
+      }
+      return token;
+    }
+  },
+
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,

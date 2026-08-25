@@ -77,14 +77,17 @@ export default function GoalsPage() {
 
     const avgProgress = goals.length === 0 ? 0 : Math.round(totalProgressSum / goals.length);
 
+    const urgentGoal = activeGoals.find(g => g.end_date);
+    const urgentDaysLeft = urgentGoal ? Math.max(0, Math.ceil((new Date(urgentGoal.end_date as string).getTime() - new Date().getTime()) / (1000 * 3600 * 24))) : 0;
+
     const stats = {
         avg_progress: avgProgress,
         top_goal_title: activeGoals[0]?.title || 'No Active Vision',
         top_goal_progress: activeGoals[0]?.milestones?.length 
             ? Math.round((activeGoals[0].milestones.filter(m => m.is_completed || m.completed).length / activeGoals[0].milestones.length) * 100)
             : 0,
-        urgent_goal_title: activeGoals[0]?.title,
-        urgent_goal_days_left: 37,
+        urgent_goal_title: urgentGoal?.title || activeGoals[0]?.title || 'No Active Vision',
+        urgent_goal_days_left: urgentDaysLeft,
         milestones_completed: completedMilestones,
         milestones_total: totalMilestones,
         active: activeGoals.length,

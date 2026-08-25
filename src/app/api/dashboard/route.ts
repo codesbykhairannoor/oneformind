@@ -9,17 +9,25 @@ export async function GET(req: Request) {
   }
 
   const userId = parseInt(session.user.id);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T00:00:00.000Z`;
+  const today = new Date(todayStr);
 
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
   try {
-    // Habits
-    const habits = await prisma.habit.findMany({ where: { userId } });
-    let totalHabits = habits.length;
-    let completedHabits = 0;
+    // Habits — fetch with today's logs to count completed
+    const habits = await prisma.habit.findMany({ 
+      where: { userId, isArchived: false },
+      include: {
+        logs: {
+          where: { date: { gte: today, lt: tomorrow } }
+        }
+      }
+    });
+    const totalHabits = habits.length;
+    const completedHabits = habits.filter(h => h.logs.some(l => l.status === 'completed')).length;
     
     // Planner
     const plannerTasks = await prisma.plannerTask.findMany({
@@ -83,7 +91,16 @@ export async function GET(req: Request) {
       },
       planner: {
         total: plannerTasks.length,
-        upcoming: plannerTasks.filter(t => !t.isCompleted).slice(0, 4)
+        completed: plannerTasks.filter(t => t.isCompleted).length,
+        upcoming: plannerTasks.filter(t => !t.isCompleted).slice(0, 4).map(t => ({
+          id: t.id,
+          title: t.title,
+          type: t.type,
+          start_time: t.startTime 
+            ? new Date(t.startTime).toISOString().substring(11, 16)
+            : null,
+          isCompleted: t.isCompleted,
+        }))
       },
       finance: {
         expense,

@@ -128,8 +128,8 @@ export default function FinancePage() {
         fetchData();
     }, [selectedMonthKey]);
 
-    // COMPUTED
-    const currentMonthTransactions = transactions.filter(t => t.date.startsWith(selectedMonthKey));
+    // COMPUTED — transactions state is already filtered by selectedMonthKey from API
+    const currentMonthTransactions = transactions;
     const totalIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
     const totalExpense = currentMonthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
     const balance = totalIncome - totalExpense;

@@ -71,16 +71,23 @@ export default function HabitsPage() {
     const t = useTranslations();
     const locale = useLocale();
 
-    // 1. Date & Period State
-    const [currentMonthKey, setCurrentMonthKey] = useState('2026-08');
+    // 1. Date & Period State — Dynamic (always current date)
+    const todayObj = new Date();
+    const todayYear = todayObj.getFullYear();
+    const todayMonth = String(todayObj.getMonth() + 1).padStart(2, '0');
+    const todayDay = String(todayObj.getDate()).padStart(2, '0');
+    const todayStr = `${todayYear}-${todayMonth}-${todayDay}`;
+    const initialMonthKey = `${todayYear}-${todayMonth}`;
+
+    const [currentMonthKey, setCurrentMonthKey] = useState(initialMonthKey);
     const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
-    const [selectedYear, setSelectedYear] = useState(2026);
-    const [selectedMonthIndex, setSelectedMonthIndex] = useState(7); // August (0-indexed)
+    const [selectedYear, setSelectedYear] = useState(todayYear);
+    const [selectedMonthIndex, setSelectedMonthIndex] = useState(todayObj.getMonth());
     const [showHint, setShowHint] = useState(true);
 
     // 2. Mobile Date Selector Strip State
-    const todayStr = '2026-08-15';
-    const [selectedMobileDate, setSelectedMobileDate] = useState(todayStr);
+    const todayStrForMobile = todayStr;
+    const [selectedMobileDate, setSelectedMobileDate] = useState(todayStrForMobile);
 
     // 3. Habits Main State
     const [habits, setHabits] = useState<HabitItem[]>([]);
@@ -88,7 +95,7 @@ export default function HabitsPage() {
 
     const fetchHabits = async () => {
         try {
-            const res = await fetch(`/api/habits?period=${currentMonthKey}`);
+            const res = await fetch(`/api/habits`);
             if (res.ok) {
                 const data = await res.json();
                 const mappedHabits = data.map((h: any) => {
@@ -172,13 +179,16 @@ export default function HabitsPage() {
         ? ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
         : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    // Compute month dates for August 2026 (31 days)
-    const monthDates = Array.from({ length: 31 }, (_, i) => {
+    // Compute month dates dynamically from currentMonthKey
+    const [mkYear, mkMonth] = currentMonthKey.split('-').map(Number);
+    const daysInCurrentMonth = new Date(mkYear, mkMonth, 0).getDate();
+    const currentTodayDay = todayObj.getDate();
+    const monthDates = Array.from({ length: daysInCurrentMonth }, (_, i) => {
         const dayNum = i + 1;
         const formattedDay = dayNum < 10 ? `0${dayNum}` : `${dayNum}`;
-        const dateString = `2026-08-${formattedDay}`;
-        const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-        const dateObj = new Date(2026, 7, dayNum);
+        const dateString = `${mkYear}-${String(mkMonth).padStart(2, '0')}-${formattedDay}`;
+        const dayNames = locale === 'id' ? ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const dateObj = new Date(mkYear, mkMonth - 1, dayNum);
         const dayName = dayNames[dateObj.getDay()];
         return {
             dayNum,
@@ -186,7 +196,7 @@ export default function HabitsPage() {
             dayName,
             dateString,
             isToday: dateString === todayStr,
-            isFuture: dayNum > 15
+            isFuture: currentMonthKey === initialMonthKey ? dayNum > currentTodayDay : (currentMonthKey > initialMonthKey)
         };
     });
 
@@ -236,8 +246,9 @@ export default function HabitsPage() {
         const progressPercent = Math.min(100, Math.round((completedCount / h.monthlyTarget) * 100));
 
         let streak = 0;
-        for (let d = 15; d >= 1; d--) {
-            const dateStr = `2026-08-${d < 10 ? '0' + d : d}`;
+        const todayDayNum = mkYear === todayYear && mkMonth === parseInt(todayMonth) ? parseInt(todayDay) : daysInCurrentMonth;
+        for (let d = todayDayNum; d >= 1; d--) {
+            const dateStr = `${mkYear}-${String(mkMonth).padStart(2, '0')}-${d < 10 ? '0' + d : d}`;
             if (h.logs[dateStr] === 'completed') streak++;
             else break;
         }
@@ -297,8 +308,9 @@ export default function HabitsPage() {
 
     // Active Streak (consecutive days with >= 1 habit completed)
     let currentStreak = 0;
-    for (let d = 15; d >= 1; d--) {
-        const dateStr = `2026-08-${d < 10 ? '0' + d : d}`;
+    const todayDayNumForStreak = mkYear === todayYear && mkMonth === parseInt(todayMonth) ? parseInt(todayDay) : daysInCurrentMonth;
+    for (let d = todayDayNumForStreak; d >= 1; d--) {
+        const dateStr = `${mkYear}-${String(mkMonth).padStart(2, '0')}-${d < 10 ? '0' + d : d}`;
         const anyDone = processedHabits.some(h => h.logs[dateStr] === 'completed');
         if (anyDone) currentStreak++;
         else break;
@@ -306,8 +318,8 @@ export default function HabitsPage() {
 
     // Perfect Days Count (days where all habits are completed)
     let perfectDaysCount = 0;
-    for (let d = 1; d <= 15; d++) {
-        const dateStr = `2026-08-${d < 10 ? '0' + d : d}`;
+    for (let d = 1; d <= todayDayNumForStreak; d++) {
+        const dateStr = `${mkYear}-${String(mkMonth).padStart(2, '0')}-${d < 10 ? '0' + d : d}`;
         const allDone = processedHabits.length > 0 && processedHabits.every(h => h.logs[dateStr] === 'completed');
         if (allDone) perfectDaysCount++;
     }

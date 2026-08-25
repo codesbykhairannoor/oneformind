@@ -23,14 +23,18 @@ export default function CalendarPage() {
     const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
 
     const [events, setEvents] = useState<CalendarEvent[]>([]);
+    const [journals, setJournals] = useState<any[]>([]);
+    const [plannerTasks, setPlannerTasks] = useState<any[]>([]);
+    const [financeTransactions, setFinanceTransactions] = useState<any[]>([]);
+    const [habitLogs, setHabitLogs] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const res = await fetch('/api/calendar');
+                const res = await fetch(`/api/calendar?period=${currentMonthKey}`);
                 if (res.ok) {
                     const data = await res.json();
-                    const mapped = data.map((e: any) => ({
+                    const mapped = data.events.map((e: any) => ({
                         id: e.id,
                         title: e.title,
                         description: e.description || '',
@@ -43,14 +47,18 @@ export default function CalendarPage() {
                         is_all_day: e.isAllDay
                     }));
                     setEvents(mapped);
+                    setJournals(data.journals || []);
+                    setPlannerTasks(data.plannerTasks || []);
+                    setFinanceTransactions(data.financeTransactions || []);
+                    setHabitLogs(data.habitLogs || []);
                 }
             } catch (error) {
-                console.error('Failed to fetch calendar events:', error);
+                console.error('Failed to fetch calendar data:', error);
             }
         };
 
         fetchEvents();
-    }, []);
+    }, [currentMonthKey]);
 
     // Build Calendar Grid Days Generator
     const generateCalendarDays = (yearMonth: string): CalendarDayItem[] => {
@@ -91,19 +99,26 @@ export default function CalendarPage() {
             const dayEvents = events.filter(e => e.start_date === dateStr);
             const isToday = dateStr === todayStr;
 
+            const dayJournals = journals.filter(j => j.date.startsWith(dateStr));
+            const dayPlanner = plannerTasks.filter(p => p.date.startsWith(dateStr));
+            const dayHabits = habitLogs.filter(h => h.date.startsWith(dateStr));
+            const dayFinance = financeTransactions.filter(f => f.date.startsWith(dateStr) && f.type === 'expense');
+            const totalExpense = dayFinance.reduce((sum, f) => sum + Number(f.amount), 0);
+            const plannerCompleted = dayPlanner.filter(p => p.isCompleted).length;
+            const plannerTotal = dayPlanner.length;
+            const plannerObj = plannerTotal > 0 ? { total: plannerTotal, done: plannerCompleted } : null;
+
             days.push({
                 date: dateStr,
                 dayNumber: day,
                 isCurrentMonth: true,
                 isToday,
                 events: dayEvents,
-                milestones: isToday ? [
-                    { id: 101, title: 'Implementasi 1:1 Calendar Suite', goal_title: 'Membangun Arsitektur Full-Stack Life OS', goal_color: '#6366f1', completed: true }
-                ] : [],
-                hasJournal: isToday,
-                habitDone: isToday ? 4 : 0,
-                planner: isToday ? { total: 5, done: 4 } : null,
-                expense: isToday ? 150000 : 0
+                milestones: [],
+                hasJournal: dayJournals.length > 0,
+                habitDone: dayHabits.length,
+                planner: plannerObj,
+                expense: totalExpense
             });
         }
 
@@ -114,6 +129,15 @@ export default function CalendarPage() {
             const nextMonthNum = month + 1 > 12 ? 1 : month + 1;
             const nextYearNum = month + 1 > 12 ? year + 1 : year;
             const dateStr = `${nextYearNum}-${String(nextMonthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayJournals = journals.filter(j => j.date.startsWith(dateStr));
+            const dayPlanner = plannerTasks.filter(p => p.date.startsWith(dateStr));
+            const dayHabits = habitLogs.filter(h => h.date.startsWith(dateStr));
+            const dayFinance = financeTransactions.filter(f => f.date.startsWith(dateStr) && f.type === 'expense');
+            const totalExpense = dayFinance.reduce((sum, f) => sum + Number(f.amount), 0);
+            const plannerCompleted = dayPlanner.filter(p => p.isCompleted).length;
+            const plannerTotal = dayPlanner.length;
+            const plannerObj = plannerTotal > 0 ? { total: plannerTotal, done: plannerCompleted } : null;
+
             days.push({
                 date: dateStr,
                 dayNumber: day,
@@ -121,10 +145,10 @@ export default function CalendarPage() {
                 isToday: dateStr === todayStr,
                 events: events.filter(e => e.start_date === dateStr),
                 milestones: [],
-                hasJournal: false,
-                habitDone: 0,
-                planner: null,
-                expense: 0
+                hasJournal: dayJournals.length > 0,
+                habitDone: dayHabits.length,
+                planner: plannerObj,
+                expense: totalExpense
             });
         }
 

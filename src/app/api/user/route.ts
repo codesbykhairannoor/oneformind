@@ -19,6 +19,8 @@ export async function GET(req: Request) {
         isPremium: true,
         premiumUntil: true,
         settings: true,
+        resumeText: true,
+        resumeFilename: true,
       }
     });
 
@@ -46,6 +48,8 @@ export async function PUT(req: Request) {
     const dataToUpdate: any = {};
     if (name) dataToUpdate.name = name;
     if (settings) dataToUpdate.settings = settings; // settings must be a valid JSON object
+    if (body.resumeText !== undefined) dataToUpdate.resumeText = body.resumeText;
+    if (body.resumeFilename !== undefined) dataToUpdate.resumeFilename = body.resumeFilename;
 
     const updatedUser = await prisma.user.update({
       where: { id: parseInt(session.user.id) },
@@ -58,6 +62,8 @@ export async function PUT(req: Request) {
         isPremium: true,
         premiumUntil: true,
         settings: true,
+        resumeText: true,
+        resumeFilename: true,
       }
     });
 

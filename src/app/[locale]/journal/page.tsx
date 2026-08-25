@@ -13,14 +13,24 @@ export default function JournalIndexPage() {
     const t = useTranslations();
 
     const [journals, setJournals] = useState<JournalItem[]>([]);
+    const [synergy, setSynergy] = useState({
+        tasks_completed: 0,
+        tasks_total: 0,
+        habits_completed: 0,
+        expense_total: 0
+    });
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
-        const fetchJournals = async () => {
+        const fetchData = async () => {
             try {
-                const res = await fetch('/api/journals');
-                if (res.ok) {
-                    const data = await res.json();
+                const [journalsRes, dashRes] = await Promise.all([
+                    fetch('/api/journals'),
+                    fetch('/api/dashboard')
+                ]);
+                
+                if (journalsRes.ok) {
+                    const data = await journalsRes.json();
                     const mapped = data.map((j: any) => ({
                         id: j.id,
                         title: j.title || '',
@@ -31,22 +41,25 @@ export default function JournalIndexPage() {
                     }));
                     setJournals(mapped);
                 }
+
+                if (dashRes.ok) {
+                    const dashData = await dashRes.json();
+                    setSynergy({
+                        tasks_completed: dashData.planner?.completed || 0,
+                        tasks_total: dashData.planner?.total || 0,
+                        habits_completed: dashData.habits?.completed || 0,
+                        expense_total: dashData.finance?.expense || 0
+                    });
+                }
             } catch (error) {
-                console.error('Failed to fetch journals:', error);
+                console.error('Failed to fetch data:', error);
             } finally {
                 setHasMounted(true);
             }
         };
 
-        fetchJournals();
+        fetchData();
     }, []);
-
-    const synergy = {
-        tasks_completed: 12,
-        tasks_total: 15,
-        habits_completed: 6,
-        expense_total: 150000
-    };
 
     const handleDelete = async (id: number | string) => {
         if (typeof window !== 'undefined' && window.confirm(t('journal_confirm_delete') || 'Hapus Jurnal? Data ini akan hilang selamanya.')) {
