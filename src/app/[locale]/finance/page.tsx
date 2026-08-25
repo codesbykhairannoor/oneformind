@@ -459,6 +459,7 @@ export default function FinancePage() {
                 editingTransaction={editingTransaction}
                 categories={categories}
                 transactions={transactions}
+                budgets={budgets}
                 onClose={() => setShowTrxModal(false)}
                 onSubmit={handleSaveSingleTrx}
                 onSwitchToBatch={() => { setShowTrxModal(false); setShowBatchModal(true); }}
@@ -469,6 +470,7 @@ export default function FinancePage() {
             <FinanceBatchModal
                 show={showBatchModal}
                 categories={categories}
+                budgets={budgets}
                 onClose={() => setShowBatchModal(false)}
                 onSubmitBatch={handleSaveBatchTrx}
                 onSwitchToSingle={() => { setShowBatchModal(false); setShowTrxModal(true); }}

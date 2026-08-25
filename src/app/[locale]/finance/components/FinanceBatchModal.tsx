@@ -16,6 +16,7 @@ interface BatchRow {
 interface FinanceBatchModalProps {
     show: boolean;
     categories: { slug: string; name: string; icon: string; type: string }[];
+    budgets?: any[];
     onClose: () => void;
     onSubmitBatch: (date: string, rows: BatchRow[]) => void;
     onSwitchToSingle?: () => void;
@@ -25,6 +26,7 @@ interface FinanceBatchModalProps {
 export default function FinanceBatchModal({
     show,
     categories,
+    budgets = [],
     onClose,
     onSubmitBatch,
     onSwitchToSingle,
@@ -41,6 +43,7 @@ export default function FinanceBatchModal({
         { type: 'expense', title: '', amount: '', category: '' }
     ]);
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showAllCategories, setShowAllCategories] = useState(false);
 
     useEffect(() => {
         if (show) {
@@ -49,6 +52,7 @@ export default function FinanceBatchModal({
                 { type: 'expense', title: '', amount: '', category: '' },
                 { type: 'expense', title: '', amount: '', category: '' }
             ]);
+            setShowAllCategories(false);
         }
     }, [show, todayStr]);
 
@@ -58,8 +62,21 @@ export default function FinanceBatchModal({
     const currencySymbol = currencySymbolMap[activeCurrency] || 'Rp';
     const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
 
-    const getCategoriesByType = (type: 'income' | 'expense') => {
-        return categories.filter(c => c.type === type);
+    const activeSlugs = new Set([
+        ...budgets.map(b => b.category)
+    ]);
+
+    // For Batch Modal, we process available categories per row based on its type
+    const getDisplayCategories = (type: 'income' | 'expense') => {
+        const available = categories.filter(c => c.type === type);
+        const active = available.filter(c => activeSlugs.has(c.slug));
+        if (type === 'income' || showAllCategories || active.length === 0) return available;
+        return active;
+    };
+
+    const hasInactiveCategories = (type: 'income' | 'expense') => {
+        const available = categories.filter(c => c.type === type);
+        return available.some(c => !activeSlugs.has(c.slug));
     };
 
     const formatDisplay = (val: string) => {
@@ -168,7 +185,6 @@ export default function FinanceBatchModal({
                     <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-50/30 dark:bg-slate-950 p-4 md:p-8 space-y-4">
                         
                         {rows.map((trx, index) => {
-                            const availCats = getCategoriesByType(trx.type);
                             return (
                                 <div 
                                     key={index} 
@@ -219,15 +235,26 @@ export default function FinanceBatchModal({
                                                 </label>
                                                 <select 
                                                     value={trx.category} 
-                                                    onChange={(e) => setRows(prev => prev.map((r, i) => i === index ? { ...r, category: e.target.value } : r))}
+                                                    onChange={(e) => {
+                                                        if (e.target.value === 'SHOW_ALL') {
+                                                            setShowAllCategories(true);
+                                                            return;
+                                                        }
+                                                        setRows(prev => prev.map((r, i) => i === index ? { ...r, category: e.target.value } : r));
+                                                    }}
                                                     className={`w-full pl-3 pr-8 h-11 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 text-xs appearance-none cursor-pointer ${trx.type === 'expense' ? 'focus:border-rose-400' : 'focus:border-emerald-400'}`}
                                                 >
                                                     <option value="">{t('select_placeholder') || 'Pilih kategori...'}</option>
-                                                    {availCats.map(cat => (
+                                                    {getDisplayCategories(trx.type).map(cat => (
                                                         <option key={cat.slug} value={cat.slug}>
                                                             {cat.icon} {cat.name}
                                                         </option>
                                                     ))}
+                                                    {!showAllCategories && trx.type === 'expense' && hasInactiveCategories(trx.type) && (
+                                                        <option value="SHOW_ALL" className="font-bold text-indigo-500">
+                                                            --- Tampilkan Kategori Lainnya ---
+                                                        </option>
+                                                    )}
                                                 </select>
                                             </div>
                                         </div>

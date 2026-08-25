@@ -20,6 +20,7 @@ interface TransactionModalProps {
     editingTransaction: TransactionModalItem | null;
     categories: { slug: string; name: string; icon: string; type: string }[];
     transactions?: any[];
+    budgets?: any[];
     onClose: () => void;
     onSubmit: (data: TransactionModalItem) => void;
     onSwitchToBatch?: () => void;
@@ -32,6 +33,7 @@ export default function TransactionModal({
     editingTransaction,
     categories,
     transactions = [],
+    budgets = [],
     onClose,
     onSubmit,
     onSwitchToBatch,
@@ -50,6 +52,7 @@ export default function TransactionModal({
     const [date, setDate] = useState<string>(todayStr);
     const [notes, setNotes] = useState<string>('');
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showAllCategories, setShowAllCategories] = useState(false);
 
     useEffect(() => {
         if (editingTransaction) {
@@ -74,6 +77,10 @@ export default function TransactionModal({
         setCategory('');
     }, [type]);
 
+    useEffect(() => {
+        if (show) setShowAllCategories(false);
+    }, [show]);
+
     if (!show) return null;
 
     const currencySymbolMap: Record<string, string> = { IDR: 'Rp', USD: '$', GBP: '£', EUR: '€', JPY: '¥' };
@@ -81,7 +88,20 @@ export default function TransactionModal({
     const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
 
 
+
+    const activeSlugs = new Set([
+        ...budgets.map(b => b.category),
+        ...transactions.map(t => t.category)
+    ]);
+
     const availableCategories = categories.filter(c => c.type === type);
+    
+    const activeCategories = availableCategories.filter(c => activeSlugs.has(c.slug));
+    const inactiveCategories = availableCategories.filter(c => !activeSlugs.has(c.slug));
+    
+    const displayCategories = (type === 'income' || showAllCategories || activeCategories.length === 0) 
+        ? availableCategories 
+        : activeCategories;
 
     const formatDisplay = (val: string) => {
         if (!val) return '';
@@ -107,7 +127,7 @@ export default function TransactionModal({
             title: title.trim(),
             amount: numAmount,
             type,
-            category: category || (availableCategories[0]?.slug || 'other'),
+            category: category || (displayCategories[0]?.slug || 'other'),
             date,
             notes
         });
@@ -216,15 +236,26 @@ export default function TransactionModal({
                                 <div className="relative">
                                     <select 
                                         value={category} 
-                                        onChange={(e) => setCategory(e.target.value)} 
+                                        onChange={(e) => {
+                                            if (e.target.value === 'SHOW_ALL') {
+                                                setShowAllCategories(true);
+                                                return;
+                                            }
+                                            setCategory(e.target.value);
+                                        }}
                                         className="w-full pl-4 pr-8 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-0 font-bold text-slate-700 dark:text-slate-200 text-sm appearance-none cursor-pointer transition-all"
                                     >
                                         <option value="">{t('select_placeholder') || 'Pilih kategori...'}</option>
-                                        {availableCategories.map(cat => (
+                                        {displayCategories.map(cat => (
                                             <option key={cat.slug} value={cat.slug}>
                                                 {cat.icon} {cat.name}
                                             </option>
                                         ))}
+                                        {!showAllCategories && type === 'expense' && inactiveCategories.length > 0 && (
+                                            <option value="SHOW_ALL" className="font-bold text-indigo-500">
+                                                --- Tampilkan Kategori Lainnya ---
+                                            </option>
+                                        )}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-600">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path d="M19 9l-7 7-7-7"/></svg>
