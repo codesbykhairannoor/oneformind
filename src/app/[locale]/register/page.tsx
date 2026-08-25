@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import InputError from '@/components/InputError';
 
+import GoogleAuthModal from '@/components/GoogleAuthModal';
+
 export default function Register() {
     const t = useTranslations();
     const router = useRouter();
@@ -14,6 +16,7 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const submit = async (e: React.FormEvent) => {
@@ -55,6 +58,7 @@ export default function Register() {
         };
         localStorage.setItem('oneformind_user_profile', JSON.stringify(userProfile));
         localStorage.setItem('oneformind_auth', JSON.stringify({ isAuthenticated: true, user: userProfile }));
+        window.dispatchEvent(new Event('auth_change'));
 
         setTimeout(() => {
             setIsProcessing(false);
@@ -64,10 +68,15 @@ export default function Register() {
 
     const handleGoogleAuth = (e: React.MouseEvent) => {
         e.preventDefault();
+        setIsGoogleModalOpen(true);
+    };
+
+    const handleGoogleAccountSelected = (account: { name: string; email: string; avatar?: string }) => {
+        setIsGoogleModalOpen(false);
         setIsProcessing(true);
         const userProfile = {
-            name: 'Google User',
-            email: 'user.google@gmail.com',
+            name: account.name,
+            email: account.email,
             headline: 'Member Architect Tier',
             bio: 'Member aktif OneForMind Productivity OS via Google Login.',
             createdAt: new Date().toISOString()
@@ -79,7 +88,7 @@ export default function Register() {
         setTimeout(() => {
             setIsProcessing(false);
             router.push('/dashboard');
-        }, 600);
+        }, 500);
     };
 
     return (
@@ -191,6 +200,12 @@ export default function Register() {
                     </div>
                 </div>
             </div>
+
+            <GoogleAuthModal
+                isOpen={isGoogleModalOpen}
+                onClose={() => setIsGoogleModalOpen(false)}
+                onSelectAccount={handleGoogleAccountSelected}
+            />
         </div>
     );
 }
