@@ -1,0 +1,11 @@
+# Exclude directories from Vercel deployment uploads
+legacy_laravel_backup/
+.claude/
+scratch/
+.vscode/
+desktop.ini
+README.md
+AGENTS.md
+CLAUDE.md
+walkthrough.md
+implementation_plan.md
