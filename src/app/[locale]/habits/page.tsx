@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
@@ -66,6 +67,8 @@ interface HabitItem {
     logs: Record<string, 'completed' | 'skipped' | 'empty'>;
 }
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function HabitsPage() {
     usePageTitle('Habits Tracker');
     const t = useTranslations();
@@ -93,34 +96,28 @@ export default function HabitsPage() {
     const [habits, setHabits] = useState<HabitItem[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    const fetchHabits = async () => {
-        try {
-            const res = await fetch(`/api/habits?period=${currentMonthKey}`);
-            if (res.ok) {
-                const data = await res.json();
-                const mappedHabits = data.map((h: any) => {
-                    const logsMap: Record<string, 'completed' | 'skipped' | 'empty'> = {};
-                    if (h.logs) {
-                        h.logs.forEach((log: any) => {
-                            const dateStr = new Date(log.date).toISOString().split('T')[0];
-                            logsMap[dateStr] = log.status as 'completed' | 'skipped' | 'empty';
-                        });
-                    }
-                    return { ...h, logs: logsMap };
-                });
-                setHabits(mappedHabits);
-            }
-        } catch (e) {
-            console.error('Failed to fetch habits', e);
-        } finally {
-            setIsLoaded(true);
-        }
-    };
+    const { data: fetchedHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher, {
+        keepPreviousData: true
+    });
 
     useEffect(() => {
-        setIsLoaded(false);
-        fetchHabits();
-        
+        if (fetchedHabits) {
+            const mappedHabits = fetchedHabits.map((h: any) => {
+                const logsMap: Record<string, 'completed' | 'skipped' | 'empty'> = {};
+                if (h.logs) {
+                    h.logs.forEach((log: any) => {
+                        const dateStr = new Date(log.date).toISOString().split('T')[0];
+                        logsMap[dateStr] = log.status as 'completed' | 'skipped' | 'empty';
+                    });
+                }
+                return { ...h, logs: logsMap };
+            });
+            setHabits(mappedHabits);
+            setIsLoaded(true);
+        }
+    }, [fetchedHabits]);
+
+    useEffect(() => {
         // Fix for: BAGIAN HABIT TRACKER TANGGAL YG DIHIGLIGHT SALAH
         // Reset selected mobile date to the 1st of the month if navigating to a different month
         if (currentMonthKey !== initialMonthKey) {

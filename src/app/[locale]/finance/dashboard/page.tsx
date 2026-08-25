@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { Link, useRouter } from '@/i18n/routing';
@@ -22,6 +23,8 @@ interface YearlyStat {
     balance: number;
 }
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function FinanceDashboardPage() {
     const t = useTranslations();
     const locale = useLocale();
@@ -32,56 +35,52 @@ export default function FinanceDashboardPage() {
     const [currentBalance, setCurrentBalance] = useState(0);
     const [avgExpense, setAvgExpense] = useState(0);
 
+    const currentYear = new Date().getFullYear();
+    const { data: fetchedData } = useSWR(`/api/finance/yearly?year=${currentYear}`, fetcher, {
+        keepPreviousData: true
+    });
+
     useEffect(() => {
-        const fetchYearlyData = async () => {
-            try {
-                const currentYear = new Date().getFullYear();
-                const res = await fetch(`/api/finance/yearly?year=${currentYear}`);
-                if (res.ok) {
-                    const data = await res.json();
+        if (fetchedData) {
+            const data = fetchedData;
+            
+            const stats: YearlyStat[] = [];
+            let sumExpense = 0;
                     
-                    const stats: YearlyStat[] = [];
-                    let sumExpense = 0;
-                    
-                    // Fixed target for now, ideally fetched from user settings
-                    const target = 15000000;
-                    
-                    for (let i = 1; i <= 12; i++) {
-                        const monthStr = `${currentYear}-${String(i).padStart(2, '0')}`;
-                        const stat = data.monthlyStats[monthStr] || { income: 0, expense: 0 };
-                        
-                        const balance = stat.income - stat.expense; // Net balance per month
-                        
-                        stats.push({
-                            month: monthStr,
-                            total_income: stat.income,
-                            total_expense: stat.expense,
-                            income_target: target,
-                            balance: balance
-                        });
-                    }
-                    
-                    // Calculate avg expense for the last 3 months
-                    const currentMonthIdx = new Date().getMonth(); // 0-based
-                    const last3Months = stats.slice(Math.max(0, currentMonthIdx - 2), currentMonthIdx + 1);
-                    const avgExp = last3Months.reduce((acc, curr) => acc + curr.total_expense, 0) / (last3Months.length || 1);
-                    
-                    setYearlyStats(stats);
-                    setTotalSavings(data.totalSavings || 0);
-                    
-                    // Current balance is accumulated over the year, or just this month?
-                    // According to user's Net Balance per month logic, we just use this month's or total?
-                    // Let's use the sum of all balances up to current month
-                    const accumulatedBalance = stats.slice(0, currentMonthIdx + 1).reduce((acc, curr) => acc + curr.balance, 0);
-                    setCurrentBalance(accumulatedBalance);
-                    setAvgExpense(avgExp);
-                }
-            } catch (error) {
-                console.error('Failed to fetch yearly stats', error);
+            // Fixed target for now, ideally fetched from user settings
+            const target = 15000000;
+            
+            for (let i = 1; i <= 12; i++) {
+                const monthStr = `${currentYear}-${String(i).padStart(2, '0')}`;
+                const stat = data.monthlyStats[monthStr] || { income: 0, expense: 0 };
+                
+                const balance = stat.income - stat.expense; // Net balance per month
+                
+                stats.push({
+                    month: monthStr,
+                    total_income: stat.income,
+                    total_expense: stat.expense,
+                    income_target: target,
+                    balance: balance
+                });
             }
-        };
-        fetchYearlyData();
-    }, []);
+            
+            // Calculate avg expense for the last 3 months
+            const currentMonthIdx = new Date().getMonth(); // 0-based
+            const last3Months = stats.slice(Math.max(0, currentMonthIdx - 2), currentMonthIdx + 1);
+            const avgExp = last3Months.reduce((acc, curr) => acc + curr.total_expense, 0) / (last3Months.length || 1);
+            
+            setYearlyStats(stats);
+            setTotalSavings(data.totalSavings || 0);
+            
+            // Current balance is accumulated over the year, or just this month?
+            // According to user's Net Balance per month logic, we just use this month's or total?
+            // Let's use the sum of all balances up to current month
+            const accumulatedBalance = stats.slice(0, currentMonthIdx + 1).reduce((acc, curr) => acc + curr.balance, 0);
+            setCurrentBalance(accumulatedBalance);
+            setAvgExpense(avgExp);
+        }
+    }, [fetchedData]);
 
     const totalFunds = totalSavings + currentBalance;
     const runwayMonths = avgExpense > 0 ? (totalFunds / avgExpense).toFixed(1) : '∞';

@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { useSession } from 'next-auth/react';
+import useSWR from 'swr';
 import {
     Sparkles,
     Target,
@@ -22,6 +23,8 @@ import {
     HelpCircle
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function Dashboard() {
     usePageTitle('Dashboard');
@@ -48,33 +51,22 @@ export default function Dashboard() {
         plan_type: 'Architect',
     };
 
-    const [synergy, setSynergy] = useState<any>({
+    const initialSynergy = {
         date_formatted: new Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
         habits: { completed: 0, total: 0, percent: 0 },
         planner: { total: 0, upcoming: [] },
         finance: { expense: 0, income: 0 },
         goals: { top_goal: { title: 'Belum ada Goal', percent: 0 } },
         journal: { is_written: false, id: null },
+    };
+
+    const { data: dashboardData } = useSWR('/api/dashboard', fetcher, { 
+        fallbackData: initialSynergy,
+        keepPreviousData: true 
     });
 
-    const [plannerData, setPlannerData] = useState<{ total: number, upcoming: any[] }>({ total: 0, upcoming: [] });
-
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const res = await fetch('/api/dashboard');
-                if (res.ok) {
-                    const data = await res.json();
-                    setSynergy((prev: any) => ({ ...prev, ...data }));
-                    setPlannerData(data.planner);
-                }
-            } catch (error) {
-                console.error('Failed to fetch dashboard data:', error);
-            }
-        };
-
-        fetchDashboardData();
-    }, []);
+    const synergy = { ...initialSynergy, ...(dashboardData || {}) };
+    const plannerData = synergy.planner;
 
     const trend = [
         { day: 'Mon', score: 65 },

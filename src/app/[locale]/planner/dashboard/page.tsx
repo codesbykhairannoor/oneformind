@@ -1,33 +1,27 @@
 'use client';
 
+import useSWR from 'swr';
+
 import React, { useState, useMemo, useEffect } from 'react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { ChevronLeft, ChevronRight, CheckCircle2, Droplets, Inbox, Maximize2, Sparkles } from 'lucide-react';
 import DayPreviewModal from './DayPreviewModal';
 import { useRouter } from '@/i18n/routing';
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function PlannerDashboard() {
     const router = useRouter();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [selectedDayData, setSelectedDayData] = useState<any>(null);
-    const [realTasks, setRealTasks] = useState<any[]>([]);
-
-    useEffect(() => {
-        const fetchMonthTasks = async () => {
-            const year = currentDate.getFullYear();
-            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-            try {
-                const res = await fetch(`/api/planner/tasks?month=${year}-${month}`);
-                if (res.ok) {
-                    setRealTasks(await res.json());
-                }
-            } catch (error) {
-                console.error("Failed to fetch planner tasks", error);
-            }
-        };
-        fetchMonthTasks();
-    }, [currentDate]);
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    
+    const { data: realTasks } = useSWR(`/api/planner/tasks?month=${year}-${month}`, fetcher, {
+        fallbackData: [],
+        keepPreviousData: true
+    });
 
     const monthNames = [
         "Januari", "Februari", "Maret", "April", "Mei", "Juni", 

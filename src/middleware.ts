@@ -18,6 +18,12 @@ export default auth((req) => {
     return Response.redirect(loginUrl);
   }
 
+  const pathname = req.nextUrl.pathname;
+  if ((pathname === '/' || pathname === '/id' || pathname === '/en') && req.auth) {
+    const locale = pathname === '/en' ? 'en' : 'id';
+    return Response.redirect(new URL(`/${locale}/dashboard`, req.nextUrl.origin));
+  }
+
   return intlMiddleware(req);
 });
  
