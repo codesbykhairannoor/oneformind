@@ -1,19 +1,9 @@
-import { getTranslations } from 'next-intl/server';
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-    const { locale } = await params;
-    const t = await getTranslations({ locale });
-    return {
-        title: t('five_meta_title'),
-        description: t('five_meta_desc'),
-        openGraph: {
-            title: t('five_meta_og_title'),
-            description: t('five_meta_og_desc'),
-        }
-    };
-}
+export const metadata: Metadata = {
+  title: 'Five Apps | OneForMind',
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
+  return <>{children}</>;
 }
