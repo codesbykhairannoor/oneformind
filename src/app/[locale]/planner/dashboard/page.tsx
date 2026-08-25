@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { ChevronLeft, ChevronRight, CheckCircle2, Droplets, Inbox, Maximize2, Sparkles } from 'lucide-react';
 import DayPreviewModal from './DayPreviewModal';
