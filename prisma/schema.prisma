@@ -15,35 +15,35 @@ enum PlanType {
 }
 
 model User {
-  id                      String    @id @default(cuid())
+  id                      Int       @id @default(autoincrement())
   name                    String
   email                   String    @unique
   username                String?   @unique
   password                String?
-  googleId                String?
-  emailVerified           DateTime? @map("emailVerifiedAt")
+  googleId                String?   @map("google_id")
+  emailVerified           DateTime? @map("email_verified_at")
   
   // Profile settings
-  settings                Json      @default("{}")
-  image                   String?   @map("avatarPath")
-  timezone                String?
-  cookieConsent           Boolean   @default(false)
+  settings                Json?
+  image                   String?   @map("avatar_path")
+  timezone                String?   @default("UTC")
+  cookieConsent           String?   @map("cookie_consent")
   
   // Subscription & Plans
-  isPremium               Boolean   @default(false)
-  planType                PlanType  @default(explorer)
-  premiumUntil            DateTime?
-  hasUsedTrial            Boolean   @default(false)
+  isPremium               Boolean   @default(false) @map("is_premium")
+  planType                String    @default("explorer") @map("plan_type")
+  premiumUntil            DateTime? @map("premium_until")
+  hasUsedTrial            Boolean   @default(false) @map("has_used_trial")
   
   // Extended features
-  resumeText              String?   @db.Text
-  resumeFilename          String?
-  notificationPreferences Json      @default("{}")
-  onboardingCompleted     Boolean   @default(false)
-  onboardingData          Json      @default("{}")
+  resumeText              String?   @map("resume_text")
+  resumeFilename          String?   @map("resume_filename")
+  notificationPreferences Json?     @map("notification_preferences")
+  onboardingCompleted     Boolean   @default(false) @map("onboarding_completed")
+  onboardingData          Json?     @map("onboarding_data")
 
-  createdAt               DateTime  @default(now())
-  updatedAt               DateTime  @default(now()) @updatedAt
+  createdAt               DateTime? @default(now()) @map("created_at")
+  updatedAt               DateTime? @default(now()) @map("updated_at")
 
   accounts                Account[]
   sessions                Session[]
@@ -53,16 +53,17 @@ model User {
 
 model Account {
   id                 String  @id @default(cuid())
-  userId             String
+  userId             Int
   type               String
   provider           String
   providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
+
+  refresh_token      String?
+  access_token       String?
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String?  @db.Text
+  id_token           String?
   session_state      String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -74,7 +75,7 @@ model Account {
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
-  userId       String
+  userId       Int
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

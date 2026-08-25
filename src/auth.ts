@@ -42,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
         
-        return user
+        return { ...user, id: String(user.id) }
       }
     })
   ]
