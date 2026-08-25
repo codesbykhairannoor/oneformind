@@ -94,7 +94,7 @@ export default function BillingPricingPage() {
             try {
                 const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'BAA4EY4bCAv5qA_E8fi83VMDyIwnokX_4Y1n6G_icl0T5moe4Lu0EMkIRg67CGU9sSNX_HlDrLRXjNMOss'; // Fallback to live ID if not set
                 const paypal = await loadScript({ 
-                    "client-id": clientId,
+                    clientId: clientId,
                     currency: "USD",
                     intent: "capture"
                 });
