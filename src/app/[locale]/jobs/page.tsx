@@ -8,6 +8,7 @@ import JobFilterBar, { JobFilterParams } from './components/JobFilterBar';
 import JobTable, { JobRowItem } from './components/JobTable';
 import MasterCvModal from './components/MasterCvModal';
 import ResumeAiModal from './components/ResumeAiModal';
+import GatedPage from '@/components/GatedPage';
 import { Briefcase, Plus, Sparkles } from 'lucide-react';
 
 export default function JobsPage() {
@@ -214,8 +215,9 @@ export default function JobsPage() {
 
     return (
         <AuthenticatedLayout>
-            {/* 1:1 from Index.vue line 65-148 */}
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 transition-colors duration-500">
+            <GatedPage feature="job">
+                {/* 1:1 from Index.vue line 65-148 */}
+                <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 transition-colors duration-500">
                 
                 {/* SUB HEADER: Title + Total Badge + Actions — 1:1 from Index.vue line 67-103 */}
                 <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 relative z-50 transition-colors duration-500">
@@ -347,7 +349,8 @@ export default function JobsPage() {
 
                 </div>
 
-            </div>
+                </div>
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }

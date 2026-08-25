@@ -6182,5 +6182,8 @@
   "legal_section_3_title": "3. Premium Payment",
   "legal_section_3_desc": "Payment transactions are processed through a secure third-party gateway (Midtrans). We do not store credit card information or other sensitive payment details on our servers.",
   "legal_link_privacy": "Read Full Privacy Policy",
-  "setting_nav_plan": "My Plan"
+  "setting_nav_plan": "My Plan",
+  "neural_bridge_title": "Neural Bridge",
+  "neural_bridge_locked_desc": "Upgrade to Architect or higher to access real-time Neural AI analysis.",
+  "btn_upgrade": "Upgrade Now"
 }

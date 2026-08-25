@@ -8,6 +8,7 @@ import GoalStats from './components/GoalStats';
 import GoalCard, { GoalItem } from './components/GoalCard';
 import GoalModal from './components/GoalModal';
 import NeuralBridge from '@/components/NeuralBridge';
+import GatedPage from '@/components/GatedPage';
 import { Milestone } from './components/MilestoneItem';
 import { Target, Sparkles } from 'lucide-react';
 
@@ -238,8 +239,9 @@ export default function GoalsPage() {
 
     return (
         <AuthenticatedLayout>
-            {/* 1:1 from Goal/Index.vue line 92-176 */}
-            <div className="goal-tracker-page min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
+            <GatedPage feature="goals">
+                {/* 1:1 from Goal/Index.vue line 92-176 */}
+                <div className="goal-tracker-page min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
                 <GoalHeader onAddClick={handleOpenCreateModal} />
 
                 <div className="w-full max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 space-y-8 pb-24 min-w-0">
@@ -324,7 +326,8 @@ export default function GoalsPage() {
                     onClose={() => setIsModalOpen(false)}
                     onSave={handleSaveGoal}
                 />
-            </div>
+                </div>
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }

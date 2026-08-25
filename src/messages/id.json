@@ -6170,5 +6170,8 @@
   "legal_section_3_title": "3. Pembayaran Premium",
   "legal_section_3_desc": "Transaksi pembayaran diproses melalui gateway pihak ketiga yang aman (Midtrans). Kami tidak menyimpan informasi kartu kredit atau detail pembayaran sensitif lainnya di server kami.",
   "legal_link_privacy": "Baca Kebijakan Privasi Lengkap",
-  "setting_nav_plan": "Paket Saya"
+  "setting_nav_plan": "Paket Saya",
+  "neural_bridge_title": "Neural Bridge",
+  "neural_bridge_locked_desc": "Upgrade ke paket Architect atau lebih tinggi untuk mengakses analisis Neural AI secara real-time.",
+  "btn_upgrade": "Upgrade Sekarang"
 }

@@ -8,6 +8,7 @@ import CalendarGrid, { CalendarDayItem, CalendarEvent } from './components/Calen
 import CalendarEventModal from './components/CalendarEventModal';
 import CalendarDayDetail from './components/CalendarDayDetail';
 import NeuralBridge from '@/components/NeuralBridge';
+import GatedPage from '@/components/GatedPage';
 
 export default function CalendarPage() {
     const t = useTranslations();
@@ -245,8 +246,9 @@ export default function CalendarPage() {
 
     return (
         <AuthenticatedLayout>
-            {/* 1:1 from Calendar/Index.vue line 124-158 */}
-            <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 relative overflow-x-hidden transition-colors duration-500">
+            <GatedPage feature="calendar">
+                {/* 1:1 from Calendar/Index.vue line 124-158 */}
+                <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 relative overflow-x-hidden transition-colors duration-500">
                 
                 <CalendarHeader 
                     currentMonth={currentMonthKey}
@@ -282,7 +284,8 @@ export default function CalendarPage() {
                     onDeleteEvent={handleDeleteEvent}
                 />
 
-            </div>
+                </div>
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }

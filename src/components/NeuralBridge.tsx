@@ -4,25 +4,20 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Sparkles, ChevronRight, Lock } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useGating } from '@/hooks/useGating';
 
 interface NeuralBridgeProps {
     module: string;
 }
 
-// Plans that have access to NeuralBridge (Architect, Legendary, Quantum)
-const NEURAL_BRIDGE_PLANS = ['architect', 'legendary', 'quantum'];
-
 export default function NeuralBridge({ module }: NeuralBridgeProps) {
     const t = useTranslations();
-    const { data: session } = useSession();
+    const { isArchitect } = useGating();
     const [synergy, setSynergy] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     // Check subscription — Neural Bridge is only for premium users with specific plans
-    const userPlan = (session?.user as any)?.planType || '';
-    const isPremium = (session?.user as any)?.isPremium || false;
-    const hasAccess = isPremium && NEURAL_BRIDGE_PLANS.includes(userPlan.toLowerCase());
+    const hasAccess = isArchitect;
 
     const handleFetchSynergy = () => {
         setLoading(true);
@@ -50,7 +45,7 @@ export default function NeuralBridge({ module }: NeuralBridgeProps) {
                         <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                             {t('neural_bridge_locked_desc') || 'Upgrade ke plan Architect atau lebih tinggi untuk mengakses analisis Neural AI secara real-time.'}
                         </p>
-                        <Link href="/pricing" className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 transition-colors">
+                        <Link href="/billing" className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 transition-colors">
                             <span>{t('btn_upgrade') || 'Upgrade Sekarang'}</span>
                             <ChevronRight className="w-3 h-3 stroke-[3]" />
                         </Link>

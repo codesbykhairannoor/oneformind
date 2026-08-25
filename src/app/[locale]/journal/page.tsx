@@ -7,6 +7,7 @@ import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import JournalHeader from './components/JournalHeader';
 import JournalCard, { JournalItem } from './components/JournalCard';
 import NeuralBridge from '@/components/NeuralBridge';
+import GatedPage from '@/components/GatedPage';
 import { Plus } from 'lucide-react';
 
 export default function JournalIndexPage() {
@@ -84,8 +85,9 @@ export default function JournalIndexPage() {
 
     return (
         <AuthenticatedLayout>
-            {/* 1:1 from Journal/Index.vue line 87-126 */}
-            <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 transition-colors duration-500">
+            <GatedPage feature="journal">
+                {/* 1:1 from Journal/Index.vue line 87-126 */}
+                <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 transition-colors duration-500">
                 
                 <JournalHeader 
                     todayDate={new Date().toISOString()} 
@@ -133,7 +135,7 @@ export default function JournalIndexPage() {
                     )}
 
                 </div>
-            </div>
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }
