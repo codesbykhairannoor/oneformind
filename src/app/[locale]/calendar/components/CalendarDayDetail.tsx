@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { X, Calendar as CalendarIcon, Clock, Plus, CheckCircle2, DollarSign, BookOpen, ArrowRight, Zap, Target, Award, ShieldAlert } from 'lucide-react';
+import { X, Calendar as CalendarIcon, Clock, Plus, CheckCircle2, DollarSign, BookOpen, ArrowRight, Zap, Target, Award, ShieldAlert, Edit3, Trash2 } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import { CalendarDayItem, CalendarEvent } from './CalendarGrid';
 

@@ -11,6 +11,7 @@ import {
 import GoalDatePicker from './GoalDatePicker';
 import MilestoneItem, { Milestone } from './MilestoneItem';
 import { GoalItem } from './GoalCard';
+import ModalPortal from '@/components/ModalPortal';
 
 interface GoalModalProps {
     show: boolean;

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, Calendar, Clock, AlignLeft, Tag, Palette } from 'lucide-react';
+import { X, Calendar, Clock, AlignLeft, Tag, Palette, Check } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import GoalDatePicker from '../../goals/components/GoalDatePicker';
 import { CalendarEvent } from './CalendarGrid';

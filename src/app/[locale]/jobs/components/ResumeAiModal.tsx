@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { Sparkles, X, FileText, ArrowRight, Wand2, RefreshCw, Loader2, Award } from 'lucide-react';
+import { Sparkles, X, FileText, ArrowRight, Wand2, RefreshCw, Loader2, Award, Check } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import { JobRowItem } from './JobTable';
 
