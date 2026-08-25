@@ -63,76 +63,80 @@ export default function SettingsPage() {
         goal: true,
     });
 
-    useEffect(() => {
-        // Load module settings
-        const saved = localStorage.getItem('oneformind_user_settings');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (parsed && parsed.modules) {
-                    setModules(prev => ({ ...prev, ...parsed.modules }));
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-    }, []);
+    // User subscription details from DB
+    const [userData, setUserData] = useState<any>(null);
+    const { status } = useSession();
 
-    const { data: session, status } = useSession();
     useEffect(() => {
-        if (status === 'authenticated' && session?.user) {
-            if (session.user.name) setName(session.user.name);
-            if (session.user.email) setEmail(session.user.email);
-        } else {
-            // Fallback for mock if not authenticated
-            const savedProfile = localStorage.getItem('oneformind_user_profile');
-            if (savedProfile) {
+        const fetchUserData = async () => {
+            if (status === 'authenticated') {
                 try {
-                    const parsed = JSON.parse(savedProfile);
-                    if (parsed.name) setName(parsed.name);
-                    if (parsed.email) setEmail(parsed.email);
-                } catch (e) {
-                    console.error(e);
+                    const res = await fetch('/api/user');
+                    if (res.ok) {
+                        const data = await res.json();
+                        setUserData(data);
+                        setName(data.name || '');
+                        setEmail(data.email || '');
+                        if (data.settings?.modules) {
+                            setModules(prev => ({ ...prev, ...data.settings.modules }));
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch user data:', error);
                 }
             }
-        }
-    }, [session, status]);
+        };
+        fetchUserData();
+    }, [status]);
 
-    const toggleModule = (key: string) => {
+    const toggleModule = async (key: string) => {
         const nextModules = { ...modules, [key]: !modules[key] };
         setModules(nextModules);
-        localStorage.setItem('oneformind_user_settings', JSON.stringify({ modules: nextModules }));
-        window.dispatchEvent(new Event('storage'));
-        setSavedMsg(true);
-        setTimeout(() => setSavedMsg(false), 2000);
+        try {
+            await fetch('/api/user', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ settings: { modules: nextModules } })
+            });
+            setSavedMsg(true);
+            setTimeout(() => setSavedMsg(false), 2000);
+        } catch (error) {
+            console.error('Failed to update modules:', error);
+        }
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const savedProfile = localStorage.getItem('oneformind_user_profile');
-            const existing = savedProfile ? JSON.parse(savedProfile) : {};
-            const updated = { ...existing, name, email };
-            localStorage.setItem('oneformind_user_profile', JSON.stringify(updated));
-            window.dispatchEvent(new Event('auth_change'));
-        } catch (e) {
-            console.error(e);
+            await fetch('/api/user', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            });
+            setSavedMsg(true);
+            setTimeout(() => setSavedMsg(false), 3000);
+            window.dispatchEvent(new Event('auth_change')); // To trigger re-fetches elsewhere if needed
+        } catch (error) {
+            console.error('Failed to update profile:', error);
         }
-        setSavedMsg(true);
-        setTimeout(() => setSavedMsg(false), 3000);
     };
 
-    // Simulated premium user details
-    const user = {
+    const user = userData ? {
+        name: userData.name,
+        email: userData.email,
+        plan_type: userData.planType || 'Explorer',
+        is_premium: userData.isPremium || false,
+        premium_until: userData.premiumUntil,
+    } : {
         name,
         email,
-        plan_type: 'Architect',
-        is_premium: true,
-        premium_until: '2026-09-24T00:00:00Z',
+        plan_type: 'Explorer',
+        is_premium: false,
+        premium_until: null,
     };
 
-    const isExplorer = !user?.plan_type || user.plan_type.toLowerCase() === 'explorer';
-    const planLabel = user?.plan_type || 'Explorer';
+    const isExplorer = !user.is_premium;
+    const planLabel = user.plan_type || 'Explorer';
 
     const premiumUntilFormatted = (() => {
         const raw = user?.premium_until;

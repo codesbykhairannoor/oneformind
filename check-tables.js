@@ -19,11 +19,20 @@ async function getCols(tableName) {
 
 async function run() {
   try {
+    const res = await pool.query(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+    `);
+    
+    console.log("All tables in public schema:");
+    res.rows.forEach(r => console.log(`- ${r.table_name}`));
+    
     const tables = [
-      'journals',
-      'calendar_events',
-      'events',
-      'dashboard'
+      'users',
+      'subscriptions',
+      'payments',
+      'transactions'
     ];
     for (const t of tables) {
       await getCols(t);

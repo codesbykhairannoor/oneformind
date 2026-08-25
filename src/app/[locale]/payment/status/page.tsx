@@ -19,8 +19,20 @@ export default function PaymentStatusPage({ searchParams }: PaymentStatusPagePro
 
     useEffect(() => {
         searchParams.then(resolved => {
-            if (resolved.status) setStatus(resolved.status);
-            if (resolved.plan) setPlan(resolved.plan);
+            const currentStatus = resolved.status || 'success';
+            const currentPlan = resolved.plan || 'Architect';
+            
+            setStatus(currentStatus);
+            setPlan(currentPlan);
+
+            if (currentStatus === 'success') {
+                // Call API to upgrade user in DB
+                fetch('/api/payment/upgrade', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan: currentPlan })
+                }).catch(err => console.error('Failed to upgrade user:', err));
+            }
         });
     }, [searchParams]);
 
