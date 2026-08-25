@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     const plannerTasks = await prisma.plannerTask.findMany({
       where: { 
         userId,
-        date: today
+        date: { gte: today, lt: tomorrow }
       }
     });
 

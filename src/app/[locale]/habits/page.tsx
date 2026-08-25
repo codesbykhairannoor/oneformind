@@ -95,7 +95,7 @@ export default function HabitsPage() {
 
     const fetchHabits = async () => {
         try {
-            const res = await fetch(`/api/habits`);
+            const res = await fetch(`/api/habits?period=${currentMonthKey}`);
             if (res.ok) {
                 const data = await res.json();
                 const mappedHabits = data.map((h: any) => {

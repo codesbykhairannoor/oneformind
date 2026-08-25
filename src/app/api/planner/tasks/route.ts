@@ -16,15 +16,17 @@ export async function GET(req: Request) {
   try {
     const whereClause: any = { userId };
     if (dateStr) {
-      const startDate = new Date(`${dateStr}T00:00:00.000Z`);
-      const endDate = new Date(`${dateStr}T23:59:59.999Z`);
+      const [year, m, d] = dateStr.split('-').map(Number);
+      const startDate = new Date(Date.UTC(year, m - 1, d, 0, 0, 0, 0));
+      const endDate = new Date(Date.UTC(year, m - 1, d, 23, 59, 59, 999));
       whereClause.date = {
         gte: startDate,
         lte: endDate,
       };
     } else if (month) {
-      const startDate = new Date(`${month}-01T00:00:00.000Z`);
-      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      const [year, m] = month.split('-').map(Number);
+      const startDate = new Date(Date.UTC(year, m - 1, 1, 0, 0, 0, 0));
+      const endDate = new Date(Date.UTC(year, m, 0, 23, 59, 59, 999));
       whereClause.date = {
         gte: startDate,
         lte: endDate,
