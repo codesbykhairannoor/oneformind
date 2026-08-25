@@ -17,7 +17,7 @@ const customAdapter = {
     const user = await prisma.user.findUnique({
       where: { id: account.userId }
     })
-    return user || null
+    return (user as any) || null
   }
 }
 
