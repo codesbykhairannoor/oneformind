@@ -212,7 +212,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 font-sans overflow-hidden selection:bg-indigo-500 selection:text-white relative transition-colors duration-500">
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 font-sans selection:bg-indigo-500 selection:text-white relative transition-colors duration-500">
             
             {/* 1:1 GLOBAL HEADER (UNIFIED DESIGN) */}
             <header className="h-[72px] sm:h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/60 sticky top-0 z-[70] transition-all duration-500 shadow-sm">
