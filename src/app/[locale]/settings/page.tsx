@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
+import { useSession } from 'next-auth/react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { 
     User, Lock, LayoutGrid, Bell, CreditCard, ShieldCheck, 
@@ -63,10 +64,11 @@ export default function SettingsPage() {
     });
 
     useEffect(() => {
-        const savedSettings = localStorage.getItem('oneformind_user_settings');
-        if (savedSettings) {
+        // Load module settings
+        const saved = localStorage.getItem('oneformind_user_settings');
+        if (saved) {
             try {
-                const parsed = JSON.parse(savedSettings);
+                const parsed = JSON.parse(saved);
                 if (parsed && parsed.modules) {
                     setModules(prev => ({ ...prev, ...parsed.modules }));
                 }
@@ -74,17 +76,27 @@ export default function SettingsPage() {
                 console.error(e);
             }
         }
-        const savedProfile = localStorage.getItem('oneformind_user_profile');
-        if (savedProfile) {
-            try {
-                const parsed = JSON.parse(savedProfile);
-                if (parsed.name) setName(parsed.name);
-                if (parsed.email) setEmail(parsed.email);
-            } catch (e) {
-                console.error(e);
+    }, []);
+
+    const { data: session, status } = useSession();
+    useEffect(() => {
+        if (status === 'authenticated' && session?.user) {
+            if (session.user.name) setName(session.user.name);
+            if (session.user.email) setEmail(session.user.email);
+        } else {
+            // Fallback for mock if not authenticated
+            const savedProfile = localStorage.getItem('oneformind_user_profile');
+            if (savedProfile) {
+                try {
+                    const parsed = JSON.parse(savedProfile);
+                    if (parsed.name) setName(parsed.name);
+                    if (parsed.email) setEmail(parsed.email);
+                } catch (e) {
+                    console.error(e);
+                }
             }
         }
-    }, []);
+    }, [session, status]);
 
     const toggleModule = (key: string) => {
         const nextModules = { ...modules, [key]: !modules[key] };

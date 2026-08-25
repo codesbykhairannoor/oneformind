@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
 import InstantIntlProvider from "@/components/InstantIntlProvider";
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import "../globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -32,9 +33,11 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${plusJakartaSans.variable} antialiased`} suppressHydrationWarning>
       <body className="selection:bg-indigo-100 selection:text-indigo-700 font-sans min-h-screen flex flex-col bg-white text-slate-900" suppressHydrationWarning>
-        <InstantIntlProvider initialLocale={locale}>
-          {children}
-        </InstantIntlProvider>
+        <SessionProviderWrapper>
+          <InstantIntlProvider initialLocale={locale}>
+            {children}
+          </InstantIntlProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

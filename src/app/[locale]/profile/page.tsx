@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
+import { useSession } from 'next-auth/react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import ModalPortal from '@/components/ModalPortal';
 import {
@@ -45,33 +47,38 @@ export default function ProfilePage() {
     const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
 
     // 2. Persistence with localStorage
-    const [isLoaded, setIsLoaded] = useState(false);
+    // 2. Load NextAuth Session
+    const { data: session, status } = useSession();
 
     useEffect(() => {
+        if (status === 'authenticated' && session?.user) {
+            if (session.user.name) setName(session.user.name);
+            if (session.user.email) setEmail(session.user.email);
+            if (session.user.image) setAvatarUrl(session.user.image);
+        }
+        
+        // Still load mock data for fields not supported by default NextAuth (headline, bio)
         const saved = localStorage.getItem('oneformind_user_profile');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                if (parsed.name) setName(parsed.name);
-                if (parsed.email) setEmail(parsed.email);
                 if (parsed.headline) setHeadline(parsed.headline);
                 if (parsed.bio) setBio(parsed.bio);
-                if (parsed.avatarUrl) setAvatarUrl(parsed.avatarUrl);
+                if (!session?.user?.image && parsed.avatarUrl) setAvatarUrl(parsed.avatarUrl);
             } catch (e) {
                 console.error(e);
             }
         }
         setIsLoaded(true);
-    }, []);
+    }, [session, status]);
 
     useEffect(() => {
         if (isLoaded) {
             localStorage.setItem('oneformind_user_profile', JSON.stringify({
-                name, email, headline, bio, avatarUrl
+                headline, bio, avatarUrl
             }));
-            window.dispatchEvent(new Event('auth_change'));
         }
-    }, [name, email, headline, bio, avatarUrl, isLoaded]);
+    }, [headline, bio, avatarUrl, isLoaded]);
 
     const handleSaveProfile = (e: React.FormEvent) => {
         e.preventDefault();

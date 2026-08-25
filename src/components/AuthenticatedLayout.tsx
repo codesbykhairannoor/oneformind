@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import ModalPortal from '@/components/ModalPortal';
+import { useSession, signOut } from 'next-auth/react';
 import {
     LayoutDashboard,
     Zap,
@@ -45,45 +46,20 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     const pathname = usePathname();
     const router = useRouter();
 
-    const [user, setUser] = useState(() => {
-        return initialUser || {
-            name: 'Alexander',
-            email: 'alexander@oneformind.com',
-            plan_type: 'Architect',
-            avatar_url: null,
-        };
-    });
-
-    useEffect(() => {
-        const syncUser = () => {
-            try {
-                const saved = localStorage.getItem('oneformind_user_profile');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (parsed.name || parsed.email) {
-                        setUser((prev: any) => ({
-                            ...prev,
-                            name: parsed.name || prev.name,
-                            email: parsed.email || prev.email,
-                            headline: parsed.headline || prev.headline,
-                            bio: parsed.bio || prev.bio,
-                            avatar_url: parsed.avatarUrl || parsed.avatar_url || prev.avatar_url,
-                        }));
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        syncUser();
-        window.addEventListener('storage', syncUser);
-        window.addEventListener('auth_change', syncUser);
-        return () => {
-            window.removeEventListener('storage', syncUser);
-            window.removeEventListener('auth_change', syncUser);
-        };
-    }, []);
+    const { data: session } = useSession();
+    
+    // We derive the user data directly from the active NextAuth session
+    const user = session?.user ? {
+        name: session.user.name || 'User',
+        email: session.user.email || '',
+        plan_type: 'Architect', // Mocking plan_type for now since it's not in default JWT
+        avatar_url: session.user.image || null,
+    } : initialUser || {
+        name: 'Alexander',
+        email: 'alexander@oneformind.com',
+        plan_type: 'Architect',
+        avatar_url: null,
+    };
 
     const isExplorer = !user?.plan_type || user.plan_type.toLowerCase() === 'explorer';
 
@@ -227,16 +203,15 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         return pathname?.startsWith(path);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setShowLogoutModal(false);
         try {
             localStorage.removeItem('oneformind_user_profile');
             localStorage.removeItem('oneformind_auth');
-            window.dispatchEvent(new Event('auth_change'));
         } catch (e) {
             console.error(e);
         }
-        router.push('/login');
+        await signOut({ callbackUrl: '/login' });
     };
 
     const goToCoachWithContext = () => {
@@ -347,9 +322,13 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                 className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
                             >
                                 <div className="relative">
-                                    <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-[10px] font-black uppercase shadow-sm">
-                                        {user?.name?.charAt(0)}
-                                    </div>
+                                    {user?.avatar_url ? (
+                                        <img src={user.avatar_url} alt={user.name} className="w-7 h-7 rounded-lg object-cover shadow-sm" />
+                                    ) : (
+                                        <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-[10px] font-black uppercase shadow-sm">
+                                            {user?.name?.charAt(0)}
+                                        </div>
+                                    )}
                                     <div className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border-[1.5px] border-white dark:border-slate-900 ${currentStatus.dot}`}></div>
                                 </div>
                                 <span className="hidden lg:block text-[12px] font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[80px]">
@@ -364,9 +343,13 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                     <div className="fixed inset-0 z-40" onClick={() => setShowProfileDropdown(false)}></div>
                                     <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                                         <div className="px-3.5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2.5">
-                                            <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-[11px] font-black capitalize shrink-0">
-                                                {user?.name?.charAt(0)}
-                                            </div>
+                                            {user?.avatar_url ? (
+                                                <img src={user.avatar_url} alt={user.name} className="w-8 h-8 rounded-lg object-cover shrink-0" />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-[11px] font-black capitalize shrink-0">
+                                                    {user?.name?.charAt(0)}
+                                                </div>
+                                            )}
                                             <div className="min-w-0 flex-1">
                                                 <p className="text-[12px] font-black text-slate-800 dark:text-white truncate leading-none">{user?.name}</p>
                                                 <p className="text-[10px] text-slate-400 truncate mt-0.5">{user?.email}</p>
