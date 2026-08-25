@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import ModalPortal from '@/components/ModalPortal';
 import { Line } from 'react-chartjs-2';
 import {
@@ -65,6 +67,7 @@ interface HabitItem {
 }
 
 export default function HabitsPage() {
+    usePageTitle('Habits Tracker');
     const t = useTranslations();
     const locale = useLocale();
 

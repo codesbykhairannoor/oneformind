@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link } from '@/i18n/routing';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function HomePage() {
+    usePageTitle('Home');
     const t = useTranslations();
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 

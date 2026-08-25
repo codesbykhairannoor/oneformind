@@ -18,10 +18,11 @@ import {
     Wallet,
     BookOpen,
     CalendarDays,
-    HelpCircle
-} from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function Dashboard() {
+    usePageTitle('Dashboard');
     const t = useTranslations();
     const locale = useLocale();
     const [loadingInsight, setLoadingInsight] = useState(false);

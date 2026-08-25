@@ -1,7 +1,23 @@
 import createMiddleware from 'next-intl/middleware';
-import {routing} from './i18n/routing';
+import { routing } from './i18n/routing';
+import { auth } from "@/auth";
  
-export default createMiddleware(routing);
+const intlMiddleware = createMiddleware(routing);
+
+export default auth((req) => {
+  const isProtectedRoute = 
+    req.nextUrl.pathname.includes('/dashboard') || 
+    req.nextUrl.pathname.includes('/planner') || 
+    req.nextUrl.pathname.includes('/finance') || 
+    req.nextUrl.pathname.includes('/habits');
+
+  if (isProtectedRoute && !req.auth) {
+    const loginUrl = new URL('/id/login', req.nextUrl.origin);
+    return Response.redirect(loginUrl);
+  }
+
+  return intlMiddleware(req);
+});
  
 export const config = {
   // Match all pathnames except api, _next, static files

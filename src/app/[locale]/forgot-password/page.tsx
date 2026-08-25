@@ -7,34 +7,7 @@ import InputError from '@/components/InputError';
 
 export default function ForgotPassword({ searchParams }: { searchParams?: { status?: string } }) {
     const t = useTranslations();
-    const [email, setEmail] = useState('');
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
     const [status, setStatus] = useState(searchParams?.status || '');
-
-    const submit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setErrors({});
-
-        let hasError = false;
-        const newErrors: Record<string, string> = {};
-
-        if (!email.includes('@')) {
-            newErrors.email = t('auth_val_email') || 'Email harus mengandung @';
-            hasError = true;
-        }
-
-        if (hasError) {
-            setErrors(newErrors);
-            return;
-        }
-
-        setIsProcessing(true);
-        setTimeout(() => {
-            setIsProcessing(false);
-            setStatus(t('auth_reset_link_sent') || 'Link pemulihan password telah dikirim ke email Anda.');
-        }, 1000);
-    };
 
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center bg-white selection:bg-indigo-100 selection:text-indigo-700 p-6 overflow-hidden">
@@ -63,32 +36,25 @@ export default function ForgotPassword({ searchParams }: { searchParams?: { stat
                     </div>
                 )}
 
-                <form onSubmit={submit} className="space-y-4">
+                <form action="/forgot-password" method="POST" className="space-y-4">
                     <div>
                         <input
                             id="email"
+                            name="email"
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
                             placeholder={t('auth_placeholder_email') || 'Alamat Email'}
-                            className={`w-full px-4 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 transition-all outline-none ${
-                                errors.email ? 'border-red-400 focus:ring-red-100 focus:border-red-500' : 'focus:border-indigo-500 focus:ring-indigo-500/10'
-                            }`}
+                            className="w-full px-4 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 transition-all outline-none focus:border-indigo-500 focus:ring-indigo-500/10"
                             required
                             autoFocus
                         />
-                        <InputError className="mt-1.5 ml-1" message={errors.email} />
                     </div>
 
                     <button
                         type="submit"
-                        disabled={isProcessing}
-                        className="w-full mt-4 bg-indigo-600 text-white font-black py-3 rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-75 flex items-center justify-center gap-2"
+                        className="w-full mt-4 bg-indigo-600 text-white font-black py-3 rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2"
                     >
                         <span>{t('auth_btn_reset') || 'Send Recovery Link'}</span>
-                        {!isProcessing && (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                        )}
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                     </button>
 
                     <div className="text-center mt-6">

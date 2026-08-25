@@ -6,6 +6,7 @@ import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import ModalPortal from '@/components/ModalPortal';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import PlannerHeader from './components/PlannerHeader';
 import PlannerSidebar from './components/PlannerSidebar';
 import PlannerTimeline from './components/PlannerTimeline';
@@ -31,6 +32,7 @@ interface InboxTask {
 }
 
 export default function PlannerPage() {
+    usePageTitle('Planner');
     const t = useTranslations();
     const locale = useLocale();
     const router = useRouter();

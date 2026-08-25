@@ -17,6 +17,7 @@ import VaultTransactionModal from './components/VaultTransactionModal';
 import ArchiveModal from './components/ArchiveModal';
 import FinanceInsights from './components/FinanceInsights';
 import { Wallet, Plus } from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 interface CategoryOption {
     slug: string;
@@ -26,6 +27,7 @@ interface CategoryOption {
 }
 
 export default function FinancePage() {
+    usePageTitle('Finance');
     const t = useTranslations();
     const locale = useLocale();
 
