@@ -65,7 +65,7 @@ export default function Dashboard() {
                 const res = await fetch('/api/dashboard');
                 if (res.ok) {
                     const data = await res.json();
-                    setSynergy(prev => ({ ...prev, ...data }));
+                    setSynergy((prev: any) => ({ ...prev, ...data }));
                     setPlannerData(data.planner);
                 }
             } catch (error) {

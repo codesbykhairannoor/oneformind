@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import CalendarHeader from './components/CalendarHeader';

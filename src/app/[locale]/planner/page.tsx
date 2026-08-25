@@ -442,7 +442,7 @@ export default function PlannerPage() {
                     tasks={tasks}
                     stats={{ percent: progressPercent, completed: completedCount, pending: pendingCount }}
                     onOpenTaskModal={() => openNewTaskModal()}
-                    onResetBoard={() => updateTasksAndSave(tasks.filter(t => t.date !== selectedDate))}
+                    onResetBoard={() => setTasks(tasks.filter(t => t.date !== selectedDate))}
                 />
 
                 {/* Main Content */}

@@ -249,7 +249,8 @@ export default function FinancePage() {
     const handleVaultMutation = async (amount: number, type: 'deposit' | 'withdraw') => {
         if (!activeVault) return;
         try {
-            const newAmount = type === 'deposit' ? activeVault.current + amount : Math.max(0, activeVault.current - amount);
+            const currentAmount = activeVault.current_amount || 0;
+            const newAmount = type === 'deposit' ? currentAmount + amount : Math.max(0, currentAmount - amount);
             const res = await fetch('/api/finance/savings', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },

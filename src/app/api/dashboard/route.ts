@@ -83,7 +83,7 @@ export async function GET(req: Request) {
       },
       planner: {
         total: plannerTasks.length,
-        upcoming: plannerTasks.filter(t => !t.completed).slice(0, 4)
+        upcoming: plannerTasks.filter(t => !t.isCompleted).slice(0, 4)
       },
       finance: {
         expense,
