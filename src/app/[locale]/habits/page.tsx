@@ -61,7 +61,7 @@ interface HabitItem {
     icon: string;
     color: string;
     period: string;
-    monthly_target: number;
+    monthlyTarget: number;
     position: number;
     logs: Record<string, 'completed' | 'skipped' | 'empty'>;
 }
@@ -83,128 +83,42 @@ export default function HabitsPage() {
     const [selectedMobileDate, setSelectedMobileDate] = useState(todayStr);
 
     // 3. Habits Main State
-    const [habits, setHabits] = useState<HabitItem[]>([
-        {
-            id: 1,
-            name: 'Meditasi Pagi 15 Menit',
-            icon: '🧘',
-            color: '#6366f1',
-            period: '2026-08',
-            monthly_target: 25,
-            position: 1,
-            logs: {
-                '2026-08-01': 'completed',
-                '2026-08-02': 'completed',
-                '2026-08-03': 'completed',
-                '2026-08-04': 'completed',
-                '2026-08-05': 'completed',
-                '2026-08-06': 'completed',
-                '2026-08-07': 'skipped',
-                '2026-08-08': 'completed',
-                '2026-08-09': 'completed',
-                '2026-08-10': 'completed',
-                '2026-08-11': 'completed',
-                '2026-08-12': 'completed',
-                '2026-08-13': 'completed',
-                '2026-08-14': 'completed',
-                '2026-08-15': 'completed',
-            }
-        },
-        {
-            id: 2,
-            name: 'Olahraga & Stretching',
-            icon: '🏋️',
-            color: '#10b981',
-            period: '2026-08',
-            monthly_target: 20,
-            position: 2,
-            logs: {
-                '2026-08-01': 'completed',
-                '2026-08-03': 'completed',
-                '2026-08-05': 'completed',
-                '2026-08-07': 'completed',
-                '2026-08-09': 'completed',
-                '2026-08-11': 'completed',
-                '2026-08-13': 'completed',
-                '2026-08-15': 'completed',
-            }
-        },
-        {
-            id: 3,
-            name: 'Membaca Buku Non-Fiksi 20 Halaman',
-            icon: '📚',
-            color: '#f59e0b',
-            period: '2026-08',
-            monthly_target: 28,
-            position: 3,
-            logs: {
-                '2026-08-01': 'completed',
-                '2026-08-02': 'completed',
-                '2026-08-04': 'completed',
-                '2026-08-05': 'completed',
-                '2026-08-06': 'completed',
-                '2026-08-08': 'completed',
-                '2026-08-10': 'completed',
-                '2026-08-12': 'completed',
-                '2026-08-14': 'completed',
-                '2026-08-15': 'completed',
-            }
-        },
-        {
-            id: 4,
-            name: 'Minum Air Putih 2.5 Liter',
-            icon: '💧',
-            color: '#3b82f6',
-            period: '2026-08',
-            monthly_target: 30,
-            position: 4,
-            logs: {
-                '2026-08-01': 'completed',
-                '2026-08-02': 'completed',
-                '2026-08-03': 'completed',
-                '2026-08-04': 'completed',
-                '2026-08-05': 'completed',
-                '2026-08-06': 'completed',
-                '2026-08-07': 'completed',
-                '2026-08-08': 'completed',
-                '2026-08-09': 'completed',
-                '2026-08-10': 'completed',
-                '2026-08-11': 'completed',
-                '2026-08-12': 'completed',
-                '2026-08-13': 'completed',
-                '2026-08-14': 'completed',
-                '2026-08-15': 'completed',
-            }
-        }
-    ]);
-
+    const [habits, setHabits] = useState<HabitItem[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Persistence with localStorage
-    useEffect(() => {
-        const savedHabits = localStorage.getItem('oneformind_habits');
-        if (savedHabits) {
-            try {
-                const parsed = JSON.parse(savedHabits);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    setHabits(parsed);
-                }
-            } catch (e) {
-                console.error('Failed to parse habits:', e);
+    const fetchHabits = async () => {
+        try {
+            const res = await fetch(`/api/habits?period=${currentMonthKey}`);
+            if (res.ok) {
+                const data = await res.json();
+                const mappedHabits = data.map((h: any) => {
+                    const logsMap: Record<string, 'completed' | 'skipped' | 'empty'> = {};
+                    if (h.logs) {
+                        h.logs.forEach((log: any) => {
+                            const dateStr = new Date(log.date).toISOString().split('T')[0];
+                            logsMap[dateStr] = log.status as 'completed' | 'skipped' | 'empty';
+                        });
+                    }
+                    return { ...h, logs: logsMap };
+                });
+                setHabits(mappedHabits);
             }
+        } catch (e) {
+            console.error('Failed to fetch habits', e);
+        } finally {
+            setIsLoaded(true);
         }
+    };
+
+    useEffect(() => {
+        setIsLoaded(false);
+        fetchHabits();
+        
         const savedMood = localStorage.getItem('oneformind_mood');
         if (savedMood) {
             setSelectedMood(savedMood);
         }
-        setIsLoaded(true);
-    }, []);
-
-    useEffect(() => {
-        if (isLoaded) {
-            localStorage.setItem('oneformind_habits', JSON.stringify(habits));
-        }
-    }, [habits, isLoaded]);
+    }, [currentMonthKey]);
 
     // 4. Mood Reflection State
     const [selectedMood, setSelectedMood] = useState('happy');
@@ -277,11 +191,13 @@ export default function HabitsPage() {
     });
 
     // Helper: Toggle Habit Log Status
-    const toggleStatus = (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped') => {
+    const toggleStatus = async (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped') => {
+        // Optimistic UI update
+        let nextStatus: 'completed' | 'skipped' | 'empty' = 'completed';
+        
         setHabits(prev => prev.map(h => {
             if (h.id === habitId) {
                 const currentStatus = h.logs[dateString] || 'empty';
-                let nextStatus: 'completed' | 'skipped' | 'empty' = 'completed';
 
                 if (forceStatus) {
                     nextStatus = currentStatus === forceStatus ? 'empty' : forceStatus;
@@ -296,6 +212,18 @@ export default function HabitsPage() {
             }
             return h;
         }));
+
+        // API Call
+        try {
+            await fetch(`/api/habits/${habitId}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: dateString, status: nextStatus })
+            });
+        } catch (e) {
+            console.error('Failed to toggle habit log', e);
+            // Revert on error could be implemented here, but ignoring for brevity
+        }
     };
 
     const getStatus = (habit: HabitItem, dateString: string) => {
@@ -305,7 +233,7 @@ export default function HabitsPage() {
     // Calculate processed habits data
     const processedHabits = habits.map(h => {
         const completedCount = Object.values(h.logs).filter(v => v === 'completed').length;
-        const progressPercent = Math.min(100, Math.round((completedCount / h.monthly_target) * 100));
+        const progressPercent = Math.min(100, Math.round((completedCount / h.monthlyTarget) * 100));
 
         let streak = 0;
         for (let d = 15; d >= 1; d--) {
@@ -402,34 +330,59 @@ export default function HabitsPage() {
         setFormName(habit.name);
         setFormIcon(habit.icon);
         setFormColor(habit.color);
-        setFormTarget(habit.monthly_target);
+        setFormTarget(habit.monthlyTarget);
         setShowCreateModal(true);
     };
 
-    const submitSingleHabit = (e: React.FormEvent) => {
+    const submitSingleHabit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formName.trim()) return;
 
-        if (editingHabitId) {
-            setHabits(prev => prev.map(h => h.id === editingHabitId ? {
-                ...h,
-                name: formName,
-                icon: formIcon,
-                color: formColor,
-                monthly_target: formTarget
-            } : h));
-        } else {
-            const newHabit: HabitItem = {
-                id: Date.now(),
-                name: formName,
-                icon: formIcon,
-                color: formColor,
-                period: currentMonthKey,
-                monthly_target: formTarget,
-                position: habits.length + 1,
-                logs: {}
-            };
-            setHabits(prev => [...prev, newHabit]);
+        try {
+            if (editingHabitId) {
+                // UPDATE API Call
+                const res = await fetch(`/api/habits/${editingHabitId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: formName,
+                        icon: formIcon,
+                        color: formColor,
+                        monthlyTarget: formTarget
+                    })
+                });
+                
+                if (res.ok) {
+                    const updated = await res.json();
+                    setHabits(prev => prev.map(h => h.id === editingHabitId ? {
+                        ...h,
+                        name: updated.name,
+                        icon: updated.icon,
+                        color: updated.color,
+                        monthlyTarget: updated.monthlyTarget
+                    } : h));
+                }
+            } else {
+                // CREATE API Call
+                const res = await fetch('/api/habits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: formName,
+                        icon: formIcon,
+                        color: formColor,
+                        period: currentMonthKey,
+                        monthlyTarget: formTarget
+                    })
+                });
+
+                if (res.ok) {
+                    const newHabit = await res.json();
+                    setHabits(prev => [...prev, { ...newHabit, logs: {} }]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to submit habit', error);
         }
         setShowCreateModal(false);
     };
@@ -439,30 +392,52 @@ export default function HabitsPage() {
         setShowDeleteModal(true);
     };
 
-    const executeDelete = () => {
+    const executeDelete = async () => {
         if (habitToDelete) {
-            setHabits(prev => prev.filter(h => h.id !== habitToDelete.id));
+            try {
+                const res = await fetch(`/api/habits/${habitToDelete.id}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    setHabits(prev => prev.filter(h => h.id !== habitToDelete.id));
+                }
+            } catch (error) {
+                console.error('Failed to delete habit', error);
+            }
         }
         setShowDeleteModal(false);
         setHabitToDelete(null);
     };
 
-    const submitBatchHabits = () => {
+    const submitBatchHabits = async () => {
         const validRows = batchRows.filter(r => r.name.trim() !== '');
         if (validRows.length === 0) return;
 
-        const newHabitsList: HabitItem[] = validRows.map((r, i) => ({
-            id: Date.now() + i,
-            name: r.name,
-            icon: r.icon,
-            color: r.color,
-            period: currentMonthKey,
-            monthly_target: r.target,
-            position: habits.length + i + 1,
-            logs: {}
-        }));
+        try {
+            // API calls sequentially to create all
+            const newHabitsList: HabitItem[] = [];
+            for (const r of validRows) {
+                const res = await fetch('/api/habits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: r.name,
+                        icon: r.icon,
+                        color: r.color,
+                        period: currentMonthKey,
+                        monthlyTarget: r.target
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    newHabitsList.push({ ...data, logs: {} });
+                }
+            }
+            setHabits(prev => [...prev, ...newHabitsList]);
+        } catch (error) {
+            console.error('Failed to submit batch habits', error);
+        }
 
-        setHabits(prev => [...prev, ...newHabitsList]);
         setShowBatchModal(false);
         setBatchRows([
             { name: '', icon: '⚡', color: '#6366f1', target: 25 },
@@ -669,7 +644,7 @@ export default function HabitsPage() {
                                                     />
                                                 </div>
                                                 <div className="flex items-center gap-1.5 shrink-0">
-                                                    <span className="text-[9px] font-black text-slate-700 dark:text-slate-300">{habit.progress_count}<span className="text-slate-400 font-bold">/{habit.monthly_target}</span></span>
+                                                    <span className="text-[9px] font-black text-slate-700 dark:text-slate-300">{habit.progress_count}<span className="text-slate-400 font-bold">/{habit.monthlyTarget}</span></span>
                                                     <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter">{Math.round(habit.progress_percent)}%</span>
                                                 </div>
                                             </div>
@@ -758,7 +733,7 @@ export default function HabitsPage() {
                                                     )}
                                                 </h4>
                                                 <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 dark:text-slate-500 mb-1.5 mt-0.5">
-                                                    <span>🎯 Target: {habit.monthly_target} Hari</span>
+                                                    <span>🎯 Target: {habit.monthlyTarget} Hari</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <div className="h-1.5 w-16 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">

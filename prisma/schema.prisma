@@ -47,6 +47,7 @@ model User {
 
   accounts                Account[]
   sessions                Session[]
+  habits                  Habit[]
 
   @@map("users")
 }
@@ -89,4 +90,39 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model Habit {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  period          String
+  name            String
+  icon            String?
+  color           String
+  monthlyTarget   Int        @map("monthly_target") @db.SmallInt
+  isArchived      Boolean    @default(false) @map("is_archived")
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+  status          String     @default("active")
+  position        Int        @default(0)
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs            HabitLog[]
+
+  @@map("habits")
+}
+
+model HabitLog {
+  id              Int        @id @default(autoincrement())
+  habitId         Int        @map("habit_id")
+  date            DateTime   @db.Date
+  status          String
+  notes           String?
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  habit           Habit      @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@map("habit_logs")
 }
