@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
-import { useRouter, usePathname } from '@/i18n/routing';
+import { useRouter, usePathname } from 'next/navigation';
 import enMessages from '@/messages/en.json';
 import idMessages from '@/messages/id.json';
 
@@ -39,11 +39,25 @@ export default function InstantIntlProvider({
         setLocale(newLocale);
         localStorage.setItem('oneformind_locale', newLocale);
 
-        // Update URL path prefix via next-intl router replace to keep Next.js context synchronized.
-        // We append search queries (e.g. ?tab=general) and hash segments.
+        // Manual prefix-aware path calculation to keep Next.js router in sync
+        let newPathname = pathname;
+        if (newLocale === 'id') {
+          // Add '/id' prefix if not already present
+          if (!pathname.startsWith('/id/') && pathname !== '/id') {
+            newPathname = `/id${pathname === '/' ? '' : pathname}`;
+          }
+        } else {
+          // Remove '/id' prefix for English ('as-needed' localePrefix)
+          if (pathname.startsWith('/id/')) {
+            newPathname = pathname.replace('/id/', '/');
+          } else if (pathname === '/id') {
+            newPathname = '/';
+          }
+        }
+
         const currentSearch = window.location.search;
         const currentHash = window.location.hash;
-        router.replace(`${pathname}${currentSearch}${currentHash}`, { locale: newLocale });
+        router.replace(`${newPathname}${currentSearch}${currentHash}`);
       }
     };
 
