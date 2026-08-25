@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/routing';
 import enMessages from '@/messages/en.json';
 import idMessages from '@/messages/id.json';
 
@@ -18,8 +19,15 @@ export default function InstantIntlProvider({
   initialLocale: string;
 }) {
   const [locale, setLocale] = useState(initialLocale);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Sync HTML lang attribute and watch for external changes
+  // Sync state if initialLocale changes externally (e.g. user manually changes URL prefix)
+  useEffect(() => {
+    setLocale(initialLocale);
+  }, [initialLocale]);
+
+  // Sync HTML lang attribute
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
@@ -31,36 +39,11 @@ export default function InstantIntlProvider({
         setLocale(newLocale);
         localStorage.setItem('oneformind_locale', newLocale);
 
-        // Update URL path prefix silently without refreshing the page
-        const currentPathname = window.location.pathname;
-        let newPathname = currentPathname;
-
-        if (currentPathname.startsWith('/en/')) {
-          newPathname = currentPathname.replace('/en/', `/${newLocale}/`);
-        } else if (currentPathname.startsWith('/id/')) {
-          newPathname = currentPathname.replace('/id/', `/${newLocale}/`);
-        } else if (currentPathname === '/en') {
-          newPathname = `/${newLocale}`;
-        } else if (currentPathname === '/id') {
-          newPathname = `/${newLocale}`;
-        } else {
-          // If no prefix is present (localePrefix: 'as-needed')
-          if (newLocale === 'id') {
-            if (!currentPathname.startsWith('/id')) {
-              newPathname = `/id${currentPathname === '/' ? '' : currentPathname}`;
-            }
-          } else {
-            if (currentPathname.startsWith('/id/')) {
-              newPathname = currentPathname.replace('/id/', '/');
-            } else if (currentPathname === '/id') {
-              newPathname = '/';
-            }
-          }
-        }
-
+        // Update URL path prefix via next-intl router replace to keep Next.js context synchronized.
+        // We append search queries (e.g. ?tab=general) and hash segments.
         const currentSearch = window.location.search;
         const currentHash = window.location.hash;
-        window.history.replaceState(null, '', `${newPathname}${currentSearch}${currentHash}`);
+        router.replace(`${pathname}${currentSearch}${currentHash}`, { locale: newLocale });
       }
     };
 
@@ -68,7 +51,7 @@ export default function InstantIntlProvider({
     return () => {
       window.removeEventListener('switch-locale' as any, handleSwitch);
     };
-  }, [locale]);
+  }, [locale, pathname, router]);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messagesMap[locale]}>
