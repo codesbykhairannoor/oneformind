@@ -58,7 +58,7 @@ function LocaleSwitcherListener({
         // next-intl's custom router automatically formats the URL prefix depending on the newLocale
         const currentSearch = window.location.search;
         const currentHash = window.location.hash;
-        router.replace(`${pathname}${currentSearch}${currentHash}`, { locale: newLocale });
+        router.replace(`${pathname}${currentSearch}${currentHash}`, { locale: newLocale, scroll: false });
       }
     };
 
