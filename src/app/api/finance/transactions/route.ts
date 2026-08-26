@@ -15,8 +15,11 @@ export async function GET(req: Request) {
   try {
     const whereClause: any = { userId };
     if (month) {
-      const startDate = new Date(`${month}-01T00:00:00.000Z`);
-      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      const [y, m] = month.split('-');
+      const year = parseInt(y);
+      const mm = parseInt(m);
+      const startDate = new Date(Date.UTC(year, mm - 1, 1, 0, 0, 0, 0));
+      const endDate = new Date(Date.UTC(year, mm, 0, 23, 59, 59, 999));
       whereClause.date = {
         gte: startDate,
         lte: endDate,

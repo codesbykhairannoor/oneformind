@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 export async function generateMetadata() {
     const t = await getTranslations();
     return {
-        title: `${t('dash_title') || 'Dashboard'} - OneForMind`,
+        title: `Dashboard - OneForMind`,
     };
 }
 
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
         prisma.financeTransaction.findMany({
             where: {
                 userId,
-                date: { gte: new Date(today.getFullYear(), today.getMonth(), 1) }
+                date: { gte: new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)) }
             }
         }),
         prisma.goal.findMany({ 
