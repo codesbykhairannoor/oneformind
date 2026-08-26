@@ -7,13 +7,30 @@ import { Link, useRouter } from '@/i18n/routing';
 import { ChevronDown, Check, Lock, Sparkles, Star } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { loadScript } from '@paypal/paypal-js';
+import { useSession } from 'next-auth/react';
 
 export default function BillingPricingPage() {
     const t = useTranslations();
     const locale = useLocale();
     const router = useRouter();
+    const { data: session } = useSession();
     const [isAnnual, setIsAnnual] = useState(true);
     const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+    const userPlan = (session?.user as any)?.planType || 'explorer';
+    const planHierarchy = ['explorer', 'architect', 'quantum', 'legendary', 'lifetime'];
+    const userPlanIndex = planHierarchy.indexOf(userPlan.toLowerCase());
+
+    const getBtnProps = (plan: string, baseClass: string, text: string) => {
+        const targetIndex = planHierarchy.indexOf(plan.toLowerCase());
+        if (targetIndex === userPlanIndex) {
+            return { disabled: true, text: t('pricing_btn_current'), className: "w-full py-5 rounded-[2rem] font-black text-xs flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default" };
+        }
+        if (targetIndex < userPlanIndex) {
+            return { disabled: true, text: "Unavailable", className: "w-full py-5 rounded-[2rem] font-black text-xs flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default opacity-50" };
+        }
+        return { disabled: false, text, className: baseClass };
+    };
 
     const isId = locale === 'id';
 
@@ -266,7 +283,7 @@ export default function BillingPricingPage() {
                             </ul>
 
                             <button type="button" disabled className="w-full py-5 rounded-[2rem] font-black text-xs flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default">
-                                {t('pricing_btn_current')}
+                                {userPlanIndex === 0 ? t('pricing_btn_current') : 'Unavailable'}
                             </button>
                         </div>
 
@@ -326,8 +343,13 @@ export default function BillingPricingPage() {
                                 </li>
                             </ul>
 
-                            <button type="button" onClick={() => handleCheckout('Architect')} className="w-full py-5 rounded-[2rem] font-black text-xs transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-500/40">
-                                {t('pricing_btn_upgrade')}
+                            <button 
+                                type="button" 
+                                disabled={getBtnProps('architect', '', '').disabled}
+                                onClick={() => handleCheckout('Architect')} 
+                                className={getBtnProps('architect', "w-full py-5 rounded-[2rem] font-black text-xs transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-500/40", '').className}
+                            >
+                                {getBtnProps('architect', '', t('pricing_btn_upgrade')).text}
                             </button>
                         </div>
 
@@ -392,8 +414,13 @@ export default function BillingPricingPage() {
                                 </li>
                             </ul>
 
-                            <button type="button" onClick={() => handleCheckout('Quantum')} className="relative z-10 w-full py-5 rounded-[2rem] font-black text-xs hover:scale-105 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)] bg-white text-slate-950">
-                                {t('pricing_btn_unleash')}
+                            <button 
+                                type="button" 
+                                disabled={getBtnProps('quantum', '', '').disabled}
+                                onClick={() => handleCheckout('Quantum')} 
+                                className={getBtnProps('quantum', "relative w-full py-6 rounded-[2rem] bg-white text-slate-950 font-black text-xs hover:scale-105 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)] z-10", '').className}
+                            >
+                                {getBtnProps('quantum', '', t('pricing_btn_unleash')).text}
                             </button>
                         </div>
 
@@ -451,8 +478,13 @@ export default function BillingPricingPage() {
                                 </li>
                             </ul>
 
-                            <button type="button" onClick={() => handleCheckout('Legendary')} className="w-full py-5 rounded-[2rem] font-black text-xs transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-slate-800">
-                                {t('pricing_btn_legendary')}
+                            <button 
+                                type="button" 
+                                disabled={getBtnProps('legendary', '', '').disabled}
+                                onClick={() => handleCheckout('Legendary')} 
+                                className={getBtnProps('legendary', "w-full py-5 rounded-[2rem] font-black text-xs transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 bg-amber-500 text-slate-950 hover:bg-amber-400 hover:shadow-amber-500/40", '').className}
+                            >
+                                {getBtnProps('legendary', '', t('pricing_btn_legendary')).text}
                             </button>
                         </div>
                     </div>
