@@ -24,10 +24,7 @@ export default function FinanceInsights({
     const t = useTranslations();
     const locale = useLocale();
 
-    const [assets, setAssets] = useState<AssetItem[]>([
-        { id: '1', name: 'Reksa Dana Pasar Uang', capital: 10000000, percent: 8.5 },
-        { id: '2', name: 'Saham Blue Chip', capital: 15000000, percent: 12.4 }
-    ]);
+    const [assets, setAssets] = useState<AssetItem[]>([]);
 
     useEffect(() => {
         const saved = localStorage.getItem('oneformind_assets');
