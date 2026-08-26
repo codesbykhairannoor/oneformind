@@ -7,29 +7,10 @@ import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import ModalPortal from '@/components/ModalPortal';
-import { Line } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    Title,
-    Tooltip,
-    Legend,
-    LineElement,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    Filler
-} from 'chart.js';
+import dynamic from 'next/dynamic';
 
-ChartJS.register(
-    Title,
-    Tooltip,
-    Legend,
-    LineElement,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    Filler
-);
+const HabitTrendChart = dynamic(() => import('./components/HabitTrendChart'), { ssr: false });
+
 import {
     Plus,
     Check,
@@ -270,43 +251,6 @@ export default function HabitsPage() {
     const overallPercentage = Math.round(
         processedHabits.reduce((acc, h) => acc + h.progress_percent, 0) / (processedHabits.length || 1)
     );
-
-    const chartData = {
-        labels: ['', '', '', '', '', '', ''],
-        datasets: [
-            {
-                label: 'Progress',
-                data: [40, 60, 45, 70, 55, 80, overallPercentage],
-                borderColor: '#818cf8',
-                backgroundColor: (context: any) => {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-                    if (!chartArea) return null;
-                    const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                    g.addColorStop(0, 'rgba(129,140,248,0.4)');
-                    g.addColorStop(1, 'rgba(129,140,248,0)');
-                    return g;
-                },
-                fill: true,
-                tension: 0.4,
-                pointRadius: 0,
-                borderWidth: 3
-            }
-        ]
-    };
-
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false }
-        },
-        scales: {
-            x: { display: false },
-            y: { display: false, min: 0, max: 100 }
-        }
-    };
 
     const topHabit = [...processedHabits].sort((a, b) => b.progress_count - a.progress_count)[0];
     const totalCompletions = processedHabits.reduce((acc, h) => acc + h.progress_count, 0);
@@ -877,7 +821,7 @@ export default function HabitsPage() {
                                 </div>
                             </div>
                             <div className="absolute inset-x-0 bottom-0 h-24">
-                                <Line data={chartData as any} options={chartOptions as any} />
+                                <HabitTrendChart overallPercentage={overallPercentage} />
                             </div>
                         </div>
 
