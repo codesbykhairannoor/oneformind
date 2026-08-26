@@ -69,7 +69,7 @@ export default function ResumeAiModal({
     return (
         // 1:1 from ResumeAiModal.vue line 66-139
         <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose}></div>
 
             <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
                 

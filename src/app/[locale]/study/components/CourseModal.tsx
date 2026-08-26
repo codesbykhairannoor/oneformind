@@ -57,7 +57,7 @@ export default function CourseModal({
 
     return (
         // 1:1 from CourseModal.vue line 48-84
-        <ModalPortal><div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <ModalPortal><div className="fixed inset-0 bg-slate-900/60  z-[100] flex items-center justify-center p-4">
             <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 border border-slate-200 dark:border-slate-800 transform animate-in zoom-in-95 duration-300 relative">
                 <button
                     type="button"

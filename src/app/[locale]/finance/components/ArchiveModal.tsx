@@ -76,7 +76,7 @@ export default function ArchiveModal({
     return (
         <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 " onClick={onClose}></div>
 
             {/* Modal Body — 1:1 from ArchiveModal.vue line 54 */}
             <div className="relative z-10 w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl dark:shadow-none border border-transparent dark:border-slate-800 transition-all duration-500 animate-in fade-in zoom-in-95 duration-200">

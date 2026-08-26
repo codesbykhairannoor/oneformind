@@ -17,7 +17,14 @@ export default function ModalPortal({ children }: { children: React.ReactNode })
 
     useEffect(() => {
         setMounted(true);
-        return () => setMounted(false);
+        // Prevent background scrolling which causes lag and layout thrashing
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+        document.body.style.overflow = 'hidden';
+        
+        return () => {
+            setMounted(false);
+            document.body.style.overflow = originalStyle;
+        };
     }, []);
 
     if (!mounted) return null;

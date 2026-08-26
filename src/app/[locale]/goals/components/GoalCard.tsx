@@ -119,7 +119,7 @@ export default function GoalCard({
                     </>
                 ) : (
                     <div style={meshGradientStyle} className="w-full h-full flex items-center justify-center transition-transform duration-700 relative group-hover:scale-105">
-                        <div className="absolute inset-0 backdrop-blur-[2px]"></div>
+                        <div className="absolute inset-0 -[2px]"></div>
                         <div className="relative z-10 w-16 h-16 rounded-full bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/10 flex items-center justify-center text-white shadow-xl">
                             <IconComp className="w-8 h-8 stroke-[2.5]" style={{ color: themeColor }} />
                         </div>

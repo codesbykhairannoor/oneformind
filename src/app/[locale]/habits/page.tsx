@@ -990,7 +990,7 @@ export default function HabitsPage() {
                 {/* SINGLE HABIT MODAL (Matching HabitModals.vue 1:1) */}
                 {showCreateModal && (
                     <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowCreateModal(false)} />
+                        <div className="absolute inset-0 bg-slate-950/50 " onClick={() => setShowCreateModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-8 w-full max-w-lg relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800">
                             
                             <div className="flex justify-between items-center mb-6">
@@ -1105,7 +1105,7 @@ export default function HabitsPage() {
                 {/* BATCH HABIT MODAL (Matching HabitBatchModal.vue 1:1) */}
                 {showBatchModal && (
                     <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowBatchModal(false)} />
+                        <div className="absolute inset-0 bg-slate-950/50 " onClick={() => setShowBatchModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-0 w-full max-w-2xl relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[85vh] flex flex-col overflow-hidden">
                             
                             {/* Modal Header */}
@@ -1298,7 +1298,7 @@ export default function HabitsPage() {
                 {/* COPY HABIT MODAL (Matching HabitModals.vue 1:1) */}
                 {showCopyModal && (
                     <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowCopyModal(false)} />
+                        <div className="absolute inset-0 bg-slate-950/50 " onClick={() => setShowCopyModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 w-full max-w-sm relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 text-center">
                             <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm border border-indigo-100">📂</div>
                             <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-2">Salin Habit Bulan Lalu?</h3>
@@ -1316,7 +1316,7 @@ export default function HabitsPage() {
                 {/* DELETE CONFIRMATION MODAL (Matching HabitModals.vue 1:1) */}
                 {showDeleteModal && habitToDelete && (
                     <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setShowDeleteModal(false)} />
+                        <div className="absolute inset-0 bg-slate-950/50 " onClick={() => setShowDeleteModal(false)} />
                         <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 w-full max-w-sm relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 text-center">
                             <div className="w-16 h-16 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm border border-rose-100">🗑️</div>
                             <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-2">Hapus Habit Ini?</h3>

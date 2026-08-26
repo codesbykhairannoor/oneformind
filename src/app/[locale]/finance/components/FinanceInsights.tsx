@@ -225,7 +225,7 @@ export default function FinanceInsights({
 
             {showInvestModal && isMounted && createPortal(
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowInvestModal(false)}></div>
+                    <div className="absolute inset-0 bg-slate-900/60 " onClick={() => setShowInvestModal(false)}></div>
                     <div className="bg-white dark:bg-slate-900 flex flex-col w-full max-w-md relative overflow-visible transition-all duration-500 border border-slate-100 dark:border-slate-800 shadow-2xl dark:shadow-none rounded-[2.5rem] p-8 animate-in fade-in zoom-in-95">
                         <h3 className="text-xl font-black text-slate-800 dark:text-white mb-6">
                             {t('invest_new') || 'Investasi Baru'}
@@ -262,7 +262,7 @@ export default function FinanceInsights({
 
             {showQuitModal && selectedAsset && isMounted && createPortal(
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowQuitModal(false)}></div>
+                    <div className="absolute inset-0 bg-slate-900/60 " onClick={() => setShowQuitModal(false)}></div>
                     <div className="bg-white dark:bg-slate-900 flex flex-col w-full max-w-md relative overflow-visible transition-all duration-500 border border-slate-100 dark:border-slate-800 shadow-2xl dark:shadow-none rounded-[2.5rem] p-8 animate-in fade-in zoom-in-95">
                         <h3 className="text-xl font-black text-slate-800 dark:text-white mb-6">
                             {t('withdraw_asset') || 'Cairkan Aset'}

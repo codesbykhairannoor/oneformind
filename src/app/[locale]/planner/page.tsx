@@ -476,7 +476,7 @@ export default function PlannerPage() {
 
                 {/* MODAL (Single Task) */}
                 {showTaskModal && (
-                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60  animate-in fade-in duration-200">
                         <div className="absolute inset-0" onClick={() => setShowTaskModal(false)}></div>
                         <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                             

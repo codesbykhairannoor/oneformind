@@ -52,7 +52,7 @@ export default function PlannerBatchModal({
     };
 
     return (
-        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60  animate-in fade-in duration-200">
             <div className="absolute inset-0" onClick={onClose}></div>
             <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] flex flex-col max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800">
                 

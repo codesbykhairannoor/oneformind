@@ -527,7 +527,7 @@ export default function BillingPricingPage() {
             {/* FAST REACT MODAL (REPLACES SWEETALERT2) */}
             {checkout.isOpen && (
                 <ModalPortal>
-                    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/60  animate-in fade-in duration-300">
                         <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2rem] shadow-2xl p-8 relative overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-100 dark:border-slate-800">
                             {checkout.error && (
                                 <div className="mb-6 p-4 rounded-xl bg-rose-50 text-rose-600 text-xs font-bold border border-rose-100 flex items-center gap-2">

@@ -152,7 +152,7 @@ export default function TransactionList({
                     {/* FinanceDatePicker popup — 1:1 from TransactionList.vue line 65-73 */}
                     {showFilterPicker && (
                         <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-                            <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowFilterPicker(false)}></div>
+                            <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 " onClick={() => setShowFilterPicker(false)}></div>
                             <FinanceDatePicker
                                 show={true}
                                 modelValue={filterDate}

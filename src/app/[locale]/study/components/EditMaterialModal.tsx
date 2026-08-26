@@ -92,7 +92,7 @@ export default function EditMaterialModal({
         // 1:1 from EditMaterialModal.vue line 144-371
         <ModalPortal><div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/90 backdrop-blur-md" onClick={onClose}></div>
+            <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/90 " onClick={onClose}></div>
 
             {/* Modal Content */}
             <div className="relative w-full max-w-5xl bg-white dark:bg-slate-950 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">

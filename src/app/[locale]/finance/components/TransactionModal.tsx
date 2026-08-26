@@ -143,7 +143,7 @@ export default function TransactionModal({
     return (
         // 1:1 from TransactionModal.vue line 64-176
         <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 " onClick={onClose}></div>
 
             <div className="relative z-10 w-full max-w-md bg-slate-50 dark:bg-slate-950 flex flex-col max-h-[85dvh] md:max-h-[85vh] transition-all duration-500 border border-slate-200 dark:border-slate-800 shadow-2xl dark:shadow-none rounded-[2.5rem] animate-in fade-in zoom-in-95 duration-200">
                 
@@ -278,7 +278,7 @@ export default function TransactionModal({
                                 </button>
                                 {showDatePicker && (
                                     <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-                                        <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowDatePicker(false)}></div>
+                                        <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 " onClick={() => setShowDatePicker(false)}></div>
                                         <FinanceDatePicker 
                                             show={true} 
                                             modelValue={date}

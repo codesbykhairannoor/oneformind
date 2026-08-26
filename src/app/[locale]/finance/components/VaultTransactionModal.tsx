@@ -184,7 +184,7 @@ export default function VaultTransactionModal({
                             </button>
                             {showDatePicker && (
                                 <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-                                    <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowDatePicker(false)}></div>
+                                    <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 " onClick={() => setShowDatePicker(false)}></div>
                                     <FinanceDatePicker 
                                         show={true}
                                         modelValue={date}

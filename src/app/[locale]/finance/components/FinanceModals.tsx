@@ -18,7 +18,7 @@ const BaseModal = ({ isOpen, onClose, children, title }: ModalProps) => {
     if (!isOpen) return null;
     return (
         <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose}></div>
             <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between p-6 md:p-8 border-b border-slate-100 dark:border-slate-800">
                     <h3 className="text-xl font-black text-slate-800 dark:text-white">{title}</h3>
@@ -48,7 +48,7 @@ export const TransactionModal = ({
 
     return (
         <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="absolute inset-0 bg-slate-900/60 " onClick={onClose}></div>
             <div className="bg-slate-50 dark:bg-slate-950 flex flex-col w-full max-w-md max-h-[85dvh] md:max-h-[85vh] relative overflow-visible transition-all duration-500 border border-slate-200 dark:border-slate-800 shadow-2xl dark:shadow-none rounded-[2.5rem] animate-in fade-in zoom-in-95">
                 
                 {/* Header */}
@@ -128,7 +128,7 @@ export const TransactionModal = ({
                             </button>
                             {showDatePicker && (
                                 <ModalPortal><div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-                                    <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowDatePicker(false)}></div>
+                                    <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 " onClick={() => setShowDatePicker(false)}></div>
                                     <FinanceDatePicker 
                                         show={true}
                                         modelValue={date}
