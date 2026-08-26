@@ -14,9 +14,10 @@ interface PaymentStatusPageProps {
 
 export default function PaymentStatusPage({ searchParams }: PaymentStatusPageProps) {
     const t = useTranslations();
-    const { data: session } = useSession();
+    const { data: session, update } = useSession();
     const [status, setStatus] = React.useState<string>('success');
     const [plan, setPlan] = React.useState<string>('Architect');
+    const [hasUpdatedSession, setHasUpdatedSession] = React.useState(false);
     
     const userName = session?.user?.name?.split(' ')[0] || 'Member';
 
@@ -35,8 +36,13 @@ export default function PaymentStatusPage({ searchParams }: PaymentStatusPagePro
             
             setStatus(currentStatus);
             setPlan(currentPlan);
+
+            if (currentStatus === 'success' && !hasUpdatedSession) {
+                update();
+                setHasUpdatedSession(true);
+            }
         });
-    }, [searchParams]);
+    }, [searchParams, hasUpdatedSession, update]);
 
     return (
         <AuthenticatedLayout>
