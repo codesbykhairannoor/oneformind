@@ -58,7 +58,11 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
                 </h2>
                 
                 <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-                    Fitur <strong>{t(`module_${feature}_title`) || feature}</strong> terkunci. Upgrade ke {tierName} untuk membuka potensi penuh ekosistem produktivitas Anda.
+                    {t.rich('dash_upgrade_tier_desc', {
+                        feature: t(`module_${feature}_title`) || feature,
+                        tierName: tierName,
+                        strong: (chunks) => <strong>{chunks}</strong>
+                    })}
                 </p>
 
                 <div className="space-y-3">
@@ -73,7 +77,7 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
                         href="/dashboard"
                         className="w-full flex items-center justify-center py-4 rounded-[1.5rem] text-slate-500 dark:text-slate-400 font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
-                        Kembali ke Dashboard
+                        {t('btn_back_dashboard') || 'Kembali ke Dashboard'}
                     </Link>
                 </div>
             </div>

@@ -5843,5 +5843,18 @@
     "payment_processing": "Memproses...",
     "payment_verifying": "Memverifikasi pembayaran Anda...",
     "payment_error_paypal": "Gagal memuat PayPal SDK",
-    "payment_error_order": "Gagal membuat invoice"
+    "payment_error_order": "Gagal membuat invoice",
+    "module_journal_title": "Jurnal Refleksi",
+    "module_job_title": "Karir & Lamaran",
+    "module_goals_title": "Target Panjang",
+    "module_calendar_title": "Kalender",
+    "module_finance_title": "Manajemen Keuangan",
+    "module_planner_title": "Planner Harian",
+    "module_habit_title": "Pelacak Kebiasaan",
+    "module_neural_os_title": "Neural OS",
+    "module_quantum_title": "Quantum AI",
+    "module_ai_coach_title": "Neural AI Coach",
+    "btn_back_dashboard": "Kembali ke Dashboard",
+    "dash_upgrade_tier_desc": "Fitur <strong>{feature}</strong> terkunci. Upgrade ke {tierName} untuk membuka potensi penuh ekosistem produktivitas Anda.",
+    "btn_upgrade": "Upgrade Sekarang"
 }

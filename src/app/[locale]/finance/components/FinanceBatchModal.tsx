@@ -46,7 +46,6 @@ export default function FinanceBatchModal({
         { type: 'expense', title: '', amount: '', category: '' }
     ]);
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showAllCategories, setShowAllCategories] = useState(false);
 
     useEffect(() => {
         if (show) {
@@ -55,7 +54,6 @@ export default function FinanceBatchModal({
                 { type: 'expense', title: '', amount: '', category: '' },
                 { type: 'expense', title: '', amount: '', category: '' }
             ]);
-            setShowAllCategories(false);
         }
     }, [show, todayStr]);
 
@@ -74,13 +72,7 @@ export default function FinanceBatchModal({
     const getDisplayCategories = (type: 'income' | 'expense') => {
         const available = categories.filter(c => c.type === type);
         const active = available.filter(c => activeSlugs.has(c.slug));
-        if (type === 'income' || showAllCategories || active.length === 0) return available;
-        return active;
-    };
-
-    const hasInactiveCategories = (type: 'income' | 'expense') => {
-        const available = categories.filter(c => c.type === type);
-        return available.some(c => !activeSlugs.has(c.slug));
+        return type === 'income' || active.length === 0 ? available : active;
     };
 
     const formatDisplay = (val: string) => {
@@ -239,13 +231,7 @@ export default function FinanceBatchModal({
                                                 </label>
                                                 <select 
                                                     value={trx.category} 
-                                                    onChange={(e) => {
-                                                        if (e.target.value === 'SHOW_ALL') {
-                                                            setShowAllCategories(true);
-                                                            return;
-                                                        }
-                                                        setRows(prev => prev.map((r, i) => i === index ? { ...r, category: e.target.value } : r));
-                                                    }}
+                                                    onChange={(e) => setRows(prev => prev.map((r, i) => i === index ? { ...r, category: e.target.value } : r))}
                                                     className={`w-full pl-3 pr-8 h-11 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 text-xs appearance-none cursor-pointer ${trx.type === 'expense' ? 'focus:border-rose-400' : 'focus:border-emerald-400'}`}
                                                 >
                                                     <option value="">{t('select_placeholder') || 'Pilih kategori...'}</option>
@@ -254,11 +240,6 @@ export default function FinanceBatchModal({
                                                             {cat.icon} {cat.name}
                                                         </option>
                                                     ))}
-                                                    {!showAllCategories && trx.type === 'expense' && hasInactiveCategories(trx.type) && (
-                                                        <option value="SHOW_ALL" className="font-bold text-indigo-500">
-                                                            --- Tampilkan Kategori Lainnya ---
-                                                        </option>
-                                                    )}
                                                 </select>
                                             </div>
                                         </div>

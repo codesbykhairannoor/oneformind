@@ -5855,5 +5855,18 @@
     "payment_processing": "Processing...",
     "payment_verifying": "Verifying your payment...",
     "payment_error_paypal": "Failed to load PayPal SDK",
-    "payment_error_order": "Failed to create invoice"
+    "payment_error_order": "Failed to create invoice",
+    "module_journal_title": "Reflection Journal",
+    "module_job_title": "Careers & Applications",
+    "module_goals_title": "Long Term Goals",
+    "module_calendar_title": "Calendar",
+    "module_finance_title": "Finance Management",
+    "module_planner_title": "Daily Planner",
+    "module_habit_title": "Habit Tracker",
+    "module_neural_os_title": "Neural OS",
+    "module_quantum_title": "Quantum AI",
+    "module_ai_coach_title": "Neural AI Coach",
+    "btn_back_dashboard": "Back to Dashboard",
+    "dash_upgrade_tier_desc": "The <strong>{feature}</strong> feature is locked. Upgrade to {tierName} to unlock the full potential of your productivity ecosystem.",
+    "btn_upgrade": "Upgrade Now"
 }
