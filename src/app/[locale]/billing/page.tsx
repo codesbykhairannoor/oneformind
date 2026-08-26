@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { Link, useRouter } from '@/i18n/routing';
-import { ChevronDown, Check, Lock, Sparkles, Star } from 'lucide-react';
-import Swal from 'sweetalert2';
+import { ChevronDown, Check, Lock, Sparkles, Star, Loader2 } from 'lucide-react';
 import { loadScript } from '@paypal/paypal-js';
 import { useSession } from 'next-auth/react';
+import ModalPortal from '@/components/ModalPortal';
+import { useEffect } from 'react';
 
 export default function BillingPricingPage() {
     const t = useTranslations();
@@ -16,6 +17,13 @@ export default function BillingPricingPage() {
     const { data: session } = useSession();
     const [isAnnual, setIsAnnual] = useState(true);
     const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+    const [checkout, setCheckout] = useState<{
+        isOpen: boolean;
+        plan: string;
+        step: 'selection' | 'loading_duitku' | 'loading_paypal' | 'paypal_sdk' | 'processing';
+        error: string | null;
+    }>({ isOpen: false, plan: '', step: 'selection', error: null });
 
     const userPlan = (session?.user as any)?.planType || 'explorer';
     const planHierarchy = ['explorer', 'architect', 'quantum', 'legendary', 'lifetime'];
@@ -57,127 +65,88 @@ export default function BillingPricingPage() {
         ['Calendar Timeline', '—', '✓', '✓'],
     ];
 
-    const handleCheckout = async (planId: string) => {
-        const billing = isAnnual ? 'yearly' : 'monthly';
-        const plan = planId.toLowerCase();
+    const handleCheckout = (planId: string) => {
+        setCheckout({ isOpen: true, plan: planId.toLowerCase(), step: 'selection', error: null });
+    };
 
-        // 1. Show Payment Method Selection
-        const result = await Swal.fire({
-            title: t('payment_select_title'),
-            text: t('payment_select_desc'),
-            showCancelButton: true,
-            showDenyButton: true,
-            confirmButtonText: t('payment_btn_duitku'),
-            denyButtonText: t('payment_btn_paypal'),
-            cancelButtonText: t('payment_btn_cancel'),
-            confirmButtonColor: '#4f46e5',
-            denyButtonColor: '#0f172a',
-        });
-
-        if (result.isConfirmed) {
-            // DUITKU FLOW
-            Swal.fire({
-                title: t('payment_preparing'),
-                html: t('payment_connecting'),
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
+    const handleDuitku = async () => {
+        setCheckout(prev => ({ ...prev, step: 'loading_duitku', error: null }));
+        try {
+            const res = await fetch('/api/payment/duitku/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan: checkout.plan, billing: isAnnual ? 'yearly' : 'monthly' })
             });
-
-            try {
-                const res = await fetch('/api/payment/duitku/checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan, billing })
-                });
-                
-                const data = await res.json();
-                if (res.ok && data.paymentUrl) {
-                    window.location.href = data.paymentUrl;
-                } else {
-                    throw new Error(data.error || 'Gagal membuat invoice');
-                }
-            } catch (err: any) {
-                Swal.fire('Error', err.message || 'Terjadi kesalahan sistem.', 'error');
+            const data = await res.json();
+            if (res.ok && data.paymentUrl) {
+                window.location.href = data.paymentUrl;
+            } else {
+                throw new Error(data.error || 'Gagal membuat invoice');
             }
-        } else if (result.isDenied) {
-            // PAYPAL FLOW
-            Swal.fire({
-                title: t('payment_init_paypal'),
-                html: t('payment_wait'),
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
+        } catch (err: any) {
+            setCheckout(prev => ({ ...prev, step: 'selection', error: err.message }));
+        }
+    };
+
+    const handlePayPal = async () => {
+        setCheckout(prev => ({ ...prev, step: 'loading_paypal', error: null }));
+        try {
+            const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'BAA4EY4bCAv5qA_E8fi83VMDyIwnokX_4Y1n6G_icl0T5moe4Lu0EMkIRg67CGU9sSNX_HlDrLRXjNMOss';
+            const paypal = await loadScript({ 
+                clientId: clientId,
+                currency: "USD",
+                intent: "capture"
             });
+            if (!paypal || !paypal.Buttons) throw new Error("PayPal SDK failed to load");
+            setCheckout(prev => ({ ...prev, step: 'paypal_sdk' }));
+        } catch (err: any) {
+            setCheckout(prev => ({ ...prev, step: 'selection', error: err.message }));
+        }
+    };
 
-            try {
-                const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'BAA4EY4bCAv5qA_E8fi83VMDyIwnokX_4Y1n6G_icl0T5moe4Lu0EMkIRg67CGU9sSNX_HlDrLRXjNMOss'; // Fallback to live ID if not set
-                const paypal = await loadScript({ 
-                    clientId: clientId,
-                    currency: "USD",
-                    intent: "capture"
-                });
-
-                if (!paypal || !paypal.Buttons) {
-                    throw new Error("PayPal SDK failed to load");
-                }
-
-                Swal.close();
-
-                Swal.fire({
-                    title: 'Checkout with PayPal',
-                    html: '<div id="paypal-button-container" class="mt-4 min-h-[150px]"></div>',
-                    showConfirmButton: false,
-                    showCancelButton: true,
-                    cancelButtonText: t('payment_close'),
-                    didOpen: () => {
-                        paypal.Buttons!({
+    useEffect(() => {
+        if (checkout.isOpen && checkout.step === 'paypal_sdk') {
+            const renderPayPal = async () => {
+                const paypal = (window as any).paypal;
+                if (paypal && paypal.Buttons) {
+                    const container = document.getElementById('paypal-button-container');
+                    if (container && container.children.length === 0) {
+                        paypal.Buttons({
                             style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'paypal' },
                             createOrder: async () => {
                                 const res = await fetch('/api/payment/paypal/checkout', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ plan, billing })
+                                    body: JSON.stringify({ plan: checkout.plan, billing: isAnnual ? 'yearly' : 'monthly' })
                                 });
                                 const data = await res.json();
                                 if (!res.ok || !data.id) throw new Error(data.error || 'Failed to create PayPal order');
                                 return data.id;
                             },
-                            onApprove: async (data) => {
-                                Swal.fire({
-                                    title: t('payment_processing'),
-                                    text: t('payment_verifying'),
-                                    allowOutsideClick: false,
-                                    didOpen: () => Swal.showLoading()
-                                });
-
+                            onApprove: async (data: any) => {
+                                setCheckout(prev => ({ ...prev, step: 'processing' }));
                                 const res = await fetch('/api/payment/paypal/capture', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ token: data.orderID, plan, billing })
+                                    body: JSON.stringify({ token: data.orderID, plan: checkout.plan, billing: isAnnual ? 'yearly' : 'monthly' })
                                 });
-                                
                                 const captureData = await res.json();
-                                if (res.ok && captureData.success) {
-                                    window.location.href = '/id/payment/status?status=success&plan=' + plan;
+                                if (res.ok) {
+                                    window.location.href = `/payment/status?resultCode=00&reference=${captureData.orderId}`;
                                 } else {
-                                    throw new Error(captureData.error || 'Verification failed');
+                                    setCheckout(prev => ({ ...prev, step: 'selection', error: captureData.error || 'Payment failed' }));
                                 }
                             },
-                            onError: (err) => {
-                                console.error("PayPal Error:", err);
-                                Swal.fire('Error', 'PayPal checkout failed.', 'error');
+                            onError: (err: any) => {
+                                setCheckout(prev => ({ ...prev, step: 'selection', error: 'PayPal encountered an error' }));
                             }
-                        }).render('#paypal-button-container').catch(err => {
-                            console.error("Failed to render buttons:", err);
-                        });
+                        }).render('#paypal-button-container');
                     }
-                });
-
-            } catch (err: any) {
-                console.error(err);
-                Swal.fire('Error', err.message || 'Failed to initialize PayPal', 'error');
-            }
+                }
+            };
+            renderPayPal();
         }
-    };
+    }, [checkout.step, checkout.isOpen, checkout.plan, isAnnual]);
 
     return (
         <AuthenticatedLayout>
@@ -554,6 +523,78 @@ export default function BillingPricingPage() {
                     </div>
                 </section>
             </main>
+
+            {/* FAST REACT MODAL (REPLACES SWEETALERT2) */}
+            {checkout.isOpen && (
+                <ModalPortal>
+                    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                        <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2rem] shadow-2xl p-8 relative overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-100 dark:border-slate-800">
+                            {checkout.error && (
+                                <div className="mb-6 p-4 rounded-xl bg-rose-50 text-rose-600 text-xs font-bold border border-rose-100 flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-rose-500">!</div>
+                                    {checkout.error}
+                                </div>
+                            )}
+
+                            {checkout.step === 'selection' && (
+                                <>
+                                    <div className="text-center mb-8">
+                                        <div className="w-16 h-16 mx-auto bg-indigo-50 dark:bg-indigo-500/10 rounded-full flex items-center justify-center mb-4 border border-indigo-100 dark:border-indigo-500/20 shadow-inner">
+                                            <span className="text-2xl">💳</span>
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">{t('payment_select_title')}</h3>
+                                        <p className="text-sm font-bold text-slate-500">{t('payment_select_desc')}</p>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <button onClick={handleDuitku} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:-translate-y-1 transition-all group bg-slate-50 dark:bg-slate-800/50">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center font-black text-indigo-600 border border-slate-100 dark:border-slate-700">Rp</div>
+                                                <span className="font-bold text-slate-700 dark:text-slate-200">{t('payment_btn_duitku')}</span>
+                                            </div>
+                                            <ChevronDown className="w-4 h-4 text-slate-400 -rotate-90 group-hover:text-indigo-500 transition-colors" />
+                                        </button>
+
+                                        <button onClick={handlePayPal} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:-translate-y-1 transition-all group bg-slate-50 dark:bg-slate-800/50">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center font-black text-sky-500 border border-slate-100 dark:border-slate-700">$</div>
+                                                <span className="font-bold text-slate-700 dark:text-slate-200">{t('payment_btn_paypal')}</span>
+                                            </div>
+                                            <ChevronDown className="w-4 h-4 text-slate-400 -rotate-90 group-hover:text-indigo-500 transition-colors" />
+                                        </button>
+                                    </div>
+
+                                    <button onClick={() => setCheckout(prev => ({ ...prev, isOpen: false }))} className="w-full mt-6 py-4 rounded-xl font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                        {t('payment_btn_cancel')}
+                                    </button>
+                                </>
+                            )}
+
+                            {(checkout.step === 'loading_duitku' || checkout.step === 'loading_paypal' || checkout.step === 'processing') && (
+                                <div className="text-center py-12">
+                                    <Loader2 className="w-12 h-12 text-indigo-500 mx-auto animate-spin mb-6" />
+                                    <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2">
+                                        {checkout.step === 'loading_duitku' ? t('payment_preparing') : checkout.step === 'loading_paypal' ? t('payment_init_paypal') : t('payment_processing')}
+                                    </h3>
+                                    <p className="text-sm font-bold text-slate-500">
+                                        {checkout.step === 'loading_duitku' ? t('payment_connecting') : checkout.step === 'loading_paypal' ? t('payment_wait') : t('payment_verifying')}
+                                    </p>
+                                </div>
+                            )}
+
+                            {checkout.step === 'paypal_sdk' && (
+                                <div className="text-center">
+                                    <h3 className="text-lg font-black text-slate-900 dark:text-white mb-6">Checkout with PayPal</h3>
+                                    <div id="paypal-button-container" className="min-h-[150px]"></div>
+                                    <button onClick={() => setCheckout(prev => ({ ...prev, isOpen: false }))} className="w-full mt-6 py-4 rounded-xl font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-100 dark:border-slate-800">
+                                        {t('payment_close')}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </ModalPortal>
+            )}
         </AuthenticatedLayout>
     );
 }
