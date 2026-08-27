@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { Lock, Sparkles, ChevronRight, ShieldAlert } from 'lucide-react';
+import { Lock, Sparkles, ChevronRight, Loader2 } from 'lucide-react';
 import { useGating } from '@/hooks/useGating';
 import { Link } from '@/i18n/routing';
 
@@ -13,7 +13,16 @@ interface GatedPageProps {
 
 export default function GatedPage({ feature, children }: GatedPageProps) {
     const t = useTranslations();
-    const { canUse, isAiEnabled } = useGating();
+    const { canUse, isAiEnabled, isLoading } = useGating();
+
+    if (isLoading) {
+        return (
+            <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 m-4 md:m-8">
+                <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm animate-pulse">Memuat data...</p>
+            </div>
+        );
+    }
 
     if (canUse(feature)) {
         return <>{children}</>;

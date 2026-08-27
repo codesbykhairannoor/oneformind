@@ -40,7 +40,9 @@ const PLAN_LEVELS: Record<string, number> = {
 };
 
 export const useGating = () => {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
+    
+    const isLoading = status === 'loading';
     
     // In NextAuth v5 custom adapter, we pass planType and isPremium to the token/session
     const user = session?.user as any;
@@ -93,5 +95,6 @@ export const useGating = () => {
         isQuantum,
         isLegendary,
         user,
+        isLoading,
     };
 };

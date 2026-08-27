@@ -46,18 +46,18 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     const pathname = usePathname();
     const router = useRouter();
 
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     
     // We derive the user data directly from the active NextAuth session
     const user = session?.user ? {
         name: session.user.name || 'User',
         email: session.user.email || '',
-        plan_type: 'Architect', // Mocking plan_type for now since it's not in default JWT
+        plan_type: (session.user as any).planType || 'Explorer',
         avatar_url: session.user.image || null,
-    } : initialUser || {
-        name: 'Alexander',
-        email: 'alexander@oneformind.com',
-        plan_type: 'Architect',
+    } : initialUser ? initialUser : {
+        name: status === 'loading' ? 'Loading...' : 'Guest',
+        email: status === 'loading' ? '...' : '',
+        plan_type: 'Explorer',
         avatar_url: null,
     };
 
