@@ -68,10 +68,6 @@ export default function JobsPage() {
         fetchUserResume();
     }, []);
 
-    const updateJobsState = (updated: JobRowItem[]) => {
-        setJobs(updated);
-    };
-
     const hasMasterCv = Boolean(masterCvText || masterCvFilename);
 
     // Compute Stats dynamically
@@ -129,14 +125,12 @@ export default function JobsPage() {
             status: 'wishlist',
             is_saving: false
         };
-        updateJobsState([newRow, ...jobs]);
+        setJobs(prev => [newRow, ...prev]);
     };
 
     // Auto save row
     const handleAutoSaveRow = async (updatedJob: JobRowItem) => {
-        // Optimistic UI update
-        const updatedList = jobs.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...updatedJob, is_saving: true } : j);
-        updateJobsState(updatedList);
+        setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, is_saving: true } : j));
 
         try {
             if (updatedJob.is_new) {
@@ -154,7 +148,7 @@ export default function JobsPage() {
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    updateJobsState(jobs.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...updatedJob, id: data.id, _key: `db_${data.id}`, is_new: false, is_saving: false } : j));
+                    setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, id: data.id, _key: `db_${data.id}`, is_new: false, is_saving: false } : j));
                 }
             } else {
                 const res = await fetch(`/api/jobs/${updatedJob.id}`, {
@@ -170,18 +164,18 @@ export default function JobsPage() {
                     })
                 });
                 if (res.ok) {
-                    updateJobsState(jobs.map(j => j.id === updatedJob.id ? { ...updatedJob, is_saving: false } : j));
+                    setJobs(prev => prev.map(j => j.id === updatedJob.id ? { ...j, is_saving: false } : j));
                 }
             }
         } catch (error) {
             console.error('Failed to save job:', error);
-            updateJobsState(jobs.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...updatedJob, is_saving: false } : j));
+            setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, is_saving: false } : j));
         }
     };
 
     // Delete job
     const handleDeleteJob = async (id: number | string) => {
-        updateJobsState(jobs.filter(j => j.id !== id));
+        setJobs(prev => prev.filter(j => j.id !== id));
         if (typeof id === 'number' || !String(id).startsWith('temp_')) {
             try {
                 await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
@@ -313,8 +307,11 @@ export default function JobsPage() {
                         onJobChange={(index, field, val) => {
                             const target = filteredJobs[index];
                             if (target) {
-                                target[field] = val as never;
-                                setJobs([...jobs]);
+                                setJobs(prev => prev.map(j => 
+                                    (j.id === target.id || j._key === target._key) 
+                                        ? { ...j, [field]: val } 
+                                        : j
+                                ));
                             }
                         }}
                     />
