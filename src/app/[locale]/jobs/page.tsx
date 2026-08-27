@@ -148,7 +148,7 @@ export default function JobsPage() {
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, id: data.id, _key: `db_${data.id}`, is_new: false, is_saving: false } : j));
+                    setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, id: data.id, is_new: false, is_saving: false } : j));
                 }
             } else {
                 const res = await fetch(`/api/jobs/${updatedJob.id}`, {
