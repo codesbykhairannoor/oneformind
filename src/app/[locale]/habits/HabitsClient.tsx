@@ -108,10 +108,18 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
             setSelectedMobileDate(todayStr);
         }
 
-        const savedMood = localStorage.getItem('oneformind_mood');
-        if (savedMood) {
-            setSelectedMood(savedMood);
-        }
+        const fetchUserMood = async () => {
+            try {
+                const res = await fetch('/api/user');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.settings?.currentMood) {
+                        setSelectedMood(data.settings.currentMood);
+                    }
+                }
+            } catch (e) {}
+        };
+        fetchUserMood();
     }, [currentMonthKey]);
 
     // 4. Mood Reflection State
@@ -126,10 +134,23 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     ];
     const currentMoodData = moodOptions.find(m => m.code === selectedMood) || moodOptions[0];
 
-    const handleSelectMood = (moodCode: string) => {
+    const handleSelectMood = async (moodCode: string) => {
         setSelectedMood(moodCode);
-        localStorage.setItem('oneformind_mood', moodCode);
         setShowMoodDropdown(false);
+        try {
+            const userRes = await fetch('/api/user');
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                const newSettings = { ...userData.settings, currentMood: moodCode };
+                await fetch('/api/user', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings: newSettings })
+                });
+            }
+        } catch (error) {
+            console.error("Failed to save user mood", error);
+        }
     };
 
     // 5. Single Habit Modal State

@@ -11,30 +11,62 @@ import ClassroomView, { ArchiveItem } from './components/ClassroomView';
 import CourseModal from './components/CourseModal';
 import SemesterModal from './components/SemesterModal';
 import ArchiveModal from './components/ArchiveModal';
-import { FolderOpen, Trash2, Sparkles, ChevronRight } from 'lucide-react';
+import { FolderOpen, Trash2, Sparkles, ChevronRight, Loader2 } from 'lucide-react';
 
 export default function StudyPage() {
     const t = useTranslations();
+    const [isLoading, setIsLoading] = useState(true);
 
     // User Settings State
-    const [userSettings, setUserSettings] = useState<Record<string, any>>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('ofm_study_user_settings');
-            if (saved) {
-                try { return JSON.parse(saved); } catch (e) {}
-            }
-        }
-        return {
-            education_level: 'kuliah',
-            major: 'Teknik Informatika',
-            current_semester: 1,
-            student_id: '202600123'
-        };
-    });
-
+    const [userSettings, setUserSettings] = useState<Record<string, any>>({});
     const hasCompletedSetup = Boolean(userSettings.education_level);
 
-    // Dynamic Terms calculation matching 1:1 Index.vue line 51-64
+    // Academic Records State
+    const [academicRecords, setAcademicRecords] = useState<CourseRecord[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [userRes, coursesRes] = await Promise.all([
+                    fetch('/api/user'),
+                    fetch('/api/study/courses')
+                ]);
+                
+                if (userRes.ok) {
+                    const userData = await userRes.json();
+                    if (userData.settings && userData.settings.study) {
+                        setUserSettings(userData.settings.study);
+                    }
+                }
+                
+                if (coursesRes.ok) {
+                    const coursesData = await coursesRes.json();
+                    setAcademicRecords(coursesData.map((c: any) => ({
+                        id: c.id,
+                        course_name: c.courseName,
+                        semester: c.semester,
+                        sks: c.sks,
+                        grade: c.grade,
+                        archives: c.archives.map((a: any) => ({
+                            id: a.id,
+                            meeting_tag: a.meetingTag,
+                            type: a.type,
+                            file_name: a.fileName,
+                            file_path: a.filePath,
+                            link_url: a.linkUrl
+                        }))
+                    })));
+                }
+            } catch (error) {
+                console.error("Failed to load study data", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // Dynamic Terms calculation
     const terms = useMemo(() => {
         const level = userSettings.education_level || 'kuliah';
         const custom = userSettings.custom_term;
@@ -75,62 +107,30 @@ export default function StudyPage() {
         }
     }, [userSettings, t]);
 
-    // Academic Records State
-    const [academicRecords, setAcademicRecords] = useState<CourseRecord[]>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('ofm_study_academic_records');
-            if (saved) {
-                try { return JSON.parse(saved); } catch (e) {}
-            }
-        }
-        return [
-            {
-                id: 1,
-                course_name: 'Pemrograman Web Lanjut',
-                semester: 1,
-                sks: 3,
-                grade: 'A',
-                archives: [
-                    { id: 'arc_1', meeting_tag: 'Pertemuan 01 - Next.js App Router', type: 'Modul', file_name: 'Slide_01_NextJS.pdf', file_path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
-                    { id: 'arc_2', meeting_tag: 'Pertemuan 01 - Next.js App Router', type: 'Catatan', link_url: 'https://nextjs.org/docs' },
-                    { id: 'arc_3', meeting_tag: 'Pertemuan 02 - Tailwind & UI System', type: 'Soal', file_name: 'Tugas_01_UI_Layout.pdf', file_path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
-                ]
-            },
-            {
-                id: 2,
-                course_name: 'Algoritma & Struktur Data',
-                semester: 1,
-                sks: 4,
-                grade: 'A-',
-                archives: [
-                    { id: 'arc_4', meeting_tag: 'Pertemuan 01 - Graph & Trees', type: 'Modul', file_name: 'Graph_Algorithms.pdf', file_path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
-                ]
-            },
-            {
-                id: 3,
-                course_name: 'Sistem Basis Data',
-                semester: 1,
-                sks: 3,
-                grade: 'B+',
-                archives: []
-            }
-        ];
-    });
-
-    const [selectedSemester, setSelectedSemester] = useState<number>(userSettings.current_semester || 1);
+    const [selectedSemester, setSelectedSemester] = useState<number>(1);
     const [manuallyAddedSemesters, setManuallyAddedSemesters] = useState<number[]>([]);
 
-    const saveRecordsToStorage = (updated: CourseRecord[]) => {
-        setAcademicRecords(updated);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('ofm_study_academic_records', JSON.stringify(updated));
+    useEffect(() => {
+        if (userSettings.current_semester) {
+            setSelectedSemester(Number(userSettings.current_semester));
         }
-    };
+    }, [userSettings.current_semester]);
 
-    const saveUserSettings = (updatedSettings: Record<string, any>) => {
+    const saveUserSettings = async (updatedSettings: Record<string, any>) => {
         setUserSettings(updatedSettings);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('ofm_study_user_settings', JSON.stringify(updatedSettings));
+        try {
+            const userRes = await fetch('/api/user');
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                const newSettings = { ...userData.settings, study: updatedSettings };
+                await fetch('/api/user', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings: newSettings })
+                });
+            }
+        } catch (error) {
+            console.error("Failed to save user settings", error);
         }
     };
 
@@ -178,70 +178,134 @@ export default function StudyPage() {
         setIsAddSemesterModalOpen(false);
     };
 
-    const handleDeleteSemester = (sem: number | string) => {
+    const handleDeleteSemester = async (sem: number | string) => {
         if (confirm(`Yakin ingin menghapus ${terms.semester} ${sem} beserta seluruh data mata kuliah di dalamnya?`)) {
+            const toDelete = academicRecords.filter(r => Number(r.semester) === Number(sem));
+            
+            // UI optimistic update
             const updated = academicRecords.filter(r => Number(r.semester) !== Number(sem));
-            saveRecordsToStorage(updated);
+            setAcademicRecords(updated);
+            
             setManuallyAddedSemesters(prev => prev.filter(s => s !== Number(sem)));
             if (Number(selectedSemester) === Number(sem)) {
                 const remaining = availableSemesters.filter(s => s !== Number(sem));
                 setSelectedSemester(remaining.length > 0 ? remaining[0] : 1);
             }
+
+            // DB sync
+            for (const course of toDelete) {
+                await fetch(`/api/study/courses?id=${course.id}`, { method: 'DELETE' });
+            }
         }
     };
 
-    const handleAddCourseSubmit = (data: { course_name: string; sks: number; grade: string }) => {
-        const newRecord: CourseRecord = {
-            id: 'course_' + Date.now(),
-            course_name: data.course_name,
-            semester: Number(selectedSemester),
-            sks: data.sks,
-            grade: data.grade,
-            archives: []
-        };
-        saveRecordsToStorage([...academicRecords, newRecord]);
+    const handleAddCourseSubmit = async (data: { course_name: string; sks: number; grade: string }) => {
         setIsAddCourseModalOpen(false);
-    };
-
-    const handleEditCourseSubmit = (data: { course_name: string; sks: number; grade: string }) => {
-        if (!editingCourse) return;
-        const updated = academicRecords.map(r => r.id === editingCourse.id ? {
-            ...r,
-            course_name: data.course_name,
-            sks: data.sks,
-            grade: data.grade
-        } : r);
-        saveRecordsToStorage(updated);
-        setIsEditCourseModalOpen(false);
-    };
-
-    const handleDeleteCourse = (id: number | string) => {
-        if (confirm(`Hapus ${terms.course} ini?`)) {
-            const updated = academicRecords.filter(r => r.id !== id);
-            saveRecordsToStorage(updated);
-            if (selectedCourse?.id === id) {
-                setSelectedCourse(null);
+        try {
+            const res = await fetch('/api/study/courses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseName: data.course_name,
+                    semester: Number(selectedSemester),
+                    sks: data.sks,
+                    grade: data.grade
+                })
+            });
+            if (res.ok) {
+                const newCourse = await res.json();
+                setAcademicRecords(prev => [...prev, {
+                    id: newCourse.id,
+                    course_name: newCourse.courseName,
+                    semester: newCourse.semester,
+                    sks: newCourse.sks,
+                    grade: newCourse.grade,
+                    archives: []
+                }]);
             }
+        } catch(e) {}
+    };
+
+    const handleEditCourseSubmit = async (data: { course_name: string; sks: number; grade: string }) => {
+        if (!editingCourse) return;
+        setIsEditCourseModalOpen(false);
+        try {
+            const res = await fetch('/api/study/courses', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: editingCourse.id,
+                    courseName: data.course_name,
+                    semester: Number(selectedSemester),
+                    sks: data.sks,
+                    grade: data.grade
+                })
+            });
+            if (res.ok) {
+                setAcademicRecords(prev => prev.map(r => r.id === editingCourse.id ? {
+                    ...r,
+                    course_name: data.course_name,
+                    sks: data.sks,
+                    grade: data.grade
+                } : r));
+            }
+        } catch(e) {}
+    };
+
+    const handleDeleteCourse = async (id: number | string) => {
+        if (confirm(`Hapus ${terms.course} ini?`)) {
+            // Optimistic update
+            setAcademicRecords(prev => prev.filter(r => r.id !== id));
+            if (selectedCourse?.id === id) setSelectedCourse(null);
+            
+            // DB Sync
+            await fetch(`/api/study/courses?id=${id}`, { method: 'DELETE' });
         }
     };
 
-    const handleAddArchive = (archive: ArchiveItem) => {
+    const handleAddArchive = async (archive: ArchiveItem) => {
         if (!activeCourseReactive) return;
-        const updated = academicRecords.map(r => {
-            if (r.id === activeCourseReactive.id) {
-                return {
-                    ...r,
-                    archives: [...(r.archives || []), archive]
-                };
+        try {
+            const res = await fetch('/api/study/archives', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseId: activeCourseReactive.id,
+                    meetingTag: archive.meeting_tag,
+                    type: archive.type,
+                    fileName: archive.file_name,
+                    filePath: archive.file_path,
+                    linkUrl: archive.link_url
+                })
+            });
+            
+            if (res.ok) {
+                const newArchive = await res.json();
+                setAcademicRecords(prev => prev.map(r => {
+                    if (r.id === activeCourseReactive.id) {
+                        return {
+                            ...r,
+                            archives: [...(r.archives || []), {
+                                id: newArchive.id,
+                                meeting_tag: newArchive.meetingTag,
+                                type: newArchive.type,
+                                file_name: newArchive.fileName,
+                                file_path: newArchive.filePath,
+                                link_url: newArchive.linkUrl
+                            }]
+                        };
+                    }
+                    return r;
+                }));
             }
-            return r;
-        });
-        saveRecordsToStorage(updated);
+        } catch(e) {}
     };
 
-    const handleDeleteArchive = (id: number | string) => {
+    const handleDeleteArchive = async (id: number | string) => {
         if (!activeCourseReactive) return;
-        const updated = academicRecords.map(r => {
+        
+        // Optimistic update
+        setAcademicRecords(prev => prev.map(r => {
             if (r.id === activeCourseReactive.id) {
                 return {
                     ...r,
@@ -249,13 +313,24 @@ export default function StudyPage() {
                 };
             }
             return r;
-        });
-        saveRecordsToStorage(updated);
+        }));
+        
+        // DB Sync
+        await fetch(`/api/study/archives?id=${id}`, { method: 'DELETE' });
     };
+
+    if (isLoading) {
+        return (
+            <AuthenticatedLayout>
+                <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+                    <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                </div>
+            </AuthenticatedLayout>
+        );
+    }
 
     return (
         <AuthenticatedLayout>
-            {/* 1:1 from Index.vue line 452-568 */}
             <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 transition-colors font-sans">
                 
                 {/* STATE 1: EMPTY STATE & SETUP */}
@@ -283,7 +358,6 @@ export default function StudyPage() {
 
                                 <div className="max-w-[1600px] w-full md:w-[95%] mx-auto px-4 sm:px-8 py-8">
                                     
-                                    {/* Banner Portfolio — 1:1 from Index.vue line 476-487 */}
                                     <Link
                                         href="/study/portfolio"
                                         className="group relative flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 overflow-hidden rounded-2xl border border-slate-800 transition-all hover:border-indigo-500/50 shadow-lg mb-8 hover:-translate-y-0.5"
@@ -303,7 +377,6 @@ export default function StudyPage() {
                                         <ChevronRight className="relative z-10 h-5 w-5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
                                     </Link>
 
-                                    {/* Course List Section Header */}
                                     <div className="flex items-end justify-between mb-6 border-b border-slate-200 dark:border-slate-800 pb-4 group/header">
                                         <h2 className="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
                                             <FolderOpen className="h-5 w-5 text-slate-400" />
@@ -320,7 +393,6 @@ export default function StudyPage() {
                                         </h2>
                                     </div>
 
-                                    {/* Grid Mata Kuliah */}
                                     {filteredCourses.length > 0 ? (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                             {filteredCourses.map((record) => (
@@ -357,7 +429,6 @@ export default function StudyPage() {
                                 </div>
                             </>
                         ) : (
-                            /* STATE 3: RUANG KELAS / DETAIL MATKUL */
                             <ClassroomView
                                 course={activeCourseReactive}
                                 terms={terms}
@@ -370,7 +441,6 @@ export default function StudyPage() {
                             />
                         )}
 
-                        {/* Modals */}
                         <SemesterModal
                             isOpen={isAddSemesterModalOpen}
                             onClose={() => setIsAddSemesterModalOpen(false)}

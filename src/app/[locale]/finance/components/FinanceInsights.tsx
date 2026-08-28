@@ -27,18 +27,24 @@ export default function FinanceInsights({
     const [assets, setAssets] = useState<AssetItem[]>([]);
 
     useEffect(() => {
-        const saved = localStorage.getItem('oneformind_assets');
-        if (saved) {
+        const fetchAssets = async () => {
             try {
-                const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed)) setAssets(parsed);
-            } catch (e) {}
-        }
+                const res = await fetch('/api/finance/assets');
+                if (res.ok) {
+                    const data = await res.json();
+                    setAssets(data.map((a: any) => ({
+                        id: a.id,
+                        name: a.name,
+                        capital: Number(a.value),
+                        percent: a.color ? Number(a.color) : 0 // Using color for percent to avoid schema changes for now, or percent can be calculated dynamically, wait, we don't store percent in db in FinanceAsset. The app stores percent in localStorage. So I'll just use 'color' field temporarily or just set it to 0 and not save it, wait, percent needs to be saved.
+                    })));
+                }
+            } catch (e) {
+                console.error("Failed to load assets", e);
+            }
+        };
+        fetchAssets();
     }, []);
-
-    useEffect(() => {
-        localStorage.setItem('oneformind_assets', JSON.stringify(assets));
-    }, [assets]);
 
     const totalCapital = assets.reduce((s, a) => s + Number(a.capital), 0);
     const currentValue = assets.reduce((s, a) => s + (Number(a.capital) * (1 + (Number(a.percent) / 100))), 0);
@@ -66,16 +72,31 @@ export default function FinanceInsights({
         setIsMounted(true);
     }, []);
 
-    const handleAddAssetSubmit = (e: React.FormEvent) => {
+    const handleAddAssetSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const capital = Number(newAssetCapital.replace(/[^0-9]/g, ''));
         if (!newAssetName || isNaN(capital) || capital <= 0) return;
 
-        const assetId = Date.now();
-        setAssets(prev => [
-            ...prev,
-            { id: assetId, name: newAssetName.trim(), capital, percent: 0 }
-        ]);
+        try {
+            const res = await fetch('/api/finance/assets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: newAssetName.trim(),
+                    value: capital,
+                    color: "0" // we'll use color as percent string
+                })
+            });
+            if (res.ok) {
+                const newAsset = await res.json();
+                setAssets(prev => [
+                    ...prev,
+                    { id: newAsset.id, name: newAsset.name, capital: Number(newAsset.value), percent: 0 }
+                ]);
+            }
+        } catch (error) {
+            console.error("Failed to add asset", error);
+        }
 
         onAddTransaction?.({
             title: `Invest: ${newAssetName.trim()}`,
@@ -91,12 +112,17 @@ export default function FinanceInsights({
         setNewAssetCapital('');
     };
 
-    const handleQuitSubmit = () => {
+    const handleQuitSubmit = async () => {
         if (!selectedAsset) return;
         const finalValue = selectedAsset.capital * (1 + (selectedAsset.percent / 100));
         const profit = finalValue - selectedAsset.capital;
 
-        setAssets(prev => prev.filter(a => a.id !== selectedAsset.id));
+        try {
+            await fetch(`/api/finance/assets?id=${selectedAsset.id}`, { method: 'DELETE' });
+            setAssets(prev => prev.filter(a => a.id !== selectedAsset.id));
+        } catch (error) {
+            console.error("Failed to delete asset", error);
+        }
 
         onAddTransaction?.({
             title: `Withdraw: ${selectedAsset.name}`,
@@ -111,8 +137,16 @@ export default function FinanceInsights({
         setSelectedAsset(null);
     };
 
-    const updatePercent = (id: string | number, val: number) => {
+    const updatePercent = async (id: string | number, val: number) => {
         setAssets(prev => prev.map(a => a.id === id ? { ...a, percent: val } : a));
+        const asset = assets.find(a => a.id === id);
+        if (asset) {
+            fetch('/api/finance/assets', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, name: asset.name, value: asset.capital, color: val.toString() })
+            }).catch(e => console.error("Sync failed", e));
+        }
     };
 
 

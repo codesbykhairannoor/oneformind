@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, CheckCircle2, Droplets, Inbox, Maximize2, Sp
 import DayPreviewModal from './DayPreviewModal';
 import { useRouter } from '@/i18n/routing';
 
-export default function PlannerDashboardClient({ initialDateStr, realTasks }: { initialDateStr: string, realTasks: any[] }) {
+export default function PlannerDashboardClient({ initialDateStr, realTasks, realDailies = [] }: { initialDateStr: string, realTasks: any[], realDailies?: any[] }) {
     const router = useRouter();
     // Parse the initial date from string to prevent hydration mismatches
     const [currentDate, setCurrentDate] = useState(new Date(`${initialDateStr}-01T00:00:00`));
@@ -58,29 +58,11 @@ export default function PlannerDashboardClient({ initialDateStr, realTasks }: { 
             notes: t.notes
         }));
 
-        // Try getting local storage data if exists
-        let water = 0;
-        let meals = null;
-        let inboxItems: any[] = [];
-        let notes = '';
-
-        if (typeof window !== 'undefined') {
-            const savedWater = localStorage.getItem(`oneformind_planner_water_${dateStr}`);
-            if (savedWater) water = parseInt(savedWater);
-
-            const savedMeals = localStorage.getItem(`oneformind_planner_meals_${dateStr}`);
-            if (savedMeals) {
-                try { meals = JSON.parse(savedMeals); } catch(e) {}
-            }
-
-            const savedInbox = localStorage.getItem(`oneformind_planner_inbox_${dateStr}`);
-            if (savedInbox) {
-                try { inboxItems = JSON.parse(savedInbox); } catch(e) {}
-            }
-
-            const savedNotes = localStorage.getItem(`oneformind_planner_notes_${dateStr}`);
-            if (savedNotes) notes = savedNotes;
-        }
+        const dailyData = realDailies.find((d: any) => d.date && d.date.startsWith(dateStr));
+        const water = dailyData?.waterGlasses || 0;
+        const meals = dailyData?.meals || null;
+        const inboxItems = dailyData?.inbox || [];
+        const notes = dailyData?.notes || '';
 
         return {
             date,

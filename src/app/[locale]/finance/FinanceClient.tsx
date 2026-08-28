@@ -50,15 +50,45 @@ export default function FinanceClient({
     const currencyLocale = currencyObj.locale;
 
     useEffect(() => {
-        const savedCurrency = localStorage.getItem('finance_currency');
-        if (savedCurrency) {
-            setActiveCurrency(savedCurrency);
-        }
+        const fetchUserConfig = async () => {
+            try {
+                const res = await fetch('/api/user');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.settings?.finance_currency) {
+                        setActiveCurrency(data.settings.finance_currency);
+                    }
+                    if (data.settings?.finance_income_target) {
+                        setIncomeTarget(Number(data.settings.finance_income_target));
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load user finance config", e);
+            }
+        };
+        fetchUserConfig();
     }, []);
+
+    const saveUserConfig = async (updates: any) => {
+        try {
+            const userRes = await fetch('/api/user');
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                const newSettings = { ...userData.settings, ...updates };
+                await fetch('/api/user', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings: newSettings })
+                });
+            }
+        } catch (error) {
+            console.error("Failed to save user config", error);
+        }
+    };
 
     const handleCurrencyChange = (code: string) => {
         setActiveCurrency(code);
-        localStorage.setItem('finance_currency', code);
+        saveUserConfig({ finance_currency: code });
     };
 
     // ===== 2. DATE STATE =====
@@ -79,14 +109,9 @@ export default function FinanceClient({
     // ===== 7. INCOME TARGET =====
     const [incomeTarget, setIncomeTarget] = useState(0);
     
-    useEffect(() => {
-        const savedTarget = localStorage.getItem('finance_income_target');
-        if (savedTarget) setIncomeTarget(Number(savedTarget));
-    }, []);
-
     const handleUpdateTarget = (val: number) => {
         setIncomeTarget(val);
-        localStorage.setItem('finance_income_target', val.toString());
+        saveUserConfig({ finance_income_target: val });
     };
 
     // ===== 8. MODAL STATES =====

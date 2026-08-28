@@ -126,45 +126,62 @@ export default function PlannerPage() {
     useEffect(() => {
         if (!isLoaded) return;
         
-        const savedNotes = localStorage.getItem(`oneformind_planner_notes_${selectedDate}`);
-        setNotes(savedNotes || '');
+        const fetchDaily = async () => {
+            try {
+                const res = await fetch(`/api/planner/daily?date=${selectedDate}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    setNotes(data.notes || '');
+                    
+                    if (data.meals) {
+                        setMeals(data.meals);
+                    } else {
+                        setMeals({ breakfast: '', lunch: '', dinner: '' });
+                    }
+                    
+                    setWaterGlasses(data.waterGlasses || 0);
+                    
+                    if (data.inbox) {
+                        setTaskInbox(data.inbox);
+                    } else {
+                        setTaskInbox([]);
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch daily data", e);
+            }
+        };
 
-        const savedMeals = localStorage.getItem(`oneformind_planner_meals_${selectedDate}`);
-        if (savedMeals) {
-            try { setMeals(JSON.parse(savedMeals)); } catch(e){ setMeals({ breakfast: '', lunch: '', dinner: '' }); }
-        } else {
-            setMeals({ breakfast: '', lunch: '', dinner: '' });
-        }
-
-        const savedWater = localStorage.getItem(`oneformind_planner_water_${selectedDate}`);
-        setWaterGlasses(savedWater ? parseInt(savedWater) : 0);
-
-        const savedInbox = localStorage.getItem(`oneformind_planner_inbox_${selectedDate}`);
-        if (savedInbox) {
-            try { setTaskInbox(JSON.parse(savedInbox)); } catch(e) { setTaskInbox([]); }
-        } else {
-            setTaskInbox([]);
-        }
+        fetchDaily();
     }, [selectedDate, isLoaded]);
+
+    const syncDaily = (payload: any) => {
+        fetch('/api/planner/daily', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: selectedDate, ...payload })
+        }).catch(e => console.error("Sync failed", e));
+    };
 
     const handleSetNotes = (val: string) => {
         setNotes(val);
-        localStorage.setItem(`oneformind_planner_notes_${selectedDate}`, val);
+        syncDaily({ notes: val });
     };
 
     const handleSetMeals = (val: { breakfast: string, lunch: string, dinner: string }) => {
         setMeals(val);
-        localStorage.setItem(`oneformind_planner_meals_${selectedDate}`, JSON.stringify(val));
+        syncDaily({ meals: val });
     };
 
     const handleSetWaterGlasses = (val: number) => {
         setWaterGlasses(val);
-        localStorage.setItem(`oneformind_planner_water_${selectedDate}`, val.toString());
+        syncDaily({ waterGlasses: val });
     };
 
     const handleSetTaskInbox = (val: InboxTask[]) => {
         setTaskInbox(val);
-        localStorage.setItem(`oneformind_planner_inbox_${selectedDate}`, JSON.stringify(val));
+        syncDaily({ inbox: val });
     };
 
     // Time conversion & conflict validation helpers

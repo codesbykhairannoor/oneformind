@@ -61,10 +61,29 @@ export default async function PlannerDashboardPage({ searchParams }: { searchPar
         notes: t.notes
     }));
 
+    const dailies = await prisma.plannerDaily.findMany({
+        where: {
+            userId,
+            date: {
+                gte: startDate,
+                lte: endDate,
+            },
+        },
+    });
+
+    const serializedDailies = dailies.map((d: any) => ({
+        date: d.date.toISOString(),
+        waterGlasses: d.waterGlasses,
+        meals: d.meals,
+        inbox: d.inbox,
+        notes: d.notes
+    }));
+
     return (
         <PlannerDashboardClient 
             initialDateStr={initialDateStr} 
             realTasks={serializedTasks} 
+            realDailies={serializedDailies}
         />
     );
 }

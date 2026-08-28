@@ -58,6 +58,9 @@ model User {
   goalContributions       GoalContribution[]
   journals                Journal[]
   calendarEvents          CalendarEvent[]
+  studyCourses            StudyCourse[]
+  plannerDailies          PlannerDaily[]
+  financeAssets           FinanceAsset[]
 
   @@map("users")
 }
@@ -334,4 +337,68 @@ model CalendarEvent {
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("calendar_events")
+}
+
+model StudyCourse {
+  id              Int             @id @default(autoincrement())
+  userId          Int             @map("user_id")
+  courseName      String          @map("course_name")
+  semester        Int
+  sks             Int
+  grade           String?
+  archives        StudyArchive[]
+  createdAt       DateTime?       @default(now()) @map("created_at")
+  updatedAt       DateTime?       @default(now()) @updatedAt @map("updated_at")
+
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("study_courses")
+}
+
+model StudyArchive {
+  id              String          @id @default(cuid())
+  courseId        Int             @map("course_id")
+  meetingTag      String          @map("meeting_tag")
+  type            String
+  fileName        String?         @map("file_name")
+  filePath        String?         @map("file_path")
+  linkUrl         String?         @map("link_url")
+  createdAt       DateTime?       @default(now()) @map("created_at")
+  updatedAt       DateTime?       @default(now()) @updatedAt @map("updated_at")
+
+  course          StudyCourse     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("study_archives")
+}
+
+model PlannerDaily {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  date            DateTime   @db.Date
+  notes           String?
+  meals           Json?
+  waterGlasses    Int        @default(0) @map("water_glasses")
+  inbox           Json?
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("planner_daily")
+}
+
+model FinanceAsset {
+  id              Int        @id @default(autoincrement())
+  userId          Int        @map("user_id")
+  name            String
+  value           Decimal    @db.Decimal
+  icon            String?
+  color           String?
+  createdAt       DateTime?  @default(now()) @map("created_at")
+  updatedAt       DateTime?  @default(now()) @updatedAt @map("updated_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finance_assets")
 }
