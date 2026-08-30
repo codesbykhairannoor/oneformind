@@ -93,7 +93,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
 
     useEffect(() => {
         const handleStorage = () => {
-            const saved = localStorage.getItem('oneformind_user_settings');
+            const saved = localStorage.getItem('tranvas_user_settings');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -206,8 +206,8 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     const handleLogout = async () => {
         setShowLogoutModal(false);
         try {
-            localStorage.removeItem('oneformind_user_profile');
-            localStorage.removeItem('oneformind_auth');
+            localStorage.removeItem('tranvas_user_profile');
+            localStorage.removeItem('tranvas_auth');
         } catch (e) {
             console.error(e);
         }
@@ -259,9 +259,9 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                         {/* UNIFIED LOGO (Matches Marketing Site) */}
                         <Link href="/dashboard" className="group flex items-center gap-2 z-[110] hover:opacity-80 transition-opacity">
                             <div className="w-9 h-9 sm:w-8 sm:h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-lg shadow-indigo-200 dark:shadow-none shrink-0">
-                                <img src="/favicon.svg" alt="OneForMind Logo" className="w-5 h-5 sm:w-4 sm:h-4 brightness-0 invert" />
+                                <img src="/favicon.svg" alt="Tranvas Logo" className="w-5 h-5 sm:w-4 sm:h-4 brightness-0 invert" />
                             </div>
-                            <span className="text-[17px] font-black text-slate-900 dark:text-white tracking-tight hidden sm:block">OneForMind</span>
+                            <span className="text-[17px] font-black text-slate-900 dark:text-white tracking-tight hidden sm:block">Tranvas</span>
                         </Link>
                     </div>
 

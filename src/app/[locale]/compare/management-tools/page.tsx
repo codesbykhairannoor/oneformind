@@ -69,7 +69,7 @@ export default function ManagementToolsComparePage() {
                                 </div>
                             </div>
 
-                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="OneForMind Focus Card">
+                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="Tranvas Focus Card">
                                 <div className="flex justify-between items-center mb-6">
                                     <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl">🎯</div>
                                     <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">{t('pm_mockup_status')}</span>
@@ -100,7 +100,7 @@ export default function ManagementToolsComparePage() {
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center mb-8">
                             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-gray-900">Explore Other Project Management Alternatives</h2>
-                            <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-gray-500 mt-2">See how OneForMind replaces bloated corporate tools.</p>
+                            <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-gray-500 mt-2">See how Tranvas replaces bloated corporate tools.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <Link href="/compare/monday" className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-indigo-300 hover:shadow-lg transition-all flex items-center gap-4">
@@ -327,7 +327,7 @@ export default function ManagementToolsComparePage() {
 
                             <div className="p-8 rounded-3xl border-2 border-indigo-100 bg-white shadow-xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">WINNER</div>
-                                <h3 className="font-black text-indigo-900 uppercase tracking-widest mb-6">OneForMind</h3>
+                                <h3 className="font-black text-indigo-900 uppercase tracking-widest mb-6">Tranvas</h3>
                                 <ul className="space-y-6">
                                      <li className="flex items-center justify-between text-sm md:text-base">
                                         <span className="font-bold text-gray-900">{t('pm_table_row_1_title')}</span>

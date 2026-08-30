@@ -12,7 +12,7 @@ export default function CommunityPage() {
 
     const faqs = [
         {
-            q: t('help_faq_q1') || 'Bagaimana cara bergabung ke komunitas Discord & Telegram resmi OneForMind?',
+            q: t('help_faq_q1') || 'Bagaimana cara bergabung ke komunitas Discord & Telegram resmi Tranvas?',
             a: t('help_faq_a1') || 'Anda dapat bergabung secara gratis dengan mengeklik tombol Discord atau Telegram yang tersedia di halaman ini.'
         },
         {
@@ -237,7 +237,7 @@ export default function CommunityPage() {
                             <span className="text-2xl font-black italic tracking-tighter">Mindful.</span>
                             <span className="text-2xl font-black italic tracking-tighter">Productive.</span>
                             <span className="text-2xl font-black italic tracking-tighter">Connected.</span>
-                            <span className="text-2xl font-black italic tracking-tighter">OneForMind.</span>
+                            <span className="text-2xl font-black italic tracking-tighter">Tranvas.</span>
                         </div>
                     </div>
                 </section>

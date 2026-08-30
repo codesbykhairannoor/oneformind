@@ -53,9 +53,9 @@ export async function POST(req: NextRequest) {
         const planKey = plan.toLowerCase();
         const paymentAmount = pricesUsd[planKey]?.[billing] || '59.00';
         
-        let productDetails = `OneForMind ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billing.charAt(0).toUpperCase() + billing.slice(1)})`;
+        let productDetails = `Tranvas ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billing.charAt(0).toUpperCase() + billing.slice(1)})`;
         if (planKey === 'lifetime' || planKey === 'legendary') {
-            productDetails = 'OneForMind Legendary Founder Edition';
+            productDetails = 'Tranvas Legendary Founder Edition';
         }
 
         const { token, baseUrl } = await getPayPalAccessToken();

@@ -12,14 +12,14 @@ export default function AiTrustPage() {
     const faqs = [
         {
             q: t('help_faq_q1') || 'Apakah data pribadi saya digunakan untuk melatih model AI umum?',
-            a: t('help_faq_a1') || 'Tidak sama sekali. OneForMind menggunakan model Ephemeral Context yang berarti data Anda diproses secara sementara untuk menghasilkan analisis lalu dihapus dari memori pemrosesan.'
+            a: t('help_faq_a1') || 'Tidak sama sekali. Tranvas menggunakan model Ephemeral Context yang berarti data Anda diproses secara sementara untuk menghasilkan analisis lalu dihapus dari memori pemrosesan.'
         },
         {
             q: t('help_faq_q2') || 'Bagaimana Neural OS menjaga kerahasiaan catatan keuangan dan jurnal?',
             a: t('help_faq_a2') || 'Seluruh data dienkripsi dari ujung ke ujung (end-to-end encryption) dan AI hanya membaca snapshot kontekstual saat Anda secara eksplisit meminta analisis On-Demand.'
         },
         {
-            q: t('help_faq_q3') || 'Apakah saya bisa mematikan fitur AI di OneForMind?',
+            q: t('help_faq_q3') || 'Apakah saya bisa mematikan fitur AI di Tranvas?',
             a: t('help_faq_a3') || 'Ya, Anda memiliki kontrol penuh untuk mematikan atau mengaktifkan modul Neural OS kapan saja sesuai kenyamanan Anda.'
         }
     ];
@@ -69,7 +69,7 @@ export default function AiTrustPage() {
                                                 "Our AI reads to assist, not to memorize."
                                             </p>
                                             <p className="text-slate-600 font-medium leading-relaxed">
-                                                OneForMind operates on a strictly <strong>Ephemeral Context</strong> model. Your personal data—tasks, journals, and finance transactions—are never used to train global AI models. We utilize Large Language Models (LLMs) as high-speed processing cores that receive temporary snapshots of your request to generate insights, which are then cleared from the processing memory.
+                                                Tranvas operates on a strictly <strong>Ephemeral Context</strong> model. Your personal data—tasks, journals, and finance transactions—are never used to train global AI models. We utilize Large Language Models (LLMs) as high-speed processing cores that receive temporary snapshots of your request to generate insights, which are then cleared from the processing memory.
                                             </p>
                                         </div>
                                     </div>
@@ -117,7 +117,7 @@ export default function AiTrustPage() {
                         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:30px_30px] opacity-10" />
                         <div className="max-w-4xl mx-auto px-6 relative z-10 space-y-8">
                             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-white font-black">Built for Audit-Readiness</h2>
-                            <p style={{ fontSize: '1.15rem', lineHeight: 1.8, color: 'var(--text-muted)' }} className="max-w-2xl mx-auto font-medium">OneForMind follows the highest standards for AI safety and data portability.</p>
+                            <p style={{ fontSize: '1.15rem', lineHeight: 1.8, color: 'var(--text-muted)' }} className="max-w-2xl mx-auto font-medium">Tranvas follows the highest standards for AI safety and data portability.</p>
                             <div className="flex flex-wrap justify-center gap-4">
                                 <div className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black tracking-widest text-xs uppercase">E-E-A-T COMPLIANT</div>
                                 <div className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black tracking-widest text-xs uppercase">GDPR ALIGNED</div>

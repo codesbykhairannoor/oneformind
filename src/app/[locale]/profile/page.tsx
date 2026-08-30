@@ -28,7 +28,7 @@ export default function ProfilePage() {
 
     // 1. Profile Main State
     const [name, setName] = useState('Alexander Supriyadi');
-    const [email, setEmail] = useState('alexander@oneformind.com');
+    const [email, setEmail] = useState('alexander@tranvas.com');
     const [headline, setHeadline] = useState('Senior Software Architect & Neural OS Enthusiast');
     const [bio, setBio] = useState('Fokus pada pengembangan sistem terdistribusi, produktivitas berbasis habit, dan otomasi AI.');
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export default function ProfilePage() {
         }
         
         // Still load mock data for fields not supported by default NextAuth (headline, bio)
-        const saved = localStorage.getItem('oneformind_user_profile');
+        const saved = localStorage.getItem('tranvas_user_profile');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -74,7 +74,7 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (isLoaded) {
-            localStorage.setItem('oneformind_user_profile', JSON.stringify({
+            localStorage.setItem('tranvas_user_profile', JSON.stringify({
                 headline, bio, avatarUrl
             }));
         }

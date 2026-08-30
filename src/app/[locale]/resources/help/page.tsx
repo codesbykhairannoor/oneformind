@@ -14,15 +14,15 @@ export default function HelpPage() {
 
     const faqs = [
         {
-            q: 'Bagaimana cara menghubungi tim bantuan teknis OneForMind?',
-            a: 'Anda dapat mengirimkan email langsung ke oneformindapp@gmail.com atau bergabung ke kanal komunitas resmi.'
+            q: 'Bagaimana cara menghubungi tim bantuan teknis Tranvas?',
+            a: 'Anda dapat mengirimkan email langsung ke tranvasapp@gmail.com atau bergabung ke kanal komunitas resmi.'
         },
         {
             q: 'Apakah ada garansi pengembalian dana 30 hari?',
             a: 'Ya, garansi pengembalian dana penuh 100% berlaku dalam 30 hari pertama tanpa syarat rumit.'
         },
         {
-            q: 'Apakah status server OneForMind selalu online?',
+            q: 'Apakah status server Tranvas selalu online?',
             a: 'Sistem kami beroperasi dengan Service Level Agreement (SLA) 99.9% Uptime dan latensi kurang dari 50ms.'
         }
     ];
@@ -312,7 +312,7 @@ export default function HelpPage() {
                             </p>
 
                             <div className="flex flex-col sm:flex-row justify-center items-center gap-8">
-                                <a href="mailto:oneformindapp@gmail.com" className="inline-flex items-center justify-center gap-4 bg-white text-indigo-950 px-12 py-6 rounded-3xl font-black text-xl hover:bg-indigo-50 shadow-2xl transition transform hover:-translate-y-1 w-full sm:w-auto active:scale-95">
+                                <a href="mailto:tranvasapp@gmail.com" className="inline-flex items-center justify-center gap-4 bg-white text-indigo-950 px-12 py-6 rounded-3xl font-black text-xl hover:bg-indigo-50 shadow-2xl transition transform hover:-translate-y-1 w-full sm:w-auto active:scale-95">
                                     {t('help_cta_btn')}
                                     <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />

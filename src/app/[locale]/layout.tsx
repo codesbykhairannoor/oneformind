@@ -13,7 +13,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "OneForMind | Productivity OS",
+  title: "Tranvas | Productivity OS",
   description: "The all-in-one productivity OS for growth, clarity, and control.",
 };
 

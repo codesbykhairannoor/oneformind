@@ -77,7 +77,7 @@ export default function HabitAppsComparePage() {
                                 </div>
                             </div>
 
-                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="OneForMind Growth Card">
+                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="Tranvas Growth Card">
                                 <div className="flex justify-between items-center mb-6">
                                     <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl">🔥</div>
                                     <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">{t('habitap_mockup_status')}</span>
@@ -304,7 +304,7 @@ export default function HabitAppsComparePage() {
 
                             <div className="bg-indigo-50 p-10 rounded-3xl border border-indigo-100 relative overflow-hidden shadow-2xl">
                                 <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-bl-2xl">RECOMMENDED</div>
-                                <h3 className="text-indigo-900 font-bold text-sm mb-8 uppercase tracking-widest text-center">OneForMind</h3>
+                                <h3 className="text-indigo-900 font-bold text-sm mb-8 uppercase tracking-widest text-center">Tranvas</h3>
                                 
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between text-sm md:text-base">

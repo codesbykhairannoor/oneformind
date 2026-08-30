@@ -20,7 +20,7 @@ export default function StatusPage() {
 
     const faqs = [
         {
-            q: 'Bagaimana status sistem OneForMind dipantau?',
+            q: 'Bagaimana status sistem Tranvas dipantau?',
             a: 'Sistem dipantau secara otomatis 24/7 dari 12 lokasi jaringan global dengan interval 60 detik.'
         },
         {
@@ -28,7 +28,7 @@ export default function StatusPage() {
             a: 'Anda dapat menghubungi tim teknis kami melalui email support atau halaman kontak.'
         },
         {
-            q: 'Berapa komitmen SLA uptime OneForMind?',
+            q: 'Berapa komitmen SLA uptime Tranvas?',
             a: 'SLA ketersediaan sistem kami ditetapkan pada tingkat minimal 99.9% per bulan.'
         }
     ];

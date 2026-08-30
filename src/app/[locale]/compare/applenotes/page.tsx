@@ -16,11 +16,11 @@ export default function AppleNotesComparePage() {
             a: t('faq_applenotes_a1')
         },
         {
-            q: 'Apakah OneForMind bisa menggantikan Apple Notes untuk semua hal?',
-            a: 'Apple Notes hebat untuk coretan cepat. OneForMind tidak bertujuan menggantikannya, melainkan menampung hal yang membutuhkan struktur dan pencapaian tujuan.'
+            q: 'Apakah Tranvas bisa menggantikan Apple Notes untuk semua hal?',
+            a: 'Apple Notes hebat untuk coretan cepat. Tranvas tidak bertujuan menggantikannya, melainkan menampung hal yang membutuhkan struktur dan pencapaian tujuan.'
         },
         {
-            q: 'Apakah data saya aman di OneForMind?',
+            q: 'Apakah data saya aman di Tranvas?',
             a: 'Ya, kami menggunakan standar enkripsi industri. Kami juga mengadopsi pendekatan minimalis: hanya menyimpan data yang benar-benar esensial untuk produktivitas Anda.'
         }
     ];
@@ -193,7 +193,7 @@ export default function AppleNotesComparePage() {
                     </div>
                 </section>
 
-                {/* SECTION 5: ONEFORMIND ADVANTAGE */}
+                {/* SECTION 5: TRANVAS ADVANTAGE */}
                 <section className="py-[80px] px-6 bg-slate-950 text-white overflow-hidden relative">
                     <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(251,191,36,0.1)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
                     <div className="max-w-4xl mx-auto text-center relative z-10">

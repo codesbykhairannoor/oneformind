@@ -12,15 +12,15 @@ export default function AboutPage() {
 
     const faqs = [
         {
-            q: 'Apa visi utama dibalik pembuatan OneForMind?',
+            q: 'Apa visi utama dibalik pembuatan Tranvas?',
             a: 'Visi kami adalah menciptakan satu sistem operasi hidup terpadu yang membebaskan manusia dari beban kognitif akibat fragmentasi puluhan aplikasi produktivitas.'
         },
         {
-            q: 'Siapa tim pengembang dibalik OneForMind?',
-            a: 'OneForMind dirancang dan dibangun oleh tim independen yang berfokus pada metodologi Atomic System, Deep Work, dan AI Life OS.'
+            q: 'Siapa tim pengembang dibalik Tranvas?',
+            a: 'Tranvas dirancang dan dibangun oleh tim independen yang berfokus pada metodologi Atomic System, Deep Work, dan AI Life OS.'
         },
         {
-            q: 'Bagaimana alur peta jalan (roadmap) pengembangan OneForMind?',
+            q: 'Bagaimana alur peta jalan (roadmap) pengembangan Tranvas?',
             a: 'Kami terus memperbarui sistem dari Fase 01 (Core Engine), Fase 02 (Synergy & Analytics), hingga Fase 03 (Neural OS AI Coaching).'
         }
     ];
@@ -273,7 +273,7 @@ export default function AboutPage() {
                         </div>
 
                         <div className="text-center pt-8">
-                            <a href="https://x.com/OneForMind" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 text-white hover:text-indigo-400 transition group">
+                            <a href="https://x.com/Tranvas" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 text-white hover:text-indigo-400 transition group">
                                 <span className="text-[10px] font-black tracking-[0.4em] uppercase">{t('team_connect')}</span>
                                 <span className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-indigo-600 transition font-black">𝕏</span>
                             </a>

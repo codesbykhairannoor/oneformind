@@ -73,7 +73,7 @@ export default function FinanceAppsComparePage() {
                                 </div>
                             </div>
 
-                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="OneForMind Finance Card">
+                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="Tranvas Finance Card">
                                 <div className="flex justify-between items-center mb-6">
                                     <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl">💵</div>
                                     <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">{t('finapp_mockup_status')}</span>
@@ -296,7 +296,7 @@ export default function FinanceAppsComparePage() {
                                         </div>
                                         <div className="bg-emerald-50/50 p-6 rounded-2xl border border-emerald-100/50">
                                             <span className="text-[10px] uppercase tracking-widest text-emerald-600 block mb-2 flex items-center gap-1">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> OneForMind
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Tranvas
                                             </span>
                                             <p className="text-emerald-950 font-bold">
                                                 {t(`finapp_table_row_${i}_col_2`)}

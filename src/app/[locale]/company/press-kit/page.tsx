@@ -115,8 +115,8 @@ export default function PressKitPage() {
                             </div>
                             
                             <div className="pt-10">
-                                <a href="mailto:oneformindapp@gmail.com" className="text-xl font-black text-indigo-600 hover:text-indigo-700 flex items-center gap-2 group">
-                                    oneformindapp@gmail.com
+                                <a href="mailto:tranvasapp@gmail.com" className="text-xl font-black text-indigo-600 hover:text-indigo-700 flex items-center gap-2 group">
+                                    tranvasapp@gmail.com
                                     <svg className="w-5 h-5 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                                 </a>
                             </div>

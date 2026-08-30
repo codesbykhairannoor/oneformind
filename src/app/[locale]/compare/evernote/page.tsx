@@ -17,11 +17,11 @@ export default function EvernoteComparePage() {
         },
         {
             q: 'Bisakah saya mengimport catatan lama dari Evernote?',
-            a: 'Saat ini OneForMind dirancang sebagai tempat untuk catatan aktif ("Active Progress"), bukan gudang penyimpanan ("Dead Storage"). Kami merekomendasikan memulai dengan lembaran baru dan hanya memindahkan data yang benar-benar Anda butuhkan secara manual.'
+            a: 'Saat ini Tranvas dirancang sebagai tempat untuk catatan aktif ("Active Progress"), bukan gudang penyimpanan ("Dead Storage"). Kami merekomendasikan memulai dengan lembaran baru dan hanya memindahkan data yang benar-benar Anda butuhkan secara manual.'
         },
         {
             q: 'Apakah ada limit penyimpanan seperti Evernote?',
-            a: 'Tidak ada limit ketat seperti batasan device atau limit harian, karena OneForMind berbasis teks murni (Markdown) yang sangat ringan. Anda bisa membuat notes sebanyak yang Anda mau.'
+            a: 'Tidak ada limit ketat seperti batasan device atau limit harian, karena Tranvas berbasis teks murni (Markdown) yang sangat ringan. Anda bisa membuat notes sebanyak yang Anda mau.'
         }
     ];
 

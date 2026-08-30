@@ -16,11 +16,11 @@ export default function ClickUpComparePage() {
             a: t('faq_clickup_a1')
         },
         {
-            q: 'Apakah OneForMind cocok untuk tim besar?',
-            a: 'OneForMind didesain khusus untuk individu (solo-preneurs, mahasiswa, profesional mandiri). Kami secara sadar tidak membangun fitur kolaborasi tim agar tidak mengorbankan kecepatan dan kesederhanaan personal.'
+            q: 'Apakah Tranvas cocok untuk tim besar?',
+            a: 'Tranvas didesain khusus untuk individu (solo-preneurs, mahasiswa, profesional mandiri). Kami secara sadar tidak membangun fitur kolaborasi tim agar tidak mengorbankan kecepatan dan kesederhanaan personal.'
         },
         {
-            q: 'Saya terbiasa dengan Gantt Chart, apakah ada di OneForMind?',
+            q: 'Saya terbiasa dengan Gantt Chart, apakah ada di Tranvas?',
             a: 'Tidak. Berdasarkan data, tampilan timeline kompleks justru menambah kecemasan individu. Kami menggantinya dengan "Fokus Hari Ini" yang hanya menampilkan apa yang relevan saat ini.'
         }
     ];
@@ -189,7 +189,7 @@ export default function ClickUpComparePage() {
                                     <tr className="bg-slate-50 border-b border-slate-200">
                                         <th className="p-6 text-slate-400 font-black uppercase tracking-widest text-sm">Feature</th>
                                         <th className="p-6 text-slate-400 font-black uppercase tracking-widest text-sm w-1/3">{t('clickup_table_head_2')}</th>
-                                        <th className="p-6 text-purple-600 font-black uppercase tracking-widest text-sm w-1/3 bg-purple-50/50">OneForMind</th>
+                                        <th className="p-6 text-purple-600 font-black uppercase tracking-widest text-sm w-1/3 bg-purple-50/50">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-600">

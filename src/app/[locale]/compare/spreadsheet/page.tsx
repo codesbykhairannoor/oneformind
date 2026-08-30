@@ -16,12 +16,12 @@ export default function SpreadsheetComparePage() {
             a: t('faq_spreadsheet_a1'),
         },
         {
-            q: 'Apakah OneForMind memiliki fitur formula dan kalkulasi seperti spreadsheet?',
-            a: 'Tidak — dan ini disengaja. OneForMind mengotomasi kalkulasi untuk Anda (budget, progress habit, goal tracker). Anda tidak perlu menulis formula VLOOKUP atau SUM manual. Semua angka penting sudah dikalkulasi secara otomatis di balik layar.',
+            q: 'Apakah Tranvas memiliki fitur formula dan kalkulasi seperti spreadsheet?',
+            a: 'Tidak — dan ini disengaja. Tranvas mengotomasi kalkulasi untuk Anda (budget, progress habit, goal tracker). Anda tidak perlu menulis formula VLOOKUP atau SUM manual. Semua angka penting sudah dikalkulasi secara otomatis di balik layar.',
         },
         {
             q: 'Saya sudah bertahun-tahun menggunakan spreadsheet untuk tracking. Apakah worth untuk pindah?',
-            a: 'Jika Anda menggunakan spreadsheet sebagai "sistem hidup" (bukan hanya untuk pekerjaan), OneForMind kemungkinan besar lebih cocok. Spreadsheet bagus untuk data statis. OneForMind didesain sebagai sistem yang hidup dan berevolusi bersama kebiasaan dan tujuan harian Anda.',
+            a: 'Jika Anda menggunakan spreadsheet sebagai "sistem hidup" (bukan hanya untuk pekerjaan), Tranvas kemungkinan besar lebih cocok. Spreadsheet bagus untuk data statis. Tranvas didesain sebagai sistem yang hidup dan berevolusi bersama kebiasaan dan tujuan harian Anda.',
         },
     ];
 
@@ -165,7 +165,7 @@ export default function SpreadsheetComparePage() {
                                     <tr>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-500 font-medium w-1/3">Feature</th>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-400 font-medium w-1/3">{t('spreadsheet_table_head_2')}</th>
-                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">OneForMind</th>
+                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-700">

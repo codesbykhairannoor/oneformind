@@ -46,7 +46,7 @@ export default function PricingPage() {
             return;
         }
 
-        const authString = localStorage.getItem('oneformind_auth');
+        const authString = localStorage.getItem('tranvas_auth');
         if (authString) {
             try {
                 const auth = JSON.parse(authString);

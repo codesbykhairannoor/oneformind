@@ -16,12 +16,12 @@ export default function NotesAppsComparePage() {
             a: t('faq_evernote_a1')
         },
         {
-            q: 'Bisakah OneForMind menggantikan aplikasi catatan saya yang sudah ada?',
-            a: 'OneForMind tidak dirancang sebagai tempat penyimpanan dokumen panjang atau wiki. Kami adalah sistem operasi harian (Personal OS). Sangat disarankan Anda tetap menyimpan aplikasi catatan lama (seperti Obsidian atau Notion) sebagai "lemari arsip" (Second Brain), sedangkan OneForMind digunakan sebagai "meja kerja" harian Anda.'
+            q: 'Bisakah Tranvas menggantikan aplikasi catatan saya yang sudah ada?',
+            a: 'Tranvas tidak dirancang sebagai tempat penyimpanan dokumen panjang atau wiki. Kami adalah sistem operasi harian (Personal OS). Sangat disarankan Anda tetap menyimpan aplikasi catatan lama (seperti Obsidian atau Notion) sebagai "lemari arsip" (Second Brain), sedangkan Tranvas digunakan sebagai "meja kerja" harian Anda.'
         },
         {
             q: 'Apakah saya bisa membuat folder bertingkat untuk catatan saya?',
-            a: 'Tidak. OneForMind menggunakan struktur harian yang datar. Setiap hari Anda mendapat satu halaman kosong, dan Anda didorong untuk membersihkannya di akhir hari (Daily Review). Ini mencegah penumpukan catatan usang yang membebani pikiran Anda.'
+            a: 'Tidak. Tranvas menggunakan struktur harian yang datar. Setiap hari Anda mendapat satu halaman kosong, dan Anda didorong untuk membersihkannya di akhir hari (Daily Review). Ini mencegah penumpukan catatan usang yang membebani pikiran Anda.'
         }
     ];
 

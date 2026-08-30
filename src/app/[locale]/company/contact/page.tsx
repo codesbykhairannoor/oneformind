@@ -55,7 +55,7 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <h4 className="text-sm font-black text-slate-900 dark:text-white mb-1">{t('contact_info_support')}</h4>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">oneformindapp@gmail.com</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">tranvasapp@gmail.com</p>
                                         </div>
                                     </div>
 

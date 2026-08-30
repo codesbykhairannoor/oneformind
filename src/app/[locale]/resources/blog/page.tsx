@@ -12,7 +12,7 @@ export default function BlogIndexPage() {
 
     const faqs = [
         {
-            q: t('help_faq_q1') || 'Seberapa sering artikel artikel baru dipublikasikan di Blog OneForMind?',
+            q: t('help_faq_q1') || 'Seberapa sering artikel artikel baru dipublikasikan di Blog Tranvas?',
             a: t('help_faq_a1') || 'Kami menerbitkan artikel panduan produktivitas dan wawasan manajemen diri 2-3 kali setiap minggu.'
         },
         {
@@ -20,7 +20,7 @@ export default function BlogIndexPage() {
             a: t('help_faq_a2') || 'Ya, Anda dapat memasukkan email pada formulir buletin untuk menerima ringkasan mingguan tanpa biaya.'
         },
         {
-            q: t('help_faq_q3') || 'Bagaimana cara berkontribusi menulis di blog OneForMind?',
+            q: t('help_faq_q3') || 'Bagaimana cara berkontribusi menulis di blog Tranvas?',
             a: t('help_faq_a3') || 'Kami menerima tulisan tamu dari pakar produktivitas dan praktisi Atomic Habits melalui email tim redaksi.'
         }
     ];
@@ -47,7 +47,7 @@ export default function BlogIndexPage() {
             icon: '⚡'
         },
         {
-            slug: 'financial-clarity-with-oneformind-finance-os',
+            slug: 'financial-clarity-with-tranvas-finance-os',
             title: 'Financial Peace of Mind: Bridging Daily Spending with Long-Term Wealth',
             excerpt: 'A zero-based budgeting system built inside your productivity workflow to eliminate money anxiety.',
             category: 'Finance OS',
@@ -131,7 +131,7 @@ export default function BlogIndexPage() {
                             {remainingPosts.map((post, idx) => (
                                 <article key={idx} className="group relative flex flex-col bg-white rounded-3xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_50px_rgba(79,70,229,0.08)] hover:-translate-y-1 transition-all duration-500">
                                     <Link href="/resources/post" className="block aspect-[16/10] overflow-hidden relative">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center text-5xl italic text-indigo-200/30 tracking-tighter font-black">OneForMind</div>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center text-5xl italic text-indigo-200/30 tracking-tighter font-black">Tranvas</div>
                                         
                                         {/* Category Badge */}
                                         <div className="absolute top-4 left-4 z-10">
@@ -165,7 +165,7 @@ export default function BlogIndexPage() {
                                         <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-xs">✨</div>
-                                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Team OneForMind</span>
+                                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Team Tranvas</span>
                                             </div>
                                             <Link href="/resources/post" className="text-indigo-600 hover:text-indigo-700 font-bold text-xs flex items-center gap-2 group/btn">
                                                 Read Post 

@@ -75,7 +75,7 @@ export default function FiveAppsComparePage() {
                                 <div className="absolute top-1/2 left-0 w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl opacity-40 rotate-90 animate-float">🎯</div>
                             </div>
 
-                            <div className="relative bg-white/90 p-10 rounded-[3rem] shadow-2xl border border-white w-80 z-20 overflow-hidden transform hover:scale-105 transition duration-500" role="img" aria-label="OneForMind Unified Orb">
+                            <div className="relative bg-white/90 p-10 rounded-[3rem] shadow-2xl border border-white w-80 z-20 overflow-hidden transform hover:scale-105 transition duration-500" role="img" aria-label="Tranvas Unified Orb">
                                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"></div>
                                 
                                 <div className="relative z-10 text-center">
@@ -254,7 +254,7 @@ export default function FiveAppsComparePage() {
                             <div className="grid grid-cols-12 gap-4 border-b border-slate-100 pb-6 mb-6">
                                 <div className="col-span-6 md:col-span-8"></div>
                                 <div className="col-span-3 md:col-span-2 text-center text-xs uppercase tracking-widest text-slate-400">{t('five_table_head_2')}</div>
-                                <div className="col-span-3 md:col-span-2 text-center text-xs uppercase tracking-widest text-indigo-600">OneForMind</div>
+                                <div className="col-span-3 md:col-span-2 text-center text-xs uppercase tracking-widest text-indigo-600">Tranvas</div>
                             </div>
 
                             <div className="space-y-6">

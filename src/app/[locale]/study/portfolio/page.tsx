@@ -13,7 +13,7 @@ import { Sparkles, ArrowLeft, Copy, RefreshCw, CheckCircle2, Plus, X, ExternalLi
 
 export default function StudyPortfolioPage() {
     const t = useTranslations();
-    const [username, setUsername] = useState('student_oneformind');
+    const [username, setUsername] = useState('student_tranvas');
     const [isEditingUsername, setIsEditingUsername] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -69,7 +69,7 @@ export default function StudyPortfolioPage() {
         }
     ]);
 
-    const [publicUrl, setPublicUrl] = useState(`https://oneformind.app/p/${username}`);
+    const [publicUrl, setPublicUrl] = useState(`https://tranvas.app/p/${username}`);
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {

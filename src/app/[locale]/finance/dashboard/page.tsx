@@ -6,7 +6,7 @@ import FinanceDashboardClient from './FinanceDashboardClient';
 
 export async function generateMetadata() {
     return {
-        title: 'Finance Dashboard - OneForMind',
+        title: 'Finance Dashboard - Tranvas',
     };
 }
 

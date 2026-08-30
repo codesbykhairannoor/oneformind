@@ -12,7 +12,7 @@ export default function SuccessStoriesPage() {
 
     const faqs = [
         {
-            q: 'Siapa saja pengguna yang telah membagikan cerita sukses di OneForMind?',
+            q: 'Siapa saja pengguna yang telah membagikan cerita sukses di Tranvas?',
             a: 'Pengguna kami terdiri dari profesional, pengusaha, kreator konten, dan pelajar dari berbagai penjuru dunia.'
         },
         {
@@ -21,7 +21,7 @@ export default function SuccessStoriesPage() {
         },
         {
             q: 'Apakah cerita sukses yang ditampilkan merupakan testimoni asli?',
-            a: 'Ya, seluruh testimoni dan angka pencapaian diverifikasi langsung dari komunitas pengguna aktif OneForMind.'
+            a: 'Ya, seluruh testimoni dan angka pencapaian diverifikasi langsung dari komunitas pengguna aktif Tranvas.'
         }
     ];
 
@@ -103,7 +103,7 @@ export default function SuccessStoriesPage() {
                                     </div>
                                     <div className="text-left">
                                         <p className="font-black text-gray-900 leading-none">Verified User</p>
-                                        <p className="text-sm text-indigo-600 font-bold mt-1">OneForMind Power User</p>
+                                        <p className="text-sm text-indigo-600 font-bold mt-1">Tranvas Power User</p>
                                     </div>
                                 </div>
 
@@ -298,7 +298,7 @@ export default function SuccessStoriesPage() {
                                 {t('stories_cta_desc')}
                             </p>
                             <div className="flex justify-center">
-                                <a href="mailto:oneformindapp@gmail.com" className="bg-white text-indigo-600 px-12 py-5 rounded-full font-black text-lg hover:bg-indigo-50 transition transform hover:scale-105 shadow-xl flex items-center gap-3">
+                                <a href="mailto:tranvasapp@gmail.com" className="bg-white text-indigo-600 px-12 py-5 rounded-full font-black text-lg hover:bg-indigo-50 transition transform hover:scale-105 shadow-xl flex items-center gap-3">
                                     {t('stories_cta_btn')}
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />

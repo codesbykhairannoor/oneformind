@@ -197,7 +197,7 @@ export default function YnabComparePage() {
                                 </ul>
                             </div>
                             <div className="p-8 rounded-3xl border-2 border-emerald-500 bg-white shadow-xl shadow-emerald-100 relative">
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">OneForMind</div>
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">Tranvas</div>
                                 <ul className="space-y-6 mt-4">
                                     <li>
                                         <div className="text-xs text-emerald-500 font-bold uppercase mb-1">{t('ynab_table_row_1_title')}</div>

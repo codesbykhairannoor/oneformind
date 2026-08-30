@@ -16,11 +16,11 @@ export default function NotionComparePage() {
             a: t('faq_notion_a1'),
         },
         {
-            q: 'Apakah OneForMind bisa digunakan sebagai wiki atau dokumentasi tim seperti Notion?',
-            a: 'Tidak — dan itu disengaja. OneForMind adalah Personal OS harian, bukan wiki tim. Jika Anda butuh dokumentasi tim, Notion tetap pilihan yang bagus. OneForMind adalah teman harian Anda untuk mengeksekusi, bukan menyimpan.',
+            q: 'Apakah Tranvas bisa digunakan sebagai wiki atau dokumentasi tim seperti Notion?',
+            a: 'Tidak — dan itu disengaja. Tranvas adalah Personal OS harian, bukan wiki tim. Jika Anda butuh dokumentasi tim, Notion tetap pilihan yang bagus. Tranvas adalah teman harian Anda untuk mengeksekusi, bukan menyimpan.',
         },
         {
-            q: 'Apakah saya bisa meng-import data dari Notion ke OneForMind?',
+            q: 'Apakah saya bisa meng-import data dari Notion ke Tranvas?',
             a: 'Saat ini belum ada fitur import otomatis dari Notion. Namun Anda bisa mulai dengan halaman harian baru dan secara bertahap memindahkan goal dan kebiasaan penting. Kebanyakan pengguna merasakan "permulaan segar" ini sebagai keuntungan, bukan kerugian.',
         },
     ];
@@ -150,7 +150,7 @@ export default function NotionComparePage() {
                                     <tr>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-500 font-medium w-1/3">Feature</th>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-400 font-medium w-1/3">{t('notion_table_head_2')}</th>
-                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">OneForMind</th>
+                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-700">

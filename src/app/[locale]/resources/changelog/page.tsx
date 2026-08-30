@@ -12,12 +12,12 @@ export default function ChangelogPage() {
 
     const faqs = [
         {
-            q: t('help_faq_q1') || 'Seberapa sering OneForMind merilis pembaruan fitur?',
+            q: t('help_faq_q1') || 'Seberapa sering Tranvas merilis pembaruan fitur?',
             a: t('help_faq_a1') || 'Kami merilis pembaruan rutin setiap 2 minggu sekali untuk peningkatan performa dan penambahan fitur baru.'
         },
         {
             q: t('help_faq_q2') || 'Bagaimana cara mengajukan ide atau umpan balik fitur baru?',
-            a: t('help_faq_a2') || 'Anda dapat mengirimkan saran fitur langsung melalui tombol pengajuan di halaman ini atau mengirimkan email ke oneformindapp@gmail.com.'
+            a: t('help_faq_a2') || 'Anda dapat mengirimkan saran fitur langsung melalui tombol pengajuan di halaman ini atau mengirimkan email ke tranvasapp@gmail.com.'
         },
         {
             q: t('help_faq_q3') || 'Apakah versi pembaruan aplikasi berjalan secara otomatis?',
@@ -366,7 +366,7 @@ export default function ChangelogPage() {
                             <p className="text-xl text-gray-500 max-w-2xl mx-auto font-medium">
                                 {t('cl_cta_desc')}
                             </p>
-                            <a href="mailto:oneformindapp@gmail.com" className="inline-flex items-center justify-center gap-3 bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-indigo-700 shadow-[0_15px_30px_rgba(79,70,229,0.3)] transition transform hover:-translate-y-1">
+                            <a href="mailto:tranvasapp@gmail.com" className="inline-flex items-center justify-center gap-3 bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-indigo-700 shadow-[0_15px_30px_rgba(79,70,229,0.3)] transition transform hover:-translate-y-1">
                                 {t('cl_cta_btn')}
                             </a>
                             <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{t('cl_cta_note')}</p>

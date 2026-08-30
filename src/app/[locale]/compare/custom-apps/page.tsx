@@ -73,7 +73,7 @@ export default function CustomAppsComparePage() {
                                 <div className="absolute bottom-4 right-4 text-gray-300 font-mono text-xs">#REF! ERROR</div>
                             </div>
 
-                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="OneForMind Zero-Configuration Dashboard: Displaying an automated monthly overview with budget usage and performance insights.">
+                            <div className="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 w-80 z-20 transform hover:scale-105 transition duration-500" role="img" aria-label="Tranvas Zero-Configuration Dashboard: Displaying an automated monthly overview with budget usage and performance insights.">
                                 <div className="flex justify-between items-center mb-6">
                                     <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl">📊</div>
                                     <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">{t('blank_mockup_status')}</span>
@@ -103,7 +103,7 @@ export default function CustomAppsComparePage() {
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center mb-8">
                             <h2 className="text-2xl font-black text-gray-900">Explore Other Custom App Alternatives</h2>
-                            <p className="text-gray-500 mt-2">See how OneForMind replaces other popular workspace tools.</p>
+                            <p className="text-gray-500 mt-2">See how Tranvas replaces other popular workspace tools.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <Link href="/compare/spreadsheet" className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-indigo-300 hover:shadow-lg transition-all flex items-center gap-4">
@@ -344,7 +344,7 @@ export default function CustomAppsComparePage() {
 
                             <div className="bg-indigo-900 p-10 rounded-3xl md:rounded-l-none border border-indigo-900 text-white relative shadow-2xl transform md:scale-105 z-10">
                                 <div className="absolute top-0 right-0 bg-white/10 px-4 py-1 rounded-bl-2xl text-xs font-bold uppercase tracking-wider">Recommended</div>
-                                <h3 className="text-indigo-200 font-bold uppercase tracking-widest text-sm mb-8">OneForMind</h3>
+                                <h3 className="text-indigo-200 font-bold uppercase tracking-widest text-sm mb-8">Tranvas</h3>
                                 <ul className="space-y-8">
                                     <li className="flex items-center justify-between border-b border-indigo-800 pb-4">
                                         <span className="font-medium text-indigo-100">{t('blank_table_row_1_title')}</span>

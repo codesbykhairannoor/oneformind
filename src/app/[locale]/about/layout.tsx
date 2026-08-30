@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About Us | OneForMind',
+  title: 'About Us | Tranvas',
 };
 
 export default function AboutLayout({ children }: { children: React.ReactNode }) {

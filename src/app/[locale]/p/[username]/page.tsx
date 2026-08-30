@@ -78,7 +78,7 @@ export default function PublicPortfolioShowPage({ params }: PublicPortfolioPageP
                             O
                         </div>
                         <div>
-                            <span className="text-base font-black text-slate-900 dark:text-white leading-none">OneForMind OS</span>
+                            <span className="text-base font-black text-slate-900 dark:text-white leading-none">Tranvas OS</span>
                             <p className="text-[10px] font-bold text-indigo-500 tracking-wider">VERIFIED PUBLIC PORTFOLIO</p>
                         </div>
                     </div>
@@ -115,7 +115,7 @@ export default function PublicPortfolioShowPage({ params }: PublicPortfolioPageP
 
                         <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">@{username}</h1>
                         <p className="text-indigo-200/80 text-sm md:text-base font-semibold max-w-xl leading-relaxed mb-6">
-                            Verified Academic Competency Portfolio powered by OneForMind Neural Skill Mapping.
+                            Verified Academic Competency Portfolio powered by Tranvas Neural Skill Mapping.
                         </p>
 
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-bold">

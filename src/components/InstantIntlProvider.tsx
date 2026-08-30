@@ -53,7 +53,7 @@ function LocaleSwitcherListener({
       const newLocale = e.detail.locale;
       if (messagesMap[newLocale] && newLocale !== locale) {
         setLocale(newLocale);
-        localStorage.setItem('oneformind_locale', newLocale);
+        localStorage.setItem('tranvas_locale', newLocale);
 
         // next-intl's custom router automatically formats the URL prefix depending on the newLocale
         const currentSearch = window.location.search;

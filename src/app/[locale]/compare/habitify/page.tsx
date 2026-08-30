@@ -20,7 +20,7 @@ export default function HabitifyComparePage() {
             a: 'Ya! Sistem kami dirancang untuk fleksibel dengan berbagai jadwal repetisi. Anda dapat mengatur kebiasaan harian, pada hari-hari tertentu dalam seminggu, atau frekuensi bulanan, semuanya akan terintegrasi ke dalam planner utama Anda.'
         },
         {
-            q: 'Bagaimana OneForMind membantu jika saya sering lupa?',
+            q: 'Bagaimana Tranvas membantu jika saya sering lupa?',
             a: 'Karena kebiasaan, to-do list, dan agenda kalender Anda disatukan dalam satu layar planner yang sama, Anda tidak perlu lagi bolak-balik aplikasi. Pengingat Anda menjadi satu alur waktu yang koheren.'
         }
     ];
@@ -158,7 +158,7 @@ export default function HabitifyComparePage() {
                                     <tr className="bg-slate-50 border-b border-slate-200">
                                         <th className="p-6 text-slate-400 font-black uppercase tracking-widest text-sm">Feature</th>
                                         <th className="p-6 text-slate-400 font-black uppercase tracking-widest text-sm w-1/3">{t('habitify_table_head_2')}</th>
-                                        <th className="p-6 text-indigo-600 font-black uppercase tracking-widest text-sm w-1/3 bg-indigo-50/50">OneForMind</th>
+                                        <th className="p-6 text-indigo-600 font-black uppercase tracking-widest text-sm w-1/3 bg-indigo-50/50">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-600">

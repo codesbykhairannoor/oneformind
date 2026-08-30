@@ -51,9 +51,9 @@ export default function GuestLayout({ children, user = null }: { children: React
                     {/* UNIFIED LOGO */}
                     <Link href="/" className="group flex items-center gap-2 z-[110] hover:opacity-80 transition-opacity">
                         <div className="w-9 h-9 sm:w-8 sm:h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-lg shadow-indigo-200 shrink-0">
-                            <img src="/favicon.svg" alt="OneForMind Logo" className="w-5 h-5 sm:w-4 sm:h-4 brightness-0 invert" />
+                            <img src="/favicon.svg" alt="Tranvas Logo" className="w-5 h-5 sm:w-4 sm:h-4 brightness-0 invert" />
                         </div>
-                        <span className="text-[17px] sm:text-[17px] font-black tracking-tight text-slate-900 hidden sm:block">OneForMind</span>
+                        <span className="text-[17px] sm:text-[17px] font-black tracking-tight text-slate-900 hidden sm:block">Tranvas</span>
                     </Link>
 
                     {/* DESKTOP MENU */}
@@ -344,14 +344,14 @@ export default function GuestLayout({ children, user = null }: { children: React
                         {/* COL 1: BRAND */}
                         <div className="col-span-2 md:col-span-1">
                             <Link href="/" className="flex items-center gap-2 mb-6">
-                                <img src="/favicon.svg" alt="OneForMind Logo" className="w-7 h-7" />
-                                <span className="text-lg font-black tracking-tighter text-slate-900">OneForMind</span>
+                                <img src="/favicon.svg" alt="Tranvas Logo" className="w-7 h-7" />
+                                <span className="text-lg font-black tracking-tighter text-slate-900">Tranvas</span>
                             </Link>
                             <p className="text-sm text-slate-700 leading-relaxed mb-6 max-w-xs font-medium">
                                 The unified productivity system designed to bring clarity to your life, habits, and finances.
                             </p>
                             <div className="text-xs text-slate-600 space-y-2 mt-4 font-bold">
-                                <p><strong>Email:</strong> oneformindapp@gmail.com</p>
+                                <p><strong>Email:</strong> tranvasapp@gmail.com</p>
                                 <p><strong>Status:</strong> HQ Jakarta, ID</p>
                             </div>
                         </div>
@@ -417,13 +417,13 @@ export default function GuestLayout({ children, user = null }: { children: React
                         <div>
                             <p className="text-xs font-semibold text-slate-500 mb-5">Connect</p>
                             <div className="flex gap-4">
-                                <a href="https://x.com/OneForMind" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:border-indigo-500 hover:text-indigo-600 transition shadow-sm" aria-label="X">
+                                <a href="https://x.com/Tranvas" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:border-indigo-500 hover:text-indigo-600 transition shadow-sm" aria-label="X">
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.294 19.497h2.039L6.482 3.239h-2.19L17.607 20.65z"/></svg>
                                 </a>
-                                <a href="https://instagram.com/oneformind" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:border-indigo-500 hover:text-indigo-600 transition shadow-sm" aria-label="Instagram">
+                                <a href="https://instagram.com/tranvas" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:border-indigo-500 hover:text-indigo-600 transition shadow-sm" aria-label="Instagram">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                                 </a>
-                                <a href="https://facebook.com/oneformind" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:border-indigo-500 hover:text-indigo-600 transition shadow-sm" aria-label="Facebook">
+                                <a href="https://facebook.com/tranvas" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:border-indigo-500 hover:text-indigo-600 transition shadow-sm" aria-label="Facebook">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                                 </a>
                             </div>
@@ -431,7 +431,7 @@ export default function GuestLayout({ children, user = null }: { children: React
                     </div>
 
                     <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-slate-700">
-                        <p>&copy; {new Date().getFullYear()} OneForMind. All rights reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} Tranvas. All rights reserved.</p>
                         <p>Made with ❤️ for better focus.</p>
                     </div>
                 </div>

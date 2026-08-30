@@ -23,15 +23,15 @@ export async function POST(req: NextRequest) {
 
         const planKey = plan.toLowerCase();
         let paymentAmount = prices[planKey]?.[billing] || 79000;
-        let productDetails = `OneForMind ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billing.charAt(0).toUpperCase() + billing.slice(1)}) Subscription`;
+        let productDetails = `Tranvas ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billing.charAt(0).toUpperCase() + billing.slice(1)}) Subscription`;
 
         if (billing === 'yearly' && planKey !== 'lifetime' && planKey !== 'legendary') {
             paymentAmount *= 12;
-            productDetails = `OneForMind ${plan.charAt(0).toUpperCase() + plan.slice(1)} Annual (12 Months) Subscription`;
+            productDetails = `Tranvas ${plan.charAt(0).toUpperCase() + plan.slice(1)} Annual (12 Months) Subscription`;
         }
 
         if (planKey === 'lifetime' || planKey === 'legendary') {
-            productDetails = 'OneForMind Legendary Founder Edition (Lifetime)';
+            productDetails = 'Tranvas Legendary Founder Edition (Lifetime)';
         }
 
         const userId = session.user.id;
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
             quantity: 1
         }];
 
-        const origin = req.headers.get('origin') || process.env.APP_URL || 'https://oneformind.com';
+        const origin = req.headers.get('origin') || process.env.APP_URL || 'https://tranvas.com';
         const callbackUrl = `${process.env.APP_URL || origin}/api/payment/duitku/callback`;
         const returnUrl = `${origin}/id/payment/status`;
 

@@ -351,7 +351,7 @@ export default function HomePage() {
                             <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                                 <div className="h-full bg-emerald-500 w-[85%] group-hover:w-[15%] transition-all duration-1000"></div>
                             </div>
-                            <p className="mt-4 text-slate-500 text-xs font-bold leading-relaxed">Reduced by 70% in OneForMind.</p>
+                            <p className="mt-4 text-slate-500 text-xs font-bold leading-relaxed">Reduced by 70% in Tranvas.</p>
                         </div>
                         <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-indigo-500/50 transition duration-500 group">
                             <div className="text-indigo-400 font-black text-xs mb-2 flex justify-between">
@@ -503,7 +503,7 @@ export default function HomePage() {
                     {/* DEEP GRADIENT ORB */}
                     <div className="absolute -inset-20 bg-gradient-to-tr from-indigo-200 to-purple-200 rounded-full blur-2xl opacity-40"></div>
                     
-                    <div className="relative bg-slate-900 rounded-[3rem] p-1 shadow-[0_50px_100px_-20px_rgba(79,70,229,0.3)] border-[12px] border-slate-800 overflow-hidden transform lg:-rotate-2 hover:rotate-0 transition-transform duration-700 aspect-[16/10]" role="img" aria-label="OneForMind Dashboard Preview: A unified interface showing habit tracking heatmap, finance budgeting progress, and a clean task management layout.">
+                    <div className="relative bg-slate-900 rounded-[3rem] p-1 shadow-[0_50px_100px_-20px_rgba(79,70,229,0.3)] border-[12px] border-slate-800 overflow-hidden transform lg:-rotate-2 hover:rotate-0 transition-transform duration-700 aspect-[16/10]" role="img" aria-label="Tranvas Dashboard Preview: A unified interface showing habit tracking heatmap, finance budgeting progress, and a clean task management layout.">
                         <div className="absolute top-0 w-full h-8 bg-slate-800 flex items-center px-4 gap-2">
                            <div className="flex gap-1.5">
                                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>

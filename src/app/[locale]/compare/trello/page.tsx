@@ -16,12 +16,12 @@ export default function TrelloComparePage() {
             a: t('faq_trello_a1'),
         },
         {
-            q: 'Apakah OneForMind memiliki fitur Kanban board seperti Trello?',
-            a: 'OneForMind berfokus pada manajemen hidup personal (habit, finance, planner) bukan project management tim. Tidak ada Kanban board. Namun jika Anda menggunakan Trello untuk to-do list pribadi, sistem planner berbasis timeline di OneForMind jauh lebih efektif untuk manajemen diri.',
+            q: 'Apakah Tranvas memiliki fitur Kanban board seperti Trello?',
+            a: 'Tranvas berfokus pada manajemen hidup personal (habit, finance, planner) bukan project management tim. Tidak ada Kanban board. Namun jika Anda menggunakan Trello untuk to-do list pribadi, sistem planner berbasis timeline di Tranvas jauh lebih efektif untuk manajemen diri.',
         },
         {
-            q: 'Untuk siapa OneForMind lebih baik dari Trello?',
-            a: 'OneForMind dirancang untuk individu yang ingin mengelola hidup mereka secara holistik. Trello lebih unggul untuk kolaborasi tim dan project management. Jika Anda single user yang ingin sistem yang menghubungkan produktivitas, kebiasaan, dan keuangan, OneForMind adalah pilihan yang jauh lebih lengkap.',
+            q: 'Untuk siapa Tranvas lebih baik dari Trello?',
+            a: 'Tranvas dirancang untuk individu yang ingin mengelola hidup mereka secara holistik. Trello lebih unggul untuk kolaborasi tim dan project management. Jika Anda single user yang ingin sistem yang menghubungkan produktivitas, kebiasaan, dan keuangan, Tranvas adalah pilihan yang jauh lebih lengkap.',
         },
     ];
 
@@ -160,7 +160,7 @@ export default function TrelloComparePage() {
                                     <tr>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-500 font-medium w-1/3">Feature</th>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-400 font-medium w-1/3">{t('trello_table_head_2')}</th>
-                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">OneForMind</th>
+                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-700">

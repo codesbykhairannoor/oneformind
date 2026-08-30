@@ -16,12 +16,12 @@ export default function MondayComparePage() {
             a: t('faq_monday_a1')
         },
         {
-            q: 'Apakah OneForMind cocok untuk manajemen tim atau kolaborasi?',
-            a: 'Saat ini, OneForMind difokuskan 100% pada produktivitas individual (Personal OS). Kami percaya bahwa sebelum bisa memimpin orang lain, Anda harus bisa memimpin diri sendiri. Kami tidak memiliki fitur kolaborasi tim yang rumit.'
+            q: 'Apakah Tranvas cocok untuk manajemen tim atau kolaborasi?',
+            a: 'Saat ini, Tranvas difokuskan 100% pada produktivitas individual (Personal OS). Kami percaya bahwa sebelum bisa memimpin orang lain, Anda harus bisa memimpin diri sendiri. Kami tidak memiliki fitur kolaborasi tim yang rumit.'
         },
         {
-            q: 'Saya terbiasa dengan Kanban dan Gantt chart, apakah OneForMind memilikinya?',
-            a: 'OneForMind sengaja tidak menggunakan tampilan manajemen proyek kompleks seperti Kanban board atau Gantt chart. Kami merampingkan semuanya menjadi satu sistem tugas, kebiasaan, dan keuangan harian yang bisa Anda proses secara linier dan terfokus.'
+            q: 'Saya terbiasa dengan Kanban dan Gantt chart, apakah Tranvas memilikinya?',
+            a: 'Tranvas sengaja tidak menggunakan tampilan manajemen proyek kompleks seperti Kanban board atau Gantt chart. Kami merampingkan semuanya menjadi satu sistem tugas, kebiasaan, dan keuangan harian yang bisa Anda proses secara linier dan terfokus.'
         }
     ];
 
@@ -170,7 +170,7 @@ export default function MondayComparePage() {
                                     <tr>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-500 font-medium w-1/3">Feature</th>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-400 font-medium w-1/3">{t('monday_table_head_2')}</th>
-                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">OneForMind</th>
+                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-700">

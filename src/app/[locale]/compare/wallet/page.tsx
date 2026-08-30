@@ -16,12 +16,12 @@ export default function WalletComparePage() {
             a: t('faq_wallet_a1'),
         },
         {
-            q: 'Apakah OneForMind mendukung bank sync otomatis seperti Wallet?',
-            a: 'Saat ini OneForMind menggunakan pendekatan manual yang disengaja. Bank sync otomatis menghilangkan gesekan (friction) yang membuat Anda sadar setiap pengeluaran. Dengan mencatat manual, Anda aktif memproses setiap transaksi, yang secara psikologis terbukti membuat Anda lebih hemat.',
+            q: 'Apakah Tranvas mendukung bank sync otomatis seperti Wallet?',
+            a: 'Saat ini Tranvas menggunakan pendekatan manual yang disengaja. Bank sync otomatis menghilangkan gesekan (friction) yang membuat Anda sadar setiap pengeluaran. Dengan mencatat manual, Anda aktif memproses setiap transaksi, yang secara psikologis terbukti membuat Anda lebih hemat.',
         },
         {
-            q: 'Bisakah OneForMind membantu saya memahami hubungan antara pengeluaran dan kebiasaan?',
-            a: 'Ya! Ini adalah keunggulan utama OneForMind. Karena data keuangan dan habit tracker berada dalam satu sistem yang sama, Anda bisa melihat korelasi langsung: misalnya pengeluaran delivery food meningkat di hari-hari ketika Anda melewatkan kebiasaan memasak.',
+            q: 'Bisakah Tranvas membantu saya memahami hubungan antara pengeluaran dan kebiasaan?',
+            a: 'Ya! Ini adalah keunggulan utama Tranvas. Karena data keuangan dan habit tracker berada dalam satu sistem yang sama, Anda bisa melihat korelasi langsung: misalnya pengeluaran delivery food meningkat di hari-hari ketika Anda melewatkan kebiasaan memasak.',
         },
     ];
 
@@ -185,7 +185,7 @@ export default function WalletComparePage() {
                                     <tr className="bg-slate-50 border-b border-slate-200">
                                         <th className="p-6 text-slate-400 font-black uppercase tracking-widest text-sm">Feature</th>
                                         <th className="p-6 text-slate-400 font-black uppercase tracking-widest text-sm w-1/3">{t('wallet_table_head_2')}</th>
-                                        <th className="p-6 text-blue-600 font-black uppercase tracking-widest text-sm w-1/3 bg-blue-50/50">OneForMind</th>
+                                        <th className="p-6 text-blue-600 font-black uppercase tracking-widest text-sm w-1/3 bg-blue-50/50">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-600">

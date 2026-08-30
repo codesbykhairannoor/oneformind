@@ -37,7 +37,7 @@ export default function SettingsPage() {
 
     // Profile state
     const [name, setName] = useState('Alexander');
-    const [email, setEmail] = useState('alexander@oneformind.com');
+    const [email, setEmail] = useState('alexander@tranvas.com');
 
     // Security state
     const [currentPassword, setCurrentPassword] = useState('');
@@ -562,7 +562,7 @@ export default function SettingsPage() {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <a 
-                                    href="mailto:oneformindapp@gmail.com" 
+                                    href="mailto:tranvasapp@gmail.com" 
                                     className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 transition-all group"
                                 >
                                     <Mail className="w-8 h-8 text-indigo-600 mb-3" />

@@ -28,12 +28,12 @@ export default function StreaksComparePage() {
             a: t('faq_streaks_a1'),
         },
         {
-            q: 'Apa yang terjadi dengan streak saya di OneForMind jika saya melewatkan satu hari?',
-            a: 'OneForMind menggunakan "Consistency Rate" bukan streak. Satu hari terlewat tidak menghancurkan segalanya — sistem menghitung persentase konsistensi Anda selama 30 hari. Ini mencegah efek psikologis "What the Hell" yang umum terjadi pada aplikasi berbasis streak.',
+            q: 'Apa yang terjadi dengan streak saya di Tranvas jika saya melewatkan satu hari?',
+            a: 'Tranvas menggunakan "Consistency Rate" bukan streak. Satu hari terlewat tidak menghancurkan segalanya — sistem menghitung persentase konsistensi Anda selama 30 hari. Ini mencegah efek psikologis "What the Hell" yang umum terjadi pada aplikasi berbasis streak.',
         },
         {
-            q: 'Apakah OneForMind hanya tersedia di iOS seperti Streaks?',
-            a: 'Tidak. OneForMind adalah aplikasi web yang bisa diakses di semua perangkat — iOS, Android, desktop, dan browser manapun. Tidak perlu download, langsung akses dari mana saja.',
+            q: 'Apakah Tranvas hanya tersedia di iOS seperti Streaks?',
+            a: 'Tidak. Tranvas adalah aplikasi web yang bisa diakses di semua perangkat — iOS, Android, desktop, dan browser manapun. Tidak perlu download, langsung akses dari mana saja.',
         },
     ];
 
@@ -175,7 +175,7 @@ export default function StreaksComparePage() {
                             </div>
                             {/* OFM Card */}
                             <div className="p-8 rounded-3xl border-2 border-indigo-500 bg-white shadow-xl shadow-indigo-100 relative">
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">OneForMind</div>
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">Tranvas</div>
                                 <ul className="space-y-6 mt-4">
                                     <li>
                                         <div className="text-xs text-indigo-400 font-bold uppercase mb-1">{t('streaks_table_row_1_title')}</div>

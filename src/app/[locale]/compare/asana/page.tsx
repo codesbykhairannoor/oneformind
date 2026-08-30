@@ -20,8 +20,8 @@ export default function AsanaComparePage() {
             a: 'Asana memprioritaskan delegasi tugas tim, manajemen ketergantungan, dan pelaporan eksekutif yang menambah beban administrasi bagi pengguna individu.'
         },
         {
-            q: 'Apakah OneForMind memerlukan lisensi tim bulanan?',
-            a: 'Tidak. OneForMind tidak membebankan biaya per-user bulanan layaknya perangkat lunak B2B enterprise.'
+            q: 'Apakah Tranvas memerlukan lisensi tim bulanan?',
+            a: 'Tidak. Tranvas tidak membebankan biaya per-user bulanan layaknya perangkat lunak B2B enterprise.'
         }
     ];
 
@@ -173,7 +173,7 @@ export default function AsanaComparePage() {
                                     <tr>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-500 font-medium w-1/3">Feature</th>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-400 font-medium w-1/3">{t('asana_table_head_2')}</th>
-                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">OneForMind</th>
+                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-700">

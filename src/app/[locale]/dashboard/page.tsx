@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 export async function generateMetadata() {
     const t = await getTranslations();
     return {
-        title: `Dashboard - OneForMind`,
+        title: `Dashboard - Tranvas`,
     };
 }
 

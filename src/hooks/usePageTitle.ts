@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react';
 
-const SITE_NAME = 'OneForMind';
+const SITE_NAME = 'Tranvas';
 
 /**
  * Sets the browser tab title for client-side pages.
- * Usage: usePageTitle('Dashboard') → "Dashboard | OneForMind"
- * Usage: usePageTitle('') → "OneForMind | Productivity OS"
+ * Usage: usePageTitle('Dashboard') → "Dashboard | Tranvas"
+ * Usage: usePageTitle('') → "Tranvas | Productivity OS"
  */
 export function usePageTitle(pageTitle?: string) {
   useEffect(() => {

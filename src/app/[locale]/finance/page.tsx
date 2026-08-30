@@ -5,7 +5,7 @@ import FinanceClient from './FinanceClient';
 
 export async function generateMetadata() {
     return {
-        title: 'Finance - OneForMind',
+        title: 'Finance - Tranvas',
     };
 }
 

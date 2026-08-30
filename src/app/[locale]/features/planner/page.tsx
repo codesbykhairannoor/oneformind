@@ -350,7 +350,7 @@ export default function FeaturePlannerPage() {
                                     <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-xl font-bold select-none">✓</div>
                                     <div className="text-left">
                                         <span className="text-[10px] uppercase tracking-widest text-indigo-300 block font-bold">Status: Verified</span>
-                                        <span className="text-sm font-medium opacity-80 italic">Scientific methods integrated with OneForMind Structured Execution loops.</span>
+                                        <span className="text-sm font-medium opacity-80 italic">Scientific methods integrated with Tranvas Structured Execution loops.</span>
                                     </div>
                                 </div>
                             </div>

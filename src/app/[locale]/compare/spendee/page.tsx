@@ -16,12 +16,12 @@ export default function SpendeeComparePage() {
             a: t('faq_spendee_a1'),
         },
         {
-            q: 'Apakah OneForMind bisa menggantikan Spendee untuk tracking pengeluaran harian?',
-            a: 'OneForMind menyediakan modul Finance yang memungkinkan Anda mencatat pengeluaran harian dan melihat ringkasan bulanan. Namun jika Anda butuh fitur bank sync otomatis atau analitik pengeluaran yang sangat detail, Spendee masih unggul di sisi tersebut. OneForMind unggul saat Anda ingin menghubungkan pengeluaran dengan kebiasaan dan tujuan hidup.',
+            q: 'Apakah Tranvas bisa menggantikan Spendee untuk tracking pengeluaran harian?',
+            a: 'Tranvas menyediakan modul Finance yang memungkinkan Anda mencatat pengeluaran harian dan melihat ringkasan bulanan. Namun jika Anda butuh fitur bank sync otomatis atau analitik pengeluaran yang sangat detail, Spendee masih unggul di sisi tersebut. Tranvas unggul saat Anda ingin menghubungkan pengeluaran dengan kebiasaan dan tujuan hidup.',
         },
         {
-            q: 'Bisakah OneForMind membantu saya memahami MENGAPA saya overspend?',
-            a: 'Ya! Inilah keunggulan utama OneForMind. Karena financial tracker, habit tracker, dan daily planner Anda berada dalam satu sistem, Anda bisa melihat korelasi: misalnya overspending pada hari-hari di mana Anda melewatkan kebiasaan olahraga atau tidur kurang dari 6 jam.',
+            q: 'Bisakah Tranvas membantu saya memahami MENGAPA saya overspend?',
+            a: 'Ya! Inilah keunggulan utama Tranvas. Karena financial tracker, habit tracker, dan daily planner Anda berada dalam satu sistem, Anda bisa melihat korelasi: misalnya overspending pada hari-hari di mana Anda melewatkan kebiasaan olahraga atau tidur kurang dari 6 jam.',
         },
     ];
 
@@ -173,7 +173,7 @@ export default function SpendeeComparePage() {
                                     <div className="flex justify-between text-slate-400 line-through"><span>Spendee Sub</span> <span>$20/yr</span></div>
                                     <div className="flex justify-between text-slate-400 line-through"><span>Habit App Sub</span> <span>$40/yr</span></div>
                                     <div className="flex justify-between text-slate-400 line-through border-b border-slate-700 pb-4"><span>Planner App Sub</span> <span>$50/yr</span></div>
-                                    <div className="flex justify-between text-white font-bold text-xl"><span>OneForMind</span> <span className="text-purple-400">Better.</span></div>
+                                    <div className="flex justify-between text-white font-bold text-xl"><span>Tranvas</span> <span className="text-purple-400">Better.</span></div>
                                 </div>
                             </div>
                             <div className="order-1 lg:order-2">
@@ -196,7 +196,7 @@ export default function SpendeeComparePage() {
                             <div className="grid grid-cols-3 bg-slate-50 border-b border-slate-200 p-6 text-center font-black text-sm uppercase tracking-widest">
                                 <div className="text-left text-slate-400">Features</div>
                                 <div className="text-slate-400">{t('spendee_table_head_2')}</div>
-                                <div className="text-purple-600">OneForMind</div>
+                                <div className="text-purple-600">Tranvas</div>
                             </div>
                             <div className="grid grid-cols-3 border-b border-slate-100 p-6 text-center items-center">
                                 <div className="text-left font-bold text-slate-700">{t('spendee_table_row_1_title')}</div>

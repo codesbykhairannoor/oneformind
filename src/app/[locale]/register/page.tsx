@@ -30,7 +30,7 @@ export default function Register() {
             <div className="w-full max-w-[420px] flex flex-col relative z-10">
                 <div className="flex justify-center mb-6">
                     <Link href="/" className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none transition-transform duration-500 hover:rotate-[360deg]">
-                        <img src="/favicon.svg?v=2" alt="OneForMind Logo" className="h-8 w-8 brightness-0 invert" />
+                        <img src="/favicon.svg?v=2" alt="Tranvas Logo" className="h-8 w-8 brightness-0 invert" />
                     </Link>
                 </div>
 

@@ -206,7 +206,7 @@ export default function BlogPostPage() {
 
                             <h2>3. Building the Unified Flow</h2>
                             <p>
-                                A practical Life OS requires three atomic layers: <strong>Morning Activation</strong> (3-habit anchor check-in), <strong>Midday Cashflow Pulse</strong> (1-tap expense record), and <strong>Evening Reflection</strong> (mood-to-spending correlation). OneForMind merges these into a single, sub-90-second daily ritual.
+                                A practical Life OS requires three atomic layers: <strong>Morning Activation</strong> (3-habit anchor check-in), <strong>Midday Cashflow Pulse</strong> (1-tap expense record), and <strong>Evening Reflection</strong> (mood-to-spending correlation). Tranvas merges these into a single, sub-90-second daily ritual.
                             </p>
                         </article>
 

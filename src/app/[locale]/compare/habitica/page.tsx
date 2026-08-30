@@ -21,7 +21,7 @@ export default function HabiticaComparePage() {
         },
         {
             q: 'Apakah ada sistem level atau experience point di sini?',
-            a: 'Tidak. Kami percaya bahwa motivasi sejati harus datang dari dalam (intrinsik), bukan dari sekadar mengumpulkan poin atau XP virtual. Di OneForMind, level Anda adalah pencapaian nyata di dunia nyata.'
+            a: 'Tidak. Kami percaya bahwa motivasi sejati harus datang dari dalam (intrinsik), bukan dari sekadar mengumpulkan poin atau XP virtual. Di Tranvas, level Anda adalah pencapaian nyata di dunia nyata.'
         }
     ];
 
@@ -151,7 +151,7 @@ export default function HabiticaComparePage() {
                             <div className="grid grid-cols-3 bg-slate-50 border-b border-slate-200 p-6 text-center font-black text-sm md:text-base uppercase tracking-widest">
                                 <div className="text-left text-slate-400">Features</div>
                                 <div className="text-slate-400">{t('habitica_table_head_2')}</div>
-                                <div className="text-indigo-600">OneForMind</div>
+                                <div className="text-indigo-600">Tranvas</div>
                             </div>
                             <div className="grid grid-cols-3 border-b border-slate-100 p-6 text-center items-center">
                                 <div className="text-left font-bold text-slate-700 text-sm md:text-base">{t('habitica_table_row_1_title')}</div>
@@ -206,7 +206,7 @@ export default function HabiticaComparePage() {
                                         <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center text-xl font-bold text-slate-300">Ex</div>
                                         <div>
                                             <div className="font-bold">Former Habitica User</div>
-                                            <div className="text-sm text-slate-500">Switched to OneForMind</div>
+                                            <div className="text-sm text-slate-500">Switched to Tranvas</div>
                                         </div>
                                     </div>
                                 </div>

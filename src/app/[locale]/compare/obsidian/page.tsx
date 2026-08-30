@@ -16,12 +16,12 @@ export default function ObsidianComparePage() {
             a: t('faq_obsidian_a1'),
         },
         {
-            q: 'Apakah OneForMind mendukung Markdown seperti Obsidian?',
-            a: 'OneForMind bukan editor Markdown. Catatan harian di OneForMind menggunakan format terstruktur (checklist, goal tracker, finance), bukan dokumen teks bebas. Jika Anda butuh penulisan Markdown panjang, Obsidian masih unggul untuk itu. OneForMind melengkapi, bukan menggantikan Obsidian.',
+            q: 'Apakah Tranvas mendukung Markdown seperti Obsidian?',
+            a: 'Tranvas bukan editor Markdown. Catatan harian di Tranvas menggunakan format terstruktur (checklist, goal tracker, finance), bukan dokumen teks bebas. Jika Anda butuh penulisan Markdown panjang, Obsidian masih unggul untuk itu. Tranvas melengkapi, bukan menggantikan Obsidian.',
         },
         {
             q: 'Apakah data saya disimpan lokal seperti Obsidian?',
-            a: 'Data OneForMind disimpan di cloud terenkripsi, bukan file lokal seperti Obsidian. Keuntungannya: sinkron di semua perangkat, tidak ada risiko kehilangan file, dan tersedia di mana saja. Jika privasi file lokal adalah prioritas utama Anda, Obsidian lebih cocok untuk vault lokal.',
+            a: 'Data Tranvas disimpan di cloud terenkripsi, bukan file lokal seperti Obsidian. Keuntungannya: sinkron di semua perangkat, tidak ada risiko kehilangan file, dan tersedia di mana saja. Jika privasi file lokal adalah prioritas utama Anda, Obsidian lebih cocok untuk vault lokal.',
         },
     ];
 
@@ -158,7 +158,7 @@ export default function ObsidianComparePage() {
                                     <tr>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-500 font-medium w-1/3">Feature</th>
                                         <th className="p-4 border-b-2 border-slate-100 text-slate-400 font-medium w-1/3">{t('obsidian_table_head_2')}</th>
-                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">OneForMind</th>
+                                        <th className="p-4 border-b-2 border-indigo-600 text-indigo-600 font-black text-lg w-1/3 bg-indigo-50/50 rounded-t-xl">Tranvas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-slate-700">

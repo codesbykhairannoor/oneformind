@@ -28,16 +28,16 @@ export default function SecurityPage() {
 
     const faqs = [
         {
-            q: 'Di mana data pengguna OneForMind disimpan?',
+            q: 'Di mana data pengguna Tranvas disimpan?',
             a: 'Semua data disimpan di infrastruktur cloud tersertifikasi ISO 27001 dengan enkripsi penuh di server Singapura & Frankfurt.'
         },
         {
-            q: 'Apakah tim OneForMind dapat membaca catatan atau jurnal pribadi saya?',
+            q: 'Apakah tim Tranvas dapat membaca catatan atau jurnal pribadi saya?',
             a: 'Tidak. Seluruh data sensitif dienkripsi di tingkat aplikasi sehingga tidak dapat dibaca oleh siapa pun termasuk pengembang.'
         },
         {
             q: 'Apakah ada program Bug Bounty untuk peneliti keamanan?',
-            a: 'Ya, kami menerima laporan celah keamanan secara bertanggung jawab di security@oneformind.com.'
+            a: 'Ya, kami menerima laporan celah keamanan secara bertanggung jawab di security@tranvas.com.'
         }
     ];
 
@@ -138,7 +138,7 @@ export default function SecurityPage() {
                                     <div className="absolute -right-4 -top-4 w-20 h-20 bg-emerald-500/20 rounded-full blur-xl group-hover:scale-150 transition duration-500"></div>
                                     <h4 className="font-black text-sm mb-2 relative z-10">{t('sec_alert_title')}</h4>
                                     <p className="text-[10px] text-slate-400 mb-6 leading-relaxed relative z-10">{t('sec_alert_desc')}</p>
-                                    <a href="mailto:oneformindapp@gmail.com" className="inline-flex items-center gap-2 text-[10px] font-black text-emerald-400 hover:gap-4 transition-all">
+                                    <a href="mailto:tranvasapp@gmail.com" className="inline-flex items-center gap-2 text-[10px] font-black text-emerald-400 hover:gap-4 transition-all">
                                         {t('sec_alert_btn')} <span>→</span>
                                     </a>
                                 </div>

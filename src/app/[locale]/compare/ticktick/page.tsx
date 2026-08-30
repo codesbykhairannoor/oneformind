@@ -16,12 +16,12 @@ export default function TickTickComparePage() {
             a: t('faq_ticktick_a1'),
         },
         {
-            q: 'Apakah OneForMind juga memiliki Pomodoro timer seperti TickTick?',
-            a: 'Saat ini OneForMind berfokus pada integrasi antara habit, planner, dan finance. Fitur Pomodoro belum tersedia, namun Anda bisa menggunakan time blocking di planner untuk menciptakan sesi deep work yang terstruktur — yang justru lebih fleksibel dari timer kaku.',
+            q: 'Apakah Tranvas juga memiliki Pomodoro timer seperti TickTick?',
+            a: 'Saat ini Tranvas berfokus pada integrasi antara habit, planner, dan finance. Fitur Pomodoro belum tersedia, namun Anda bisa menggunakan time blocking di planner untuk menciptakan sesi deep work yang terstruktur — yang justru lebih fleksibel dari timer kaku.',
         },
         {
-            q: 'Apa perbedaan utama antara OneForMind dan TickTick dalam hal manajemen tugas?',
-            a: 'TickTick adalah task manager murni yang sangat baik dalam daftar tugas dan sub-tugas. OneForMind berbeda karena ia menghubungkan tugas harian ke kebiasaan dan tujuan besar. Setiap tugas di OneForMind bisa dikaitkan langsung dengan goal hidup Anda, sehingga Anda selalu tahu MENGAPA Anda melakukan sesuatu.',
+            q: 'Apa perbedaan utama antara Tranvas dan TickTick dalam hal manajemen tugas?',
+            a: 'TickTick adalah task manager murni yang sangat baik dalam daftar tugas dan sub-tugas. Tranvas berbeda karena ia menghubungkan tugas harian ke kebiasaan dan tujuan besar. Setiap tugas di Tranvas bisa dikaitkan langsung dengan goal hidup Anda, sehingga Anda selalu tahu MENGAPA Anda melakukan sesuatu.',
         },
     ];
 
@@ -192,7 +192,7 @@ export default function TickTickComparePage() {
                                 </ul>
                             </div>
                             <div className="p-8 rounded-3xl border-2 border-blue-500 bg-white shadow-xl shadow-blue-100 relative">
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">OneForMind</div>
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">Tranvas</div>
                                 <ul className="space-y-6 mt-4">
                                     <li>
                                         <div className="text-xs text-blue-500 font-bold uppercase mb-1">{t('ticktick_table_row_1_title')}</div>

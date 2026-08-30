@@ -16,12 +16,12 @@ export default function TodoistComparePage() {
             a: t('faq_todoist_a1'),
         },
         {
-            q: 'Apakah OneForMind bisa menggantikan Todoist sebagai task manager utama?',
-            a: 'Tergantung kebutuhan Anda. Jika Anda butuh task manager murni dengan fitur collaboration tim yang advanced, Todoist lebih cocok. Tapi jika Anda seorang individu yang ingin mengelola hidup secara holistik (tugas + kebiasaan + keuangan), OneForMind adalah pilihan yang jauh lebih komprehensif.',
+            q: 'Apakah Tranvas bisa menggantikan Todoist sebagai task manager utama?',
+            a: 'Tergantung kebutuhan Anda. Jika Anda butuh task manager murni dengan fitur collaboration tim yang advanced, Todoist lebih cocok. Tapi jika Anda seorang individu yang ingin mengelola hidup secara holistik (tugas + kebiasaan + keuangan), Tranvas adalah pilihan yang jauh lebih komprehensif.',
         },
         {
-            q: 'Kenapa OneForMind lebih baik dari Todoist untuk produktivitas personal?',
-            a: 'Todoist hanya mencatat apa yang harus Anda lakukan. OneForMind menghubungkan apa yang Anda lakukan dengan tujuan besar Anda. Dengan time blocking terintegrasi, Anda tidak hanya punya daftar tugas — Anda punya jadwal yang realistis yang mempertimbangkan kebiasaan dan kapasitas Anda.',
+            q: 'Kenapa Tranvas lebih baik dari Todoist untuk produktivitas personal?',
+            a: 'Todoist hanya mencatat apa yang harus Anda lakukan. Tranvas menghubungkan apa yang Anda lakukan dengan tujuan besar Anda. Dengan time blocking terintegrasi, Anda tidak hanya punya daftar tugas — Anda punya jadwal yang realistis yang mempertimbangkan kebiasaan dan kapasitas Anda.',
         },
     ];
 
@@ -200,7 +200,7 @@ export default function TodoistComparePage() {
                             <div className="grid grid-cols-3 bg-slate-50 border-b border-slate-200 p-6 text-center font-black text-sm uppercase tracking-widest">
                                 <div className="text-left text-slate-400">Features</div>
                                 <div className="text-slate-400">{t('todoist_table_head_2')}</div>
-                                <div className="text-red-600">OneForMind</div>
+                                <div className="text-red-600">Tranvas</div>
                             </div>
                             <div className="grid grid-cols-3 border-b border-slate-100 p-6 text-center items-center">
                                 <div className="text-left font-bold text-slate-700">{t('todoist_table_row_1_title')}</div>

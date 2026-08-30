@@ -12,7 +12,7 @@ export default function GuidePage() {
 
     const faqs = [
         {
-            q: t('help_faq_q1') || 'Berapa lama waktu yang dibutuhkan untuk menguasai OneForMind User Guide?',
+            q: t('help_faq_q1') || 'Berapa lama waktu yang dibutuhkan untuk menguasai Tranvas User Guide?',
             a: t('help_faq_a1') || 'Panduan dasar dapat dipelajari dalam 10 menit. Sistem telah dirancang tanpa konfigurasi rumit.'
         },
         {
@@ -20,7 +20,7 @@ export default function GuidePage() {
             a: t('help_faq_a2') || 'Ya, seluruh modul video masterclass dapat diakses secara gratis langsung dari halaman panduan ini.'
         },
         {
-            q: t('help_faq_q3') || 'Bagaimana cara mendapatkan sertifikasi OneForMind Mastery?',
+            q: t('help_faq_q3') || 'Bagaimana cara mendapatkan sertifikasi Tranvas Mastery?',
             a: t('help_faq_a3') || 'Anda cukup mengikuti 3 alur sertifikasi: Pelajari Modul, Terapkan Workflow, dan Ambil Lencana Kelulusan.'
         }
     ];
@@ -250,7 +250,7 @@ export default function GuidePage() {
                                     {t('guide_support_desc')}
                                 </p>
                                 <div className="flex flex-col sm:flex-row justify-center gap-6">
-                                    <a href="mailto:oneformindapp@gmail.com" className="bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-lg hover:bg-indigo-500 transition shadow-xl shadow-indigo-900/50 flex items-center justify-center gap-3">
+                                    <a href="mailto:tranvasapp@gmail.com" className="bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-lg hover:bg-indigo-500 transition shadow-xl shadow-indigo-900/50 flex items-center justify-center gap-3">
                                         <Mail size={20} /> {t('guide_btn_contact')}
                                     </a>
                                     <Link href="/resources/community" className="bg-white/5 text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-lg hover:bg-white/10 transition flex items-center justify-center gap-3">
