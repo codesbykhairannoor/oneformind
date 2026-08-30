@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Notes Apps | Tranvas',
+  title: 'Best Note-Taking Apps | Tranvas',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

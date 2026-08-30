@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Spreadsheet | Tranvas',
+  title: 'Tranvas vs Spreadsheets | Tranvas',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

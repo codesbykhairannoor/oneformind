@@ -4,56 +4,63 @@ import path from 'path';
 const dir = './src/app';
 
 const titleMappings = {
-    // Marketing & Solutions
-    'Student': 'For Students',
-    'Personalgrowth': 'Personal Growth',
-    'Ai Trust': 'AI Trust & Privacy',
-    'Finance Mastery': 'Finance Tracker',
-    'Second Brain': 'Second Brain System',
-    'Deep Work': 'Deep Work Mode',
-    'Career Accelerator': 'Career Accelerator',
-    'Atomic System': 'Atomic Habit System',
-    'Freelancer': 'For Freelancers',
-    'Habit': 'Habit Tracker',
-    'Planner': 'Daily Planner',
-    'Journal': 'Private Journal',
-    'Neural Os': 'Neural OS',
-    'Finance': 'Finance Manager',
+    // Competitor Comparisons
+    'Ynab': 'Tranvas vs YNAB',
+    'Ticktick': 'Tranvas vs TickTick',
+    'Wallet': 'Tranvas vs Wallet',
+    'Trello': 'Tranvas vs Trello',
+    'Todoist': 'Tranvas vs Todoist',
+    'Streaks': 'Tranvas vs Streaks',
+    'Spendee': 'Tranvas vs Spendee',
+    'Spreadsheet': 'Tranvas vs Spreadsheets',
+    'Obsidian': 'Tranvas vs Obsidian',
+    'Notion': 'Tranvas vs Notion',
+    'Monday': 'Tranvas vs Monday.com',
+    'Habitify': 'Tranvas vs Habitify',
+    'Habitica': 'Tranvas vs Habitica',
+    'Five Apps': 'Tranvas vs App Clutter',
     
-    // Auth & Legal
-    'Register': 'Sign Up',
-    'Login': 'Log In',
-    'Forgot Password': 'Forgot Password',
-    'Pricing': 'Pricing & Plans',
+    // Category Comparisons
+    'Habit Apps': 'Best Habit Tracker Apps',
+    'Management Tools': 'Best Management Tools',
+    'Notes Apps': 'Best Note-Taking Apps',
     
-    // Resources
-    'Post': 'Blog Post',
-    'Stories': 'Success Stories',
-    'Guide': 'User Guide',
-    'Help': 'Help Center'
+    // Other Features
+    'Job': 'Job Tracker',
+    'Goal': 'Goal Tracker',
+    'Calendar': 'Smart Calendar',
+    
+    // Company / Legal
+    'Press Kit': 'Press Kit & Brand Assets',
+    'Status': 'System Status',
+    'Contact': 'Contact Us',
+    'About': 'About Us',
+    'Privacy Policy': 'Privacy Policy',
+    'Terms Of Service': 'Terms of Service'
 };
 
 function processTitleMatch(match, originalTitle, separator, brandName) {
     let newTitleStr = originalTitle;
     
-    // Check our specific mappings
     if (titleMappings[originalTitle]) {
         newTitleStr = titleMappings[originalTitle];
     }
     
-    // Marketing & external pages use ' | Brand'
-    // Internal dashboard pages use ' - Brand'
-    // We can infer internal pages if they are dashboard, settings, profile, etc.
+    // If it's a comparison page (starts with 'Tranvas vs'), we don't append | Tranvas again
+    if (newTitleStr.startsWith('Tranvas vs') || newTitleStr.startsWith('Best ')) {
+        return `title: '${newTitleStr} | ${brandName}'`;
+    }
+    
     const internalPages = ['Settings', 'Dashboard', 'Profile', 'Finance'];
     
     let newSeparator = ' | ';
     if (internalPages.includes(newTitleStr)) {
         newSeparator = ' - ';
     } else if (newTitleStr === 'Log In' || newTitleStr === 'Sign Up') {
-        newSeparator = ' | '; // Auth is external
+        newSeparator = ' | ';
     }
     
-    return `title: '${newTitleStr}${newSeparator}Tranvas'`;
+    return `title: '${newTitleStr}${newSeparator}${brandName}'`;
 }
 
 function walkAndReplace(dir) {
@@ -68,14 +75,8 @@ function walkAndReplace(dir) {
             let content = fs.readFileSync(fullPath, 'utf8');
             let originalContent = content;
 
-            // Match title: 'Something | Tranvas'
             content = content.replace(/title:\s*['"](.*?)[\s]*[|-][\s]*Tranvas['"]/gi, (match, p1) => {
                 return processTitleMatch(match, p1.trim(), '|', 'Tranvas');
-            });
-            
-            // Also match metadata objects in page.tsx if any
-            content = content.replace(/title:\s*`(.*?)[\s]*[|-][\s]*Tranvas`/gi, (match, p1) => {
-                return processTitleMatch(match, p1.trim(), '|', 'Tranvas').replace(/'/g, '`');
             });
 
             if (content !== originalContent) {
