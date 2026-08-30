@@ -14,7 +14,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Tranvas | Productivity OS",
+  title: "Tranvas | The Unified Life Operating System",
   description: "The all-in-one productivity OS for growth, clarity, and control.",
 };
 

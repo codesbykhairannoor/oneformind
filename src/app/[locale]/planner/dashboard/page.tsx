@@ -5,7 +5,7 @@ import PlannerDashboardClient from './PlannerDashboardClient';
 
 export async function generateMetadata() {
     return {
-        title: 'Planner Dashboard - Tranvas',
+        title: 'Planner Dashboard | Tranvas',
     };
 }
 

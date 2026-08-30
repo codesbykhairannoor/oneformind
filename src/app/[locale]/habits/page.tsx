@@ -5,7 +5,7 @@ import HabitsClient from './HabitsClient';
 
 export async function generateMetadata() {
     return {
-        title: 'Habits Tracker - Tranvas',
+        title: 'Habits Tracker | Tranvas',
     };
 }
 

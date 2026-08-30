@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Neural Os | Tranvas',
+  title: 'Neural OS | Tranvas',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

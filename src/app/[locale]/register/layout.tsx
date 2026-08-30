@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Register | Tranvas',
+  title: 'Sign Up | Tranvas',
 };
 
 export default function RegisterLayout({ children }: { children: React.ReactNode }) {
