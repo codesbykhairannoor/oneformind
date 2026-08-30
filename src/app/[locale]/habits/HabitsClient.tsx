@@ -680,7 +680,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                             
                             {/* Sticky Header */}
                             <div className="sticky top-0 z-30 bg-white dark:bg-transparent border-b border-slate-100 dark:border-slate-800/50 flex shadow-sm dark:shadow-none">
-                                <div className="sticky left-0 z-40 bg-white dark:bg-transparent w-72 shrink-0 border-r border-slate-100 dark:border-slate-800/50 p-4 flex items-center font-bold text-slate-400 dark:text-slate-500 text-xs capitalize shadow-[10px_0_20px_rgba(0,0,0,0.02)] dark:shadow-[10px_0_20px_rgba(0,0,0,0.2)]">
+                                <div className="sticky left-0 z-40 bg-white dark:bg-slate-900 w-72 shrink-0 border-r border-slate-100 dark:border-slate-800/50 p-4 flex items-center font-bold text-slate-400 dark:text-slate-500 text-xs capitalize shadow-[10px_0_20px_rgba(0,0,0,0.02)] dark:shadow-[10px_0_20px_rgba(0,0,0,0.2)]">
                                     <div className="w-8 shrink-0"></div>
                                     <span className="truncate">Nama Habit</span>
                                 </div>
@@ -694,7 +694,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                         </div>
                                     ))}
                                 </div>
-                                <div className="flex shrink-0 sticky right-0 z-40 bg-white dark:bg-transparent w-32 p-4 border-l border-slate-100 dark:border-slate-800/50 items-center justify-end font-bold text-slate-400 dark:text-slate-500 text-xs capitalize shadow-[-10px_0_20px_rgba(255,255,255,0.8)] dark:shadow-none">
+                                <div className="flex shrink-0 sticky right-0 z-40 bg-white dark:bg-slate-900 w-32 p-4 border-l border-slate-100 dark:border-slate-800/50 items-center justify-end font-bold text-slate-400 dark:text-slate-500 text-xs capitalize shadow-[-10px_0_20px_rgba(255,255,255,0.8)] dark:shadow-none">
                                     Total Log
                                 </div>
                             </div>
@@ -705,7 +705,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                     <div key={habit.id} className="flex transition-colors duration-200 group relative bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800">
                                         
                                         {/* Left Sticky Info */}
-                                        <div className="sticky left-0 z-30 w-72 shrink-0 bg-white dark:bg-slate-900/40 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/60 border-r border-slate-100 dark:border-slate-800/50 p-4 flex items-center gap-3 shadow-[10px_0_20px_rgba(0,0,0,0.02)] dark:shadow-[10px_0_20px_rgba(0,0,0,0.2)]">
+                                        <div className="sticky left-0 z-30 w-72 shrink-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 border-r border-slate-100 dark:border-slate-800/50 p-4 flex items-center gap-3 shadow-[10px_0_20px_rgba(0,0,0,0.02)] dark:shadow-[10px_0_20px_rgba(0,0,0,0.2)]">
                                             <div className="drag-handle cursor-grab active:cursor-grabbing text-slate-300 dark:text-slate-700 hover:text-indigo-500 opacity-30 group-hover:opacity-100 transition-opacity p-1 -ml-2 shrink-0">
                                                 <GripVertical size={16} />
                                             </div>
@@ -779,7 +779,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                         </div>
 
                                         {/* Right Sticky Total Cell */}
-                                        <div className="flex shrink-0 sticky right-0 z-30 w-32 bg-white dark:bg-slate-900/40 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/60 border-l border-slate-100 dark:border-slate-800/50 p-4 flex-col justify-center shadow-[-10px_0_20px_rgba(255,255,255,0.8)] dark:shadow-none">
+                                        <div className="flex shrink-0 sticky right-0 z-30 w-32 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 border-l border-slate-100 dark:border-slate-800/50 p-4 flex-col justify-center shadow-[-10px_0_20px_rgba(255,255,255,0.8)] dark:shadow-none">
                                             <div className="flex justify-between items-end mb-1">
                                                 <span className="text-lg font-black text-slate-700 dark:text-slate-200">{habit.progress_count}</span>
                                                 <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1">{Math.round(habit.progress_percent)}%</span>
