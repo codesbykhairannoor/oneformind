@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
+import Script from 'next/script';
 import InstantIntlProvider from "@/components/InstantIntlProvider";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import "../globals.css";
@@ -33,6 +34,15 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${plusJakartaSans.variable} antialiased`} suppressHydrationWarning>
       <body className="selection:bg-indigo-100 selection:text-indigo-700 font-sans min-h-screen flex flex-col bg-white text-slate-900" suppressHydrationWarning>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7PNK1P4WZN" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7PNK1P4WZN');
+          `}
+        </Script>
         <SessionProviderWrapper>
           <InstantIntlProvider initialLocale={locale}>
             {children}
