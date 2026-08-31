@@ -16,11 +16,32 @@ var db *sql.DB
 
 func init() {
 	var err error
-	connStr := os.Getenv("POSTGRES_PRISMA_URL")
+			connStr := os.Getenv("POSTGRES_URL_NON_POOLING")
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL")
+	}
 	if connStr == "" {
 		connStr = os.Getenv("DATABASE_URL")
 	}
-	db, err = sql.Open("postgres", connStr+"&sslmode=require")
+	
+	// Strip pgbouncer=true if it exists because lib/pq doesn't support it
+	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
+	connStr = strings.Replace(connStr, "?&", "?", -1)
+	connStr = strings.Replace(connStr, "&&", "&", -1)
+	if strings.HasSuffix(connStr, "?") {
+		connStr = strings.TrimSuffix(connStr, "?")
+	}
+
+	// Ensure sslmode=require is present
+	if !strings.Contains(connStr, "sslmode=") {
+		if strings.Contains(connStr, "?") {
+			connStr += "&sslmode=require"
+		} else {
+			connStr += "?sslmode=require"
+		}
+	}
+
+	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		fmt.Printf("Error connecting to DB: %v\n", err)
 	}

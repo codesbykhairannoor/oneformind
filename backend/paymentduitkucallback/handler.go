@@ -19,10 +19,19 @@ var dbDuitku *sql.DB
 
 func init() {
 	var err error
-	connStr := os.Getenv("POSTGRES_PRISMA_URL")
+		connStr := os.Getenv("POSTGRES_URL_NON_POOLING")
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL")
+	}
 	if connStr == "" {
 		connStr = os.Getenv("DATABASE_URL")
 	}
+	
+	// Strip pgbouncer=true if it exists because lib/pq doesn't support it
+	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
+	connStr = strings.Replace(connStr, "?&", "?", -1)
+	connStr = strings.Replace(connStr, "&&", "&", -1)
+
 	dbDuitku, err = sql.Open("postgres", connStr+"&sslmode=require")
 	if err != nil {
 		fmt.Printf("Error connecting to DB (Duitku): %v\n", err)
