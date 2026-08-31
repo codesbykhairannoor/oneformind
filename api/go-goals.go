@@ -72,9 +72,22 @@ type Goal struct {
 func GoalsHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := r.Header.Get("X-User-Id")
 	if userIdStr == "" {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
 	}
+
+	// Server-Side Gating: Goals requires Architect tier
+	var planType string
+	err := dbGoals.QueryRow(`SELECT plan_type FROM users WHERE id = $1`, userIdStr).Scan(&planType)
+	if err != nil {
+		http.Error(w, `{"error": "User not found"}`, http.StatusUnauthorized)
+		return
+	}
+	if planType != "architect" && planType != "quantum" && planType != "legendary" && planType != "trial" {
+		http.Error(w, `{"error": "Forbidden: Goals requires Architect tier"}`, http.StatusForbidden)
+		return
+	}
+
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)

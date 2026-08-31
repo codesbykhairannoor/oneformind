@@ -39,61 +39,26 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { plan = 'architect', billing = 'yearly' } = body;
+        const proto = req.headers.get('x-forwarded-proto') || 'http';
+        const host = req.headers.get('host');
+        const goUrl = `${proto}://${host}/api/go-payment-paypal/checkout`;
 
-        // Convert IDR to USD for PayPal roughly (e.g. 15,000 IDR = $1)
-        // Let's define absolute USD prices based on legacy logic
-        const pricesUsd: Record<string, Record<string, string>> = {
-            'architect': { 'yearly': '59.00', 'monthly': '7.99' },
-            'quantum': { 'yearly': '89.00', 'monthly': '11.99' },
-            'legendary': { 'yearly': '599.00', 'monthly': '599.00' },
-            'lifetime': { 'yearly': '599.00', 'monthly': '599.00' }
-        };
-
-        const planKey = plan.toLowerCase();
-        const paymentAmount = pricesUsd[planKey]?.[billing] || '59.00';
-        
-        let productDetails = `Tranvas ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billing.charAt(0).toUpperCase() + billing.slice(1)})`;
-        if (planKey === 'lifetime' || planKey === 'legendary') {
-            productDetails = 'Tranvas Legendary Founder Edition';
-        }
-
-        const { token, baseUrl } = await getPayPalAccessToken();
-
-        const orderPayload = {
-            intent: 'CAPTURE',
-            purchase_units: [
-                {
-                    reference_id: `${planKey.toUpperCase()}-${session.user.id}-${Date.now()}`,
-                    description: productDetails,
-                    amount: {
-                        currency_code: 'USD',
-                        value: paymentAmount
-                    }
-                }
-            ],
-            application_context: {
-                shipping_preference: 'NO_SHIPPING'
-            }
-        };
-
-        const orderRes = await fetch(`${baseUrl}/v2/checkout/orders`, {
+        const goRes = await fetch(goUrl, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-User-Id': session.user.id,
             },
-            body: JSON.stringify(orderPayload)
+            body: JSON.stringify(body)
         });
 
-        const orderData = await orderRes.json();
-
-        if (orderRes.ok && orderData.id) {
-            return NextResponse.json({ id: orderData.id });
-        } else {
-            console.error('PayPal Order Error:', orderData);
-            return NextResponse.json({ error: 'Failed to create PayPal order' }, { status: 400 });
+        if (!goRes.ok) {
+            const text = await goRes.text();
+            throw new Error(`Go backend returned ${goRes.status}: ${text}`);
         }
+
+        const data = await goRes.json();
+        return NextResponse.json(data);
     } catch (error: any) {
         console.error('PayPal Checkout Exception:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

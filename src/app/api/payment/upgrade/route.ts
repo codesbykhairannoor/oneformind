@@ -10,36 +10,28 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { plan } = body;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-payment-upgrade`;
 
-    if (!plan) {
-      return NextResponse.json({ error: 'Plan is required' }, { status: 400 });
-    }
-
-    // Set premium_until to 1 year from now for this simulation
-    const premiumUntil = new Date();
-    premiumUntil.setFullYear(premiumUntil.getFullYear() + 1);
-
-    const updatedUser = await prisma.user.update({
-      where: { id: parseInt(session.user.id) },
-      data: {
-        isPremium: true,
-        planType: plan,
-        premiumUntil: premiumUntil,
+    const goRes = await fetch(goUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        planType: true,
-        isPremium: true,
-        premiumUntil: true,
-      }
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json({ success: true, user: updatedUser });
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error upgrading user subscription:', error);
+    console.error('Error upgrading user subscription via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

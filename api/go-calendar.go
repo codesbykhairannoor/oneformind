@@ -105,6 +105,18 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Server-Side Gating: Calendar requires Architect tier
+	var planType string
+	err = db.QueryRow(`SELECT plan_type FROM users WHERE id = $1`, userID).Scan(&planType)
+	if err != nil {
+		http.Error(w, `{"error": "User not found"}`, http.StatusUnauthorized)
+		return
+	}
+	if planType != "architect" && planType != "quantum" && planType != "legendary" && planType != "trial" {
+		http.Error(w, `{"error": "Forbidden: Calendar requires Architect tier"}`, http.StatusForbidden)
+		return
+	}
+
 	if db == nil {
 		http.Error(w, `{"error": "Database connection not initialized"}`, http.StatusInternalServerError)
 		return

@@ -40,65 +40,26 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { token, plan = 'architect', billing = 'yearly' } = body;
+        const proto = req.headers.get('x-forwarded-proto') || 'http';
+        const host = req.headers.get('host');
+        const goUrl = `${proto}://${host}/api/go-payment-paypal/capture`;
 
-        if (!token) {
-            return NextResponse.json({ error: 'Missing token' }, { status: 400 });
-        }
-
-        const { token: accessToken, baseUrl } = await getPayPalAccessToken();
-
-        const captureRes = await fetch(`${baseUrl}/v2/checkout/orders/${token}/capture`, {
+        const goRes = await fetch(goUrl, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'X-User-Id': session.user.id,
+            },
+            body: JSON.stringify(body)
         });
 
-        const captureData = await captureRes.json();
-
-        if (captureRes.ok && captureData.status === 'COMPLETED') {
-            // Update the user
-            const userId = Number(session.user.id);
-            const user = await prisma.user.findUnique({ where: { id: userId } });
-            
-            if (user) {
-                const planKey = plan.toUpperCase();
-                let finalPlan = planKey.toLowerCase();
-                let premiumUntil = new Date();
-
-                if (planKey === 'LIFETIME' || planKey === 'LEGENDARY') {
-                    finalPlan = 'legendary';
-                    premiumUntil.setFullYear(premiumUntil.getFullYear() + 100);
-                } else {
-                    if (billing === 'yearly') {
-                        premiumUntil.setFullYear(premiumUntil.getFullYear() + 1);
-                    } else {
-                        premiumUntil.setMonth(premiumUntil.getMonth() + 1);
-                    }
-                }
-
-                if (planKey === 'QUANTUM') {
-                    finalPlan = 'quantum';
-                }
-
-                await prisma.user.update({
-                    where: { id: userId },
-                    data: {
-                        isPremium: true,
-                        planType: finalPlan,
-                        premiumUntil: premiumUntil
-                    }
-                });
-
-                console.log(`Successfully upgraded user ${userId} to ${finalPlan} via PayPal`);
-                return NextResponse.json({ success: true });
-            }
-        } else {
-            console.error('PayPal Capture Error:', captureData);
-            return NextResponse.json({ error: 'Failed to capture PayPal order' }, { status: 400 });
+        if (!goRes.ok) {
+            const text = await goRes.text();
+            throw new Error(`Go backend returned ${goRes.status}: ${text}`);
         }
+
+        const data = await goRes.json();
+        return NextResponse.json(data);
     } catch (error: any) {
         console.error('PayPal Capture Exception:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

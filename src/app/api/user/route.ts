@@ -9,31 +9,29 @@ export async function GET(req: Request) {
   }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: parseInt(session.user.id) },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        planType: true,
-        isPremium: true,
-        premiumUntil: true,
-        settings: true,
-        resumeText: true,
-        resumeFilename: true,
-      }
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-user`;
+
+    const goRes = await fetch(goUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
     }
 
-    const response = NextResponse.json(user);
-    // Cache user profile for 5 min privately (profile changes are rare)
+    const data = await goRes.json();
+    const response = NextResponse.json(data);
     response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
     return response;
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error('Error fetching user from Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -46,33 +44,28 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const { name, settings } = body;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-user`;
 
-    const dataToUpdate: any = {};
-    if (name) dataToUpdate.name = name;
-    if (settings) dataToUpdate.settings = settings; // settings must be a valid JSON object
-    if (body.resumeText !== undefined) dataToUpdate.resumeText = body.resumeText;
-    if (body.resumeFilename !== undefined) dataToUpdate.resumeFilename = body.resumeFilename;
-
-    const updatedUser = await prisma.user.update({
-      where: { id: parseInt(session.user.id) },
-      data: dataToUpdate,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        planType: true,
-        isPremium: true,
-        premiumUntil: true,
-        settings: true,
-        resumeText: true,
-        resumeFilename: true,
-      }
+    const goRes = await fetch(goUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json(updatedUser);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error('Error updating user via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
