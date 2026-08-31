@@ -323,46 +323,44 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
 
         try {
             if (editingHabitId) {
-                // UPDATE API Call
-                const res = await fetch(`/api/habits/${editingHabitId}`, {
+                // OPTIMISTIC UPDATE
+                setHabits(prev => prev.map(h => h.id === editingHabitId ? {
+                    ...h, name: formName, icon: formIcon, color: formColor, monthlyTarget: formTarget
+                } : h));
+
+                fetch(`/api/habits/${editingHabitId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: formName,
-                        icon: formIcon,
-                        color: formColor,
-                        monthlyTarget: formTarget
-                    })
-                });
-                
-                if (res.ok) {
-                    const updated = await res.json();
-                    setHabits(prev => prev.map(h => h.id === editingHabitId ? {
-                        ...h,
-                        name: updated.name,
-                        icon: updated.icon,
-                        color: updated.color,
-                        monthlyTarget: updated.monthlyTarget
-                    } : h));
-                }
+                    body: JSON.stringify({ name: formName, icon: formIcon, color: formColor, monthlyTarget: formTarget })
+                }).catch(e => console.error('Failed to update habit', e));
             } else {
-                // CREATE API Call
-                const res = await fetch('/api/habits', {
+                // OPTIMISTIC CREATE
+                const tempId = Date.now();
+                const newHabit: HabitItem = {
+                    id: tempId,
+                    name: formName,
+                    icon: formIcon,
+                    color: formColor,
+                    period: currentMonthKey,
+                    monthlyTarget: formTarget,
+                    position: habits.length > 0 ? Math.max(...habits.map(h => h.position)) + 1 : 1,
+                    logs: {}
+                };
+                setHabits(prev => [...prev, newHabit]);
+
+                fetch('/api/habits', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: formName,
-                        icon: formIcon,
-                        color: formColor,
-                        period: currentMonthKey,
-                        monthlyTarget: formTarget
-                    })
+                    body: JSON.stringify({ name: formName, icon: formIcon, color: formColor, period: currentMonthKey, monthlyTarget: formTarget })
+                })
+                .then(res => res.json())
+                .then(realHabit => {
+                    setHabits(prev => prev.map(h => h.id === tempId ? { ...realHabit, logs: {} } : h));
+                })
+                .catch(e => {
+                    console.error('Failed to create habit', e);
+                    setHabits(prev => prev.filter(h => h.id !== tempId)); // revert on error
                 });
-
-                if (res.ok) {
-                    const newHabit = await res.json();
-                    setHabits(prev => [...prev, { ...newHabit, logs: {} }]);
-                }
             }
         } catch (error) {
             console.error('Failed to submit habit', error);
@@ -377,16 +375,14 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
 
     const executeDelete = async () => {
         if (habitToDelete) {
-            try {
-                const res = await fetch(`/api/habits/${habitToDelete.id}`, {
-                    method: 'DELETE'
-                });
-                if (res.ok) {
-                    setHabits(prev => prev.filter(h => h.id !== habitToDelete.id));
-                }
-            } catch (error) {
+            const targetId = habitToDelete.id;
+            // OPTIMISTIC DELETE
+            setHabits(prev => prev.filter(h => h.id !== targetId));
+            
+            fetch(`/api/habits/${targetId}`, { method: 'DELETE' })
+            .catch(error => {
                 console.error('Failed to delete habit', error);
-            }
+            });
         }
         setShowDeleteModal(false);
         setHabitToDelete(null);
@@ -396,30 +392,36 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         const validRows = batchRows.filter(r => r.name.trim() !== '');
         if (validRows.length === 0) return;
 
-        try {
-            // API calls sequentially to create all
-            const newHabitsList: HabitItem[] = [];
-            for (const r of validRows) {
+        // OPTIMISTIC BATCH CREATE
+        const tempHabits: HabitItem[] = validRows.map((r, i) => ({
+            id: Date.now() + i,
+            name: r.name,
+            icon: r.icon,
+            color: r.color,
+            period: currentMonthKey,
+            monthlyTarget: r.target,
+            position: (habits.length > 0 ? Math.max(...habits.map(h => h.position)) : 0) + i + 1,
+            logs: {}
+        }));
+        
+        setHabits(prev => [...prev, ...tempHabits]);
+
+        // Background API calls
+        validRows.forEach(async (r, i) => {
+            try {
                 const res = await fetch('/api/habits', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: r.name,
-                        icon: r.icon,
-                        color: r.color,
-                        period: currentMonthKey,
-                        monthlyTarget: r.target
-                    })
+                    body: JSON.stringify({ name: r.name, icon: r.icon, color: r.color, period: currentMonthKey, monthlyTarget: r.target })
                 });
                 if (res.ok) {
-                    const data = await res.json();
-                    newHabitsList.push({ ...data, logs: {} });
+                    const realHabit = await res.json();
+                    setHabits(prev => prev.map(h => h.id === tempHabits[i].id ? { ...realHabit, logs: {} } : h));
                 }
+            } catch (e) {
+                console.error('Failed to submit batch habit', e);
             }
-            setHabits(prev => [...prev, ...newHabitsList]);
-        } catch (error) {
-            console.error('Failed to submit batch habits', error);
-        }
+        });
 
         setShowBatchModal(false);
         setBatchRows([
