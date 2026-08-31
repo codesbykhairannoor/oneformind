@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"database/sql"
@@ -41,7 +41,7 @@ type User struct {
 	ResumeFilename *string    `json:"resumeFilename"`
 }
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func UserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := r.Header.Get("X-User-Id")
 

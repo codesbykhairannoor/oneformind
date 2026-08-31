@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/go-user`;
+    const goUrl = `${proto}://${host}/api/index?route=user`;
 
     const goRes = await fetch(goUrl, {
       method: 'GET',
@@ -46,7 +46,7 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/go-user`;
+    const goUrl = `${proto}://${host}/api/index?route=user`;
 
     const goRes = await fetch(goUrl, {
       method: 'PUT',

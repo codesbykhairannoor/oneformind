@@ -5,7 +5,7 @@ import { auth } from '@/auth';
 async function proxyToGo(req: Request, userId: string, method: string, transactionId: string, body?: any) {
   const host = req.headers.get('host');
   const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-  const goUrl = `${protocol}://${host}/api/go-finance-transactions?id=${transactionId}`;
+  const goUrl = `${protocol}://${host}/api/index?route=finance-transactions&id=${transactionId}`;
 
   try {
     const response = await fetch(goUrl, {

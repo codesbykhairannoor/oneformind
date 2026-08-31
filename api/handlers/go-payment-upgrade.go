@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"database/sql"
@@ -28,7 +28,7 @@ func init() {
 	dbUpgrade.SetConnMaxLifetime(30 * time.Minute)
 }
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func PaymentUpgradeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
 		http.Error(w, `{"error": "Method Not Allowed"}`, http.StatusMethodNotAllowed)

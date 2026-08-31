@@ -26,7 +26,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     try {
       const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
       const host = process.env.VERCEL_URL || req.headers.get('host');
-      const goUrl = `${proto}://${host}/api/go-goals-milestones?goalId=${goalId}`;
+      const goUrl = `${proto}://${host}/api/index?route=goals-milestones&goalId=${goalId}`;
       
       const goRes = await fetch(goUrl, {
         method: 'POST',

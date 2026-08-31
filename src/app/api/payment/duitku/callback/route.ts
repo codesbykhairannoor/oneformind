@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         const contentType = req.headers.get('content-type') || '';
         const proto = req.headers.get('x-forwarded-proto') || 'http';
         const host = req.headers.get('host');
-        const goUrl = `${proto}://${host}/api/go-payment-duitku/callback`;
+        const goUrl = `${proto}://${host}/api/index?route=payment-duitku-callback`;
         
         // Pass everything directly to Go (either form or json)
         let requestBody;

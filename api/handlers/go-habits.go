@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"database/sql"
@@ -74,7 +74,7 @@ type Habit struct {
 }
 
 // Handler is the entrypoint for Vercel Serverless
-func Handler(w http.ResponseWriter, r *http.Request) {
+func HabitsHandler(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers if needed
 	w.Header().Set("Content-Type", "application/json")
 

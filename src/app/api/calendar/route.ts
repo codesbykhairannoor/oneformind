@@ -15,7 +15,7 @@ export async function GET(req: Request) {
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/go-calendar?period=${period}`;
+    const goUrl = `${proto}://${host}/api/index?route=calendar&period=${period}`;
 
     const goRes = await fetch(goUrl, {
       method: 'GET',
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/go-calendar`;
+    const goUrl = `${proto}://${host}/api/index?route=calendar`;
 
     const goRes = await fetch(goUrl, {
       method: 'POST',

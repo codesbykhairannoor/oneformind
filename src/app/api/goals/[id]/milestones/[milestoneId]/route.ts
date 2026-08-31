@@ -27,7 +27,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string; m
     try {
       const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
       const host = process.env.VERCEL_URL || req.headers.get('host');
-      const goUrl = `${proto}://${host}/api/go-goals-milestones?goalId=${goalId}&milestoneId=${milestoneId}`;
+      const goUrl = `${proto}://${host}/api/index?route=goals-milestones&goalId=${goalId}&milestoneId=${milestoneId}`;
       
       const goRes = await fetch(goUrl, {
         method: 'PUT',
@@ -89,7 +89,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
     try {
       const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
       const host = process.env.VERCEL_URL || req.headers.get('host');
-      const goUrl = `${proto}://${host}/api/go-goals-milestones?goalId=${goalId}&milestoneId=${milestoneId}`;
+      const goUrl = `${proto}://${host}/api/index?route=goals-milestones&goalId=${goalId}&milestoneId=${milestoneId}`;
       
       const goRes = await fetch(goUrl, {
         method: 'DELETE',

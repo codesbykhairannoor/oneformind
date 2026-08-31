@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"bytes"
@@ -76,7 +76,9 @@ func getPayPalAccessToken() (string, string, error) {
 	return "", "", fmt.Errorf("Invalid token response")
 }
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+
+
+func PaymentPaypalCaptureHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
 		http.Error(w, `{"error": "Method Not Allowed"}`, http.StatusMethodNotAllowed)
@@ -95,6 +97,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tokenOrder, ok := reqBody["token"].(string)
+	if !ok || tokenOrder == "" {
+		http.Error(w, `{"error": "Missing token"}`, http.StatusBadRequest)
+		return
+	}
+
 	plan := "architect"
 	if p, ok := reqBody["plan"].(string); ok && p != "" {
 		plan = p
@@ -104,53 +112,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		billing = b
 	}
 
-	pricesUsd := map[string]map[string]string{
-		"architect": {"yearly": "59.00", "monthly": "7.99"},
-		"quantum":   {"yearly": "89.00", "monthly": "11.99"},
-		"legendary": {"yearly": "599.00", "monthly": "599.00"},
-		"lifetime":  {"yearly": "599.00", "monthly": "599.00"},
-	}
-
-	planKey := strings.ToLower(plan)
-	paymentAmount := "59.00"
-	if p, ok := pricesUsd[planKey]; ok {
-		if amt, ok2 := p[billing]; ok2 {
-			paymentAmount = amt
-		}
-	}
-
-	productDetails := fmt.Sprintf("Tranvas %s (%s)", strings.Title(plan), strings.Title(billing))
-	if planKey == "lifetime" || planKey == "legendary" {
-		productDetails = "Tranvas Legendary Founder Edition"
-	}
-
 	token, baseUrl, err := getPayPalAccessToken()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to get PayPal token"}`, http.StatusInternalServerError)
 		return
 	}
 
-	referenceId := fmt.Sprintf("%s-%s-%d", strings.ToUpper(planKey), userID, time.Now().UnixNano()/1e6)
-
-	orderPayload := map[string]interface{}{
-		"intent": "CAPTURE",
-		"purchase_units": []map[string]interface{}{
-			{
-				"reference_id": referenceId,
-				"description":  productDetails,
-				"amount": map[string]string{
-					"currency_code": "USD",
-					"value":         paymentAmount,
-				},
-			},
-		},
-		"application_context": map[string]string{
-			"shipping_preference": "NO_SHIPPING",
-		},
-	}
-
-	payloadBytes, _ := json.Marshal(orderPayload)
-	req, _ := http.NewRequest("POST", baseUrl+"/v2/checkout/orders", bytes.NewBuffer(payloadBytes))
+	req, _ := http.NewRequest("POST", baseUrl+"/v2/checkout/orders/"+tokenOrder+"/capture", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -163,17 +131,38 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	var orderData map[string]interface{}
-	json.Unmarshal(bodyBytes, &orderData)
+	var captureData map[string]interface{}
+	json.Unmarshal(bodyBytes, &captureData)
+
+	status, _ := captureData["status"].(string)
 
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
-		if id, ok := orderData["id"].(string); ok {
-			json.NewEncoder(w).Encode(map[string]string{"id": id})
+		if status == "COMPLETED" {
+			planKey := strings.ToUpper(plan)
+			finalPlan := strings.ToLower(planKey)
+			premiumUntil := time.Now()
+
+			if planKey == "LIFETIME" || planKey == "LEGENDARY" {
+				finalPlan = "legendary"
+				premiumUntil = premiumUntil.AddDate(100, 0, 0)
+			} else {
+				if billing == "yearly" {
+					premiumUntil = premiumUntil.AddDate(1, 0, 0)
+				} else {
+					premiumUntil = premiumUntil.AddDate(0, 1, 0)
+				}
+			}
+
+			if planKey == "QUANTUM" {
+				finalPlan = "quantum"
+			}
+
+			dbPaypal.Exec(`UPDATE users SET is_premium = true, plan_type = $1, premium_until = $2 WHERE id = $3`, finalPlan, premiumUntil, userID)
+			
+			json.NewEncoder(w).Encode(map[string]interface{}{"success": true})
 			return
 		}
 	}
 
-	http.Error(w, `{"error": "Failed to create PayPal order"}`, http.StatusBadRequest)
+	http.Error(w, `{"error": "Payment not completed"}`, http.StatusBadRequest)
 }
-
-

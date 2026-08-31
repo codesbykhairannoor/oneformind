@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"database/sql"
@@ -53,7 +53,7 @@ type StudyArchive struct {
 	UpdatedAt  *time.Time `json:"updatedAt"`
 }
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func StudyArchivesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	userIdStr := r.Header.Get("X-User-Id")
