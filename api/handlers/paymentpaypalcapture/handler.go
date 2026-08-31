@@ -1,7 +1,6 @@
 package paymentpaypalcapture
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"

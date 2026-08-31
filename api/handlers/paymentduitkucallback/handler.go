@@ -1,14 +1,11 @@
 package paymentduitkucallback
 
 import (
-	"bytes"
 	"crypto/md5"
-	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strconv"
