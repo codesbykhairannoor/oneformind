@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -15,6 +17,7 @@ export async function POST(req: Request) {
     const goUrl = `${proto}://${host}/api?route=study-archives`;
 
     const goRes = await fetch(goUrl, {
+      cache: 'no-store',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,6 +58,7 @@ export async function DELETE(req: Request) {
     const goUrl = `${proto}://${host}/api?route=study-archives&id=${id}`;
 
     const goRes = await fetch(goUrl, {
+      cache: 'no-store',
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

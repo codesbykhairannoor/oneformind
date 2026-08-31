@@ -3,6 +3,8 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
     try {
         const session = await auth();
@@ -16,6 +18,7 @@ export async function POST(req: NextRequest) {
         const goUrl = `${proto}://${host}/api?route=payment-duitku-checkout`;
 
         const goRes = await fetch(goUrl, {
+      cache: 'no-store',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(req: Request, props: { params: Promise<{ id: string; milestoneId: string }> }) {
   const params = await props.params;
   const session = await auth();

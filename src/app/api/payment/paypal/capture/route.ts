@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+export const dynamic = 'force-dynamic';
+
 // Helper to get PayPal Access Token
 async function getPayPalAccessToken() {
     const mode = process.env.PAYPAL_MODE || 'sandbox';
@@ -45,6 +47,7 @@ export async function POST(req: NextRequest) {
         const goUrl = `${proto}://${host}/api?route=payment-paypal-capture`;
 
         const goRes = await fetch(goUrl, {
+      cache: 'no-store',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+export const dynamic = 'force-dynamic';
+
 // Helper for Go Proxy
 async function proxyToGo(req: Request, userId: string, method: string, body?: any) {
   // Use the host header to build the absolute URL to the Go Serverless function
@@ -14,6 +16,7 @@ async function proxyToGo(req: Request, userId: string, method: string, body?: an
 
   try {
     const response = await fetch(goUrl, {
+      cache: 'no-store',
       method,
       headers: {
         'Content-Type': 'application/json',

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -15,6 +17,7 @@ export async function POST(req: Request) {
     const goUrl = `${proto}://${host}/api?route=payment-upgrade`;
 
     const goRes = await fetch(goUrl, {
+      cache: 'no-store',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

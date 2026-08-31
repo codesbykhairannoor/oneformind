@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+export const dynamic = 'force-dynamic';
+
 async function proxyToGo(req: Request, userId: string, method: string, taskId: string, body?: any) {
   const host = req.headers.get('host');
   const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
@@ -10,6 +12,7 @@ async function proxyToGo(req: Request, userId: string, method: string, taskId: s
 
   try {
     const response = await fetch(goUrl, {
+      cache: 'no-store',
       method,
       headers: {
         'Content-Type': 'application/json',

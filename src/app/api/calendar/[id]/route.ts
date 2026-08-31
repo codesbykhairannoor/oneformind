@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const session = await auth();
@@ -19,6 +21,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
     const goUrl = `${proto}://${host}/api?route=calendar&id=${eventId}`;
 
     const goRes = await fetch(goUrl, {
+      cache: 'no-store',
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -56,6 +59,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
     const goUrl = `${proto}://${host}/api?route=calendar&id=${eventId}`;
 
     const goRes = await fetch(goUrl, {
+      cache: 'no-store',
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
