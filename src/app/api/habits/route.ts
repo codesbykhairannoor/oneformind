@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     try {
       const data = await proxyToGo(req, userId, 'GET');
       const response = NextResponse.json(data);
-      response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=10');
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
       return response;
     } catch (e) {
       // Fallback to Prisma if Go proxy fails during migration

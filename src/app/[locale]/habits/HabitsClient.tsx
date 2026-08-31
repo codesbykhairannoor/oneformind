@@ -75,8 +75,9 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
 
     // 3. Habits Main State
     const { data: fetchedHabits, mutate: mutateHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher, {
-        fallbackData: currentMonthKey === initialMonthKey ? initialHabits : undefined,
-        keepPreviousData: true
+        revalidateOnMount: true,
+        revalidateOnFocus: true,
+        dedupingInterval: 0,
     });
 
     const parsedHabits = useMemo(() => {
