@@ -174,6 +174,7 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		CurrentValue  *float64 `json:"currentValue"`
 		StartDate     *string  `json:"startDate"`
 		EndDate       *string  `json:"endDate"`
+		SpecificDays  *string  `json:"specificDays"`
 		Status        *string  `json:"status"`
 		CoverImageUrl *string  `json:"coverImageUrl"`
 		Reward        *string  `json:"reward"`
@@ -212,30 +213,9 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		t, _ := time.Parse(time.RFC3339, *body.StartDate)
 		startDate = &t
 	}
-		SpecificDays  *string  `json:"specificDays"`
-		Status        *string  `json:"status"`
-		CoverImageUrl *string  `json:"coverImageUrl"`
-		Reward        *string  `json:"reward"`
-		Priority      *string  `json:"priority"`
-		Color         *string  `json:"color"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, "Invalid body", http.StatusBadRequest)
-		return
-	}
-
-	targetValue := 100.0
-	if body.TargetValue != nil {
-		targetValue = *body.TargetValue
-	}
-	currentValue := 0.0
-	if body.CurrentValue != nil {
-		currentValue = *body.CurrentValue
-	}
-	status := "active"
-	if body.Status != nil {
-		status = *body.Status
+	if body.EndDate != nil && *body.EndDate != "" {
+		t, _ := time.Parse(time.RFC3339, *body.EndDate)
+		endDate = &t
 	}
 
 	if dbGoals == nil {
@@ -249,7 +229,7 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		INSERT INTO goals (user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at
-	`, userId, body.Title, body.Category, body.Type, targetValue, currentValue, body.StartDate, body.EndDate, body.SpecificDays, status, body.CoverImageUrl, body.Reward, body.Priority, body.Color).Scan(
+	`, userId, body.Title, body.Category, tType, tTarget, tCurrent, startDate, endDate, body.SpecificDays, tStatus, body.CoverImageUrl, body.Reward, tPriority, body.Color).Scan(
 		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &g.CreatedAt, &g.UpdatedAt,
 	)
 
