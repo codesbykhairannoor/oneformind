@@ -34,7 +34,10 @@ export async function GET(req: Request) {
       ]
     });
 
-    return NextResponse.json(transactions);
+    const res = NextResponse.json(transactions);
+    // Cache finance data privately for 30s (transactions don't change every second)
+    res.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=10');
+    return res;
   } catch (error) {
     console.error('Error fetching transactions:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

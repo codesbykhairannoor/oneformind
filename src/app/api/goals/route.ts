@@ -17,7 +17,10 @@ export async function GET(req: Request) {
       orderBy: { id: 'desc' }
     });
 
-    return NextResponse.json(goals);
+    const res = NextResponse.json(goals);
+    // Goals rarely change, cache for 2 minutes
+    res.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=30');
+    return res;
   } catch (error) {
     console.error('Error fetching goals:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
