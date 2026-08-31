@@ -16,7 +16,10 @@ var db *sql.DB
 
 func init() {
 	var err error
-			connStr := os.Getenv("POSTGRES_URL_NON_POOLING")
+				connStr := os.Getenv("POSTGRES_PRISMA_URL")
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
+	}
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL")
 	}
