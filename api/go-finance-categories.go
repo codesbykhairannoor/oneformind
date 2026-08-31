@@ -37,8 +37,9 @@ type FinanceCategory struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"userId"`
 	Name      string    `json:"name"`
+	Slug      string    `json:"slug"`
 	Type      string    `json:"type"`
-	Icon      *string   `json:"icon"`
+	Icon      string    `json:"icon"`
 	Color     *string   `json:"color"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -56,18 +57,17 @@ func FinanceCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		rows, _ := dbFinCat.Query(`SELECT id, user_id, name, type, icon, color, created_at, updated_at FROM finance_categories WHERE user_id = $1 ORDER BY name ASC`, userID)
+		rows, _ := dbFinCat.Query(`SELECT id, user_id, name, slug, type, icon, color, created_at, updated_at FROM finance_categories WHERE user_id = $1 ORDER BY name ASC`, userID)
 		defer rows.Close()
 
 		cats := []FinanceCategory{}
 		for rows.Next() {
 			var c FinanceCategory
-			var icon, color sql.NullString
+			var color sql.NullString
 			var createdAt, updatedAt sql.NullTime
 			
-			err := rows.Scan(&c.ID, &c.UserID, &c.Name, &c.Type, &icon, &color, &createdAt, &updatedAt)
+			err := rows.Scan(&c.ID, &c.UserID, &c.Name, &c.Slug, &c.Type, &c.Icon, &color, &createdAt, &updatedAt)
 			if err == nil {
-				if icon.Valid { c.Icon = &icon.String }
 				if color.Valid { c.Color = &color.String }
 				if createdAt.Valid { c.CreatedAt = createdAt.Time }
 				if updatedAt.Valid { c.UpdatedAt = updatedAt.Time }
@@ -81,19 +81,27 @@ func FinanceCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewDecoder(r.Body).Decode(&body)
 
 		name := body["name"].(string)
+		
+		slug := ""
+		if s, ok := body["slug"].(string); ok { slug = s } else { slug = strings.ToLower(strings.ReplaceAll(name, " ", "-")) }
+		
 		tType := body["type"].(string)
-		var icon, color interface{} = nil, nil
+		
+		icon := "folder"
 		if i, ok := body["icon"].(string); ok && i != "" { icon = i }
+		
+		var color interface{} = nil
 		if c, ok := body["color"].(string); ok && c != "" { color = c }
 
 		var id int
 		err := dbFinCat.QueryRow(`
-			INSERT INTO finance_categories (user_id, name, type, icon, color, created_at, updated_at)
-			VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id`,
-			userID, name, tType, icon, color,
+			INSERT INTO finance_categories (user_id, name, slug, type, icon, color, created_at, updated_at)
+			VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING id`,
+			userID, name, slug, tType, icon, color,
 		).Scan(&id)
 		
 		if err != nil {
+			fmt.Println("Error inserting category:", err)
 			http.Error(w, `{"error": "Insert Error"}`, 500)
 			return
 		}

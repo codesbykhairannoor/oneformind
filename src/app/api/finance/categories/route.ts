@@ -70,13 +70,14 @@ export async function POST(req: Request) {
       }
     }
 
-    const { name, type, icon, color } = body;
+    const { name, slug, type, icon, color } = body;
     const category = await prisma.financeCategory.create({
       data: {
         userId: parseInt(userId),
         name,
+        slug,
         type,
-        icon: icon || null,
+        icon: icon || 'folder',
         color: color || null,
       }
     });
