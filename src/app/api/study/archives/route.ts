@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=study-archives`;
+    const goUrl = `${proto}://${host}/api?route=study-archives`;
 
     const goRes = await fetch(goUrl, {
       method: 'POST',
@@ -52,7 +52,7 @@ export async function DELETE(req: Request) {
 
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=study-archives&id=${id}`;
+    const goUrl = `${proto}://${host}/api?route=study-archives&id=${id}`;
 
     const goRes = await fetch(goUrl, {
       method: 'DELETE',

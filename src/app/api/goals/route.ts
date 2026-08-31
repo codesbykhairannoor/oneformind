@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     try {
       const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
       const host = process.env.VERCEL_URL || req.headers.get('host');
-      const goUrl = `${proto}://${host}/api/index?route=goals`;
+      const goUrl = `${proto}://${host}/api?route=goals`;
       
       const goRes = await fetch(goUrl, {
         method: 'GET',
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     try {
       const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
       const host = process.env.VERCEL_URL || req.headers.get('host');
-      const goUrl = `${proto}://${host}/api/index?route=goals`;
+      const goUrl = `${proto}://${host}/api?route=goals`;
       
       const goRes = await fetch(goUrl, {
         method: 'POST',

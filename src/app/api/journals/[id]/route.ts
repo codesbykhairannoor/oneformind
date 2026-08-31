@@ -16,7 +16,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=journals&id=${journalId}`;
+    const goUrl = `${proto}://${host}/api?route=journals&id=${journalId}`;
 
     const goRes = await fetch(goUrl, {
       method: 'PUT',
@@ -53,7 +53,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=journals&id=${journalId}`;
+    const goUrl = `${proto}://${host}/api?route=journals&id=${journalId}`;
 
     const goRes = await fetch(goUrl, {
       method: 'DELETE',

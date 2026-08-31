@@ -6,7 +6,7 @@ async function proxyToGo(req: Request, userId: string, method: string, body?: an
   const host = req.headers.get('host');
   const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
   const { search } = new URL(req.url);
-  const goUrl = `${protocol}://${host}/api/index?route=planner-tasks${search ? '&' + search.slice(1) : ''}`;
+  const goUrl = `${protocol}://${host}/api?route=planner-tasks${search ? '&' + search.slice(1) : ''}`;
 
   try {
     const response = await fetch(goUrl, {

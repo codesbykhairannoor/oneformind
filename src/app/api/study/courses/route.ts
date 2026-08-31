@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=study-courses`;
+    const goUrl = `${proto}://${host}/api?route=study-courses`;
 
     const goRes = await fetch(goUrl, {
       method: 'GET',
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=study-courses`;
+    const goUrl = `${proto}://${host}/api?route=study-courses`;
 
     const goRes = await fetch(goUrl, {
       method: 'POST',
@@ -78,7 +78,7 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=study-courses`;
+    const goUrl = `${proto}://${host}/api?route=study-courses`;
 
     const goRes = await fetch(goUrl, {
       method: 'PUT',
@@ -118,7 +118,7 @@ export async function DELETE(req: Request) {
 
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api/index?route=study-courses&id=${id}`;
+    const goUrl = `${proto}://${host}/api?route=study-courses&id=${id}`;
 
     const goRes = await fetch(goUrl, {
       method: 'DELETE',

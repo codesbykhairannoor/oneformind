@@ -6,7 +6,7 @@ async function proxyToGo(req: Request, userId: string, method: string, taskId: s
   const host = req.headers.get('host');
   const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
   // Send ID as a query param since Go is a single flat file handler
-  const goUrl = `${protocol}://${host}/api/index?route=planner-tasks&id=${taskId}`;
+  const goUrl = `${protocol}://${host}/api?route=planner-tasks&id=${taskId}`;
 
   try {
     const response = await fetch(goUrl, {
