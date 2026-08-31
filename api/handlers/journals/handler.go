@@ -1,4 +1,4 @@
-package handlers
+package journals
 
 import (
 	"database/sql"

@@ -1,4 +1,4 @@
-package handlers
+package plannertasks
 
 import (
 	"database/sql"

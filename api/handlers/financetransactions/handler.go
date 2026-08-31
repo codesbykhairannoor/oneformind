@@ -1,4 +1,4 @@
-package handlers
+package financetransactions
 
 import (
 	"database/sql"

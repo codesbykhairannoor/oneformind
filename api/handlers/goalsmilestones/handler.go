@@ -1,4 +1,4 @@
-package handlers
+package goalsmilestones
 
 import (
 	"database/sql"

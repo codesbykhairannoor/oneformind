@@ -1,4 +1,4 @@
-package handlers
+package goals
 
 import (
 	"database/sql"

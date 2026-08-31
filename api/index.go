@@ -2,7 +2,25 @@ package handler
 
 import (
 	"net/http"
-	"tranvas-api/handlers"
+
+	"tranvas-api/handlers/calendar"
+	"tranvas-api/handlers/financecategories"
+	"tranvas-api/handlers/financetransactions"
+	"tranvas-api/handlers/goals"
+	"tranvas-api/handlers/goalsmilestones"
+	"tranvas-api/handlers/habits"
+	"tranvas-api/handlers/jobs"
+	"tranvas-api/handlers/journals"
+	"tranvas-api/handlers/paymentduitkucallback"
+	"tranvas-api/handlers/paymentduitkucheckout"
+	"tranvas-api/handlers/paymentpaypalcapture"
+	"tranvas-api/handlers/paymentpaypalcheckout"
+	"tranvas-api/handlers/paymentupgrade"
+	"tranvas-api/handlers/plannerdaily"
+	"tranvas-api/handlers/plannertasks"
+	"tranvas-api/handlers/studyarchives"
+	"tranvas-api/handlers/studycourses"
+	"tranvas-api/handlers/user"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -10,41 +28,41 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	switch route {
 	case "calendar":
-		handlers.CalendarHandler(w, r)
+		calendar.CalendarHandler(w, r)
 	case "finance-categories":
-		handlers.FinanceCategoriesHandler(w, r)
+		financecategories.FinanceCategoriesHandler(w, r)
 	case "finance-transactions":
-		handlers.FinanceTransactionsHandler(w, r)
+		financetransactions.FinanceTransactionsHandler(w, r)
 	case "goals-milestones":
-		handlers.GoalsMilestonesHandler(w, r)
+		goalsmilestones.GoalsMilestonesHandler(w, r)
 	case "goals":
-		handlers.GoalsHandler(w, r)
+		goals.GoalsHandler(w, r)
 	case "habits":
-		handlers.HabitsHandler(w, r)
+		habits.HabitsHandler(w, r)
 	case "jobs":
-		handlers.JobsHandler(w, r)
+		jobs.JobsHandler(w, r)
 	case "journals":
-		handlers.JournalsHandler(w, r)
+		journals.JournalsHandler(w, r)
 	case "payment-duitku-callback":
-		handlers.PaymentDuitkuCallbackHandler(w, r)
+		paymentduitkucallback.PaymentDuitkuCallbackHandler(w, r)
 	case "payment-duitku-checkout":
-		handlers.PaymentDuitkuCheckoutHandler(w, r)
+		paymentduitkucheckout.PaymentDuitkuCheckoutHandler(w, r)
 	case "payment-paypal-capture":
-		handlers.PaymentPaypalCaptureHandler(w, r)
+		paymentpaypalcapture.PaymentPaypalCaptureHandler(w, r)
 	case "payment-paypal-checkout":
-		handlers.PaymentPaypalCheckoutHandler(w, r)
+		paymentpaypalcheckout.PaymentPaypalCheckoutHandler(w, r)
 	case "payment-upgrade":
-		handlers.PaymentUpgradeHandler(w, r)
+		paymentupgrade.PaymentUpgradeHandler(w, r)
 	case "planner-daily":
-		handlers.PlannerDailyHandler(w, r)
+		plannerdaily.PlannerDailyHandler(w, r)
 	case "planner-tasks":
-		handlers.PlannerTasksHandler(w, r)
+		plannertasks.PlannerTasksHandler(w, r)
 	case "study-archives":
-		handlers.StudyArchivesHandler(w, r)
+		studyarchives.StudyArchivesHandler(w, r)
 	case "study-courses":
-		handlers.StudyCoursesHandler(w, r)
+		studycourses.StudyCoursesHandler(w, r)
 	case "user":
-		handlers.UserHandler(w, r)
+		user.UserHandler(w, r)
 	default:
 		http.Error(w, `{"error": "Route not found"}`, http.StatusNotFound)
 	}

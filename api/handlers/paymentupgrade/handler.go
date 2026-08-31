@@ -1,4 +1,4 @@
-package handlers
+package paymentupgrade
 
 import (
 	"database/sql"

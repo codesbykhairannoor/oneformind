@@ -1,4 +1,4 @@
-package handlers
+package plannerdaily
 
 import (
 	"database/sql"
