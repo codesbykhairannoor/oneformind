@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const proto = req.headers.get('x-forwarded-proto') || 'http';
         const host = req.headers.get('host');
-        const goUrl = `${proto}://${host}/api?route=payment-paypal-capture`;
+        const goUrl = `${proto}://${host}/api?route=payment-paypal-capture&userId=${session.user.id}`;
 
         const goRes = await fetch(goUrl, {
       cache: 'no-store',

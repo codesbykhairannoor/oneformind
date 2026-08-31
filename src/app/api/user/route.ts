@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=user`;
+    const goUrl = `${proto}://${host}/api?route=user&userId=${session.user.id}`;
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',
@@ -49,7 +49,7 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=user`;
+    const goUrl = `${proto}://${host}/api?route=user&userId=${session.user.id}`;
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',

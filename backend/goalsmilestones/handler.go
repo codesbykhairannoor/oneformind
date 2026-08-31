@@ -74,6 +74,9 @@ type GoalMilestone struct {
 func GoalsMilestonesHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := r.Header.Get("X-User-Id")
 	if userIdStr == "" {
+		userIdStr = r.URL.Query().Get("userId")
+	}
+	if userIdStr == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}

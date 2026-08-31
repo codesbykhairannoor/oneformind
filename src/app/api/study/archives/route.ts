@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=study-archives`;
+    const goUrl = `${proto}://${host}/api?route=study-archives&userId=${session.user.id}`;
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',
@@ -55,7 +55,7 @@ export async function DELETE(req: Request) {
 
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=study-archives&id=${id}`;
+    const goUrl = `${proto}://${host}/api?route=study-archives&id=${id}&userId=${session.user.id}`;
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',

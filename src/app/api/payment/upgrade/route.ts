@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=payment-upgrade`;
+    const goUrl = `${proto}://${host}/api?route=payment-upgrade&userId=${session.user.id}`;
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',

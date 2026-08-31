@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=calendar&period=${period}`;
+    const goUrl = `${proto}://${host}/api?route=calendar&period=${period}&userId=${userId}`;
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=calendar`;
+    const goUrl = `${proto}://${host}/api?route=calendar&userId=${userId}`;
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',

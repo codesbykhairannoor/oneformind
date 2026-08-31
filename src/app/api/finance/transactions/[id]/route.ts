@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 async function proxyToGo(req: Request, userId: string, method: string, transactionId: string, body?: any) {
   const host = req.headers.get('host');
   const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-  const goUrl = `${protocol}://${host}/api?route=finance-transactions&id=${transactionId}`;
+  const goUrl = `${protocol}://${host}/api?route=finance-transactions&id=${transactionId}&userId=${userId}`;
 
   try {
     const response = await fetch(goUrl, {

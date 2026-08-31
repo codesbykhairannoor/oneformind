@@ -78,6 +78,9 @@ func PlannerTasksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	
 	userIdStr := r.Header.Get("X-User-Id")
+	if userIdStr == "" {
+		userIdStr = r.URL.Query().Get("userId")
+	}
 	userID, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)

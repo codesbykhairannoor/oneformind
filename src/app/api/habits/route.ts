@@ -12,7 +12,7 @@ async function proxyToGo(req: Request, userId: string, method: string, body?: an
   
   // Forward the URL search params (like ?period=daily)
   const { search } = new URL(req.url);
-  const goUrl = `${protocol}://${host}/api?route=habits${search ? '&' + search.slice(1) : ''}`;
+  const goUrl = `${protocol}://${host}/api?route=habits${search ? '&' + search.slice(1) : ''}&userId=${userId}`;
 
   try {
     const response = await fetch(goUrl, {

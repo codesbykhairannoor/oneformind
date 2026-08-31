@@ -77,6 +77,9 @@ func StudyArchivesHandler(w http.ResponseWriter, r *http.Request) {
 
 	userIdStr := r.Header.Get("X-User-Id")
 	if userIdStr == "" {
+		userIdStr = r.URL.Query().Get("userId")
+	}
+	if userIdStr == "" {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
 	}
