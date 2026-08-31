@@ -13,6 +13,8 @@ import GatedPage from '@/components/GatedPage';
 import { Milestone } from './components/MilestoneItem';
 import { Target, Sparkles } from 'lucide-react';
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function GoalsPage() {
     const t = useTranslations();
     const [currentTab, setCurrentTab] = useState<'active' | 'completed'>('active');
@@ -221,10 +223,12 @@ export default function GoalsPage() {
         }
     };
 
-    const handleDeleteMilestone = async (goal: GoalItem, mId: number) => {
-        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: (g.milestones || []).filter(ms => ms.id !== mId) } : g));
+    const handleDeleteMilestone = async (goal: GoalItem, mId: number | string | null | undefined) => {
+        if (!mId) return;
+        const idNum = Number(mId);
+        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: (g.milestones || []).filter(ms => ms.id !== idNum) } : g));
         try {
-            await fetch(`/api/goals/${goal.id}/milestones/${mId}`, { method: 'DELETE' });
+            await fetch(`/api/goals/${goal.id}/milestones/${idNum}`, { method: 'DELETE' });
             mutateGoals();
         } catch (error) {
             console.error(error);

@@ -247,7 +247,7 @@ export default function FinanceClient({
                 const res = await fetch('/api/finance/savings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: data.name, targetAmount: Number(data.target), icon: data.icon, color: data.color })
+                    body: JSON.stringify({ title: data.title, targetAmount: Number(data.target_amount), icon: data.icon, color: data.color })
                 });
                 if (res.ok) {
                     mutateSav();

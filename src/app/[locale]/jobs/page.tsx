@@ -9,6 +9,8 @@ import JobFilterBar, { JobFilterParams } from './components/JobFilterBar';
 import JobTable, { JobRowItem } from './components/JobTable';
 import MasterCvModal from './components/MasterCvModal';
 import ResumeAiModal from './components/ResumeAiModal';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 import GatedPage from '@/components/GatedPage';
 import { Briefcase, Plus, Sparkles } from 'lucide-react';
 

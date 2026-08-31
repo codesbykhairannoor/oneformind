@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import useSWR from 'swr';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
@@ -116,11 +116,7 @@ export default function PlannerPage() {
         }
     }, [dateParam]);
 
-            } else {
-                setTaskInbox([]);
-            }
-        }
-    }, [fetchedDaily]);
+
 
     // Initial Hydration
     useEffect(() => {
