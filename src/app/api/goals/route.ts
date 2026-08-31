@@ -8,17 +8,42 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
+
+  // ==========================================
+  // 🚀 STRANGLER FIG PROXY TO GO SERVERLESS
+  // ==========================================
+  if (process.env.VERCEL) {
+    try {
+      const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+      const host = process.env.VERCEL_URL || req.headers.get('host');
+      const goUrl = `${proto}://${host}/api/go-goals`;
+      
+      const goRes = await fetch(goUrl, {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userId,
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      });
+      
+      if (!goRes.ok) throw new Error(`Go backend returned ${goRes.status}`);
+      const data = await goRes.json();
+      return NextResponse.json(data);
+    } catch (e) {
+      console.error('Go proxy failed, falling back to Node.js Prisma:', e);
+    }
+  }
 
   try {
     const goals = await prisma.goal.findMany({
-      where: { userId },
+      where: { userId: parseInt(userId) },
       include: { milestones: true },
       orderBy: { id: 'desc' }
     });
 
     const res = NextResponse.json(goals);
-    // Goals rarely change, cache for 2 minutes
     res.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=30');
     return res;
   } catch (error) {
@@ -33,15 +58,48 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
+  const bodyText = await req.text();
+  let body;
+  try {
+      body = JSON.parse(bodyText);
+  } catch (e) {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  // ==========================================
+  // 🚀 STRANGLER FIG PROXY TO GO SERVERLESS
+  // ==========================================
+  if (process.env.VERCEL) {
+    try {
+      const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+      const host = process.env.VERCEL_URL || req.headers.get('host');
+      const goUrl = `${proto}://${host}/api/go-goals`;
+      
+      const goRes = await fetch(goUrl, {
+        method: 'POST',
+        headers: {
+          'X-User-Id': userId,
+          'Content-Type': 'application/json'
+        },
+        body: bodyText,
+        cache: 'no-store'
+      });
+      
+      if (!goRes.ok) throw new Error(`Go backend returned ${goRes.status}`);
+      const data = await goRes.json();
+      return NextResponse.json(data);
+    } catch (e) {
+      console.error('Go proxy failed, falling back to Node.js Prisma:', e);
+    }
+  }
 
   try {
-    const body = await req.json();
     const { title, category, type, targetValue, currentValue, startDate, endDate, status, coverImageUrl, reward, priority, color } = body;
 
     const goal = await prisma.goal.create({
       data: {
-        userId,
+        userId: parseInt(userId),
         title,
         category: category || null,
         type: type || 'custom',

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import useSWR from 'swr';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import FinanceHeader, { SUPPORTED_CURRENCIES } from './components/FinanceHeader';
 import FinanceStats from './components/FinanceStats';
@@ -43,6 +44,7 @@ export default function FinanceClient({
     usePageTitle('Finance');
     const t = useTranslations();
     const locale = useLocale();
+    const fetcher = (url: string) => fetch(url).then(res => res.json());
 
     // ===== 1. CURRENCY SYSTEM (1:1 from useFinanceFormat.js) =====
     const [activeCurrency, setActiveCurrency] = useState('IDR');
@@ -129,50 +131,42 @@ export default function FinanceClient({
     const [vaultTxType, setVaultTxType] = useState<'deposit' | 'withdraw'>('deposit');
     const [filterDate, setFilterDate] = useState('');
 
-    const [isLoaded, setIsLoaded] = useState(true);
-
-    const fetchData = async () => {
-        setIsLoaded(false);
-        try {
-            const [txRes, catRes, budRes, savRes] = await Promise.all([
-                fetch(`/api/finance/transactions?month=${selectedMonthKey}`),
-                fetch(`/api/finance/categories`),
-                fetch(`/api/finance/budgets?month=${selectedMonthKey}`),
-                fetch(`/api/finance/savings`)
-            ]);
-
-            if (txRes.ok) {
-                const data = await txRes.json();
-                setTransactions(data.map((t: any) => ({
-                    ...t,
-                    amount: Number(t.amount),
-                    date: t.date.split('T')[0]
-                })));
-            }
-            if (catRes.ok) setCategories(await catRes.json());
-            if (budRes.ok) {
-                const data = await budRes.json();
-                setBudgets(data.map((b: any) => ({ ...b, limit: Number(b.limitAmount) })));
-            }
-            if (savRes.ok) {
-                const data = await savRes.json();
-                setSavingsVault(data.map((s: any) => ({
-                    ...s,
-                    name: s.title,
-                    target: Number(s.targetAmount),
-                    current: Number(s.currentAmount)
-                })));
-            }
-        } catch (e) {
-            console.error('Failed to fetch finance data:', e);
-        } finally {
-            setIsLoaded(true);
-        }
-    };
+    // ===== 8. SWR DATA FETCHING & CACHING =====
+    const { data: txData } = useSWR(`/api/finance/transactions?month=${selectedMonthKey}`, fetcher);
+    const { data: catData } = useSWR(`/api/finance/categories`, fetcher);
+    const { data: budData } = useSWR(`/api/finance/budgets?month=${selectedMonthKey}`, fetcher);
+    const { data: savData } = useSWR(`/api/finance/savings`, fetcher);
 
     useEffect(() => {
-        fetchData();
-    }, [selectedMonthKey]);
+        if (txData) {
+            setTransactions(txData.map((t: any) => ({
+                ...t,
+                amount: Number(t.amount),
+                date: t.date.split('T')[0]
+            })));
+        }
+    }, [txData]);
+
+    useEffect(() => {
+        if (catData) setCategories(catData);
+    }, [catData]);
+
+    useEffect(() => {
+        if (budData) {
+            setBudgets(budData.map((b: any) => ({ ...b, limit: Number(b.limitAmount) })));
+        }
+    }, [budData]);
+
+    useEffect(() => {
+        if (savData) {
+            setSavingsVault(savData.map((s: any) => ({
+                ...s,
+                name: s.title,
+                target: Number(s.targetAmount),
+                current: Number(s.currentAmount)
+            })));
+        }
+    }, [savData]);
 
     // COMPUTED — transactions state is already filtered by selectedMonthKey from API
     const currentMonthTransactions = transactions;
@@ -266,12 +260,10 @@ export default function FinanceClient({
         try {
             const res = await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
             if (!res.ok) {
-                console.warn('Delete failed on server, refreshing...');
-                fetchData();
+                console.warn('Delete failed on server');
             }
         } catch (error) {
             console.error('Failed to delete transaction:', error);
-            fetchData();
         }
     };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import useSWR from 'swr';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import ModalPortal from '@/components/ModalPortal';
 import { useSearchParams } from 'next/navigation';
@@ -32,6 +33,7 @@ interface InboxTask {
 }
 
 export default function PlannerPage() {
+    const fetcher = (url: string) => fetch(url).then(res => res.json());
     usePageTitle('Planner');
     const t = useTranslations();
     const locale = useLocale();
@@ -88,73 +90,50 @@ export default function PlannerPage() {
         }
     }, [dateParam]);
 
+    // SWR Fetching
+    const { data: fetchedTasks } = useSWR(`/api/planner/tasks?date=${selectedDate}`, fetcher);
+    const { data: fetchedDaily } = useSWR(`/api/planner/daily?date=${selectedDate}`, fetcher);
+
+    useEffect(() => {
+        if (fetchedTasks) {
+            setTasks(fetchedTasks.map((t: any) => ({
+                id: t.id,
+                date: t.date.split('T')[0],
+                title: t.title,
+                start_time: t.startTime ? t.startTime.substring(11, 16) : '',
+                end_time: t.endTime ? t.endTime.substring(11, 16) : '',
+                type: t.type,
+                notes: t.notes || '',
+                completed: t.isCompleted
+            })));
+        }
+    }, [fetchedTasks]);
+
+    useEffect(() => {
+        if (fetchedDaily) {
+            setNotes(fetchedDaily.notes || '');
+            if (fetchedDaily.meals) {
+                setMeals(fetchedDaily.meals);
+            } else {
+                setMeals({ breakfast: '', lunch: '', dinner: '' });
+            }
+            setWaterGlasses(fetchedDaily.waterGlasses || 0);
+            if (fetchedDaily.inbox) {
+                setTaskInbox(fetchedDaily.inbox);
+            } else {
+                setTaskInbox([]);
+            }
+        }
+    }, [fetchedDaily]);
+
     // Initial Hydration
     useEffect(() => {
         const savedStart = localStorage.getItem('planner_start_time');
         if (savedStart) setStartHour(parseInt(savedStart));
         
-        const fetchTasks = async () => {
-            try {
-                const res = await fetch(`/api/planner/tasks?date=${selectedDate}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setTasks(data.map((t: any) => ({
-                        id: t.id,
-                        date: t.date.split('T')[0],
-                        title: t.title,
-                        start_time: t.startTime ? t.startTime.substring(11, 16) : '',
-                        end_time: t.endTime ? t.endTime.substring(11, 16) : '',
-                        type: t.type,
-                        notes: t.notes || '',
-                        completed: t.isCompleted
-                    })));
-                }
-            } catch (error) {
-                console.error('Failed to fetch tasks:', error);
-            } finally {
-                setIsLoaded(true);
-            }
-        };
-
-        fetchTasks();
-
         const clockInterval = setInterval(() => setNow(new Date()), 60000);
         return () => clearInterval(clockInterval);
-    }, [selectedDate]);
-
-    // Effect for loading specific date data when selectedDate changes
-    useEffect(() => {
-        if (!isLoaded) return;
-        
-        const fetchDaily = async () => {
-            try {
-                const res = await fetch(`/api/planner/daily?date=${selectedDate}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    
-                    setNotes(data.notes || '');
-                    
-                    if (data.meals) {
-                        setMeals(data.meals);
-                    } else {
-                        setMeals({ breakfast: '', lunch: '', dinner: '' });
-                    }
-                    
-                    setWaterGlasses(data.waterGlasses || 0);
-                    
-                    if (data.inbox) {
-                        setTaskInbox(data.inbox);
-                    } else {
-                        setTaskInbox([]);
-                    }
-                }
-            } catch (e) {
-                console.error("Failed to fetch daily data", e);
-            }
-        };
-
-        fetchDaily();
-    }, [selectedDate, isLoaded]);
+    }, []);
 
     const syncDaily = (payload: any) => {
         fetch('/api/planner/daily', {

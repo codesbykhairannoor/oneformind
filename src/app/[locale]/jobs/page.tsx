@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import useSWR from 'swr';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import JobStats, { JobStatsData } from './components/JobStats';
 import JobFilterBar, { JobFilterParams } from './components/JobFilterBar';
@@ -17,32 +18,26 @@ export default function JobsPage() {
     // Local Jobs State initialized with mock / persisted data
     const [jobs, setJobs] = useState<JobRowItem[]>([]);
 
+    const fetcher = (url: string) => fetch(url).then(res => res.json());
+    const { data: fetchedJobs } = useSWR('/api/jobs', fetcher);
+
     useEffect(() => {
-        const fetchJobs = async () => {
-            try {
-                const res = await fetch('/api/jobs');
-                if (res.ok) {
-                    const data = await res.json();
-                    const mapped = data.map((j: any) => ({
-                        id: j.id,
-                        _key: `db_${j.id}`,
-                        company: j.company,
-                        title: j.title,
-                        location: j.location || '',
-                        applied_date: j.appliedDate ? j.appliedDate.split('T')[0] : '',
-                        status: j.status,
-                        notes: j.notes || '',
-                        is_new: false,
-                        is_saving: false
-                    }));
-                    setJobs(mapped);
-                }
-            } catch (error) {
-                console.error('Failed to fetch jobs:', error);
-            }
-        };
-        fetchJobs();
-    }, []);
+        if (fetchedJobs) {
+            const mapped = fetchedJobs.map((j: any) => ({
+                id: j.id,
+                _key: `db_${j.id}`,
+                company: j.company,
+                title: j.title,
+                location: j.location || '',
+                applied_date: j.appliedDate ? j.appliedDate.split('T')[0] : '',
+                status: j.status,
+                notes: j.notes || '',
+                is_new: false,
+                is_saving: false
+            }));
+            setJobs(mapped);
+        }
+    }, [fetchedJobs]);
 
     const [filters, setFilters] = useState<JobFilterParams>({ search: '', status: 'all', days: null });
     const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);

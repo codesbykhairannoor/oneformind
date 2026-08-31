@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import useSWR from 'swr';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import GoalHeader from './components/GoalHeader';
 import GoalStats from './components/GoalStats';
@@ -22,41 +23,33 @@ export default function GoalsPage() {
 
     const [goals, setGoals] = useState<GoalItem[]>([]);
 
-    useEffect(() => {
-        const fetchGoals = async () => {
-            try {
-                const res = await fetch('/api/goals');
-                if (res.ok) {
-                    const data = await res.json();
-                    const mapped = data.map((g: any) => ({
-                        id: g.id,
-                        title: g.title,
-                        color: g.color || '#6366f1',
-                        type: g.type,
-                        status: g.status,
-                        priority: g.priority,
-                        reward: g.reward || '',
-                        start_date: g.startDate ? g.startDate.split('T')[0] : '',
-                        end_date: g.endDate ? g.endDate.split('T')[0] : '',
-                        category: g.category || '',
-                        milestones: (g.milestones || []).map((m: any) => ({
-                            id: m.id,
-                            title: m.title,
-                            is_completed: m.completed,
-                            completed: m.completed,
-                        })),
-                    }));
-                    setGoals(mapped);
-                }
-            } catch (error) {
-                console.error('Failed to fetch goals:', error);
-            } finally {
-                setHasMounted(true);
-            }
-        };
+    const fetcher = (url: string) => fetch(url).then(res => res.json());
+    const { data: fetchedGoals } = useSWR('/api/goals', fetcher);
 
-        fetchGoals();
-    }, []);
+    useEffect(() => {
+        if (fetchedGoals) {
+            const mapped = fetchedGoals.map((g: any) => ({
+                id: g.id,
+                title: g.title,
+                color: g.color || '#6366f1',
+                type: g.type,
+                status: g.status,
+                priority: g.priority,
+                reward: g.reward || '',
+                start_date: g.startDate ? g.startDate.split('T')[0] : '',
+                end_date: g.endDate ? g.endDate.split('T')[0] : '',
+                category: g.category || '',
+                milestones: (g.milestones || []).map((m: any) => ({
+                    id: m.id,
+                    title: m.title,
+                    is_completed: m.completed,
+                    completed: m.completed,
+                })),
+            }));
+            setGoals(mapped);
+        }
+        setHasMounted(true);
+    }, [fetchedGoals]);
 
     // Stats Calculation
     const activeGoals = goals.filter(g => g.status !== 'completed');
