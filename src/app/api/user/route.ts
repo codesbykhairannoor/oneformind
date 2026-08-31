@@ -28,7 +28,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    const response = NextResponse.json(user);
+    // Cache user profile for 5 min privately (profile changes are rare)
+    response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
+    return response;
   } catch (error) {
     console.error('Error fetching user:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

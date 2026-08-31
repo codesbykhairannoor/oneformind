@@ -27,7 +27,10 @@ export async function GET(req: Request) {
       }
     });
 
-    return NextResponse.json(habits);
+    const response = NextResponse.json(habits);
+    // Cache habit list privately for 30s so navigating away and back doesn't re-hit DB
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=10');
+    return response;
   } catch (error) {
     console.error('Error fetching habits:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
