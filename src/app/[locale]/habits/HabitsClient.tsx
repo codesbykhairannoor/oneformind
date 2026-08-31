@@ -94,11 +94,11 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         });
     }, [fetchedHabits]);
 
-    const [habits, setHabits] = useState<HabitItem[]>(parsedHabits || []);
-    const [isLoaded, setIsLoaded] = useState(!!parsedHabits);
+    const [habits, setHabits] = useState<HabitItem[]>(parsedHabits ?? []);
+    const [isLoaded, setIsLoaded] = useState(parsedHabits !== null);
 
     useEffect(() => {
-        if (parsedHabits) {
+        if (parsedHabits !== null) {  // Array.isArray covers both [] and [items]
             setHabits(parsedHabits);
             setIsLoaded(true);
         }
