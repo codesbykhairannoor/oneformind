@@ -352,19 +352,25 @@ export default function PlannerPage() {
             return;
         }
 
+        setShowTaskModal(false); // Close immediately for instant feel
+
         try {
             if (editingTaskId) {
-                const res = await fetch(`/api/planner/tasks/${editingTaskId}`, {
+                // Optimistic Update
+                updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { ...t, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes } : t));
+                
+                await fetch(`/api/planner/tasks/${editingTaskId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
                     })
                 });
-                if (res.ok) {
-                    updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { ...t, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes } : t));
-                }
             } else {
+                // Optimistic Update
+                const tempId = Date.now();
+                updateTasksState(prev => [...prev, { id: tempId, date: selectedDate, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes, completed: false }]);
+
                 const res = await fetch('/api/planner/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -374,13 +380,13 @@ export default function PlannerPage() {
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    updateTasksState(prev => [...prev, { id: data.id, date: selectedDate, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes, completed: false }]);
+                    // Replace temp ID with real ID
+                    updateTasksState(prev => prev.map(t => t.id === tempId ? { ...t, id: data.id } : t));
                 }
             }
         } catch (error) {
             console.error('Failed to save task:', error);
         }
-        setShowTaskModal(false);
     };
 
     const handleMoveTask = async (taskId: number, newStartTime: string) => {
@@ -431,15 +437,7 @@ export default function PlannerPage() {
         setShowTaskModal(false);
     };
 
-    if (!isLoaded) {
-        return (
-            <AuthenticatedLayout>
-                <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
-                </div>
-            </AuthenticatedLayout>
-        );
-    }
+    // No more full-screen spinner! Render skeleton or empty state instantly!
 
     return (
         <AuthenticatedLayout>

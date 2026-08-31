@@ -171,9 +171,7 @@ export default function FinanceClient({
     };
 
     useEffect(() => {
-        if (selectedMonthKey !== initialMonthKey) {
-            fetchData();
-        }
+        fetchData();
     }, [selectedMonthKey]);
 
     // COMPUTED — transactions state is already filtered by selectedMonthKey from API
@@ -208,6 +206,9 @@ export default function FinanceClient({
     const handleSaveSingleTrx = async (data: any) => {
         try {
             if (data.id) {
+                // Optimistic UI
+                setTransactions(prev => prev.map(t => t.id === data.id ? { ...data, amount: Number(data.amount), date: data.date.split('T')[0] } : t));
+                
                 const res = await fetch(`/api/finance/transactions/${data.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -218,6 +219,10 @@ export default function FinanceClient({
                     setTransactions(prev => prev.map(t => t.id === data.id ? { ...updated, amount: Number(updated.amount), date: updated.date.split('T')[0] } : t));
                 }
             } else {
+                // Optimistic UI
+                const tempId = Date.now();
+                setTransactions(prev => [{ ...data, id: tempId, amount: Number(data.amount), date: data.date.split('T')[0] }, ...prev]);
+                
                 const res = await fetch('/api/finance/transactions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -225,7 +230,7 @@ export default function FinanceClient({
                 });
                 if (res.ok) {
                     const created = await res.json();
-                    setTransactions(prev => [{ ...created, amount: Number(created.amount), date: created.date.split('T')[0] }, ...prev]);
+                    setTransactions(prev => prev.map(t => t.id === tempId ? { ...created, amount: Number(created.amount), date: created.date.split('T')[0] } : t));
                 }
             }
         } catch (error) {
@@ -251,18 +256,22 @@ export default function FinanceClient({
             }
             setTransactions(prev => [...newTrxs, ...prev]);
         } catch (error) {
-            console.error('Failed to batch save transactions:', error);
+            console.error('Batch save failed', error);
         }
     };
 
     const handleDeleteTrx = async (id: number) => {
+        // Optimistic UI
+        setTransactions(prev => prev.filter(t => t.id !== id));
         try {
             const res = await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                setTransactions(prev => prev.filter(t => t.id !== id));
+            if (!res.ok) {
+                console.warn('Delete failed on server, refreshing...');
+                fetchData();
             }
         } catch (error) {
             console.error('Failed to delete transaction:', error);
+            fetchData();
         }
     };
 

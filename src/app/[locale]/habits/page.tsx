@@ -1,4 +1,3 @@
-import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import HabitsClient from './HabitsClient';
@@ -15,8 +14,6 @@ export default async function HabitsPage({ searchParams }: { searchParams: { mon
         redirect('/login');
     }
 
-    const userId = parseInt(session.user.id);
-    
     // Default to current month if not provided in URL
     let year = new Date().getFullYear();
     let month = new Date().getMonth() + 1;
@@ -31,37 +28,12 @@ export default async function HabitsPage({ searchParams }: { searchParams: { mon
 
     const initialDateStr = `${year}-${String(month).padStart(2, '0')}`;
     
-    // Fetch data for the requested month
-    const habits = await prisma.habit.findMany({
-      where: {
-        userId,
-        isArchived: false,
-        period: initialDateStr,
-      },
-      orderBy: {
-        position: 'asc',
-      },
-      include: {
-        logs: true,
-      }
-    });
-
-    const serializedHabits = habits.map(h => ({
-        ...h,
-        createdAt: h.createdAt ? h.createdAt.toISOString() : null,
-        updatedAt: h.updatedAt ? h.updatedAt.toISOString() : null,
-        logs: h.logs.map(l => ({
-            ...l,
-            date: l.date.toISOString(),
-            createdAt: l.createdAt ? l.createdAt.toISOString() : null,
-            updatedAt: l.updatedAt ? l.updatedAt.toISOString() : null,
-        }))
-    }));
-
+    // Pass empty initial data so the fast Go backend loads it on the client
+    // This removes the server-side Next.js navigation blocking!
     return (
         <HabitsClient 
             initialDateStr={initialDateStr} 
-            initialHabits={serializedHabits} 
+            initialHabits={[]} 
         />
     );
 }
