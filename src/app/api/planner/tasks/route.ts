@@ -2,45 +2,66 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+async function proxyToGo(req: Request, userId: string, method: string, body?: any) {
+  const host = req.headers.get('host');
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  const { search } = new URL(req.url);
+  const goUrl = `${protocol}://${host}/api/go-planner-tasks${search}`;
+
+  try {
+    const response = await fetch(goUrl, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!response.ok) throw new Error(`Go API returned ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Go Proxy Error:', error);
+    throw error;
+  }
+}
+
 export async function GET(req: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const userId = session.user.id;
+  
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    try {
+      const data = await proxyToGo(req, userId, 'GET');
+      return NextResponse.json(data);
+    } catch (e) {
+      console.warn('Falling back to Prisma');
+    }
   }
 
-  const userId = parseInt(session.user.id);
   const { searchParams } = new URL(req.url);
   const dateStr = searchParams.get('date');
   const month = searchParams.get('month');
 
   try {
-    const whereClause: any = { userId };
+    const whereClause: any = { userId: parseInt(userId) };
     if (dateStr) {
       const [year, m, d] = dateStr.split('-').map(Number);
       const startDate = new Date(Date.UTC(year, m - 1, d, 0, 0, 0, 0));
       const endDate = new Date(Date.UTC(year, m - 1, d, 23, 59, 59, 999));
-      whereClause.date = {
-        gte: startDate,
-        lte: endDate,
-      };
+      whereClause.date = { gte: startDate, lte: endDate };
     } else if (month) {
       const [year, m] = month.split('-').map(Number);
       const startDate = new Date(Date.UTC(year, m - 1, 1, 0, 0, 0, 0));
       const endDate = new Date(Date.UTC(year, m, 0, 23, 59, 59, 999));
-      whereClause.date = {
-        gte: startDate,
-        lte: endDate,
-      };
+      whereClause.date = { gte: startDate, lte: endDate };
     }
 
     const tasks = await prisma.plannerTask.findMany({
       where: whereClause,
-      orderBy: [
-        { startTime: 'asc' },
-        { id: 'asc' }
-      ]
+      orderBy: [{ startTime: 'asc' }, { id: 'asc' }]
     });
-
     return NextResponse.json(tasks);
   } catch (error) {
     console.error('Error fetching planner tasks:', error);
@@ -50,19 +71,26 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
 
   try {
     const body = await req.json();
-    const { date, startTime, endTime, title, notes, type, isCompleted } = body;
 
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+      try {
+        const data = await proxyToGo(req, userId, 'POST', body);
+        return NextResponse.json(data);
+      } catch (e) {
+        console.warn('Falling back to Prisma');
+      }
+    }
+
+    const { date, startTime, endTime, title, notes, type, isCompleted } = body;
     const task = await prisma.plannerTask.create({
       data: {
-        userId,
+        userId: parseInt(userId),
         date: new Date(date),
         startTime: startTime ? new Date(`1970-01-01T${startTime}:00.000Z`) : null,
         endTime: endTime ? new Date(`1970-01-01T${endTime}:00.000Z`) : null,
@@ -72,7 +100,6 @@ export async function POST(req: Request) {
         isCompleted: isCompleted || false,
       }
     });
-
     return NextResponse.json(task);
   } catch (error) {
     console.error('Error creating planner task:', error);
