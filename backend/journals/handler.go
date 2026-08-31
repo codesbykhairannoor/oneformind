@@ -15,7 +15,7 @@ import (
 
 var db *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -76,6 +76,9 @@ type Journal struct {
 }
 
 func JournalsHandler(w http.ResponseWriter, r *http.Request) {
+	if db == nil {
+		initDB()
+	}
 	w.Header().Set("Content-Type", "application/json")
 
 	userIdStr := r.Header.Get("X-User-Id")

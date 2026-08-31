@@ -15,7 +15,7 @@ import (
 
 var dbMilestones *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -72,6 +72,9 @@ type GoalMilestone struct {
 }
 
 func GoalsMilestonesHandler(w http.ResponseWriter, r *http.Request) {
+	if dbMilestones == nil {
+		initDB()
+	}
 	userIdStr := r.Header.Get("X-User-Id")
 	if userIdStr == "" {
 		userIdStr = r.URL.Query().Get("userId")

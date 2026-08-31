@@ -14,7 +14,7 @@ import (
 
 var dbUpgrade *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -60,6 +60,9 @@ func init() {
 }
 
 func PaymentUpgradeHandler(w http.ResponseWriter, r *http.Request) {
+	if dbUpgrade == nil {
+		initDB()
+	}
 	if dbUpgrade == nil {
 		http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
 		return

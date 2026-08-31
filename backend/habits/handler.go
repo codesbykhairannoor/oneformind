@@ -16,7 +16,7 @@ import (
 // DB connection pool
 var db *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -90,6 +90,9 @@ type Habit struct {
 
 // Handler is the entrypoint for Vercel Serverless
 func HabitsHandler(w http.ResponseWriter, r *http.Request) {
+	if db == nil {
+		initDB()
+	}
 	// Set CORS headers if needed
 	w.Header().Set("Content-Type", "application/json")
 

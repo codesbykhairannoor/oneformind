@@ -15,7 +15,7 @@ import (
 
 var dbTasks *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -75,6 +75,9 @@ type PlannerTask struct {
 }
 
 func PlannerTasksHandler(w http.ResponseWriter, r *http.Request) {
+	if dbTasks == nil {
+		initDB()
+	}
 	w.Header().Set("Content-Type", "application/json")
 	
 	userIdStr := r.Header.Get("X-User-Id")

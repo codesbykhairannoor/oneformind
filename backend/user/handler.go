@@ -14,7 +14,7 @@ import (
 
 var db *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -73,11 +73,17 @@ type User struct {
 
 func UserHandler(w http.ResponseWriter, r *http.Request) {
 	if db == nil {
+		initDB()
+	}
+	if db == nil {
 		http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	userID := r.Header.Get("X-User-Id")
+	if userID == "" {
+		userID = r.URL.Query().Get("userId")
+	}
 
 	if userID == "" {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)

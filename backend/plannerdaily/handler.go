@@ -15,7 +15,7 @@ import (
 
 var dbDaily *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -73,6 +73,9 @@ type PlannerDaily struct {
 }
 
 func PlannerDailyHandler(w http.ResponseWriter, r *http.Request) {
+	if dbDaily == nil {
+		initDB()
+	}
 	w.Header().Set("Content-Type", "application/json")
 	
 	userIdStr := r.Header.Get("X-User-Id")

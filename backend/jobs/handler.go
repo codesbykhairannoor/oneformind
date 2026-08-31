@@ -15,7 +15,7 @@ import (
 
 var dbJobs *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -77,6 +77,9 @@ type Job struct {
 }
 
 func JobsHandler(w http.ResponseWriter, r *http.Request) {
+	if dbJobs == nil {
+		initDB()
+	}
 	userIdStr := r.Header.Get("X-User-Id")
 	if userIdStr == "" {
 		userIdStr = r.URL.Query().Get("userId")

@@ -17,7 +17,7 @@ import (
 
 var dbPaypal *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -107,6 +107,9 @@ func getPayPalAccessToken() (string, string, error) {
 }
 
 func PaymentPaypalCheckoutHandler(w http.ResponseWriter, r *http.Request) {
+	if dbPaypal == nil {
+		initDB()
+	}
 	if dbPaypal == nil {
 		http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
 		return

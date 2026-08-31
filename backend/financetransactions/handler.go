@@ -15,7 +15,7 @@ import (
 
 var dbFinTx *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -74,6 +74,9 @@ type FinanceTransaction struct {
 }
 
 func FinanceTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+	if dbFinTx == nil {
+		initDB()
+	}
 	w.Header().Set("Content-Type", "application/json")
 	
 	userIdStr := r.Header.Get("X-User-Id")

@@ -17,7 +17,7 @@ import (
 
 var dbDuitku *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -65,6 +65,9 @@ func init() {
 
 
 func PaymentDuitkuCallbackHandler(w http.ResponseWriter, r *http.Request) {
+	if dbDuitku == nil {
+		initDB()
+	}
 	if dbDuitku == nil {
 		http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
 		return

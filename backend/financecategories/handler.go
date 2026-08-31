@@ -15,7 +15,7 @@ import (
 
 var dbFinCat *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -73,6 +73,9 @@ type FinanceCategory struct {
 }
 
 func FinanceCategoriesHandler(w http.ResponseWriter, r *http.Request) {
+	if dbFinCat == nil {
+		initDB()
+	}
 	if dbFinCat == nil {
 		http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
 		return

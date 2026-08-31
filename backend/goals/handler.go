@@ -15,7 +15,7 @@ import (
 
 var dbGoals *sql.DB
 
-func init() {
+func initDB() {
 	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
@@ -93,6 +93,9 @@ type Goal struct {
 }
 
 func GoalsHandler(w http.ResponseWriter, r *http.Request) {
+	if dbGoals == nil {
+		initDB()
+	}
 	userIdStr := r.Header.Get("X-User-Id")
 	if userIdStr == "" {
 		userIdStr = r.URL.Query().Get("userId")
