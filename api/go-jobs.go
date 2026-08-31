@@ -1,12 +1,41 @@
-package api
+package handler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
+
+var dbJobs *sql.DB
+
+func init() {
+	if dbJobs != nil {
+		return
+	}
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		return
+	}
+	if !strings.Contains(dbURL, "sslmode=") {
+		if strings.Contains(dbURL, "?") {
+			dbURL += "&sslmode=require"
+		} else {
+			dbURL += "?sslmode=require"
+		}
+	}
+	dbJobs, _ = sql.Open("postgres", dbURL)
+	if dbJobs != nil {
+		dbJobs.SetMaxOpenConns(2)
+		dbJobs.SetMaxIdleConns(1)
+		dbJobs.SetConnMaxLifetime(5 * time.Minute)
+	}
+}
 
 // Job represents the job model in Prisma
 type Job struct {
@@ -51,13 +80,13 @@ func JobsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetJobs(w http.ResponseWriter, r *http.Request, userId int) {
-	pool, err := GetDB()
-	if err != nil {
+	if dbJobs == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
-	rows, err := pool.Query(r.Context(), `
+	// Fetch Jobs
+	rows, err := dbJobs.Query(`
 		SELECT "id", "userId", "title", "company", "status", "salary", "location", "jobUrl", "notes", "appliedDate", "createdAt", "updatedAt"
 		FROM "Job"
 		WHERE "userId" = $1
@@ -114,14 +143,14 @@ func handleCreateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		}
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbJobs == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
+	// Insert
 	var j Job
-	err = pool.QueryRow(r.Context(), `
+	err := dbJobs.QueryRow(`
 		INSERT INTO "Job" ("userId", "title", "company", "status", "salary", "location", "jobUrl", "notes", "appliedDate", "updatedAt")
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP)
 		RETURNING "id", "userId", "title", "company", "status", "salary", "location", "jobUrl", "notes", "appliedDate", "createdAt", "updatedAt"
@@ -166,15 +195,14 @@ func handleUpdateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbJobs == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Verify ownership
 	var existingUserId int
-	err = pool.QueryRow(r.Context(), `SELECT "userId" FROM "Job" WHERE "id" = $1`, jobId).Scan(&existingUserId)
+	err = dbJobs.QueryRow(`SELECT "userId" FROM "Job" WHERE "id" = $1`, jobId).Scan(&existingUserId)
 	if err != nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -238,7 +266,7 @@ func handleUpdateJob(w http.ResponseWriter, r *http.Request, userId int) {
 	args = append(args, jobId)
 
 	var j Job
-	err = pool.QueryRow(r.Context(), query, args...).Scan(
+	err = dbJobs.QueryRow(query, args...).Scan(
 		&j.ID, &j.UserID, &j.Title, &j.Company, &j.Status, &j.Salary, &j.Location, &j.JobUrl, &j.Notes, &j.AppliedDate, &j.CreatedAt, &j.UpdatedAt,
 	)
 
@@ -263,15 +291,14 @@ func handleDeleteJob(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbJobs == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Verify ownership
 	var existingUserId int
-	err = pool.QueryRow(r.Context(), `SELECT "userId" FROM "Job" WHERE "id" = $1`, jobId).Scan(&existingUserId)
+	err = dbJobs.QueryRow(`SELECT "userId" FROM "Job" WHERE "id" = $1`, jobId).Scan(&existingUserId)
 	if err != nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -281,7 +308,7 @@ func handleDeleteJob(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	_, err = pool.Exec(r.Context(), `DELETE FROM "Job" WHERE "id" = $1`, jobId)
+	_, err = dbJobs.Exec(`DELETE FROM "Job" WHERE id = $1`, jobId)
 	if err != nil {
 		http.Error(w, "Failed to delete job", http.StatusInternalServerError)
 		return

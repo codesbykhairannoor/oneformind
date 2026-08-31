@@ -1,12 +1,41 @@
-package api
+package handler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
+
+var dbGoals *sql.DB
+
+func init() {
+	if dbGoals != nil {
+		return
+	}
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		return
+	}
+	if !strings.Contains(dbURL, "sslmode=") {
+		if strings.Contains(dbURL, "?") {
+			dbURL += "&sslmode=require"
+		} else {
+			dbURL += "?sslmode=require"
+		}
+	}
+	dbGoals, _ = sql.Open("postgres", dbURL)
+	if dbGoals != nil {
+		dbGoals.SetMaxOpenConns(2)
+		dbGoals.SetMaxIdleConns(1)
+		dbGoals.SetConnMaxLifetime(5 * time.Minute)
+	}
+}
 
 type GoalMilestone struct {
 	ID         int        `json:"id"`
@@ -67,14 +96,13 @@ func GoalsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
-	pool, err := GetDB()
-	if err != nil {
+	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Fetch Goals
-	rows, err := pool.Query(r.Context(), `
+	rows, err := dbGoals.Query(`
 		SELECT id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at
 		FROM goals
 		WHERE user_id = $1
@@ -106,7 +134,7 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 
 	// Fetch Milestones if there are goals
 	if len(goalIDs) > 0 {
-		mRows, err := pool.Query(r.Context(), `
+		mRows, err := dbGoals.Query(`
 			SELECT id, goal_id, title, completed, "order", target_date, created_at, updated_at
 			FROM goal_milestones
 			WHERE goal_id = ANY($1)
@@ -184,23 +212,44 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		t, _ := time.Parse(time.RFC3339, *body.StartDate)
 		startDate = &t
 	}
-	if body.EndDate != nil && *body.EndDate != "" {
-		t, _ := time.Parse(time.RFC3339, *body.EndDate)
-		endDate = &t
+		SpecificDays  *string  `json:"specificDays"`
+		Status        *string  `json:"status"`
+		CoverImageUrl *string  `json:"coverImageUrl"`
+		Reward        *string  `json:"reward"`
+		Priority      *string  `json:"priority"`
+		Color         *string  `json:"color"`
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+		return
+	}
+
+	targetValue := 100.0
+	if body.TargetValue != nil {
+		targetValue = *body.TargetValue
+	}
+	currentValue := 0.0
+	if body.CurrentValue != nil {
+		currentValue = *body.CurrentValue
+	}
+	status := "active"
+	if body.Status != nil {
+		status = *body.Status
+	}
+
+	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
+	// Insert
 	var g Goal
-	err = pool.QueryRow(r.Context(), `
-		INSERT INTO goals (user_id, title, category, type, target_value, current_value, start_date, end_date, status, cover_image_url, reward, priority, color, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	err := dbGoals.QueryRow(`
+		INSERT INTO goals (user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at
-	`, userId, body.Title, body.Category, tType, tTarget, tCurrent, startDate, endDate, tStatus, body.CoverImageUrl, body.Reward, tPriority, body.Color).Scan(
+	`, userId, body.Title, body.Category, body.Type, targetValue, currentValue, body.StartDate, body.EndDate, body.SpecificDays, status, body.CoverImageUrl, body.Reward, body.Priority, body.Color).Scan(
 		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &g.CreatedAt, &g.UpdatedAt,
 	)
 
@@ -246,15 +295,14 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Verify ownership
 	var existingUserId int
-	err = pool.QueryRow(r.Context(), `SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
+	err = dbGoals.QueryRow(`SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
 	if err != nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -343,7 +391,7 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	args = append(args, goalId)
 
 	var g Goal
-	err = pool.QueryRow(r.Context(), query, args...).Scan(
+	err = dbGoals.QueryRow(query, args...).Scan(
 		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &g.CreatedAt, &g.UpdatedAt,
 	)
 
@@ -354,7 +402,7 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 
 	// Fetch milestones for the updated goal
 	g.Milestones = []GoalMilestone{}
-	mRows, err := pool.Query(r.Context(), `
+	mRows, err := dbGoals.Query(`
 		SELECT id, goal_id, title, completed, "order", target_date, created_at, updated_at
 		FROM goal_milestones
 		WHERE goal_id = $1
@@ -386,15 +434,14 @@ func handleDeleteGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Verify ownership
 	var existingUserId int
-	err = pool.QueryRow(r.Context(), `SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
+	err = dbGoals.QueryRow(`SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
 	if err != nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -404,7 +451,7 @@ func handleDeleteGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	_, err = pool.Exec(r.Context(), `DELETE FROM goals WHERE id = $1`, goalId)
+	_, err = dbGoals.Exec(`DELETE FROM goals WHERE id = $1`, goalId)
 	if err != nil {
 		http.Error(w, "Failed to delete goal", http.StatusInternalServerError)
 		return

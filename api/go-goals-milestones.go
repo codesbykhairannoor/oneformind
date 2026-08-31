@@ -1,11 +1,52 @@
-package api
+package handler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	_ "github.com/lib/pq"
 )
+
+var dbMilestones *sql.DB
+
+func init() {
+	if dbMilestones != nil {
+		return
+	}
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		return
+	}
+	if !strings.Contains(dbURL, "sslmode=") {
+		if strings.Contains(dbURL, "?") {
+			dbURL += "&sslmode=require"
+		} else {
+			dbURL += "?sslmode=require"
+		}
+	}
+	dbMilestones, _ = sql.Open("postgres", dbURL)
+	if dbMilestones != nil {
+		dbMilestones.SetMaxOpenConns(2)
+		dbMilestones.SetMaxIdleConns(1)
+		dbMilestones.SetConnMaxLifetime(5 * time.Minute)
+	}
+}
+
+type GoalMilestone struct {
+	ID         int        `json:"id"`
+	GoalID     int        `json:"goalId"`
+	Title      string     `json:"title"`
+	Completed  bool       `json:"completed"`
+	Order      int        `json:"order"`
+	TargetDate *time.Time `json:"targetDate,omitempty"`
+	CreatedAt  *time.Time `json:"createdAt"`
+	UpdatedAt  *time.Time `json:"updatedAt"`
+}
 
 func GoalsMilestonesHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := r.Header.Get("X-User-Id")
@@ -62,22 +103,21 @@ func handleCreateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 		order = *body.Order
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbMilestones == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Verify ownership
 	var existingUserId int
-	err = pool.QueryRow(r.Context(), `SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
+	err = dbMilestones.QueryRow(`SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
 	if err != nil || existingUserId != userId {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
 	var m GoalMilestone
-	err = pool.QueryRow(r.Context(), `
+	err = dbMilestones.QueryRow(`
 		INSERT INTO goal_milestones (goal_id, title, completed, "order", created_at, updated_at)
 		VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id, goal_id, title, completed, "order", target_date, created_at, updated_at
@@ -118,15 +158,14 @@ func handleUpdateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbMilestones == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Verify ownership
 	var existingUserId int
-	err = pool.QueryRow(r.Context(), `SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
+	err = dbMilestones.QueryRow(`SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
 	if err != nil || existingUserId != userId {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -156,7 +195,7 @@ func handleUpdateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 	args = append(args, milestoneId, goalId)
 
 	var m GoalMilestone
-	err = pool.QueryRow(r.Context(), query, args...).Scan(
+	err = dbMilestones.QueryRow(query, args...).Scan(
 		&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &m.TargetDate, &m.CreatedAt, &m.UpdatedAt,
 	)
 
@@ -183,21 +222,20 @@ func handleDeleteMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	pool, err := GetDB()
-	if err != nil {
+	if dbMilestones == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
 
 	// Verify ownership
 	var existingUserId int
-	err = pool.QueryRow(r.Context(), `SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
+	err = dbMilestones.QueryRow(`SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
 	if err != nil || existingUserId != userId {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
-	_, err = pool.Exec(r.Context(), `DELETE FROM goal_milestones WHERE id = $1 AND goal_id = $2`, milestoneId, goalId)
+	_, err = dbMilestones.Exec(`DELETE FROM goal_milestones WHERE id = $1 AND goal_id = $2`, milestoneId, goalId)
 	if err != nil {
 		http.Error(w, "Failed to delete milestone", http.StatusInternalServerError)
 		return
