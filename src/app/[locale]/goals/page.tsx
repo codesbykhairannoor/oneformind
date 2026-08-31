@@ -21,35 +21,38 @@ export default function GoalsPage() {
 
     const [hasMounted, setHasMounted] = useState(false);
 
-    const [goals, setGoals] = useState<GoalItem[]>([]);
+    const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
 
-    const fetcher = (url: string) => fetch(url).then(res => res.json());
-    const { data: fetchedGoals } = useSWR('/api/goals', fetcher);
+    const parsedGoals = React.useMemo(() => {
+        if (!fetchedGoals) return null;
+        return fetchedGoals.map((g: any) => ({
+            id: g.id,
+            title: g.title,
+            color: g.color || '#6366f1',
+            type: g.type,
+            status: g.status,
+            priority: g.priority,
+            reward: g.reward || '',
+            start_date: g.startDate ? g.startDate.split('T')[0] : '',
+            end_date: g.endDate ? g.endDate.split('T')[0] : '',
+            category: g.category || '',
+            milestones: (g.milestones || []).map((m: any) => ({
+                id: m.id,
+                title: m.title,
+                is_completed: m.completed,
+                completed: m.completed,
+            })),
+        }));
+    }, [fetchedGoals]);
+
+    const [goals, setGoals] = useState<GoalItem[]>(parsedGoals || []);
 
     useEffect(() => {
-        if (fetchedGoals) {
-            const mapped = fetchedGoals.map((g: any) => ({
-                id: g.id,
-                title: g.title,
-                color: g.color || '#6366f1',
-                type: g.type,
-                status: g.status,
-                priority: g.priority,
-                reward: g.reward || '',
-                start_date: g.startDate ? g.startDate.split('T')[0] : '',
-                end_date: g.endDate ? g.endDate.split('T')[0] : '',
-                category: g.category || '',
-                milestones: (g.milestones || []).map((m: any) => ({
-                    id: m.id,
-                    title: m.title,
-                    is_completed: m.completed,
-                    completed: m.completed,
-                })),
-            }));
-            setGoals(mapped);
+        if (parsedGoals) {
+            setGoals(parsedGoals);
         }
         setHasMounted(true);
-    }, [fetchedGoals]);
+    }, [parsedGoals]);
 
     // Stats Calculation
     const activeGoals = goals.filter(g => g.status !== 'completed');
@@ -100,8 +103,11 @@ export default function GoalsPage() {
     };
 
     const handleSaveGoal = async (form: GoalItem) => {
+        setIsModalOpen(false); // Close immediately for instant feel
         try {
             if (editingGoal) {
+                // Optimistic update
+                setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form } : g));
                 const res = await fetch(`/api/goals/${editingGoal.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -111,10 +117,11 @@ export default function GoalsPage() {
                         reward: form.reward, priority: form.priority, color: form.color
                     })
                 });
-                if (res.ok) {
-                    setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form } : g));
-                }
+                if (res.ok) mutateGoals();
             } else {
+                // Optimistic update
+                const tempId = Date.now();
+                setGoals(prev => [{ ...form, id: tempId, milestones: [], status: 'active' }, ...prev]);
                 const res = await fetch('/api/goals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -124,44 +131,47 @@ export default function GoalsPage() {
                         reward: form.reward, priority: form.priority, color: form.color
                     })
                 });
-                if (res.ok) {
-                    const data = await res.json();
-                    const newGoal: GoalItem = { ...form, id: data.id, milestones: [] };
-                    setGoals(prev => [newGoal, ...prev]);
-                }
+                if (res.ok) mutateGoals();
             }
         } catch (error) {
             console.error('Failed to save goal:', error);
+            mutateGoals(); // Revert on error
         }
-        setIsModalOpen(false);
     };
 
     const handleDeleteGoal = async (id: number | string) => {
         if (typeof window !== 'undefined' && window.confirm('Hapus Goal ini? Data akan hilang selamanya.')) {
+            // Optimistic update
+            setGoals(prev => prev.filter(g => g.id !== id));
             try {
                 await fetch(`/api/goals/${id}`, { method: 'DELETE' });
-                setGoals(prev => prev.filter(g => g.id !== id));
+                mutateGoals();
             } catch (error) {
                 console.error('Failed to delete goal:', error);
+                mutateGoals(); // Revert on error
             }
         }
     };
 
     const handleCompleteGoal = async (goal: GoalItem) => {
+        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'completed' } : g));
         try {
             await fetch(`/api/goals/${goal.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'completed' }) });
-            setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'completed' } : g));
+            mutateGoals();
         } catch (error) {
             console.error(error);
+            mutateGoals();
         }
     };
 
     const handleMarkAsActive = async (goal: GoalItem) => {
+        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'active' } : g));
         try {
             await fetch(`/api/goals/${goal.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'active' }) });
-            setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'active' } : g));
+            mutateGoals();
         } catch (error) {
             console.error(error);
+            mutateGoals();
         }
     };
 
@@ -197,27 +207,28 @@ export default function GoalsPage() {
 
     const handleToggleMilestone = async (goal: GoalItem, m: Milestone) => {
         const nextState = !(m.is_completed || m.completed);
+        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: (g.milestones || []).map(ms => ms.id === m.id ? { ...ms, is_completed: nextState, completed: nextState } : ms) } : g));
         try {
             await fetch(`/api/goals/${goal.id}/milestones/${m.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ completed: nextState })
             });
-            setGoals(prev => prev.map(g => g.id === goal.id ? {
-                ...g, milestones: (g.milestones || []).map(item => item.id === m.id ? { ...item, is_completed: nextState, completed: nextState } : item)
-            } : g));
+            mutateGoals();
         } catch (error) {
             console.error(error);
+            mutateGoals();
         }
     };
 
-    const handleDeleteMilestone = async (goal: GoalItem, mId: number | string | null | undefined) => {
-        if (!mId) return;
+    const handleDeleteMilestone = async (goal: GoalItem, mId: number) => {
+        setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: (g.milestones || []).filter(ms => ms.id !== mId) } : g));
         try {
             await fetch(`/api/goals/${goal.id}/milestones/${mId}`, { method: 'DELETE' });
-            setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: (g.milestones || []).filter(m => m.id !== mId) } : g));
+            mutateGoals();
         } catch (error) {
             console.error(error);
+            mutateGoals();
         }
     };
     if (!hasMounted) {

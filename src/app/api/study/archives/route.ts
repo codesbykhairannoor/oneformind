@@ -10,31 +10,28 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { courseId, meetingTag, type, fileName, filePath, linkUrl } = body;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-study-archives`;
 
-    // Verify ownership of the course
-    const course = await prisma.studyCourse.findUnique({
-      where: { id: courseId },
+    const goRes = await fetch(goUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
+      body: JSON.stringify(body)
     });
 
-    if (!course || course.userId !== parseInt(session.user.id)) {
-      return NextResponse.json({ error: 'Course not found or forbidden' }, { status: 403 });
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
     }
 
-    const newArchive = await prisma.studyArchive.create({
-      data: {
-        courseId,
-        meetingTag,
-        type,
-        fileName,
-        filePath,
-        linkUrl,
-      },
-    });
-
-    return NextResponse.json(newArchive);
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error creating archive:', error);
+    console.error('Error creating archive via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -53,23 +50,27 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
     }
 
-    // Verify ownership via course
-    const archive = await prisma.studyArchive.findUnique({
-      where: { id },
-      include: { course: true },
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-study-archives?id=${id}`;
+
+    const goRes = await fetch(goUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
 
-    if (!archive || archive.course.userId !== parseInt(session.user.id)) {
-      return NextResponse.json({ error: 'Not found or forbidden' }, { status: 403 });
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
     }
 
-    await prisma.studyArchive.delete({
-      where: { id },
-    });
-
-    return NextResponse.json({ success: true });
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error deleting archive:', error);
+    console.error('Error deleting archive via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

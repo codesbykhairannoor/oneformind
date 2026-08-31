@@ -13,30 +13,29 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
   const userId = parseInt(session.user.id);
 
   try {
-    const existing = await prisma.journal.findUnique({ where: { id: journalId } });
-    if (!existing || existing.userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
-
     const body = await req.json();
-    const updateData: any = {};
-    if (body.date !== undefined) updateData.date = new Date(body.date);
-    if (body.title !== undefined) updateData.title = body.title;
-    if (body.content !== undefined) updateData.content = body.content;
-    if (body.mood !== undefined) updateData.mood = body.mood;
-    if (body.imagePath !== undefined) updateData.imagePath = body.imagePath;
-    if (body.isPinned !== undefined) updateData.isPinned = body.isPinned;
-    if (body.aiSentiment !== undefined) updateData.aiSentiment = body.aiSentiment;
-    if (body.moodScore !== undefined) updateData.moodScore = body.moodScore !== null ? Number(body.moodScore) : null;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-journals?id=${journalId}`;
 
-    const journal = await prisma.journal.update({
-      where: { id: journalId },
-      data: updateData,
+    const goRes = await fetch(goUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json(journal);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error updating journal:', error);
+    console.error('Error updating journal via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -52,18 +51,27 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
   const userId = parseInt(session.user.id);
 
   try {
-    const existing = await prisma.journal.findUnique({ where: { id: journalId } });
-    if (!existing || existing.userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-journals?id=${journalId}`;
 
-    await prisma.journal.delete({
-      where: { id: journalId },
+    const goRes = await fetch(goUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
 
-    return NextResponse.json({ success: true });
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error deleting journal:', error);
+    console.error('Error deleting journal via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

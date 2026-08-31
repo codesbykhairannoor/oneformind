@@ -96,17 +96,32 @@ export default function FinanceClient({
     // ===== 2. DATE STATE =====
     const [selectedMonthKey, setSelectedMonthKey] = useState(initialMonthKey);
 
-    // ===== 3. CATEGORIES STATE =====
-    const [categories, setCategories] = useState<CategoryOption[]>(initialCategories);
+    // ===== 3. SWR DATA FETCHING & CACHING =====
+    const { data: txRawData, mutate: mutateTx } = useSWR(`/api/finance/transactions?month=${selectedMonthKey}`, fetcher, { keepPreviousData: true });
+    const { data: catRawData, mutate: mutateCat } = useSWR(`/api/finance/categories`, fetcher, { keepPreviousData: true });
+    const { data: budRawData, mutate: mutateBud } = useSWR(`/api/finance/budgets?month=${selectedMonthKey}`, fetcher, { keepPreviousData: true });
+    const { data: savRawData, mutate: mutateSav } = useSWR(`/api/finance/savings`, fetcher, { keepPreviousData: true });
 
-    // ===== 4. TRANSACTIONS STATE =====
-    const [transactions, setTransactions] = useState<TransactionItem[]>(initialTransactions);
+    // Derive parsed data from SWR cache or fallback to initial data
+    const transactions: TransactionItem[] = (txRawData || initialTransactions).map((t: any) => ({
+        ...t,
+        amount: Number(t.amount),
+        date: t.date?.split('T')[0] || t.date
+    }));
 
-    // ===== 5. BUDGETS STATE =====
-    const [budgets, setBudgets] = useState<any[]>(initialBudgets);
+    const categories: CategoryOption[] = catRawData || initialCategories;
 
-    // ===== 6. SAVINGS VAULT STATE =====
-    const [savingsVault, setSavingsVault] = useState<SavingsVaultItem[]>(initialSavings);
+    const budgets: any[] = (budRawData || initialBudgets).map((b: any) => ({ 
+        ...b, 
+        limit: Number(b.limitAmount) 
+    }));
+
+    const savingsVault: SavingsVaultItem[] = (savRawData || initialSavings).map((s: any) => ({
+        ...s,
+        name: s.title || s.name,
+        target: Number(s.targetAmount || s.target),
+        current: Number(s.currentAmount || s.current)
+    }));
 
     // ===== 7. INCOME TARGET =====
     const [incomeTarget, setIncomeTarget] = useState(0);
@@ -131,44 +146,7 @@ export default function FinanceClient({
     const [vaultTxType, setVaultTxType] = useState<'deposit' | 'withdraw'>('deposit');
     const [filterDate, setFilterDate] = useState('');
 
-    // ===== 8. SWR DATA FETCHING & CACHING =====
-    const { data: txData } = useSWR(`/api/finance/transactions?month=${selectedMonthKey}`, fetcher);
-    const { data: catData } = useSWR(`/api/finance/categories`, fetcher);
-    const { data: budData } = useSWR(`/api/finance/budgets?month=${selectedMonthKey}`, fetcher);
-    const { data: savData } = useSWR(`/api/finance/savings`, fetcher);
-
-    useEffect(() => {
-        if (txData) {
-            setTransactions(txData.map((t: any) => ({
-                ...t,
-                amount: Number(t.amount),
-                date: t.date.split('T')[0]
-            })));
-        }
-    }, [txData]);
-
-    useEffect(() => {
-        if (catData) setCategories(catData);
-    }, [catData]);
-
-    useEffect(() => {
-        if (budData) {
-            setBudgets(budData.map((b: any) => ({ ...b, limit: Number(b.limitAmount) })));
-        }
-    }, [budData]);
-
-    useEffect(() => {
-        if (savData) {
-            setSavingsVault(savData.map((s: any) => ({
-                ...s,
-                name: s.title,
-                target: Number(s.targetAmount),
-                current: Number(s.currentAmount)
-            })));
-        }
-    }, [savData]);
-
-    // COMPUTED — transactions state is already filtered by selectedMonthKey from API
+    // ===== COMPUTED — transactions state is already filtered by selectedMonthKey from API =====
     const currentMonthTransactions = transactions;
     const totalIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
     const totalExpense = currentMonthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
@@ -201,31 +179,25 @@ export default function FinanceClient({
         try {
             if (data.id) {
                 // Optimistic UI
-                setTransactions(prev => prev.map(t => t.id === data.id ? { ...data, amount: Number(data.amount), date: data.date.split('T')[0] } : t));
+                mutateTx(transactions.map(t => t.id === data.id ? { ...data, amount: Number(data.amount), date: data.date.split('T')[0] } : t), false);
                 
                 const res = await fetch(`/api/finance/transactions/${data.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                if (res.ok) {
-                    const updated = await res.json();
-                    setTransactions(prev => prev.map(t => t.id === data.id ? { ...updated, amount: Number(updated.amount), date: updated.date.split('T')[0] } : t));
-                }
+                mutateTx(); // revalidate
             } else {
                 // Optimistic UI
                 const tempId = Date.now();
-                setTransactions(prev => [{ ...data, id: tempId, amount: Number(data.amount), date: data.date.split('T')[0] }, ...prev]);
+                mutateTx([{ ...data, id: tempId, amount: Number(data.amount), date: data.date.split('T')[0] }, ...transactions], false);
                 
                 const res = await fetch('/api/finance/transactions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                if (res.ok) {
-                    const created = await res.json();
-                    setTransactions(prev => prev.map(t => t.id === tempId ? { ...created, amount: Number(created.amount), date: created.date.split('T')[0] } : t));
-                }
+                mutateTx(); // revalidate
             }
         } catch (error) {
             console.error('Failed to save transaction:', error);
@@ -243,27 +215,19 @@ export default function FinanceClient({
                         date, type: r.type, amount: Number(r.amount), title: r.title, category: r.category || 'other'
                     })
                 });
-                if (res.ok) {
-                    const created = await res.json();
-                    newTrxs.push({ ...created, amount: Number(created.amount), date: created.date.split('T')[0] });
-                }
             }
-            setTransactions(prev => [...newTrxs, ...prev]);
+            mutateTx();
+            setShowBatchModal(false);
         } catch (error) {
-            console.error('Batch save failed', error);
+            console.error('Failed to batch save transactions:', error);
         }
     };
 
     const handleDeleteTrx = async (id: number) => {
-        // Optimistic UI
-        setTransactions(prev => prev.filter(t => t.id !== id));
-        try {
-            const res = await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
-            if (!res.ok) {
-                console.warn('Delete failed on server');
-            }
-        } catch (error) {
-            console.error('Failed to delete transaction:', error);
+        if (confirm(t('common.delete_confirm'))) {
+            mutateTx(transactions.filter(t => t.id !== id), false);
+            await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
+            mutateTx();
         }
     };
 
@@ -276,18 +240,18 @@ export default function FinanceClient({
                     body: JSON.stringify({ id: data.id, title: data.title, targetAmount: Number(data.target_amount), icon: data.icon })
                 });
                 if (res.ok) {
-                    const updated = await res.json();
-                    setSavingsVault(prev => prev.map(s => s.id === data.id ? { ...s, name: updated.title, target: Number(updated.targetAmount), icon: updated.icon } : s));
+                    mutateSav();
+                    setShowSavingModal(false);
                 }
             } else {
                 const res = await fetch('/api/finance/savings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: data.title, targetAmount: Number(data.target_amount), icon: data.icon, color: '#6366f1' })
+                    body: JSON.stringify({ title: data.name, targetAmount: Number(data.target), icon: data.icon, color: data.color })
                 });
                 if (res.ok) {
-                    const created = await res.json();
-                    setSavingsVault(prev => [...prev, { id: created.id, name: created.title, target: Number(created.targetAmount), current: 0, icon: created.icon, color: created.color }]);
+                    mutateSav();
+                    setShowSavingModal(false);
                 }
             }
         } catch (error) {
@@ -306,7 +270,9 @@ export default function FinanceClient({
                 body: JSON.stringify({ id: activeVault.id, currentAmount: newAmount })
             });
             if (res.ok) {
-                setSavingsVault(prev => prev.map(s => s.id === activeVault.id ? { ...s, current: newAmount } : s));
+                mutateSav();
+                mutateTx();
+                setShowVaultTxModal(false);
             }
         } catch (error) {
             console.error('Failed to mutate vault:', error);
@@ -321,8 +287,7 @@ export default function FinanceClient({
                 body: JSON.stringify(data)
             });
             if (res.ok) {
-                const created = await res.json();
-                setTransactions(prev => [{ ...created, amount: Number(created.amount), date: created.date.split('T')[0] }, ...prev]);
+                mutateTx();
             }
         } catch (error) {
             console.error('Failed to add asset transaction:', error);
@@ -333,7 +298,6 @@ export default function FinanceClient({
         <AuthenticatedLayout>
             <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500 pb-20">
                 
-                {/* FinanceHeader — sticky nav bar with full 5-currency dropdown */}
                 <FinanceHeader
                     selectedMonthKey={selectedMonthKey}
                     onMonthChange={changeMonth}
@@ -344,10 +308,8 @@ export default function FinanceClient({
                     onCurrencyChange={handleCurrencyChange}
                 />
 
-                {/* Main Content — 1:1 from Index.vue line 500 */}
                 <div className="w-full min-h-screen px-3 sm:px-6 lg:px-8 py-6 transition-colors duration-500">
                     
-                    {/* FinanceStats — 1:1 from Index.vue line 501-503 */}
                     <div className="mb-8 overflow-x-auto no-scrollbar -mx-3 px-3 lg:mx-0 lg:px-0">
                         <FinanceStats
                             totalIncome={totalIncome}
@@ -360,10 +322,8 @@ export default function FinanceClient({
                         />
                     </div>
 
-                    {/* 5-Column Grid — 1:1 from Index.vue line 505 */}
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
                         
-                        {/* RIGHT SIDEBAR (2 cols, sticky) — 1:1 from Index.vue line 506-535 */}
                         <div className="lg:col-span-2 w-full lg:sticky lg:top-24 h-fit space-y-8 lg:space-y-6 order-1 lg:order-2">
                             <BudgetSidebar
                                 budgets={budgets}
@@ -372,15 +332,22 @@ export default function FinanceClient({
                                 incomeStats={incomeStats}
                                 onAddBudget={() => setShowCategoryModal(true)}
                                 onEditBudget={() => setShowCategoryModal(true)}
-                                onDeleteBudget={(id) => setBudgets(prev => prev.filter(b => b.id !== id))}
+                                onDeleteBudget={async (id) => {
+                                    mutateBud(budgets.filter(b => b.id !== id), false);
+                                    await fetch(`/api/finance/budgets?id=${id}`, { method: 'DELETE' });
+                                    mutateBud();
+                                }}
                                 onAddCategory={() => setShowCategoryModal(true)}
                                 onEditCategory={() => setShowCategoryModal(true)}
-                                onDeleteCategory={(cat) => setCategories(prev => prev.filter(c => c.slug !== cat.slug))}
+                                onDeleteCategory={async (cat) => {
+                                    mutateCat(categories.filter(c => c.slug !== cat.slug), false);
+                                    await fetch(`/api/finance/categories?slug=${cat.slug}`, { method: 'DELETE' });
+                                    mutateCat();
+                                }}
                                 activeCurrency={activeCurrency}
                                 currencyLocale={currencyLocale}
                             />
 
-                            {/* Investment Lab — 1:1 from Index.vue line 524-534 */}
                             <div className="hidden lg:block">
                                 <FinanceInsights 
                                     activeCurrency={activeCurrency}
@@ -390,10 +357,8 @@ export default function FinanceClient({
                             </div>
                         </div>
 
-                        {/* LEFT MAIN COLUMN (3 cols) — 1:1 from Index.vue line 537-638 */}
                         <div className="lg:col-span-3 space-y-8 w-full order-2 lg:order-1 pb-24 lg:pb-0">
                             
-                            {/* Daily History (Grouped by Day) — 1:1 from Index.vue line 538-592 */}
                             <TransactionList
                                 transactions={currentMonthTransactions}
                                 categories={categories}
@@ -404,7 +369,6 @@ export default function FinanceClient({
                                 currencyLocale={currencyLocale}
                             />
 
-                            {/* 🏦 The Vault (Savings) — 1:1 from Index.vue line 593-618 */}
                             <div className="space-y-6 relative group">
                                 <div className="flex items-center justify-between px-1 lg:px-0">
                                     <div className="flex items-center gap-3">
@@ -467,16 +431,14 @@ export default function FinanceClient({
                                 </div>
                             </div>
 
-                            {/* Mobile-only FinanceInsights — 1:1 from Index.vue line 622-631 */}
-                                                            <div className="lg:hidden relative">
-                                                                <FinanceInsights 
-                                                                    activeCurrency={activeCurrency}
-                                                                    currencyLocale={currencyLocale}
-                                                                    onAddTransaction={handleAddAssetTransaction}
-                                                                />
-                                                            </div>
+                            <div className="lg:hidden relative">
+                                <FinanceInsights 
+                                    activeCurrency={activeCurrency}
+                                    currencyLocale={currencyLocale}
+                                    onAddTransaction={handleAddAssetTransaction}
+                                />
+                            </div>
 
-                            {/* Trend Chart — 1:1 from Index.vue line 633-637 */}
                             {currentMonthTransactions.length > 0 && (
                                 <div className="relative">
                                     <DailyTrendChart
@@ -491,7 +453,6 @@ export default function FinanceClient({
                 </div>
             </div>
 
-            {/* MODALS — 1:1 from Index.vue line 642-647 */}
             <ArchiveModal
                 show={showArchiveModal}
                 dayData={selectedDayData}
@@ -530,15 +491,24 @@ export default function FinanceClient({
                 show={showCategoryModal}
                 categories={categories}
                 onClose={() => setShowCategoryModal(false)}
-                onAddCategory={(cat: any) => {
-                    setCategories(prev => [...prev, { slug: cat.slug, name: cat.name, icon: cat.icon, type: cat.type }]);
-                    if (cat.type === 'expense' && cat.limit) {
-                        setBudgets(prev => [...prev, { id: Date.now(), category: cat.slug, limit: cat.limit, icon: cat.icon, spent: 0 }]);
+                onAddCategory={async (cat: any) => {
+                    await fetch('/api/finance/categories', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cat)
+                    });
+                    mutateCat();
+                    if (cat.limit) {
+                        mutateBud();
                     }
+                    setShowCategoryModal(false);
                 }}
-                onDeleteCategory={(slug: string) => {
-                    setCategories(prev => prev.filter(c => c.slug !== slug));
-                    setBudgets(prev => prev.filter(b => b.category !== slug));
+                onDeleteCategory={async (slug: string) => {
+                    mutateCat(categories.filter(c => c.slug !== slug), false);
+                    mutateBud(budgets.filter(b => b.category !== slug), false);
+                    await fetch(`/api/finance/categories?slug=${slug}`, { method: 'DELETE' });
+                    mutateCat();
+                    mutateBud();
                 }}
             />
 

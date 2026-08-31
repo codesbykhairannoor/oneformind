@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -74,30 +74,34 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     const [selectedMobileDate, setSelectedMobileDate] = useState(todayStrForMobile);
 
     // 3. Habits Main State
-    const [habits, setHabits] = useState<HabitItem[]>([]);
-    const [isLoaded, setIsLoaded] = useState(false);
-
-    const { data: fetchedHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher, {
+    const { data: fetchedHabits, mutate: mutateHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher, {
         fallbackData: currentMonthKey === initialMonthKey ? initialHabits : undefined,
         keepPreviousData: true
     });
 
+    const parsedHabits = useMemo(() => {
+        if (!fetchedHabits) return null;
+        return fetchedHabits.map((h: any) => {
+            const logsMap: Record<string, 'completed' | 'skipped' | 'empty'> = {};
+            if (h.logs) {
+                h.logs.forEach((log: any) => {
+                    const dateStr = new Date(log.date).toISOString().split('T')[0];
+                    logsMap[dateStr] = log.status as 'completed' | 'skipped' | 'empty';
+                });
+            }
+            return { ...h, logs: logsMap };
+        });
+    }, [fetchedHabits]);
+
+    const [habits, setHabits] = useState<HabitItem[]>(parsedHabits || []);
+    const [isLoaded, setIsLoaded] = useState(!!parsedHabits);
+
     useEffect(() => {
-        if (fetchedHabits) {
-            const mappedHabits = fetchedHabits.map((h: any) => {
-                const logsMap: Record<string, 'completed' | 'skipped' | 'empty'> = {};
-                if (h.logs) {
-                    h.logs.forEach((log: any) => {
-                        const dateStr = new Date(log.date).toISOString().split('T')[0];
-                        logsMap[dateStr] = log.status as 'completed' | 'skipped' | 'empty';
-                    });
-                }
-                return { ...h, logs: logsMap };
-            });
-            setHabits(mappedHabits);
+        if (parsedHabits) {
+            setHabits(parsedHabits);
             setIsLoaded(true);
         }
-    }, [fetchedHabits]);
+    }, [parsedHabits]);
 
     useEffect(() => {
         // Fix for: BAGIAN HABIT TRACKER TANGGAL YG DIHIGLIGHT SALAH

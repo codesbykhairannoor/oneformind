@@ -56,10 +56,36 @@ export default function PlannerPage() {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    const [tasks, setTasks] = useState<TaskItem[]>([]);
-    const [notes, setNotes] = useState('');
-    const [meals, setMeals] = useState({ breakfast: '', lunch: '', dinner: '' });
-    const [waterGlasses, setWaterGlasses] = useState(0);
+    const { data: fetchedTasks, mutate: mutateTasks } = useSWR(`/api/planner/tasks?date=${selectedDate}`, fetcher, { keepPreviousData: true });
+    const { data: fetchedDaily, mutate: mutateDaily } = useSWR(`/api/planner/daily?date=${selectedDate}`, fetcher, { keepPreviousData: true });
+    
+    const parsedTasks = React.useMemo(() => {
+        if (!fetchedTasks) return null;
+        return fetchedTasks.map((t: any) => ({
+            id: t.id,
+            date: t.date.split('T')[0],
+            title: t.title,
+            start_time: t.startTime,
+            end_time: t.endTime,
+            type: t.type,
+            notes: t.notes || '',
+            completed: t.completed
+        }));
+    }, [fetchedTasks]);
+
+    const parsedDaily = React.useMemo(() => {
+        if (!fetchedDaily) return null;
+        return fetchedDaily;
+    }, [fetchedDaily]);
+
+    const [tasks, setTasks] = useState<TaskItem[]>(parsedTasks || []);
+    const [notes, setNotes] = useState(parsedDaily?.notes || '');
+    const [meals, setMeals] = useState(parsedDaily ? {
+        breakfast: parsedDaily.breakfast || '',
+        lunch: parsedDaily.lunch || '',
+        dinner: parsedDaily.dinner || ''
+    } : { breakfast: '', lunch: '', dinner: '' });
+    const [waterGlasses, setWaterGlasses] = useState(parsedDaily?.water || 0);
     const [taskInbox, setTaskInbox] = useState<InboxTask[]>([]);
     
     const [pomodoroTime, setPomodoroTime] = useState(25 * 60);
@@ -90,36 +116,6 @@ export default function PlannerPage() {
         }
     }, [dateParam]);
 
-    // SWR Fetching
-    const { data: fetchedTasks } = useSWR(`/api/planner/tasks?date=${selectedDate}`, fetcher);
-    const { data: fetchedDaily } = useSWR(`/api/planner/daily?date=${selectedDate}`, fetcher);
-
-    useEffect(() => {
-        if (fetchedTasks) {
-            setTasks(fetchedTasks.map((t: any) => ({
-                id: t.id,
-                date: t.date.split('T')[0],
-                title: t.title,
-                start_time: t.startTime ? t.startTime.substring(11, 16) : '',
-                end_time: t.endTime ? t.endTime.substring(11, 16) : '',
-                type: t.type,
-                notes: t.notes || '',
-                completed: t.isCompleted
-            })));
-        }
-    }, [fetchedTasks]);
-
-    useEffect(() => {
-        if (fetchedDaily) {
-            setNotes(fetchedDaily.notes || '');
-            if (fetchedDaily.meals) {
-                setMeals(fetchedDaily.meals);
-            } else {
-                setMeals({ breakfast: '', lunch: '', dinner: '' });
-            }
-            setWaterGlasses(fetchedDaily.waterGlasses || 0);
-            if (fetchedDaily.inbox) {
-                setTaskInbox(fetchedDaily.inbox);
             } else {
                 setTaskInbox([]);
             }

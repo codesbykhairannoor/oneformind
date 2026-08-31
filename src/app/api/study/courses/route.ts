@@ -9,14 +9,27 @@ export async function GET(req: Request) {
   }
 
   try {
-    const courses = await prisma.studyCourse.findMany({
-      where: { userId: parseInt(session.user.id) },
-      include: { archives: true },
-      orderBy: { createdAt: 'desc' },
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-study-courses`;
+
+    const goRes = await fetch(goUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
-    return NextResponse.json(courses);
+
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching courses:', error);
+    console.error('Error fetching courses from Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -29,22 +42,28 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { courseName, semester, sks, grade } = body;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-study-courses`;
 
-    const newCourse = await prisma.studyCourse.create({
-      data: {
-        userId: parseInt(session.user.id),
-        courseName,
-        semester,
-        sks,
-        grade,
+    const goRes = await fetch(goUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
       },
-      include: { archives: true },
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json(newCourse);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error creating course:', error);
+    console.error('Error creating course via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -57,28 +76,28 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const { id, courseName, semester, sks, grade } = body;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-study-courses`;
 
-    // Verify ownership
-    const existing = await prisma.studyCourse.findUnique({ where: { id } });
-    if (!existing || existing.userId !== parseInt(session.user.id)) {
-      return NextResponse.json({ error: 'Not found or forbidden' }, { status: 403 });
-    }
-
-    const updatedCourse = await prisma.studyCourse.update({
-      where: { id },
-      data: {
-        courseName,
-        semester,
-        sks,
-        grade,
+    const goRes = await fetch(goUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
       },
-      include: { archives: true },
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json(updatedCourse);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error updating course:', error);
+    console.error('Error updating course via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -97,21 +116,27 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
     }
 
-    const courseId = parseInt(id);
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-study-courses?id=${id}`;
 
-    // Verify ownership
-    const existing = await prisma.studyCourse.findUnique({ where: { id: courseId } });
-    if (!existing || existing.userId !== parseInt(session.user.id)) {
-      return NextResponse.json({ error: 'Not found or forbidden' }, { status: 403 });
-    }
-
-    await prisma.studyCourse.delete({
-      where: { id: courseId },
+    const goRes = await fetch(goUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
 
-    return NextResponse.json({ success: true });
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error deleting course:', error);
+    console.error('Error deleting course via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

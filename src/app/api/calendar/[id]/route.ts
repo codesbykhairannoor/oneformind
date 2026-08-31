@@ -13,31 +13,29 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
   const userId = parseInt(session.user.id);
 
   try {
-    const existing = await prisma.calendarEvent.findUnique({ where: { id: eventId } });
-    if (!existing || existing.userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
-
     const body = await req.json();
-    const updateData: any = {};
-    if (body.title !== undefined) updateData.title = body.title;
-    if (body.description !== undefined) updateData.description = body.description;
-    if (body.type !== undefined) updateData.type = body.type;
-    if (body.color !== undefined) updateData.color = body.color;
-    if (body.startDate !== undefined) updateData.startDate = new Date(body.startDate);
-    if (body.endDate !== undefined) updateData.endDate = body.endDate ? new Date(body.endDate) : null;
-    if (body.isAllDay !== undefined) updateData.isAllDay = body.isAllDay;
-    if (body.startTime !== undefined) updateData.startTime = body.startTime ? new Date(body.startTime) : null;
-    if (body.endTime !== undefined) updateData.endTime = body.endTime ? new Date(body.endTime) : null;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-calendar?id=${eventId}`;
 
-    const event = await prisma.calendarEvent.update({
-      where: { id: eventId },
-      data: updateData,
+    const goRes = await fetch(goUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json(event);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error updating calendar event:', error);
+    console.error('Error updating calendar event via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -53,18 +51,27 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
   const userId = parseInt(session.user.id);
 
   try {
-    const existing = await prisma.calendarEvent.findUnique({ where: { id: eventId } });
-    if (!existing || existing.userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-calendar?id=${eventId}`;
 
-    await prisma.calendarEvent.delete({
-      where: { id: eventId },
+    const goRes = await fetch(goUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
 
-    return NextResponse.json({ success: true });
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error deleting calendar event:', error);
+    console.error('Error deleting calendar event via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

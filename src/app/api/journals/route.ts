@@ -8,17 +8,28 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = parseInt(session.user.id);
-
   try {
-    const journals = await prisma.journal.findMany({
-      where: { userId },
-      orderBy: { date: 'desc' }
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-journals`;
+
+    const goRes = await fetch(goUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
 
-    return NextResponse.json(journals);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching journals:', error);
+    console.error('Error fetching journals from Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -29,29 +40,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = parseInt(session.user.id);
-
   try {
     const body = await req.json();
-    const { date, title, content, mood, imagePath, isPinned, aiSentiment, moodScore } = body;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-journals`;
 
-    const journal = await prisma.journal.create({
-      data: {
-        userId,
-        date: new Date(date),
-        title: title || null,
-        content: content || null,
-        mood: mood || null,
-        imagePath: imagePath || null,
-        isPinned: isPinned || false,
-        aiSentiment: aiSentiment || null,
-        moodScore: moodScore !== undefined ? Number(moodScore) : null,
-      }
+    const goRes = await fetch(goUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json(journal);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error creating journal:', error);
+    console.error('Error creating journal via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

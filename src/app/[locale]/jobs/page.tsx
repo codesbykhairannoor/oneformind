@@ -15,29 +15,31 @@ import { Briefcase, Plus, Sparkles } from 'lucide-react';
 export default function JobsPage() {
     const t = useTranslations();
 
-    // Local Jobs State initialized with mock / persisted data
-    const [jobs, setJobs] = useState<JobRowItem[]>([]);
+    const { data: fetchedJobs, mutate: mutateJobs } = useSWR('/api/jobs', fetcher);
 
-    const fetcher = (url: string) => fetch(url).then(res => res.json());
-    const { data: fetchedJobs } = useSWR('/api/jobs', fetcher);
+    const parsedJobs = useMemo(() => {
+        if (!fetchedJobs) return null;
+        return fetchedJobs.map((j: any) => ({
+            id: j.id,
+            _key: `db_${j.id}`,
+            company: j.company,
+            title: j.title,
+            location: j.location || '',
+            applied_date: j.appliedDate ? j.appliedDate.split('T')[0] : '',
+            status: j.status,
+            notes: j.notes || '',
+            is_new: false,
+            is_saving: false
+        }));
+    }, [fetchedJobs]);
+
+    const [jobs, setJobs] = useState<JobRowItem[]>(parsedJobs || []);
 
     useEffect(() => {
-        if (fetchedJobs) {
-            const mapped = fetchedJobs.map((j: any) => ({
-                id: j.id,
-                _key: `db_${j.id}`,
-                company: j.company,
-                title: j.title,
-                location: j.location || '',
-                applied_date: j.appliedDate ? j.appliedDate.split('T')[0] : '',
-                status: j.status,
-                notes: j.notes || '',
-                is_new: false,
-                is_saving: false
-            }));
-            setJobs(mapped);
+        if (parsedJobs) {
+            setJobs(parsedJobs);
         }
-    }, [fetchedJobs]);
+    }, [parsedJobs]);
 
     const [filters, setFilters] = useState<JobFilterParams>({ search: '', status: 'all', days: null });
     const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);

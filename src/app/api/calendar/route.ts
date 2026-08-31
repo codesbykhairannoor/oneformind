@@ -10,45 +10,30 @@ export async function GET(req: Request) {
 
   const userId = parseInt(session.user.id);
   const { searchParams } = new URL(req.url);
-  const period = searchParams.get('period'); // Format: YYYY-MM
+  const period = searchParams.get('period') || '';
   
-  let startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-  let endDate = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59);
-
-  if (period && period.match(/^\d{4}-\d{2}$/)) {
-    const [year, month] = period.split('-').map(Number);
-    startDate = new Date(Date.UTC(year, month - 1, 1));
-    endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59));
-  }
-
   try {
-    const [events, journals, plannerTasks, financeTransactions, habitLogs] = await Promise.all([
-      prisma.calendarEvent.findMany({
-        where: { userId, startDate: { gte: startDate, lte: endDate } },
-      }),
-      prisma.journal.findMany({
-        where: { userId, date: { gte: startDate, lte: endDate } },
-      }),
-      prisma.plannerTask.findMany({
-        where: { userId, date: { gte: startDate, lte: endDate } },
-      }),
-      prisma.financeTransaction.findMany({
-        where: { userId, date: { gte: startDate, lte: endDate } },
-      }),
-      prisma.habitLog.findMany({
-        where: { habit: { userId }, date: { gte: startDate, lte: endDate }, status: 'completed' },
-      })
-    ]);
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-calendar?period=${period}`;
 
-    return NextResponse.json({
-      events,
-      journals,
-      plannerTasks,
-      financeTransactions,
-      habitLogs
+    const goRes = await fetch(goUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
     });
+
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching calendar data:', error);
+    console.error('Error fetching calendar data from Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -63,26 +48,28 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { title, description, type, color, startDate, endDate, isAllDay, startTime, endTime } = body;
+    const proto = req.headers.get('x-forwarded-proto') || 'http';
+    const host = req.headers.get('host');
+    const goUrl = `${proto}://${host}/api/go-calendar`;
 
-    const event = await prisma.calendarEvent.create({
-      data: {
-        userId,
-        title,
-        description: description || null,
-        type: type || 'event',
-        color: color || '#3b82f6',
-        startDate: new Date(startDate),
-        endDate: endDate ? new Date(endDate) : null,
-        isAllDay: isAllDay || false,
-        startTime: startTime ? new Date(startTime) : null,
-        endTime: endTime ? new Date(endTime) : null,
-      }
+    const goRes = await fetch(goUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': session.user.id,
+      },
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json(event);
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    const data = await goRes.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error creating calendar event:', error);
+    console.error('Error creating calendar event via Go backend:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
