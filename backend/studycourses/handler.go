@@ -16,21 +16,40 @@ import (
 var db *sql.DB
 
 func init() {
-	dbURL := os.Getenv("DATABASE_URL")
-	if dbURL == "" {
-		fmt.Println("Warning: DATABASE_URL not set")
+	connStr := os.Getenv("POSTGRES_PRISMA_URL")
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
+	}
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL")
+	}
+	if connStr == "" {
+		connStr = os.Getenv("DATABASE_URL")
+	}
+	if connStr == "" {
+		fmt.Println("FATAL: No database connection string found in any env var")
 		return
 	}
-	if !strings.Contains(dbURL, "sslmode=") {
-		if strings.Contains(dbURL, "?") {
-			dbURL += "&sslmode=require"
+
+	// Strip pgbouncer=true because lib/pq doesn't support it
+	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
+	connStr = strings.Replace(connStr, "?&", "?", -1)
+	connStr = strings.Replace(connStr, "&&", "&", -1)
+	if strings.HasSuffix(connStr, "?") {
+		connStr = strings.TrimSuffix(connStr, "?")
+	}
+
+	// Ensure sslmode=require is present
+	if !strings.Contains(connStr, "sslmode=") {
+		if strings.Contains(connStr, "?") {
+			connStr += "&sslmode=require"
 		} else {
-			dbURL += "?sslmode=require"
+			connStr += "?sslmode=require"
 		}
 	}
 
 	var err error
-	db, err = sql.Open("postgres", dbURL)
+	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		fmt.Printf("Error opening database: %v\n", err)
 		return

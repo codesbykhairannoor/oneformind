@@ -16,26 +16,48 @@ import (
 var dbFinTx *sql.DB
 
 func init() {
-	if dbFinTx != nil {
+	connStr := os.Getenv("POSTGRES_PRISMA_URL")
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
+	}
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL")
+	}
+	if connStr == "" {
+		connStr = os.Getenv("DATABASE_URL")
+	}
+	if connStr == "" {
+		fmt.Println("FATAL: No database connection string found in any env var")
 		return
 	}
-	dbURL := os.Getenv("DATABASE_URL")
-	if dbURL == "" {
-		return
+
+	// Strip pgbouncer=true because lib/pq doesn't support it
+	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
+	connStr = strings.Replace(connStr, "?&", "?", -1)
+	connStr = strings.Replace(connStr, "&&", "&", -1)
+	if strings.HasSuffix(connStr, "?") {
+		connStr = strings.TrimSuffix(connStr, "?")
 	}
-	if !strings.Contains(dbURL, "sslmode=") {
-		if strings.Contains(dbURL, "?") {
-			dbURL += "&sslmode=require"
+
+	// Ensure sslmode=require is present
+	if !strings.Contains(connStr, "sslmode=") {
+		if strings.Contains(connStr, "?") {
+			connStr += "&sslmode=require"
 		} else {
-			dbURL += "?sslmode=require"
+			connStr += "?sslmode=require"
 		}
 	}
-	dbFinTx, _ = sql.Open("postgres", dbURL)
-	if dbFinTx != nil {
-		dbFinTx.SetMaxOpenConns(2)
-		dbFinTx.SetMaxIdleConns(1)
-		dbFinTx.SetConnMaxLifetime(5 * time.Minute)
+
+	var err error
+	dbFinTx, err = sql.Open("postgres", connStr)
+	if err != nil {
+		fmt.Printf("Error opening database: %v\n", err)
+		return
 	}
+
+	dbFinTx.SetMaxOpenConns(2)
+	dbFinTx.SetMaxIdleConns(1)
+	dbFinTx.SetConnMaxLifetime(5 * time.Minute)
 }
 
 type FinanceTransaction struct {

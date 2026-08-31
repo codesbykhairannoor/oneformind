@@ -18,32 +18,57 @@ import (
 var dbDuitku *sql.DB
 
 func init() {
-	var err error
-		connStr := os.Getenv("POSTGRES_URL_NON_POOLING")
+	connStr := os.Getenv("POSTGRES_PRISMA_URL")
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
+	}
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL")
 	}
 	if connStr == "" {
 		connStr = os.Getenv("DATABASE_URL")
 	}
-	
-	// Strip pgbouncer=true if it exists because lib/pq doesn't support it
+	if connStr == "" {
+		fmt.Println("FATAL: No database connection string found in any env var")
+		return
+	}
+
+	// Strip pgbouncer=true because lib/pq doesn't support it
 	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
 	connStr = strings.Replace(connStr, "?&", "?", -1)
 	connStr = strings.Replace(connStr, "&&", "&", -1)
-
-	dbDuitku, err = sql.Open("postgres", connStr+"&sslmode=require")
-	if err != nil {
-		fmt.Printf("Error connecting to DB (Duitku): %v\n", err)
+	if strings.HasSuffix(connStr, "?") {
+		connStr = strings.TrimSuffix(connStr, "?")
 	}
+
+	// Ensure sslmode=require is present
+	if !strings.Contains(connStr, "sslmode=") {
+		if strings.Contains(connStr, "?") {
+			connStr += "&sslmode=require"
+		} else {
+			connStr += "?sslmode=require"
+		}
+	}
+
+	var err error
+	dbDuitku, err = sql.Open("postgres", connStr)
+	if err != nil {
+		fmt.Printf("Error opening database: %v\n", err)
+		return
+	}
+
 	dbDuitku.SetMaxOpenConns(2)
 	dbDuitku.SetMaxIdleConns(1)
-	dbDuitku.SetConnMaxLifetime(30 * time.Minute)
+	dbDuitku.SetConnMaxLifetime(5 * time.Minute)
 }
 
 
 
 func PaymentDuitkuCallbackHandler(w http.ResponseWriter, r *http.Request) {
+	if dbDuitku == nil {
+		http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
 		http.Error(w, `{"error": "Method Not Allowed"}`, http.StatusMethodNotAllowed)

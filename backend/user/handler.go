@@ -15,8 +15,7 @@ import (
 var db *sql.DB
 
 func init() {
-	var err error
-				connStr := os.Getenv("POSTGRES_PRISMA_URL")
+	connStr := os.Getenv("POSTGRES_PRISMA_URL")
 	if connStr == "" {
 		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
 	}
@@ -26,8 +25,12 @@ func init() {
 	if connStr == "" {
 		connStr = os.Getenv("DATABASE_URL")
 	}
-	
-	// Strip pgbouncer=true if it exists because lib/pq doesn't support it
+	if connStr == "" {
+		fmt.Println("FATAL: No database connection string found in any env var")
+		return
+	}
+
+	// Strip pgbouncer=true because lib/pq doesn't support it
 	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
 	connStr = strings.Replace(connStr, "?&", "?", -1)
 	connStr = strings.Replace(connStr, "&&", "&", -1)
@@ -44,13 +47,16 @@ func init() {
 		}
 	}
 
+	var err error
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
-		fmt.Printf("Error connecting to DB: %v\n", err)
+		fmt.Printf("Error opening database: %v\n", err)
+		return
 	}
+
 	db.SetMaxOpenConns(2)
 	db.SetMaxIdleConns(1)
-	db.SetConnMaxLifetime(30 * time.Minute)
+	db.SetConnMaxLifetime(5 * time.Minute)
 }
 
 type User struct {
@@ -66,6 +72,10 @@ type User struct {
 }
 
 func UserHandler(w http.ResponseWriter, r *http.Request) {
+	if db == nil {
+		http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	userID := r.Header.Get("X-User-Id")
 
