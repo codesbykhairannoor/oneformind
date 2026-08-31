@@ -11,12 +11,20 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap", // PERF: Use font-display:swap to prevent invisible text during font load
 });
 
 export const metadata: Metadata = {
   title: "Tranvas | The Unified Life Operating System",
   description: "The all-in-one productivity OS for growth, clarity, and control.",
 };
+
+// PERF: Pre-generate both locale routes at build time so they're served
+// from Vercel CDN edge cache with zero server function invocations.
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 
 export default async function RootLayout({
   children,

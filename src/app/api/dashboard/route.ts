@@ -83,7 +83,7 @@ export async function GET(req: Request) {
       }
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       habits: {
         completed: completedHabits,
         total: totalHabits,
@@ -114,6 +114,9 @@ export async function GET(req: Request) {
         id: journals[0]?.id || null
       }
     });
+    // Cache dashboard data privately for 60 seconds to avoid hammering DB on every page visit
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=30');
+    return response;
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

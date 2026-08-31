@@ -1,15 +1,23 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/routing';
-import enMessages from '@/messages/en.json';
-import idMessages from '@/messages/id.json';
 
-const messagesMap: Record<string, any> = {
-  en: enMessages,
-  id: idMessages,
-};
+// PERF: Do NOT statically import both JSON files here.
+// Doing `import enMessages from '@/messages/en.json'` would bundle 800KB of
+// translation data into every page's JS, even for users who only need one lang.
+// Instead we lazy-load only the active locale's messages at runtime.
+type Messages = Record<string, string>;
+
+async function loadMessages(locale: string): Promise<Messages> {
+  if (locale === 'id') {
+    const mod = await import('../messages/id.json');
+    return mod.default as unknown as Messages;
+  }
+  const mod = await import('../messages/en.json');
+  return mod.default as unknown as Messages;
+}
 
 export default function InstantIntlProvider({
   children,
@@ -19,6 +27,15 @@ export default function InstantIntlProvider({
   initialLocale: string;
 }) {
   const [locale, setLocale] = useState(initialLocale);
+  const [messages, setMessages] = useState<Messages | null>(null);
+  const loadedLocaleRef = useRef<string | null>(null);
+
+  // Load messages for the current locale (only once per locale)
+  useEffect(() => {
+    if (loadedLocaleRef.current === locale) return;
+    loadedLocaleRef.current = locale;
+    loadMessages(locale).then(setMessages);
+  }, [locale]);
 
   // Sync state if initialLocale changes externally (e.g. user manually changes URL prefix)
   useEffect(() => {
@@ -30,8 +47,11 @@ export default function InstantIntlProvider({
     document.documentElement.lang = locale;
   }, [locale]);
 
+  // Don't render children until messages are loaded (prevents flash of untranslated content)
+  if (!messages) return null;
+
   return (
-    <NextIntlClientProvider locale={locale} messages={messagesMap[locale]}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <LocaleSwitcherListener locale={locale} setLocale={setLocale} />
       {children}
     </NextIntlClientProvider>
@@ -51,7 +71,7 @@ function LocaleSwitcherListener({
   useEffect(() => {
     const handleSwitch = (e: CustomEvent<{ locale: string }>) => {
       const newLocale = e.detail.locale;
-      if (messagesMap[newLocale] && newLocale !== locale) {
+      if (newLocale && newLocale !== locale) {
         setLocale(newLocale);
         localStorage.setItem('tranvas_locale', newLocale);
 
@@ -70,3 +90,4 @@ function LocaleSwitcherListener({
 
   return null;
 }
+
