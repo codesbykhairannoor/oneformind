@@ -104,13 +104,13 @@ export default function PlannerPage() {
 
     const [tasks, setTasks] = useState<TaskItem[]>(parsedTasks || []);
     const [notes, setNotes] = useState(parsedDaily?.notes || '');
-    const [meals, setMeals] = useState(parsedDaily ? {
-        breakfast: parsedDaily.breakfast || '',
-        lunch: parsedDaily.lunch || '',
-        dinner: parsedDaily.dinner || ''
-    } : { breakfast: '', lunch: '', dinner: '' });
-    const [waterGlasses, setWaterGlasses] = useState(parsedDaily?.water || 0);
-    const [taskInbox, setTaskInbox] = useState<InboxTask[]>([]);
+    const [meals, setMeals] = useState({
+        breakfast: parsedDaily?.meals?.breakfast || '',
+        lunch: parsedDaily?.meals?.lunch || '',
+        dinner: parsedDaily?.meals?.dinner || ''
+    });
+    const [waterGlasses, setWaterGlasses] = useState(parsedDaily?.waterGlasses || 0);
+    const [taskInbox, setTaskInbox] = useState<InboxTask[]>(parsedDaily?.inbox || []);
     
     const [pomodoroTime, setPomodoroTime] = useState(25 * 60);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -131,11 +131,15 @@ export default function PlannerPage() {
         if (parsedDaily !== null) {
             setNotes(parsedDaily.notes || '');
             setMeals({
-                breakfast: parsedDaily.breakfast || '',
-                lunch: parsedDaily.lunch || '',
-                dinner: parsedDaily.dinner || ''
+                breakfast: parsedDaily.meals?.breakfast || '',
+                lunch: parsedDaily.meals?.lunch || '',
+                dinner: parsedDaily.meals?.dinner || ''
             });
-            setWaterGlasses(parsedDaily.water || 0);
+            setWaterGlasses(parsedDaily.waterGlasses || 0);
+            setTaskInbox(parsedDaily.inbox || []);
+        } else {
+            // While fetching new date, we don't necessarily reset to avoid flicker,
+            // but if the fetch returns empty object {}, the properties above will evaluate to empty.
         }
     }, [parsedDaily]);
 
