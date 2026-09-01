@@ -57,17 +57,17 @@ export default function FinanceClient({
     const currencyObj = SUPPORTED_CURRENCIES.find(c => c.code === activeCurrency) || SUPPORTED_CURRENCIES[0];
     const currencyLocale = currencyObj.locale;
 
+    const [userSettings, setUserSettings] = useState<any>({});
+
     useEffect(() => {
         const fetchUserConfig = async () => {
             try {
                 const res = await fetch('/api/user');
                 if (res.ok) {
                     const data = await res.json();
+                    setUserSettings(data.settings || {});
                     if (data.settings?.finance_currency) {
                         setActiveCurrency(data.settings.finance_currency);
-                    }
-                    if (data.settings?.finance_income_target) {
-                        setIncomeTarget(Number(data.settings.finance_income_target));
                     }
                 }
             } catch (e) {
@@ -78,6 +78,7 @@ export default function FinanceClient({
     }, []);
 
     const saveUserConfig = async (updates: any) => {
+        setUserSettings((prev: any) => ({ ...prev, ...updates }));
         try {
             const userRes = await fetch('/api/user');
             if (userRes.ok) {
@@ -132,9 +133,16 @@ export default function FinanceClient({
     // ===== 7. INCOME TARGET =====
     const [incomeTarget, setIncomeTarget] = useState(0);
     
+    useEffect(() => {
+        const target = userSettings[`finance_income_target_${selectedMonthKey}`] 
+                    || userSettings[`finance_income_target`] 
+                    || 0;
+        setIncomeTarget(Number(target));
+    }, [selectedMonthKey, userSettings]);
+
     const handleUpdateTarget = (val: number) => {
         setIncomeTarget(val);
-        saveUserConfig({ finance_income_target: val });
+        saveUserConfig({ [`finance_income_target_${selectedMonthKey}`]: val });
     };
 
     // ===== 8. MODAL STATES =====
