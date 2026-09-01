@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 var dbDaily *sql.DB
@@ -49,7 +49,7 @@ func initDB() {
 	}
 
 	var err error
-	dbDaily, err = sql.Open("postgres", connStr)
+	dbDaily, err = sql.Open("pgx", connStr)
 	if err != nil {
 		fmt.Printf("Error opening database: %v\n", err)
 		return

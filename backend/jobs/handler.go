@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 var dbJobs *sql.DB
@@ -47,7 +47,7 @@ func initDB() {
 	}
 
 	var err error
-	dbJobs, err = sql.Open("postgres", connStr)
+	dbJobs, err = sql.Open("pgx", connStr)
 	if err != nil {
 		fmt.Printf("Error opening database: %v\n", err)
 		return
