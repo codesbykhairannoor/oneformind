@@ -69,6 +69,12 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     const [selectedMonthIndex, setSelectedMonthIndex] = useState(todayObj.getMonth());
     const [showHint, setShowHint] = useState(true);
 
+    // Sync selected year/month to currentMonthKey so SWR fetches new data
+    useEffect(() => {
+        const newKey = `${selectedYear}-${String(selectedMonthIndex + 1).padStart(2, '0')}`;
+        setCurrentMonthKey(newKey);
+    }, [selectedYear, selectedMonthIndex]);
+
     // 2. Mobile Date Selector Strip State
     const todayStrForMobile = todayStr;
     const [selectedMobileDate, setSelectedMobileDate] = useState(todayStrForMobile);
