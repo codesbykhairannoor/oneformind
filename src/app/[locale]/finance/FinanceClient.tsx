@@ -104,7 +104,7 @@ export default function FinanceClient({
     const [selectedMonthKey, setSelectedMonthKey] = useState(initialMonthKey);
 
     // ===== 3. SWR DATA FETCHING & CACHING =====
-    const swrOptions = { keepPreviousData: true, revalidateOnMount: true, revalidateOnFocus: true, dedupingInterval: 0 };
+    const swrOptions = { keepPreviousData: true };
     const { data: txRawData, mutate: mutateTx } = useSWR(`/api/finance/transactions?month=${selectedMonthKey}`, fetcher, swrOptions);
     const { data: catRawData, mutate: mutateCat } = useSWR(`/api/finance/categories`, fetcher, swrOptions);
     const { data: budRawData, mutate: mutateBud } = useSWR(`/api/finance/budgets?month=${selectedMonthKey}`, fetcher, swrOptions);
