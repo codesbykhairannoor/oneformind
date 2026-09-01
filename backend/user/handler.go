@@ -94,9 +94,15 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		var u User
 		var settingsStr sql.NullString
+		var premiumUntil sql.NullTime
 		err := db.QueryRow(`SELECT id, name, email, plan_type, is_premium, premium_until, settings, resume_text, resume_filename FROM users WHERE id = $1`, userID).
-			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
+			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &premiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
 		
+		if premiumUntil.Valid {
+			t := premiumUntil.Time
+			u.PremiumUntil = &t
+		}
+
 		if settingsStr.Valid && settingsStr.String != "" {
 			u.Settings = json.RawMessage(settingsStr.String)
 		} else {
@@ -155,9 +161,15 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 			// No update needed, return current user
 			var u User
 			var settingsStr sql.NullString
+			var premiumUntil sql.NullTime
 			db.QueryRow(`SELECT id, name, email, plan_type, is_premium, premium_until, settings, resume_text, resume_filename FROM users WHERE id = $1`, userID).
-				Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
+				Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &premiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
 			
+			if premiumUntil.Valid {
+				t := premiumUntil.Time
+				u.PremiumUntil = &t
+			}
+
 			if settingsStr.Valid && settingsStr.String != "" {
 				u.Settings = json.RawMessage(settingsStr.String)
 			} else {
@@ -173,9 +185,15 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		
 		var u User
 		var settingsStr sql.NullString
+		var premiumUntil sql.NullTime
 		err := db.QueryRow(query, args...).
-			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
+			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &premiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
 		
+		if premiumUntil.Valid {
+			t := premiumUntil.Time
+			u.PremiumUntil = &t
+		}
+
 		if settingsStr.Valid && settingsStr.String != "" {
 			u.Settings = json.RawMessage(settingsStr.String)
 		} else {

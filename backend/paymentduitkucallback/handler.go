@@ -128,7 +128,7 @@ func PaymentDuitkuCallbackHandler(w http.ResponseWriter, r *http.Request) {
 			planType := strings.ToUpper(parts[0])
 			userId := parts[1]
 
-			var existingPlan string
+			var existingPlan sql.NullString
 			err := dbDuitku.QueryRow(`SELECT plan_type FROM users WHERE id = $1`, userId).Scan(&existingPlan)
 			
 			if err == nil {
