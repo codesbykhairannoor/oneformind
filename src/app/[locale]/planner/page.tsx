@@ -69,16 +69,32 @@ export default function PlannerPage() {
     
     const parsedTasks = React.useMemo(() => {
         if (!fetchedTasks) return null;
-        return fetchedTasks.map((t: any) => ({
-            id: t.id,
-            date: t.date.split('T')[0],
-            title: t.title,
-            start_time: t.startTime,
-            end_time: t.endTime,
-            type: t.type,
-            notes: t.notes || '',
-            completed: t.completed
-        }));
+        return fetchedTasks.map((t: any) => {
+            const extractTime = (isoString: string) => {
+                if (!isoString) return '';
+                // Handle both full ISO strings and already formatted "HH:MM" strings
+                if (isoString.includes('T')) {
+                    const date = new Date(isoString);
+                    // Use UTC hours if it was stored as UTC, or local hours. The Z indicates UTC.
+                    // Actually, let's just extract the HH:MM substring directly to avoid timezone shifts
+                    // 1970-01-01T09:00:00Z -> "09:00"
+                    const timePart = isoString.split('T')[1];
+                    return timePart ? timePart.substring(0, 5) : '';
+                }
+                return isoString;
+            };
+
+            return {
+                id: t.id,
+                date: t.date ? t.date.split('T')[0] : '',
+                title: t.title,
+                start_time: extractTime(t.startTime),
+                end_time: extractTime(t.endTime),
+                type: t.type,
+                notes: t.notes || '',
+                completed: t.isCompleted || false
+            };
+        });
     }, [fetchedTasks]);
 
     const parsedDaily = React.useMemo(() => {
