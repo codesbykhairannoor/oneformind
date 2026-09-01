@@ -99,28 +99,22 @@ func FinanceBudgetsHandler(w http.ResponseWriter, r *http.Request) {
 		handleGetBudgets(w, r, userID)
 	case http.MethodPost:
 		handleCreateBudget(w, r, userID)
+	case http.MethodPut:
+		handleUpdateBudget(w, r, userID)
+	case http.MethodDelete:
+		handleDeleteBudget(w, r, userID)
 	default:
-		w.Header().Set("Allow", "GET, POST")
+		w.Header().Set("Allow", "GET, POST, PUT, DELETE")
 		http.Error(w, `{"error": "Method Not Allowed"}`, http.StatusMethodNotAllowed)
 	}
 }
 
 func handleGetBudgets(w http.ResponseWriter, r *http.Request, userID int) {
-	month := r.URL.Query().Get("month")
-
 	query := `SELECT id, user_id, category, limit_amount, month, created_at, updated_at 
 			  FROM finance_budgets 
-			  WHERE user_id = $1`
-	args := []interface{}{userID}
+			  WHERE user_id = $1 ORDER BY id DESC`
 
-	if month != "" {
-		query += ` AND month = $2`
-		args = append(args, month)
-	}
-
-	query += ` ORDER BY id ASC`
-
-	rows, err := db.Query(query, args...)
+	rows, err := db.Query(query, userID)
 	if err != nil {
 		http.Error(w, `{"error": "Internal Server Error"}`, http.StatusInternalServerError)
 		return
@@ -154,23 +148,29 @@ func handleCreateBudget(w http.ResponseWriter, r *http.Request, userID int) {
 	}
 
 	category, _ := body["category"].(string)
-	month, _ := body["month"].(string)
 	
 	limitAmount := 0.0
-	if la, ok := body["limitAmount"].(float64); ok {
-		limitAmount = la
-	} else if laStr, ok := body["limitAmount"].(string); ok {
-		limitAmount, _ = strconv.ParseFloat(laStr, 64)
+	if v, ok := body["limitAmount"].(float64); ok {
+		limitAmount = v
+	} else if vStr, ok := body["limitAmount"].(string); ok {
+		limitAmount, _ = strconv.ParseFloat(vStr, 64)
 	}
+
+	month, _ := body["month"].(string)
 
 	query := `INSERT INTO finance_budgets (user_id, category, limit_amount, month, created_at, updated_at) 
 			  VALUES ($1, $2, $3, $4, NOW(), NOW()) 
-			  RETURNING id, user_id, category, limit_amount, month, created_at, updated_at`
+			  RETURNING id, created_at, updated_at`
 
 	var b FinanceBudget
+	b.UserID = userID
+	b.Category = category
+	b.LimitAmount = limitAmount
+	b.Month = month
+
 	var createdAt, updatedAt sql.NullTime
 	err := db.QueryRow(query, userID, category, limitAmount, month).
-		Scan(&b.ID, &b.UserID, &b.Category, &b.LimitAmount, &b.Month, &createdAt, &updatedAt)
+		Scan(&b.ID, &createdAt, &updatedAt)
 
 	if err != nil {
 		http.Error(w, `{"error": "Failed to create budget"}`, http.StatusInternalServerError)
@@ -185,4 +185,103 @@ func handleCreateBudget(w http.ResponseWriter, r *http.Request, userID int) {
 	}
 
 	json.NewEncoder(w).Encode(b)
+}
+
+func handleUpdateBudget(w http.ResponseWriter, r *http.Request, userID int) {
+	var body map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+
+	idFloat, ok := body["id"].(float64)
+	if !ok {
+		http.Error(w, `{"error": "ID is required"}`, http.StatusBadRequest)
+		return
+	}
+	budgetID := int(idFloat)
+
+	// Verify ownership
+	var existingUserID int
+	err := db.QueryRow(`SELECT user_id FROM finance_budgets WHERE id = $1`, budgetID).Scan(&existingUserID)
+	if err == sql.ErrNoRows {
+		http.Error(w, `{"error": "Not found"}`, http.StatusNotFound)
+		return
+	}
+	if existingUserID != userID {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusForbidden)
+		return
+	}
+
+	setParts := []string{}
+	args := []interface{}{budgetID, userID}
+	i := 3
+
+	for k, v := range body {
+		dbCol := ""
+		switch k {
+		case "category": dbCol = "category"
+		case "limitAmount": dbCol = "limit_amount"
+		case "month": dbCol = "month"
+		default: continue
+		}
+		
+		if k == "limitAmount" {
+			if strVal, ok := v.(string); ok {
+				v, _ = strconv.ParseFloat(strVal, 64)
+			}
+		}
+
+		setParts = append(setParts, fmt.Sprintf("%s = $%d", dbCol, i))
+		args = append(args, v)
+		i++
+	}
+
+	if len(setParts) == 0 {
+		w.Write([]byte(`{"success": true}`))
+		return
+	}
+
+	setParts = append(setParts, "updated_at = NOW()")
+	
+	query := fmt.Sprintf(`UPDATE finance_budgets SET %s WHERE id = $1 AND user_id = $2 RETURNING updated_at`, strings.Join(setParts, ", "))
+	
+	var updatedAt sql.NullTime
+	err = db.QueryRow(query, args...).Scan(&updatedAt)
+	
+	if err != nil {
+		fmt.Printf("Error updating budget: %v\n", err)
+		http.Error(w, `{"error": "Failed to update budget"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte(`{"success": true}`))
+}
+
+func handleDeleteBudget(w http.ResponseWriter, r *http.Request, userID int) {
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		http.Error(w, `{"error": "Missing ID"}`, http.StatusBadRequest)
+		return
+	}
+	
+	budgetID, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, `{"error": "Invalid ID"}`, http.StatusBadRequest)
+		return
+	}
+
+	result, err := db.Exec(`DELETE FROM finance_budgets WHERE id = $1 AND user_id = $2`, budgetID, userID)
+	if err != nil {
+		http.Error(w, `{"error": "Failed to delete budget"}`, http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		http.Error(w, `{"error": "Not found or unauthorized"}`, http.StatusNotFound)
+		return
+	}
+
+	w.Write([]byte(`{"success": true}`))
 }

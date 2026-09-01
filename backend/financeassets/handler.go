@@ -284,20 +284,15 @@ func handleDeleteAsset(w http.ResponseWriter, r *http.Request, userID int) {
 		return
 	}
 
-	var existingUserID int
-	err = db.QueryRow(`SELECT user_id FROM finance_assets WHERE id = $1`, assetID).Scan(&existingUserID)
-	if err == sql.ErrNoRows {
-		http.Error(w, `{"error": "Not found"}`, http.StatusNotFound)
-		return
-	}
-	if existingUserID != userID {
-		http.Error(w, `{"error": "Unauthorized"}`, http.StatusForbidden)
+	result, err := db.Exec(`DELETE FROM finance_assets WHERE id = $1 AND user_id = $2`, assetID, userID)
+	if err != nil {
+		http.Error(w, `{"error": "Failed to delete asset"}`, http.StatusInternalServerError)
 		return
 	}
 
-	_, err = db.Exec(`DELETE FROM finance_assets WHERE id = $1`, assetID)
-	if err != nil {
-		http.Error(w, `{"error": "Failed to delete asset"}`, http.StatusInternalServerError)
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		http.Error(w, `{"error": "Not found or unauthorized"}`, http.StatusNotFound)
 		return
 	}
 
