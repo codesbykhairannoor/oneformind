@@ -9,6 +9,7 @@ import {
     LayoutDashboard,
     Zap,
     Calendar,
+    CheckCircle,
     Wallet,
     BookOpen,
     GraduationCap,
@@ -468,10 +469,22 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
             {/* 1:1 BODY LAYOUT WITH SIDEBAR & MAIN (Line 143-239) */}
             <div className="flex flex-1 overflow-hidden relative">
                 
-                {/* 1:1 DESKTOP SIDEBAR (AppSidebarNav.vue 1:1 hierarchy) */}
+				{/* Mobile Drawer Overlay */}
+				{(!isDesktop && isMobileDrawerOpen) && (
+					<div 
+						className="fixed inset-0 bg-slate-900/50 z-[80] md:hidden backdrop-blur-sm transition-opacity" 
+						onClick={() => setIsMobileDrawerOpen(false)}
+					></div>
+				)}
+
+                {/* 1:1 DESKTOP & MOBILE SIDEBAR */}
                 <aside 
-                    className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 hidden md:flex flex-col z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out relative ${
-                        isSidebarCollapsed ? 'w-[68px]' : 'w-[232px]'
+                    className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col z-[90] shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out ${
+						!isDesktop ? 'fixed top-0 bottom-0 left-0 h-[100dvh]' : 'relative'
+					} ${
+                        !isDesktop 
+                            ? (isMobileDrawerOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full w-[260px]') 
+                            : (isSidebarCollapsed ? 'w-[68px] translate-x-0' : 'w-[232px] translate-x-0')
                     }`}
                 >
                     <nav className={`flex-1 overflow-y-auto py-3 custom-scrollbar space-y-0.5 ${isSidebarCollapsed ? 'px-2' : 'px-2.5'}`}>

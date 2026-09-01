@@ -312,6 +312,7 @@ export default function FinanceClient({
                     onOpenBatchModal={() => setShowBatchModal(true)}
                     activeCurrency={activeCurrency}
                     onCurrencyChange={handleCurrencyChange}
+                    transactions={currentMonthTransactions}
                 />
 
                 <div className="w-full min-h-screen px-3 sm:px-6 lg:px-8 py-6 transition-colors duration-500">

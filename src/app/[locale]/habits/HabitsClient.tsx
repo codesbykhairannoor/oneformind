@@ -251,7 +251,26 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
             });
         } catch (e) {
             console.error('Failed to toggle habit log', e);
-            // Revert on error could be implemented here, but ignoring for brevity
+        }
+    };
+
+    const handleCopyPreviousHabits = async () => {
+        try {
+            const res = await fetch(`/api/habits?action=copy`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ targetPeriod: currentMonthKey })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                mutateHabits();
+                alert(`Berhasil menyalin ${data.copied_count} habit dari bulan lalu!`);
+            } else {
+                alert(data.error || 'Gagal menyalin habit dari bulan lalu');
+            }
+        } catch (error) {
+            console.error('Copy failed:', error);
+            alert('Terjadi kesalahan saat menyalin habit.');
         }
     };
 
@@ -591,13 +610,22 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                             <p className="text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto mb-8 leading-relaxed">
                                 {t('habits_empty_desc') || 'Mulai bangun rutinitas positif Anda hari ini. Tambahkan habit pertama Anda!'}
                             </p>
-                            <button 
-                                onClick={openCreateModal} 
-                                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2"
-                            >
-                                <Plus className="w-4.5 h-4.5 stroke-[3]" />
-                                <span>{t('habits_add_btn') || 'Tambah Habit'}</span>
-                            </button>
+                            <div className="flex flex-col sm:flex-row items-center gap-3">
+                                <button 
+                                    onClick={openCreateModal} 
+                                    className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2"
+                                >
+                                    <Plus className="w-4.5 h-4.5 stroke-[3]" />
+                                    <span>{t('habits_add_btn') || 'Tambah Habit'}</span>
+                                </button>
+                                <button 
+                                    onClick={handleCopyPreviousHabits} 
+                                    className="px-8 py-4 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-black rounded-2xl shadow-xl shadow-slate-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-slate-700"
+                                >
+                                    <ArrowRight className="w-4.5 h-4.5 stroke-[3]" />
+                                    <span>Salin dari Bulan Lalu</span>
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <>

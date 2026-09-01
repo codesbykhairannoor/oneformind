@@ -125,7 +125,9 @@ func HabitsHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		handleGetHabits(w, r, userID)
 	case http.MethodPost:
-		if habitIdStr != "" && action == "logs" {
+		if action == "copy" {
+			handleCopyHabits(w, r, userID)
+		} else if habitIdStr != "" && action == "logs" {
 			handleToggleHabitLog(w, r, userID, habitIdStr)
 		} else {
 			handleCreateHabit(w, r, userID)
@@ -402,6 +404,86 @@ func handleDeleteHabit(w http.ResponseWriter, r *http.Request, userID int, habit
 	}
 
 	w.Write([]byte(`{"success": true}`))
+}
+
+func handleCopyHabits(w http.ResponseWriter, r *http.Request, userID int) {
+	// Parse the target period from the request body
+	var body struct {
+		TargetPeriod string `json:"targetPeriod"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+
+	if body.TargetPeriod == "" {
+		http.Error(w, `{"error": "Target period is required"}`, http.StatusBadRequest)
+		return
+	}
+
+	// Calculate previous period
+	// Format is YYYY-MM
+	parts := strings.Split(body.TargetPeriod, "-")
+	if len(parts) != 2 {
+		http.Error(w, `{"error": "Invalid period format"}`, http.StatusBadRequest)
+		return
+	}
+	
+	year, _ := strconv.Atoi(parts[0])
+	month, _ := strconv.Atoi(parts[1])
+	
+	prevMonth := month - 1
+	prevYear := year
+	if prevMonth == 0 {
+		prevMonth = 12
+		prevYear--
+	}
+	
+	prevPeriod := fmt.Sprintf("%04d-%02d", prevYear, prevMonth)
+
+	// Fetch habits from previous period
+	rows, err := db.Query(`
+		SELECT name, icon, color, monthly_target, status, position 
+		FROM habits 
+		WHERE user_id = $1 AND period = $2 AND is_archived = false
+	`, userID, prevPeriod)
+	
+	if err != nil {
+		http.Error(w, fmt.Sprintf(`{"error": "Failed to fetch previous habits: %v"}`, err), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var habitsToCopy []Habit
+	for rows.Next() {
+		var h Habit
+		if err := rows.Scan(&h.Name, &h.Icon, &h.Color, &h.MonthlyTarget, &h.Status, &h.Position); err == nil {
+			habitsToCopy = append(habitsToCopy, h)
+		}
+	}
+
+	if len(habitsToCopy) == 0 {
+		http.Error(w, `{"error": "No habits found in the previous month to copy"}`, http.StatusNotFound)
+		return
+	}
+
+	// Insert copied habits for the target period
+	for _, h := range habitsToCopy {
+		_, err := db.Exec(`
+			INSERT INTO habits (user_id, period, name, icon, color, monthly_target, status, position, is_archived, created_at, updated_at) 
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, false, NOW(), NOW())
+		`, userID, body.TargetPeriod, h.Name, h.Icon, h.Color, h.MonthlyTarget, h.Status, h.Position)
+		
+		if err != nil {
+			fmt.Printf("Error copying habit %s: %v\n", h.Name, err)
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"copied_count": len(habitsToCopy),
+	})
 }
 
 func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, habitIdStr string) {
