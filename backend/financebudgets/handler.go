@@ -110,11 +110,22 @@ func FinanceBudgetsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetBudgets(w http.ResponseWriter, r *http.Request, userID int) {
+	monthStr := r.URL.Query().Get("month")
+	
 	query := `SELECT id, user_id, category, limit_amount, month, created_at, updated_at 
 			  FROM finance_budgets 
-			  WHERE user_id = $1 ORDER BY id DESC`
+			  WHERE user_id = $1`
+			  
+	args := []interface{}{userID}
+	
+	if monthStr != "" {
+		query += ` AND month = $2`
+		args = append(args, monthStr)
+	}
+	
+	query += ` ORDER BY id DESC`
 
-	rows, err := db.Query(query, userID)
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		http.Error(w, `{"error": "Internal Server Error"}`, http.StatusInternalServerError)
 		return
