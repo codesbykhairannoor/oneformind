@@ -16,26 +16,33 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
       headers['Origin'] = origin;
     }
 
-    const fetchOptions: RequestInit & { duplex?: string } = {
+    const fetchOptions: RequestInit = {
       method: req.method,
       headers,
       cache: 'no-store',
     };
 
-    // Stream the request body directly instead of buffering it.
-    // This avoids reading the entire body into memory before forwarding.
-    if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
-      fetchOptions.body = req.body;
-      fetchOptions.duplex = 'half'; // Required for streaming fetch in Edge Runtime
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      const reqText = await req.text();
+      if (reqText) {
+        fetchOptions.body = reqText;
+      }
     }
 
     const goRes = await fetch(goUrl, fetchOptions);
 
-    // Stream the response back directly — no buffering into arrayBuffer.
-    return new Response(goRes.body, {
+    if (!goRes.ok) {
+      const text = await goRes.text();
+      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+    }
+
+    // Stream the raw Go response bytes directly to the client.
+    // This avoids double JSON serialization which can turn null → {} in some runtimes.
+    const rawBody = await goRes.arrayBuffer();
+    return new Response(rawBody, {
       status: goRes.status,
       headers: {
-        'Content-Type': goRes.headers.get('Content-Type') || 'application/json',
+        'Content-Type': 'application/json',
         'Cache-Control': 'private, no-store',
       },
     });
