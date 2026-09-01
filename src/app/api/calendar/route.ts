@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { proxyToGo } from '@/lib/proxy';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
@@ -10,35 +10,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = parseInt(session.user.id);
   const { searchParams } = new URL(req.url);
-  const period = searchParams.get('period') || '';
+  searchParams.set('userId', session.user.id);
   
-  try {
-    const proto = req.headers.get('x-forwarded-proto') || 'http';
-    const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=calendar&period=${period}&userId=${userId}`;
-
-    const goRes = await fetch(goUrl, {
-      cache: 'no-store',
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-User-Id': session.user.id,
-      },
-    });
-
-    if (!goRes.ok) {
-      const text = await goRes.text();
-      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
-    }
-
-    const data = await goRes.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error fetching calendar data from Go backend:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
+  return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
 }
 
 export async function POST(req: Request) {
@@ -47,33 +22,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = parseInt(session.user.id);
-
-  try {
-    const body = await req.json();
-    const proto = req.headers.get('x-forwarded-proto') || 'http';
-    const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=calendar&userId=${userId}`;
-
-    const goRes = await fetch(goUrl, {
-      cache: 'no-store',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-User-Id': session.user.id,
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!goRes.ok) {
-      const text = await goRes.text();
-      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
-    }
-
-    const data = await goRes.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error creating calendar event via Go backend:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', session.user.id);
+  
+  return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
 }

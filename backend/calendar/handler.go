@@ -31,7 +31,6 @@ func initDB() {
 		return
 	}
 
-	// Strip pgbouncer=true because lib/pq doesn't support it
 	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
 	connStr = strings.Replace(connStr, "?&", "?", -1)
 	connStr = strings.Replace(connStr, "&&", "&", -1)
@@ -39,7 +38,6 @@ func initDB() {
 		connStr = strings.TrimSuffix(connStr, "?")
 	}
 
-	// Ensure sslmode=require is present
 	if !strings.Contains(connStr, "sslmode=") {
 		if strings.Contains(connStr, "?") {
 			connStr += "&sslmode=require"
@@ -72,15 +70,15 @@ type CalendarEvent struct {
 	IsAllDay    bool       `json:"isAllDay"`
 	StartTime   *time.Time `json:"startTime"`
 	EndTime     *time.Time `json:"endTime"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
+	CreatedAt   *time.Time `json:"createdAt"`
+	UpdatedAt   *time.Time `json:"updatedAt"`
 }
 
 type Journal struct {
 	ID        int       `json:"id"`
 	Date      time.Time `json:"date"`
-	Content   string    `json:"content"`
-	Mood      int       `json:"mood"`
+	Content   *string   `json:"content"`
+	Mood      *string   `json:"mood"`
 }
 
 type PlannerTask struct {
@@ -173,8 +171,16 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 			defer rows.Close()
 			for rows.Next() {
 				var e CalendarEvent
-				rows.Scan(&e.ID, &e.UserID, &e.Title, &e.Description, &e.Type, &e.Color, &e.StartDate, &e.EndDate, &e.IsAllDay, &e.StartTime, &e.EndTime, &e.CreatedAt, &e.UpdatedAt)
-				events = append(events, e)
+				var ed, st, et, ca, ua sql.NullTime
+				err := rows.Scan(&e.ID, &e.UserID, &e.Title, &e.Description, &e.Type, &e.Color, &e.StartDate, &ed, &e.IsAllDay, &st, &et, &ca, &ua)
+				if err == nil {
+					if ed.Valid { t := ed.Time; e.EndDate = &t }
+					if st.Valid { t := st.Time; e.StartTime = &t }
+					if et.Valid { t := et.Time; e.EndTime = &t }
+					if ca.Valid { t := ca.Time; e.CreatedAt = &t }
+					if ua.Valid { t := ua.Time; e.UpdatedAt = &t }
+					events = append(events, e)
+				}
 			}
 		}
 
@@ -185,8 +191,10 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 			defer jRows.Close()
 			for jRows.Next() {
 				var j Journal
-				jRows.Scan(&j.ID, &j.Date, &j.Content, &j.Mood)
-				journals = append(journals, j)
+				err := jRows.Scan(&j.ID, &j.Date, &j.Content, &j.Mood)
+				if err == nil {
+					journals = append(journals, j)
+				}
 			}
 		}
 
@@ -197,38 +205,41 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 			defer tRows.Close()
 			for tRows.Next() {
 				var t PlannerTask
-				tRows.Scan(&t.ID, &t.Date, &t.Title, &t.StartTime, &t.EndTime, &t.Type, &t.IsCompleted)
-				tasks = append(tasks, t)
+				var st, et sql.NullTime
+				err := tRows.Scan(&t.ID, &t.Date, &t.Title, &st, &et, &t.Type, &t.IsCompleted)
+				if err == nil {
+					if st.Valid { tTime := st.Time; t.StartTime = &tTime }
+					if et.Valid { tTime := et.Time; t.EndTime = &tTime }
+					tasks = append(tasks, t)
+				}
 			}
 		}
 
 		// Finance
 		finances := []FinanceTransaction{}
-		fRows, err := db.Query(`SELECT id, date, type, amount, title, category_id FROM finance_transactions WHERE user_id = $1 AND date >= $2 AND date <= $3`, userID, startDate, endDate)
+		fRows, err := db.Query(`SELECT id, date, type, amount, title, category FROM finance_transactions WHERE user_id = $1 AND date >= $2 AND date <= $3`, userID, startDate, endDate)
 		if err == nil {
 			defer fRows.Close()
 			for fRows.Next() {
 				var f FinanceTransaction
-				var catID *int
-				fRows.Scan(&f.ID, &f.Date, &f.Type, &f.Amount, &f.Title, &catID)
-				if catID != nil {
-				    f.Category = strconv.Itoa(*catID)
-				} else {
-					f.Category = ""
+				err := fRows.Scan(&f.ID, &f.Date, &f.Type, &f.Amount, &f.Title, &f.Category)
+				if err == nil {
+					finances = append(finances, f)
 				}
-				finances = append(finances, f)
 			}
 		}
 
-		// HabitLogs (joined with Habit to ensure userId matches)
+		// HabitLogs
 		habitLogs := []HabitLog{}
 		hRows, err := db.Query(`SELECT hl.id, hl.habit_id, hl.date, hl.status FROM habit_logs hl JOIN habits h ON hl.habit_id = h.id WHERE h.user_id = $1 AND hl.date >= $2 AND hl.date <= $3 AND hl.status = 'completed'`, userID, startDate, endDate)
 		if err == nil {
 			defer hRows.Close()
 			for hRows.Next() {
 				var hl HabitLog
-				hRows.Scan(&hl.ID, &hl.HabitID, &hl.Date, &hl.Status)
-				habitLogs = append(habitLogs, hl)
+				err := hRows.Scan(&hl.ID, &hl.HabitID, &hl.Date, &hl.Status)
+				if err == nil {
+					habitLogs = append(habitLogs, hl)
+				}
 			}
 		}
 
@@ -263,12 +274,33 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 			req.Color = "#3b82f6"
 		}
 
+		var startDate time.Time
+		if req.StartDate != "" {
+			startDate, _ = time.Parse(time.RFC3339, req.StartDate)
+		} else {
+			startDate = time.Now()
+		}
+
+		var endDate, startTime, endTime sql.NullTime
+		if req.EndDate != nil && *req.EndDate != "" {
+			t, _ := time.Parse(time.RFC3339, *req.EndDate)
+			endDate = sql.NullTime{Time: t, Valid: true}
+		}
+		if req.StartTime != nil && *req.StartTime != "" {
+			t, _ := time.Parse(time.RFC3339, *req.StartTime)
+			startTime = sql.NullTime{Time: t, Valid: true}
+		}
+		if req.EndTime != nil && *req.EndTime != "" {
+			t, _ := time.Parse(time.RFC3339, *req.EndTime)
+			endTime = sql.NullTime{Time: t, Valid: true}
+		}
+
 		query := `INSERT INTO calendar_events (user_id, title, description, type, color, start_date, end_date, is_all_day, start_time, end_time, created_at, updated_at) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW()) RETURNING id, created_at, updated_at`
 		
 		var id int
 		var ca, ua time.Time
-		err := db.QueryRow(query, userID, req.Title, req.Description, req.Type, req.Color, req.StartDate, req.EndDate, req.IsAllDay, req.StartTime, req.EndTime).Scan(&id, &ca, &ua)
+		err := db.QueryRow(query, userID, req.Title, req.Description, req.Type, req.Color, startDate, endDate, req.IsAllDay, startTime, endTime).Scan(&id, &ca, &ua)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(`{"error": "Failed to create: %v"}`, err), http.StatusInternalServerError)
 			return
@@ -281,7 +313,7 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 			"description": req.Description,
 			"type": req.Type,
 			"color": req.Color,
-			"startDate": req.StartDate,
+			"startDate": startDate,
 			"endDate": req.EndDate,
 			"isAllDay": req.IsAllDay,
 			"startTime": req.StartTime,
@@ -323,6 +355,13 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 			case "endTime": dbCol = "end_time"
 			default: continue
 			}
+
+			// Handle potential null dates sent as empty strings or nulls from UI
+			if (k == "endDate" || k == "startTime" || k == "endTime") && (v == "" || v == nil) {
+				setParts = append(setParts, fmt.Sprintf("%s = NULL", dbCol))
+				continue
+			}
+
 			setParts = append(setParts, fmt.Sprintf("%s = $%d", dbCol, i))
 			args = append(args, v)
 			i++

@@ -1,81 +1,31 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { proxyToGo } from '@/lib/proxy';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function PUT(req: Request, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const eventId = parseInt(params.id);
-  const userId = parseInt(session.user.id);
-
-  try {
-    const body = await req.json();
-    const proto = req.headers.get('x-forwarded-proto') || 'http';
-    const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=calendar&id=${eventId}&userId=${userId}`;
-
-    const goRes = await fetch(goUrl, {
-      cache: 'no-store',
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-User-Id': session.user.id,
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!goRes.ok) {
-      const text = await goRes.text();
-      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
-    }
-
-    const data = await goRes.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error updating calendar event via Go backend:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', session.user.id);
+  searchParams.set('id', params.id);
+  
+  return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
 }
 
-export async function DELETE(req: Request, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const eventId = parseInt(params.id);
-  const userId = parseInt(session.user.id);
-
-  try {
-    const proto = req.headers.get('x-forwarded-proto') || 'http';
-    const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=calendar&id=${eventId}&userId=${userId}`;
-
-    const goRes = await fetch(goUrl, {
-      cache: 'no-store',
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-User-Id': session.user.id,
-      },
-    });
-
-    if (!goRes.ok) {
-      const text = await goRes.text();
-      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
-    }
-
-    const data = await goRes.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error deleting calendar event via Go backend:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', session.user.id);
+  searchParams.set('id', params.id);
+  
+  return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
 }

@@ -31,7 +31,6 @@ func initDB() {
 		return
 	}
 
-	// Strip pgbouncer=true because lib/pq doesn't support it
 	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
 	connStr = strings.Replace(connStr, "?&", "?", -1)
 	connStr = strings.Replace(connStr, "&&", "&", -1)
@@ -39,7 +38,6 @@ func initDB() {
 		connStr = strings.TrimSuffix(connStr, "?")
 	}
 
-	// Ensure sslmode=require is present
 	if !strings.Contains(connStr, "sslmode=") {
 		if strings.Contains(connStr, "?") {
 			connStr += "&sslmode=require"
@@ -60,7 +58,6 @@ func initDB() {
 	dbJobs.SetConnMaxLifetime(5 * time.Minute)
 }
 
-// Job represents the job model in Prisma
 type Job struct {
 	ID          int        `json:"id"`
 	UserID      int        `json:"userId"`
@@ -72,8 +69,8 @@ type Job struct {
 	JobUrl      *string    `json:"jobUrl,omitempty"`
 	Notes       *string    `json:"notes,omitempty"`
 	AppliedDate *time.Time `json:"appliedDate,omitempty"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
+	CreatedAt   *time.Time `json:"createdAt"`
+	UpdatedAt   *time.Time `json:"updatedAt"`
 }
 
 func JobsHandler(w http.ResponseWriter, r *http.Request) {
@@ -127,12 +124,11 @@ func handleGetJobs(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	// Fetch Jobs
 	rows, err := dbJobs.Query(`
-		SELECT "id", "userId", "title", "company", "status", "salary", "location", "jobUrl", "notes", "appliedDate", "createdAt", "updatedAt"
-		FROM "Job"
-		WHERE "userId" = $1
-		ORDER BY "id" DESC
+		SELECT id, user_id, title, company, status, salary, location, job_url, notes, applied_date, created_at, updated_at
+		FROM jobs
+		WHERE user_id = $1
+		ORDER BY id DESC
 	`, userId)
 	if err != nil {
 		http.Error(w, "Failed to query jobs", http.StatusInternalServerError)
@@ -143,14 +139,33 @@ func handleGetJobs(w http.ResponseWriter, r *http.Request, userId int) {
 	jobs := []Job{}
 	for rows.Next() {
 		var j Job
+		var appliedDate, createdAt, updatedAt sql.NullTime
+		var salary sql.NullFloat64
+
 		err := rows.Scan(
-			&j.ID, &j.UserID, &j.Title, &j.Company, &j.Status, &j.Salary, &j.Location, &j.JobUrl, &j.Notes, &j.AppliedDate, &j.CreatedAt, &j.UpdatedAt,
+			&j.ID, &j.UserID, &j.Title, &j.Company, &j.Status, &salary, &j.Location, &j.JobUrl, &j.Notes, &appliedDate, &createdAt, &updatedAt,
 		)
-		if err != nil {
-			http.Error(w, "Failed to scan job", http.StatusInternalServerError)
-			return
+		if err == nil {
+			if salary.Valid {
+				s := salary.Float64
+				j.Salary = &s
+			}
+			if appliedDate.Valid {
+				t := appliedDate.Time
+				j.AppliedDate = &t
+			}
+			if createdAt.Valid {
+				t := createdAt.Time
+				j.CreatedAt = &t
+			}
+			if updatedAt.Valid {
+				t := updatedAt.Time
+				j.UpdatedAt = &t
+			}
+			jobs = append(jobs, j)
+		} else {
+			fmt.Printf("Job scan error: %v\n", err)
 		}
-		jobs = append(jobs, j)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -164,9 +179,9 @@ func handleCreateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		Status      string   `json:"status"`
 		Salary      *float64 `json:"salary"`
 		Location    *string  `json:"location"`
-		JobUrl      *string  `json:"job_url"`
+		JobUrl      *string  `json:"jobUrl"`
 		Notes       *string  `json:"notes"`
-		AppliedDate *string  `json:"applied_date"`
+		AppliedDate *string  `json:"appliedDate"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -185,24 +200,38 @@ func handleCreateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		}
 	}
 
-	if dbJobs == nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
-		return
-	}
-
-	// Insert
 	var j Job
+	var appDate, createdAt, updatedAt sql.NullTime
+	var salary sql.NullFloat64
+
 	err := dbJobs.QueryRow(`
-		INSERT INTO "Job" ("userId", "title", "company", "status", "salary", "location", "jobUrl", "notes", "appliedDate", "updatedAt")
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP)
-		RETURNING "id", "userId", "title", "company", "status", "salary", "location", "jobUrl", "notes", "appliedDate", "createdAt", "updatedAt"
+		INSERT INTO jobs (user_id, title, company, status, salary, location, job_url, notes, applied_date, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+		RETURNING id, user_id, title, company, status, salary, location, job_url, notes, applied_date, created_at, updated_at
 	`, userId, body.Title, body.Company, body.Status, body.Salary, body.Location, body.JobUrl, body.Notes, appliedDate).Scan(
-		&j.ID, &j.UserID, &j.Title, &j.Company, &j.Status, &j.Salary, &j.Location, &j.JobUrl, &j.Notes, &j.AppliedDate, &j.CreatedAt, &j.UpdatedAt,
+		&j.ID, &j.UserID, &j.Title, &j.Company, &j.Status, &salary, &j.Location, &j.JobUrl, &j.Notes, &appDate, &createdAt, &updatedAt,
 	)
 
 	if err != nil {
 		http.Error(w, "Failed to insert job", http.StatusInternalServerError)
 		return
+	}
+
+	if salary.Valid {
+		s := salary.Float64
+		j.Salary = &s
+	}
+	if appDate.Valid {
+		t := appDate.Time
+		j.AppliedDate = &t
+	}
+	if createdAt.Valid {
+		t := createdAt.Time
+		j.CreatedAt = &t
+	}
+	if updatedAt.Valid {
+		t := updatedAt.Time
+		j.UpdatedAt = &t
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -227,9 +256,9 @@ func handleUpdateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		Status      *string  `json:"status"`
 		Salary      *float64 `json:"salary"`
 		Location    *string  `json:"location"`
-		JobUrl      *string  `json:"job_url"`
+		JobUrl      *string  `json:"jobUrl"`
 		Notes       *string  `json:"notes"`
-		AppliedDate *string  `json:"applied_date"`
+		AppliedDate *string  `json:"appliedDate"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -237,14 +266,9 @@ func handleUpdateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	if dbJobs == nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
-		return
-	}
-
 	// Verify ownership
 	var existingUserId int
-	err = dbJobs.QueryRow(`SELECT "userId" FROM "Job" WHERE "id" = $1`, jobId).Scan(&existingUserId)
+	err = dbJobs.QueryRow(`SELECT user_id FROM jobs WHERE id = $1`, jobId).Scan(&existingUserId)
 	if err != nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -254,49 +278,52 @@ func handleUpdateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	query := `UPDATE "Job" SET "updatedAt" = CURRENT_TIMESTAMP`
+	query := `UPDATE jobs SET updated_at = NOW()`
 	args := []interface{}{}
 	argId := 1
 
 	if body.Title != nil {
-		query += `, "title" = $` + strconv.Itoa(argId)
+		query += `, title = $` + strconv.Itoa(argId)
 		args = append(args, *body.Title)
 		argId++
 	}
 	if body.Company != nil {
-		query += `, "company" = $` + strconv.Itoa(argId)
+		query += `, company = $` + strconv.Itoa(argId)
 		args = append(args, *body.Company)
 		argId++
 	}
 	if body.Status != nil {
-		query += `, "status" = $` + strconv.Itoa(argId)
+		query += `, status = $` + strconv.Itoa(argId)
 		args = append(args, *body.Status)
 		argId++
 	}
 	if body.Salary != nil {
-		query += `, "salary" = $` + strconv.Itoa(argId)
+		query += `, salary = $` + strconv.Itoa(argId)
 		args = append(args, *body.Salary)
 		argId++
 	}
 	if body.Location != nil {
-		query += `, "location" = $` + strconv.Itoa(argId)
+		query += `, location = $` + strconv.Itoa(argId)
 		args = append(args, *body.Location)
 		argId++
 	}
 	if body.JobUrl != nil {
-		query += `, "jobUrl" = $` + strconv.Itoa(argId)
+		query += `, job_url = $` + strconv.Itoa(argId)
 		args = append(args, *body.JobUrl)
 		argId++
 	}
 	if body.Notes != nil {
-		query += `, "notes" = $` + strconv.Itoa(argId)
+		query += `, notes = $` + strconv.Itoa(argId)
 		args = append(args, *body.Notes)
 		argId++
 	}
 	if body.AppliedDate != nil {
-		query += `, "appliedDate" = $` + strconv.Itoa(argId)
+		query += `, applied_date = $` + strconv.Itoa(argId)
 		if *body.AppliedDate != "" {
-			t, _ := time.Parse(time.RFC3339, *body.AppliedDate)
+			t, err := time.Parse(time.RFC3339, *body.AppliedDate)
+			if err != nil {
+				t, _ = time.Parse("2006-01-02", *body.AppliedDate)
+			}
 			args = append(args, t)
 		} else {
 			args = append(args, nil)
@@ -304,17 +331,37 @@ func handleUpdateJob(w http.ResponseWriter, r *http.Request, userId int) {
 		argId++
 	}
 
-	query += ` WHERE "id" = $` + strconv.Itoa(argId) + ` RETURNING "id", "userId", "title", "company", "status", "salary", "location", "jobUrl", "notes", "appliedDate", "createdAt", "updatedAt"`
+	query += ` WHERE id = $` + strconv.Itoa(argId) + ` RETURNING id, user_id, title, company, status, salary, location, job_url, notes, applied_date, created_at, updated_at`
 	args = append(args, jobId)
 
 	var j Job
+	var appDate, createdAt, updatedAt sql.NullTime
+	var salary sql.NullFloat64
+
 	err = dbJobs.QueryRow(query, args...).Scan(
-		&j.ID, &j.UserID, &j.Title, &j.Company, &j.Status, &j.Salary, &j.Location, &j.JobUrl, &j.Notes, &j.AppliedDate, &j.CreatedAt, &j.UpdatedAt,
+		&j.ID, &j.UserID, &j.Title, &j.Company, &j.Status, &salary, &j.Location, &j.JobUrl, &j.Notes, &appDate, &createdAt, &updatedAt,
 	)
 
 	if err != nil {
 		http.Error(w, "Failed to update job", http.StatusInternalServerError)
 		return
+	}
+
+	if salary.Valid {
+		s := salary.Float64
+		j.Salary = &s
+	}
+	if appDate.Valid {
+		t := appDate.Time
+		j.AppliedDate = &t
+	}
+	if createdAt.Valid {
+		t := createdAt.Time
+		j.CreatedAt = &t
+	}
+	if updatedAt.Valid {
+		t := updatedAt.Time
+		j.UpdatedAt = &t
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -333,14 +380,9 @@ func handleDeleteJob(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	if dbJobs == nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
-		return
-	}
-
 	// Verify ownership
 	var existingUserId int
-	err = dbJobs.QueryRow(`SELECT "userId" FROM "Job" WHERE "id" = $1`, jobId).Scan(&existingUserId)
+	err = dbJobs.QueryRow(`SELECT user_id FROM jobs WHERE id = $1`, jobId).Scan(&existingUserId)
 	if err != nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -350,7 +392,7 @@ func handleDeleteJob(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
-	_, err = dbJobs.Exec(`DELETE FROM "Job" WHERE id = $1`, jobId)
+	_, err = dbJobs.Exec(`DELETE FROM jobs WHERE id = $1`, jobId)
 	if err != nil {
 		http.Error(w, "Failed to delete job", http.StatusInternalServerError)
 		return
