@@ -98,8 +98,8 @@ export default function PlannerPage() {
     }, [fetchedTasks]);
 
     const parsedDaily = React.useMemo(() => {
-        if (!fetchedDaily || !Array.isArray(fetchedDaily)) return null;
-        return fetchedDaily;
+        if (!fetchedDaily || typeof fetchedDaily !== 'object' || Array.isArray(fetchedDaily)) return null;
+        return fetchedDaily as any;
     }, [fetchedDaily]);
 
     const [tasks, setTasks] = useState<TaskItem[]>(parsedTasks || []);
