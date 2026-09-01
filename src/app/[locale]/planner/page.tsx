@@ -68,7 +68,7 @@ export default function PlannerPage() {
     });
     
     const parsedTasks = React.useMemo(() => {
-        if (!fetchedTasks) return null;
+        if (!fetchedTasks || !Array.isArray(fetchedTasks)) return null;
         return fetchedTasks.map((t: any) => {
             const extractTime = (isoString: string) => {
                 if (!isoString) return '';
@@ -98,7 +98,7 @@ export default function PlannerPage() {
     }, [fetchedTasks]);
 
     const parsedDaily = React.useMemo(() => {
-        if (!fetchedDaily) return null;
+        if (!fetchedDaily || !Array.isArray(fetchedDaily)) return null;
         return fetchedDaily;
     }, [fetchedDaily]);
 

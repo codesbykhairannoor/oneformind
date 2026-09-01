@@ -26,7 +26,7 @@ export default function GoalsPage() {
     const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
 
     const parsedGoals = React.useMemo(() => {
-        if (!fetchedGoals) return null;
+        if (!fetchedGoals || !Array.isArray(fetchedGoals)) return null;
         return fetchedGoals.map((g: any) => ({
             id: g.id,
             title: g.title,

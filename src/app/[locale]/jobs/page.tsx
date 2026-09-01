@@ -20,7 +20,7 @@ export default function JobsPage() {
     const { data: fetchedJobs, mutate: mutateJobs } = useSWR('/api/jobs', fetcher);
 
     const parsedJobs = useMemo(() => {
-        if (!fetchedJobs) return null;
+        if (!fetchedJobs || !Array.isArray(fetchedJobs)) return null;
         return fetchedJobs.map((j: any) => ({
             id: j.id,
             _key: `db_${j.id}`,

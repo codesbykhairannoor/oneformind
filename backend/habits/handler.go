@@ -172,8 +172,8 @@ func handleGetHabits(w http.ResponseWriter, r *http.Request, userID int) {
 	}
 	defer rows.Close()
 
-	var habits []Habit
-	var habitIDs []int
+	habits := []Habit{}
+	habitIDs := []int{}
 	habitMap := make(map[int]*Habit)
 
 	for rows.Next() {

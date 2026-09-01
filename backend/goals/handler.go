@@ -157,8 +157,8 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 	defer rows.Close()
 
 	goalsMap := make(map[int]*Goal)
-	var goals []Goal
-	var goalIDs []int
+	goals := []Goal{}
+	goalIDs := []int{}
 
 	for rows.Next() {
 		var g Goal

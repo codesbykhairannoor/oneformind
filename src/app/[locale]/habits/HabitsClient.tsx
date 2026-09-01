@@ -87,7 +87,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     });
 
     const parsedHabits = useMemo(() => {
-        if (!fetchedHabits) return null;
+        if (!fetchedHabits || !Array.isArray(fetchedHabits)) return null;
         return fetchedHabits.map((h: any) => {
             const logsMap: Record<string, 'completed' | 'skipped' | 'empty'> = {};
             if (h.logs) {

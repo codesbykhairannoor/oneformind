@@ -36,15 +36,16 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
       throw new Error(`Go backend returned ${goRes.status}: ${text}`);
     }
 
-    const data = await goRes.json();
-    const response = NextResponse.json(data);
-    
-    // Only set cache headers for GET requests if needed, but since it's user-specific, we keep it private
-    if (req.method === 'GET') {
-      response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
-    }
-
-    return response;
+    // Stream the raw Go response bytes directly to the client.
+    // This avoids double JSON serialization which can turn null → {} in some runtimes.
+    const rawBody = await goRes.arrayBuffer();
+    return new Response(rawBody, {
+      status: goRes.status,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'private, no-store',
+      },
+    });
   } catch (error: any) {
     console.error(`Proxy to Go error [${route}]:`, error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
