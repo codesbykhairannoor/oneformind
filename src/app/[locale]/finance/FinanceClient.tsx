@@ -320,7 +320,7 @@ export default function FinanceClient({
                     onOpenBatchModal={() => setShowBatchModal(true)}
                     activeCurrency={activeCurrency}
                     onCurrencyChange={handleCurrencyChange}
-                    transactions={currentMonthTransactions}
+                    transactions={transactions}
                 />
 
                 <div className="w-full min-h-screen px-3 sm:px-6 lg:px-8 py-6 transition-colors duration-500">
@@ -375,7 +375,7 @@ export default function FinanceClient({
                         <div className="lg:col-span-3 space-y-8 w-full order-2 lg:order-1 pb-24 lg:pb-0">
                             
                             <TransactionList
-                                transactions={currentMonthTransactions}
+                                transactions={transactions}
                                 categories={categories}
                                 filterDate={filterDate}
                                 setFilterDate={setFilterDate}
@@ -454,10 +454,10 @@ export default function FinanceClient({
                                 />
                             </div>
 
-                            {currentMonthTransactions.length > 0 && (
+                            {transactions.length > 0 && (
                                 <div className="relative">
                                     <DailyTrendChart
-                                        transactions={currentMonthTransactions}
+                                        transactions={transactions}
                                         currentDate={`${selectedMonthKey}-01`}
                                         onDayClick={(payload: any) => setFilterDate(payload.date)}
                                     />
