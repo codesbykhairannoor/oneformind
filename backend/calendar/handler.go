@@ -223,8 +223,12 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 			defer fRows.Close()
 			for fRows.Next() {
 				var f FinanceTransaction
-				err := fRows.Scan(&f.ID, &f.Date, &f.Type, &f.Amount, &f.Title, &f.Category)
+				var amountBytes []byte
+				err := fRows.Scan(&f.ID, &f.Date, &f.Type, &amountBytes, &f.Title, &f.Category)
 				if err == nil {
+					if len(amountBytes) > 0 {
+						f.Amount, _ = strconv.ParseFloat(string(amountBytes), 64)
+					}
 					finances = append(finances, f)
 				}
 			}

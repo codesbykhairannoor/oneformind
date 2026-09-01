@@ -137,8 +137,13 @@ func handleGetBudgets(w http.ResponseWriter, r *http.Request, userID int) {
 	for rows.Next() {
 		var b FinanceBudget
 		var createdAt, updatedAt sql.NullTime
-		if err := rows.Scan(&b.ID, &b.UserID, &b.Category, &b.LimitAmount, &b.Month, &createdAt, &updatedAt); err != nil {
+		var amountBytes []byte
+		if err := rows.Scan(&b.ID, &b.UserID, &b.Category, &amountBytes, &b.Month, &createdAt, &updatedAt); err != nil {
+			fmt.Println("Budget scan err:", err)
 			continue
+		}
+		if len(amountBytes) > 0 {
+			b.LimitAmount, _ = strconv.ParseFloat(string(amountBytes), 64)
 		}
 		if createdAt.Valid {
 			b.CreatedAt = createdAt.Time

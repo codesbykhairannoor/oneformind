@@ -133,11 +133,18 @@ func handleGetYearly(w http.ResponseWriter, r *http.Request, userID int) {
 	}
 
 	for rows.Next() {
-		var amount float64
+		var amountBytes []byte
 		var tType string
 		var date time.Time
-		if err := rows.Scan(&amount, &tType, &date); err != nil {
+
+		if err := rows.Scan(&amountBytes, &tType, &date); err != nil {
+			fmt.Println("Yearly scan err:", err)
 			continue
+		}
+		
+		var amount float64
+		if len(amountBytes) > 0 {
+			amount, _ = strconv.ParseFloat(string(amountBytes), 64)
 		}
 		
 		monthKey := date.Format("2006-01") // YYYY-MM

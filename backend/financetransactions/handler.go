@@ -119,14 +119,21 @@ func FinanceTransactionsHandler(w http.ResponseWriter, r *http.Request) {
 		for rows.Next() {
 			var t FinanceTransaction
 			var createdAt, updatedAt sql.NullTime
+			var amountBytes []byte
 			var notes sql.NullString
-			
-			err := rows.Scan(&t.ID, &t.UserID, &t.Title, &t.Amount, &t.Type, &t.Category, &t.Date, &notes, &createdAt, &updatedAt)
+
+			err := rows.Scan(&t.ID, &t.UserID, &t.Title, &amountBytes, &t.Type, &t.Category, &t.Date, &notes, &createdAt, &updatedAt)
 			if err == nil {
+				if len(amountBytes) > 0 {
+					t.Amount, _ = strconv.ParseFloat(string(amountBytes), 64)
+				}
 				if notes.Valid { t.Notes = &notes.String }
 				if createdAt.Valid { t.CreatedAt = createdAt.Time }
 				if updatedAt.Valid { t.UpdatedAt = updatedAt.Time }
 				txs = append(txs, t)
+			} else {
+				http.Error(w, fmt.Sprintf(`{"error": "Scan error: %v"}`, err), 500)
+				return
 			}
 		}
 		json.NewEncoder(w).Encode(txs)

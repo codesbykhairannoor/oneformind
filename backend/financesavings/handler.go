@@ -126,8 +126,16 @@ func handleGetSavings(w http.ResponseWriter, r *http.Request, userID int) {
 	for rows.Next() {
 		var s FinanceSaving
 		var createdAt, updatedAt sql.NullTime
-		if err := rows.Scan(&s.ID, &s.UserID, &s.Title, &s.TargetAmount, &s.CurrentAmount, &s.Icon, &s.Color, &createdAt, &updatedAt); err != nil {
+		var targetBytes, currentBytes []byte
+		if err := rows.Scan(&s.ID, &s.UserID, &s.Title, &targetBytes, &currentBytes, &s.Icon, &s.Color, &createdAt, &updatedAt); err != nil {
+			fmt.Println("Savings scan err:", err)
 			continue
+		}
+		if len(targetBytes) > 0 {
+			s.TargetAmount, _ = strconv.ParseFloat(string(targetBytes), 64)
+		}
+		if len(currentBytes) > 0 {
+			s.CurrentAmount, _ = strconv.ParseFloat(string(currentBytes), 64)
 		}
 		if createdAt.Valid {
 			s.CreatedAt = createdAt.Time

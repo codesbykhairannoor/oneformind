@@ -127,8 +127,13 @@ func handleGetAssets(w http.ResponseWriter, r *http.Request, userID int) {
 	for rows.Next() {
 		var a FinanceAsset
 		var createdAt, updatedAt sql.NullTime
-		if err := rows.Scan(&a.ID, &a.UserID, &a.Name, &a.Value, &a.Icon, &a.Color, &createdAt, &updatedAt); err != nil {
+		var amountBytes []byte
+		if err := rows.Scan(&a.ID, &a.UserID, &a.Name, &amountBytes, &a.Icon, &a.Color, &createdAt, &updatedAt); err != nil {
+			fmt.Println("Asset scan err:", err)
 			continue
+		}
+		if len(amountBytes) > 0 {
+			a.Value, _ = strconv.ParseFloat(string(amountBytes), 64)
 		}
 		if createdAt.Valid {
 			a.CreatedAt = createdAt.Time
