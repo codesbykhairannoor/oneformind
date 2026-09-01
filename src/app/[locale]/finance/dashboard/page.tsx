@@ -19,7 +19,7 @@ interface YearlyStat {
 }
 
 export default async function FinanceDashboardPage() {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user?.email) {
         redirect('/login');

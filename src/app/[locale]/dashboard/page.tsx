@@ -12,14 +12,20 @@ export async function generateMetadata() {
 }
 
 export default async function DashboardPage() {
-    const session = await auth();
     const locale = await getLocale();
 
-    if (!session?.user?.id) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user?.email) {
         redirect(`/${locale}/login`);
     }
-
-    const userId = parseInt(session.user.id);
+    
+    let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
+    if (!dbUser) {
+        dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
+    }
+    const userId = dbUser.id;
     const now = new Date();
     const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T00:00:00.000Z`;
     const today = new Date(todayStr);

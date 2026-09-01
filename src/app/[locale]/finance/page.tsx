@@ -10,7 +10,7 @@ export async function generateMetadata() {
 }
 
 export default async function FinancePage({ searchParams }: { searchParams: { month?: string } }) {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user?.email) {
         redirect('/login');
