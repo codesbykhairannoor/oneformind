@@ -1,8 +1,39 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
+
+async function proxyToGo(req: Request, userId: string, method: string, goalId: string, action?: string, body?: any) {
+  const host = req.headers.get('host');
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  
+  const { search } = new URL(req.url);
+  let goUrl = `${protocol}://${host}/api?route=goals-milestones${search ? '&' + search.slice(1) : ''}&userId=${userId}&goalId=${goalId}`;
+  if (action) {
+    goUrl += `&action=${action}`;
+  }
+
+  try {
+    const response = await fetch(goUrl, {
+      cache: 'no-store',
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Go API returned ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Go Proxy Error:', error);
+    throw error;
+  }
+}
 
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -11,64 +42,12 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const goalId = params.id;
-  const userId = session.user.id;
-  const bodyText = await req.text();
-  let body;
   try {
-      body = JSON.parse(bodyText);
-  } catch (e) {
-      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
-
-  // ==========================================
-  // 🚀 STRANGLER FIG PROXY TO GO SERVERLESS
-  // ==========================================
-  if (process.env.VERCEL) {
-    try {
-      const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-      const host = process.env.VERCEL_URL || req.headers.get('host');
-      const goUrl = `${proto}://${host}/api?route=goals-milestones&goalId=${goalId}&userId=${userId}`;
-      
-      const goRes = await fetch(goUrl, {
-        method: 'POST',
-        headers: {
-          'X-User-Id': userId,
-          'Content-Type': 'application/json'
-        },
-        body: bodyText,
-        cache: 'no-store'
-      });
-      
-      if (!goRes.ok) throw new Error(`Go backend returned ${goRes.status}`);
-      const data = await goRes.json();
-      return NextResponse.json(data);
-    } catch (e) {
-      console.error('Go proxy failed, falling back to Node.js Prisma:', e);
-    }
-  }
-
-  try {
-    const existingGoal = await prisma.goal.findUnique({ where: { id: parseInt(goalId) } });
-    if (!existingGoal || existingGoal.userId !== parseInt(userId)) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
-
-    const { title, completed, order, targetDate } = body;
-
-    const milestone = await prisma.goalMilestone.create({
-      data: {
-        goalId: parseInt(goalId),
-        title,
-        completed: completed || false,
-        order: order || 0,
-        targetDate: targetDate ? new Date(targetDate) : null,
-      }
-    });
-
-    return NextResponse.json(milestone);
+    const body = await req.json();
+    const data = await proxyToGo(req, session.user.id, 'POST', params.id, undefined, body);
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error creating milestone:', error);
+    console.error('Error proxying POST goal milestone:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

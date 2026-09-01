@@ -1,8 +1,36 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
+
+async function proxyToGo(req: Request, userId: string, method: string, body?: any) {
+  const host = req.headers.get('host');
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  
+  const { search } = new URL(req.url);
+  const goUrl = `${protocol}://${host}/api?route=finance-assets${search ? '&' + search.slice(1) : ''}&userId=${userId}`;
+
+  try {
+    const response = await fetch(goUrl, {
+      cache: 'no-store',
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Go API returned ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Go Proxy Error:', error);
+    throw error;
+  }
+}
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -11,13 +39,10 @@ export async function GET(req: Request) {
   }
 
   try {
-    const assets = await prisma.financeAsset.findMany({
-      where: { userId: parseInt(session.user.id) },
-      orderBy: { createdAt: 'desc' },
-    });
-    return NextResponse.json(assets);
+    const data = await proxyToGo(req, session.user.id, 'GET');
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching finance assets:', error);
+    console.error('Error proxying GET assets:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -30,21 +55,10 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { name, value, icon, color } = body;
-
-    const newAsset = await prisma.financeAsset.create({
-      data: {
-        userId: parseInt(session.user.id),
-        name,
-        value,
-        icon,
-        color,
-      },
-    });
-
-    return NextResponse.json(newAsset);
+    const data = await proxyToGo(req, session.user.id, 'POST', body);
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error creating finance asset:', error);
+    console.error('Error proxying POST assets:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -57,27 +71,10 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const { id, name, value, icon, color } = body;
-
-    // Verify ownership
-    const existing = await prisma.financeAsset.findUnique({ where: { id } });
-    if (!existing || existing.userId !== parseInt(session.user.id)) {
-      return NextResponse.json({ error: 'Not found or forbidden' }, { status: 403 });
-    }
-
-    const updatedAsset = await prisma.financeAsset.update({
-      where: { id },
-      data: {
-        name,
-        value,
-        icon,
-        color,
-      },
-    });
-
-    return NextResponse.json(updatedAsset);
+    const data = await proxyToGo(req, session.user.id, 'PUT', body);
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error updating finance asset:', error);
+    console.error('Error proxying PUT assets:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -89,28 +86,10 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-      return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
-    }
-
-    const assetId = parseInt(id);
-
-    // Verify ownership
-    const existing = await prisma.financeAsset.findUnique({ where: { id: assetId } });
-    if (!existing || existing.userId !== parseInt(session.user.id)) {
-      return NextResponse.json({ error: 'Not found or forbidden' }, { status: 403 });
-    }
-
-    await prisma.financeAsset.delete({
-      where: { id: assetId },
-    });
-
-    return NextResponse.json({ success: true });
+    const data = await proxyToGo(req, session.user.id, 'DELETE');
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error deleting finance asset:', error);
+    console.error('Error proxying DELETE assets:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

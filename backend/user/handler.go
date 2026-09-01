@@ -60,15 +60,15 @@ func initDB() {
 }
 
 type User struct {
-	ID             int        `json:"id"`
-	Name           *string    `json:"name"`
-	Email          *string    `json:"email"`
-	PlanType       *string    `json:"planType"`
-	IsPremium      bool       `json:"isPremium"`
-	PremiumUntil   *time.Time `json:"premiumUntil"`
-	Settings       *string    `json:"settings"`
-	ResumeText     *string    `json:"resumeText"`
-	ResumeFilename *string    `json:"resumeFilename"`
+	ID             int             `json:"id"`
+	Name           *string         `json:"name"`
+	Email          *string         `json:"email"`
+	PlanType       *string         `json:"planType"`
+	IsPremium      bool            `json:"isPremium"`
+	PremiumUntil   *time.Time      `json:"premiumUntil"`
+	Settings       json.RawMessage `json:"settings"`
+	ResumeText     *string         `json:"resumeText"`
+	ResumeFilename *string         `json:"resumeFilename"`
 }
 
 func UserHandler(w http.ResponseWriter, r *http.Request) {
@@ -93,8 +93,16 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		var u User
+		var settingsStr sql.NullString
 		err := db.QueryRow(`SELECT id, name, email, plan_type, is_premium, premium_until, settings, resume_text, resume_filename FROM users WHERE id = $1`, userID).
-			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &u.Settings, &u.ResumeText, &u.ResumeFilename)
+			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
+		
+		if settingsStr.Valid && settingsStr.String != "" {
+			u.Settings = json.RawMessage(settingsStr.String)
+		} else {
+			u.Settings = json.RawMessage(`{}`)
+		}
+
 		if err != nil {
 			if err == sql.ErrNoRows {
 				http.Error(w, `{"error": "User not found"}`, http.StatusNotFound)
@@ -146,8 +154,15 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		if len(setParts) == 0 {
 			// No update needed, return current user
 			var u User
+			var settingsStr sql.NullString
 			db.QueryRow(`SELECT id, name, email, plan_type, is_premium, premium_until, settings, resume_text, resume_filename FROM users WHERE id = $1`, userID).
-				Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &u.Settings, &u.ResumeText, &u.ResumeFilename)
+				Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
+			
+			if settingsStr.Valid && settingsStr.String != "" {
+				u.Settings = json.RawMessage(settingsStr.String)
+			} else {
+				u.Settings = json.RawMessage(`{}`)
+			}
 			json.NewEncoder(w).Encode(u)
 			return
 		}
@@ -157,9 +172,16 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		query := fmt.Sprintf(`UPDATE users SET %s WHERE id = $1 RETURNING id, name, email, plan_type, is_premium, premium_until, settings, resume_text, resume_filename`, strings.Join(setParts, ", "))
 		
 		var u User
+		var settingsStr sql.NullString
 		err := db.QueryRow(query, args...).
-			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &u.Settings, &u.ResumeText, &u.ResumeFilename)
+			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &u.PremiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
 		
+		if settingsStr.Valid && settingsStr.String != "" {
+			u.Settings = json.RawMessage(settingsStr.String)
+		} else {
+			u.Settings = json.RawMessage(`{}`)
+		}
+
 		if err != nil {
 			http.Error(w, fmt.Sprintf(`{"error": "Failed to update user: %v"}`, err), http.StatusInternalServerError)
 			return

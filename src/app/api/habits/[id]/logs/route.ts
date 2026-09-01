@@ -1,8 +1,39 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
+
+async function proxyToGo(req: Request, userId: string, method: string, habitId: string, action?: string, body?: any) {
+  const host = req.headers.get('host');
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  
+  const { search } = new URL(req.url);
+  let goUrl = `${protocol}://${host}/api?route=habits${search ? '&' + search.slice(1) : ''}&userId=${userId}&habitId=${habitId}`;
+  if (action) {
+    goUrl += `&action=${action}`;
+  }
+
+  try {
+    const response = await fetch(goUrl, {
+      cache: 'no-store',
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Go API returned ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Go Proxy Error:', error);
+    throw error;
+  }
+}
 
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -11,58 +42,12 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const habitId = parseInt(params.id);
-  const userId = parseInt(session.user.id);
-
   try {
-    const existing = await prisma.habit.findUnique({ where: { id: habitId } });
-    if (!existing || existing.userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
-
     const body = await req.json();
-    const { date, status, notes } = body; // status can be 'completed', 'skipped', 'empty'
-
-    // date should be a valid string 'YYYY-MM-DD'
-    const logDate = new Date(date);
-
-    if (status === 'empty') {
-      // Delete the log if it exists
-      await prisma.habitLog.deleteMany({
-        where: {
-          habitId,
-          date: logDate,
-        }
-      });
-      return NextResponse.json({ success: true, status: 'empty' });
-    }
-
-    // Since we don't have a direct upsert without ID (unless we use the unique constraint),
-    // Wait, we do have a unique constraint: @@unique([habitId, date])
-    // But we need to define the compound unique index in Prisma for upsert to work, which we did.
-
-    const log = await prisma.habitLog.upsert({
-      where: {
-        habitId_date: {
-          habitId,
-          date: logDate,
-        }
-      },
-      update: {
-        status,
-        notes,
-      },
-      create: {
-        habitId,
-        date: logDate,
-        status,
-        notes,
-      }
-    });
-
-    return NextResponse.json(log);
+    const data = await proxyToGo(req, session.user.id, 'POST', params.id, 'logs', body);
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error toggling habit log:', error);
+    console.error('Error proxying POST habit log:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

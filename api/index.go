@@ -4,8 +4,12 @@ import (
 	"net/http"
 
 	"tranvas-api/backend/calendar"
+	"tranvas-api/backend/financeassets"
+	"tranvas-api/backend/financebudgets"
 	"tranvas-api/backend/financecategories"
+	"tranvas-api/backend/financesavings"
 	"tranvas-api/backend/financetransactions"
+	"tranvas-api/backend/financeyearly"
 	"tranvas-api/backend/goals"
 	"tranvas-api/backend/goalsmilestones"
 	"tranvas-api/backend/habits"
@@ -29,10 +33,18 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	switch route {
 	case "calendar":
 		calendar.CalendarHandler(w, r)
+	case "finance-assets":
+		financeassets.FinanceAssetsHandler(w, r)
+	case "finance-budgets":
+		financebudgets.FinanceBudgetsHandler(w, r)
 	case "finance-categories":
 		financecategories.FinanceCategoriesHandler(w, r)
+	case "finance-savings":
+		financesavings.FinanceSavingsHandler(w, r)
 	case "finance-transactions":
 		financetransactions.FinanceTransactionsHandler(w, r)
+	case "finance-yearly":
+		financeyearly.FinanceYearlyHandler(w, r)
 	case "goals-milestones":
 		goalsmilestones.GoalsMilestonesHandler(w, r)
 	case "goals":

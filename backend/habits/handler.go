@@ -117,13 +117,32 @@ func HabitsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	habitIdStr := r.URL.Query().Get("habitId")
+	action := r.URL.Query().Get("action")
+
 	switch r.Method {
 	case http.MethodGet:
 		handleGetHabits(w, r, userID)
 	case http.MethodPost:
-		handleCreateHabit(w, r, userID)
+		if habitIdStr != "" && action == "logs" {
+			handleToggleHabitLog(w, r, userID, habitIdStr)
+		} else {
+			handleCreateHabit(w, r, userID)
+		}
+	case http.MethodPut:
+		if habitIdStr != "" {
+			handleUpdateHabit(w, r, userID, habitIdStr)
+		} else {
+			http.Error(w, `{"error": "Method Not Allowed"}`, http.StatusMethodNotAllowed)
+		}
+	case http.MethodDelete:
+		if habitIdStr != "" {
+			handleDeleteHabit(w, r, userID, habitIdStr)
+		} else {
+			http.Error(w, `{"error": "Method Not Allowed"}`, http.StatusMethodNotAllowed)
+		}
 	default:
-		w.Header().Set("Allow", "GET, POST")
+		w.Header().Set("Allow", "GET, POST, PUT, DELETE")
 		http.Error(w, `{"error": "Method Not Allowed"}`, http.StatusMethodNotAllowed)
 	}
 }
@@ -230,59 +249,239 @@ func handleGetHabits(w http.ResponseWriter, r *http.Request, userID int) {
 }
 
 func handleCreateHabit(w http.ResponseWriter, r *http.Request, userID int) {
-	var body struct {
-		Name          string  `json:"name"`
-		Icon          *string `json:"icon"`
-		Color         string  `json:"color"`
-		Period        string  `json:"period"`
-		MonthlyTarget int     `json:"monthlyTarget"`
-	}
-
+	var body map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, `{"error": "Bad Request"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
 		return
 	}
 
-	if body.Color == "" {
-		body.Color = "#6366f1"
+	period, _ := body["period"].(string)
+	name, _ := body["name"].(string)
+	color, _ := body["color"].(string)
+
+	if period == "" || name == "" || color == "" {
+		http.Error(w, `{"error": "Missing required fields"}`, http.StatusBadRequest)
+		return
 	}
-	if body.MonthlyTarget == 0 {
-		body.MonthlyTarget = 30
+
+	monthlyTarget := 0
+	if mt, ok := body["monthlyTarget"].(float64); ok {
+		monthlyTarget = int(mt)
+	}
+
+	var icon *string
+	if i, ok := body["icon"].(string); ok && i != "" {
+		icon = &i
 	}
 
 	// Get max position
-	var maxPos sql.NullInt32
-	err := db.QueryRow(`SELECT position FROM habits WHERE user_id = $1 AND period = $2 AND is_archived = false ORDER BY position DESC LIMIT 1`, userID, body.Period).Scan(&maxPos)
-	
-	position := 1
-	if err == nil && maxPos.Valid {
-		position = int(maxPos.Int32) + 1
+	var maxPos int
+	err := db.QueryRow(`SELECT COALESCE(MAX(position), -1) FROM habits WHERE user_id = $1 AND period = $2`, userID, period).Scan(&maxPos)
+	if err != nil {
+		maxPos = -1
 	}
+	position := maxPos + 1
 
-	// Insert
+	query := `INSERT INTO habits (user_id, period, name, icon, color, monthly_target, position) 
+			  VALUES ($1, $2, $3, $4, $5, $6, $7) 
+			  RETURNING id, created_at, updated_at, status, is_archived`
+	
 	var h Habit
-	query := `INSERT INTO habits (user_id, name, icon, color, period, monthly_target, status, position, is_archived, created_at, updated_at) 
-			  VALUES ($1, $2, $3, $4, $5, $6, 'active', $7, false, NOW(), NOW()) 
-			  RETURNING id, user_id, period, name, icon, color, monthly_target, is_archived, created_at, updated_at, status, position`
+	h.UserID = userID
+	h.Period = period
+	h.Name = name
+	h.Color = color
+	h.Icon = icon
+	h.MonthlyTarget = monthlyTarget
+	h.Position = position
 
-	var createdAt, updatedAt sql.NullTime
-	err = db.QueryRow(query, userID, body.Name, body.Icon, body.Color, body.Period, body.MonthlyTarget, position).Scan(
-		&h.ID, &h.UserID, &h.Period, &h.Name, &h.Icon, &h.Color, &h.MonthlyTarget, &h.IsArchived, &createdAt, &updatedAt, &h.Status, &h.Position,
-	)
+	err = db.QueryRow(query, userID, period, name, icon, color, monthlyTarget, position).
+		Scan(&h.ID, &h.CreatedAt, &h.UpdatedAt, &h.Status, &h.IsArchived)
 
 	if err != nil {
-		fmt.Printf("Insert error: %v\n", err)
-		http.Error(w, `{"error": "Internal Server Error"}`, http.StatusInternalServerError)
+		fmt.Printf("Error creating habit: %v\n", err)
+		http.Error(w, `{"error": "Failed to create habit"}`, http.StatusInternalServerError)
 		return
 	}
 
-	if createdAt.Valid {
-		h.CreatedAt = createdAt.Time
-	}
-	if updatedAt.Valid {
-		h.UpdatedAt = updatedAt.Time
-	}
-	h.Logs = []HabitLog{}
+	h.Logs = []HabitLog{} // empty logs for new habit
 
 	json.NewEncoder(w).Encode(h)
+}
+func handleUpdateHabit(w http.ResponseWriter, r *http.Request, userID int, habitIdStr string) {
+	habitID, err := strconv.Atoi(habitIdStr)
+	if err != nil {
+		http.Error(w, `{"error": "Invalid habit ID"}`, http.StatusBadRequest)
+		return
+	}
+
+	// Verify ownership
+	var existingUserID int
+	err = db.QueryRow(`SELECT user_id FROM habits WHERE id = $1`, habitID).Scan(&existingUserID)
+	if err == sql.ErrNoRows {
+		http.Error(w, `{"error": "Not found"}`, http.StatusNotFound)
+		return
+	}
+	if existingUserID != userID {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusForbidden)
+		return
+	}
+
+	var req map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+
+	setParts := []string{}
+	args := []interface{}{habitID}
+	i := 2
+
+	for k, v := range req {
+		dbCol := ""
+		switch k {
+		case "name": dbCol = "name"
+		case "icon": dbCol = "icon"
+		case "color": dbCol = "color"
+		case "monthlyTarget": dbCol = "monthly_target"
+		case "position": dbCol = "position"
+		case "isArchived": dbCol = "is_archived"
+		case "status": dbCol = "status"
+		default: continue
+		}
+
+		setParts = append(setParts, fmt.Sprintf("%s = $%d", dbCol, i))
+		args = append(args, v)
+		i++
+	}
+
+	if len(setParts) == 0 {
+		w.Write([]byte(`{"success": true}`))
+		return
+	}
+
+	setParts = append(setParts, "updated_at = NOW()")
+	
+	query := fmt.Sprintf(`UPDATE habits SET %s WHERE id = $1`, strings.Join(setParts, ", "))
+	
+	_, err = db.Exec(query, args...)
+	if err != nil {
+		fmt.Printf("Error updating habit: %v\n", err)
+		http.Error(w, `{"error": "Failed to update habit"}`, http.StatusInternalServerError)
+		return
+	}
+	
+	w.Write([]byte(`{"success": true}`))
+}
+
+func handleDeleteHabit(w http.ResponseWriter, r *http.Request, userID int, habitIdStr string) {
+	habitID, err := strconv.Atoi(habitIdStr)
+	if err != nil {
+		http.Error(w, `{"error": "Invalid habit ID"}`, http.StatusBadRequest)
+		return
+	}
+
+	// Verify ownership
+	var existingUserID int
+	err = db.QueryRow(`SELECT user_id FROM habits WHERE id = $1`, habitID).Scan(&existingUserID)
+	if err == sql.ErrNoRows {
+		http.Error(w, `{"error": "Not found"}`, http.StatusNotFound)
+		return
+	}
+	if existingUserID != userID {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusForbidden)
+		return
+	}
+
+	_, err = db.Exec(`DELETE FROM habits WHERE id = $1`, habitID)
+	if err != nil {
+		fmt.Printf("Error deleting habit: %v\n", err)
+		http.Error(w, `{"error": "Failed to delete habit"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte(`{"success": true}`))
+}
+
+func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, habitIdStr string) {
+	habitID, err := strconv.Atoi(habitIdStr)
+	if err != nil {
+		http.Error(w, `{"error": "Invalid habit ID"}`, http.StatusBadRequest)
+		return
+	}
+
+	var existingUserID int
+	err = db.QueryRow(`SELECT user_id FROM habits WHERE id = $1`, habitID).Scan(&existingUserID)
+	if err == sql.ErrNoRows {
+		http.Error(w, `{"error": "Not found"}`, http.StatusNotFound)
+		return
+	}
+	if existingUserID != userID {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusForbidden)
+		return
+	}
+
+	var req map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error": "Invalid JSON"}`, http.StatusBadRequest)
+		return
+	}
+
+	dateStr, _ := req["date"].(string)
+	status, _ := req["status"].(string)
+	
+	var notes *string
+	if n, ok := req["notes"].(string); ok {
+		notes = &n
+	}
+
+	if dateStr == "" || status == "" {
+		http.Error(w, `{"error": "Missing date or status"}`, http.StatusBadRequest)
+		return
+	}
+
+	if len(dateStr) > 10 {
+		dateStr = dateStr[:10]
+	}
+
+	if status == "empty" {
+		_, err = db.Exec(`DELETE FROM habit_logs WHERE habit_id = $1 AND DATE(date) = $2`, habitID, dateStr)
+		if err != nil {
+			http.Error(w, `{"error": "Failed to delete log"}`, http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte(`{"success": true, "status": "empty"}`))
+		return
+	}
+
+	query := `
+		INSERT INTO habit_logs (habit_id, date, status, notes) 
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (habit_id, date) 
+		DO UPDATE SET status = EXCLUDED.status, notes = EXCLUDED.notes, updated_at = NOW()
+		RETURNING id, date, status, notes, created_at, updated_at
+	`
+	var l HabitLog
+	l.HabitID = habitID
+	
+	var logDate, createdAt, updatedAt time.Time
+	var logNotes sql.NullString
+	
+	err = db.QueryRow(query, habitID, dateStr, status, notes).
+		Scan(&l.ID, &logDate, &l.Status, &logNotes, &createdAt, &updatedAt)
+
+	if err != nil {
+		fmt.Printf("Error upserting habit log: %v\n", err)
+		http.Error(w, `{"error": "Failed to update log"}`, http.StatusInternalServerError)
+		return
+	}
+
+	l.Date = logDate
+	l.CreatedAt = createdAt
+	l.UpdatedAt = updatedAt
+	if logNotes.Valid {
+		l.Notes = &logNotes.String
+	}
+
+	json.NewEncoder(w).Encode(l)
 }
