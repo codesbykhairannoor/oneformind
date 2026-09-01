@@ -56,8 +56,16 @@ export default function PlannerPage() {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    const { data: fetchedTasks, mutate: mutateTasks } = useSWR(`/api/planner/tasks?date=${selectedDate}`, fetcher, { keepPreviousData: true });
-    const { data: fetchedDaily, mutate: mutateDaily } = useSWR(`/api/planner/daily?date=${selectedDate}`, fetcher, { keepPreviousData: true });
+    const { data: fetchedTasks, mutate: mutateTasks } = useSWR(`/api/planner/tasks?date=${selectedDate}`, fetcher, { 
+        revalidateOnMount: true,
+        revalidateOnFocus: true,
+        dedupingInterval: 0,
+    });
+    const { data: fetchedDaily, mutate: mutateDaily } = useSWR(`/api/planner/daily?date=${selectedDate}`, fetcher, { 
+        revalidateOnMount: true,
+        revalidateOnFocus: true,
+        dedupingInterval: 0,
+    });
     
     const parsedTasks = React.useMemo(() => {
         if (!fetchedTasks) return null;
@@ -95,6 +103,25 @@ export default function PlannerPage() {
     const [startHour, setStartHour] = useState(6);
     const [now, setNow] = useState(new Date());
     const [isLoaded, setIsLoaded] = useState(false);
+
+    // Sync SWR fetched data into local states
+    useEffect(() => {
+        if (parsedTasks !== null) {
+            setTasks(parsedTasks);
+        }
+    }, [parsedTasks]);
+
+    useEffect(() => {
+        if (parsedDaily !== null) {
+            setNotes(parsedDaily.notes || '');
+            setMeals({
+                breakfast: parsedDaily.breakfast || '',
+                lunch: parsedDaily.lunch || '',
+                dinner: parsedDaily.dinner || ''
+            });
+            setWaterGlasses(parsedDaily.water || 0);
+        }
+    }, [parsedDaily]);
 
     // Modal state
     const [showTaskModal, setShowTaskModal] = useState(false);
