@@ -4,7 +4,8 @@ import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -12,12 +13,13 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   const { searchParams } = new URL(req.url);
   searchParams.set('userId', session.user.id);
-  searchParams.set('id', params.id);
+  searchParams.set('id', id);
   
   return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,7 +27,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
   const { searchParams } = new URL(req.url);
   searchParams.set('userId', session.user.id);
-  searchParams.set('id', params.id);
+  searchParams.set('id', id);
   
   return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
 }
