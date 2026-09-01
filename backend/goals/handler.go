@@ -162,13 +162,31 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 
 	for rows.Next() {
 		var g Goal
+		var startDate, endDate, createdAt, updatedAt sql.NullTime
 		err := rows.Scan(
-			&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &g.CreatedAt, &g.UpdatedAt,
+			&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &startDate, &endDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &createdAt, &updatedAt,
 		)
 		if err != nil {
 			http.Error(w, "Failed to scan goal", http.StatusInternalServerError)
 			return
 		}
+		if startDate.Valid {
+			t := startDate.Time
+			g.StartDate = &t
+		}
+		if endDate.Valid {
+			t := endDate.Time
+			g.EndDate = &t
+		}
+		if createdAt.Valid {
+			t := createdAt.Time
+			g.CreatedAt = &t
+		}
+		if updatedAt.Valid {
+			t := updatedAt.Time
+			g.UpdatedAt = &t
+		}
+
 		g.Milestones = []GoalMilestone{}
 		goalsMap[g.ID] = &g
 		goalIDs = append(goalIDs, g.ID)
@@ -186,7 +204,20 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 			defer mRows.Close()
 			for mRows.Next() {
 				var m GoalMilestone
-				if err := mRows.Scan(&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &m.TargetDate, &m.CreatedAt, &m.UpdatedAt); err == nil {
+				var targetDate, createdAt, updatedAt sql.NullTime
+				if err := mRows.Scan(&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &targetDate, &createdAt, &updatedAt); err == nil {
+					if targetDate.Valid {
+						t := targetDate.Time
+						m.TargetDate = &t
+					}
+					if createdAt.Valid {
+						t := createdAt.Time
+						m.CreatedAt = &t
+					}
+					if updatedAt.Valid {
+						t := updatedAt.Time
+						m.UpdatedAt = &t
+					}
 					if g, ok := goalsMap[m.GoalID]; ok {
 						g.Milestones = append(g.Milestones, m)
 					}

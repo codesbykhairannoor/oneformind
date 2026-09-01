@@ -113,8 +113,19 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 			defer rows.Close()
 			for rows.Next() {
 				var j Journal
-				rows.Scan(&j.ID, &j.UserID, &j.Date, &j.Title, &j.Content, &j.Mood, &j.ImagePath, &j.IsPinned, &j.AiSentiment, &j.MoodScore, &j.CreatedAt, &j.UpdatedAt)
-				journals = append(journals, j)
+				var createdAt, updatedAt sql.NullTime
+				err := rows.Scan(&j.ID, &j.UserID, &j.Date, &j.Title, &j.Content, &j.Mood, &j.ImagePath, &j.IsPinned, &j.AiSentiment, &j.MoodScore, &createdAt, &updatedAt)
+				if err == nil {
+					if createdAt.Valid {
+						j.CreatedAt = createdAt.Time
+					}
+					if updatedAt.Valid {
+						j.UpdatedAt = updatedAt.Time
+					}
+					journals = append(journals, j)
+				} else {
+					fmt.Printf("Journal scan error: %v\n", err)
+				}
 			}
 		} else {
 			http.Error(w, fmt.Sprintf(`{"error": "Failed to fetch: %v"}`, err), http.StatusInternalServerError)
