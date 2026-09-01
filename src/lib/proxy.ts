@@ -4,7 +4,15 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
-    const goUrl = `${proto}://${host}/api?route=${route}&${queryParams}`;
+    
+    let goUrl = '';
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      // Docker / Coolify Environment
+      goUrl = `${process.env.NEXT_PUBLIC_API_URL}/${route}?${queryParams}`;
+    } else {
+      // Vercel Serverless Environment
+      goUrl = `${proto}://${host}/api?route=${route}&${queryParams}`;
+    }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
