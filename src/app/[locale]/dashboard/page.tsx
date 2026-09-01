@@ -121,11 +121,11 @@ export default async function DashboardPage() {
         }
     };
 
-    const user = {
-        name: session.user.name || 'User',
-        email: session.user.email || '',
+    const clientUser = {
+        name: user.user_metadata?.name || user.user_metadata?.full_name || 'User',
+        email: user.email || '',
         plan_type: 'Architect',
     };
 
-    return <DashboardClient user={user} synergy={synergy} locale={locale} />;
+    return <DashboardClient user={clientUser} synergy={synergy} locale={locale} />;
 }
