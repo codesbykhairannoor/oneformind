@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/auth';
+import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import FinanceDashboardClient from './FinanceDashboardClient';
 
@@ -19,12 +19,16 @@ interface YearlyStat {
 }
 
 export default async function FinanceDashboardPage() {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) {
         redirect('/login');
     }
-
-    const userId = parseInt(session.user.id);
+    let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
+    if (!dbUser) {
+        dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
+    }
+    const userId = dbUser.id;
     const currentYear = new Date().getFullYear();
     const startDate = new Date(`${currentYear}-01-01T00:00:00.000Z`);
     const endDate = new Date(`${currentYear}-12-31T23:59:59.999Z`);

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/auth';
+import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import FinanceClient from './FinanceClient';
 
@@ -10,12 +10,16 @@ export async function generateMetadata() {
 }
 
 export default async function FinancePage({ searchParams }: { searchParams: { month?: string } }) {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) {
         redirect('/login');
     }
-
-    const userId = parseInt(session.user.id);
+    let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
+    if (!dbUser) {
+        dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
+    }
+    const userId = dbUser.id;
     
     // Default to current month if not provided in URL
     let year = new Date().getFullYear();

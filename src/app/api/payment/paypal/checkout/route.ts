@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { createClient } from '@/utils/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,10 +35,16 @@ async function getPayPalAccessToken() {
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await auth();
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
+  if (!dbUser) {
+      dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
+  }
+  const session = { user: { id: dbUser.id.toString(), email: user.email } };
 
         const body = await req.json();
         const proto = req.headers.get('x-forwarded-proto') || 'http';

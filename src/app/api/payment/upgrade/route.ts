@@ -1,14 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/auth';
+import { createClient } from '@/utils/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
+  if (!dbUser) {
+      dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
+  }
+  const session = { user: { id: dbUser.id.toString(), email: user.email } };
 
   try {
     const body = await req.json();

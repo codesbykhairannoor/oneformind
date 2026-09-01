@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/auth';
+import { createClient } from '@/utils/supabase/server';
 import DashboardClient from './DashboardClient';
 import { redirect } from 'next/navigation';
 
