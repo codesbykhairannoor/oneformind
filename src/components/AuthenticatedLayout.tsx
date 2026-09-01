@@ -52,10 +52,10 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     
     // We derive the user data directly from the active NextAuth session
     const user = session?.user ? {
-        name: session.user.name || 'User',
+        name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || 'User',
         email: session.user.email || '',
         plan_type: (session.user as any).planType || 'Explorer',
-        avatar_url: session.user.image || null,
+        avatar_url: session.user.user_metadata?.avatar_url || null,
     } : initialUser ? initialUser : {
         name: status === 'loading' ? 'Loading...' : 'Guest',
         email: status === 'loading' ? '...' : '',

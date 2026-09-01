@@ -52,9 +52,9 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (status === 'authenticated' && session?.user) {
-            if (session.user.name) setName(session.user.name);
+            if (session.user.user_metadata?.full_name) setName(session.user.user_metadata.full_name);
             if (session.user.email) setEmail(session.user.email);
-            if (session.user.image) setAvatarUrl(session.user.image);
+            if (session.user.user_metadata?.avatar_url) setAvatarUrl(session.user.user_metadata.avatar_url);
         }
         
         // Still load mock data for fields not supported by default NextAuth (headline, bio)
@@ -64,7 +64,7 @@ export default function ProfilePage() {
                 const parsed = JSON.parse(saved);
                 if (parsed.headline) setHeadline(parsed.headline);
                 if (parsed.bio) setBio(parsed.bio);
-                if (!session?.user?.image && parsed.avatarUrl) setAvatarUrl(parsed.avatarUrl);
+                if (!session?.user?.user_metadata?.avatar_url && parsed.avatarUrl) setAvatarUrl(parsed.avatarUrl);
             } catch (e) {
                 console.error(e);
             }
