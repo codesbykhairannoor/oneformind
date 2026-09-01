@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { useMemo } from 'react';
 
 // Feature -> tier mapping (1:1 from legacy useGating.js)

@@ -4,7 +4,7 @@ import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
 import Script from 'next/script';
 import InstantIntlProvider from "@/components/InstantIntlProvider";
-import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+
 import "../globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -51,11 +51,9 @@ export default async function RootLayout({
             gtag('config', 'G-7PNK1P4WZN');
           `}
         </Script>
-        <SessionProviderWrapper>
           <InstantIntlProvider initialLocale={locale}>
             {children}
           </InstantIntlProvider>
-        </SessionProviderWrapper>
       </body>
     </html>
   );

@@ -1,7 +1,15 @@
 package handler
 
 import (
+	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"tranvas-api/backend/calendar"
 	"tranvas-api/backend/financeassets"
@@ -27,7 +35,100 @@ import (
 	"tranvas-api/backend/user"
 )
 
+var dbVercel *sql.DB
+
+func initVercelDB() {
+	if dbVercel != nil {
+		return
+	}
+	connStr := os.Getenv("POSTGRES_PRISMA_URL")
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
+	}
+	if connStr == "" {
+		connStr = os.Getenv("POSTGRES_URL")
+	}
+	if connStr == "" {
+		connStr = os.Getenv("DATABASE_URL")
+	}
+	if connStr == "" {
+		log.Println("WARNING: No database connection string found")
+		return
+	}
+
+	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
+	connStr = strings.Replace(connStr, "?&", "?", -1)
+	connStr = strings.Replace(connStr, "&&", "&", -1)
+	if strings.HasSuffix(connStr, "?") {
+		connStr = strings.TrimSuffix(connStr, "?")
+	}
+	if !strings.Contains(connStr, "sslmode=") {
+		if strings.Contains(connStr, "?") {
+			connStr += "&sslmode=require"
+		} else {
+			connStr += "?sslmode=require"
+		}
+	}
+
+	var err error
+	dbVercel, err = sql.Open("pgx", connStr)
+	if err != nil {
+		log.Printf("Error opening db in vercel: %v\n", err)
+	}
+}
+
 func Handler(w http.ResponseWriter, r *http.Request) {
+	// 1. Authenticate and Map User ID
+	authHeader := r.Header.Get("Authorization")
+	if authHeader != "" {
+		parts := strings.Split(authHeader, " ")
+		if len(parts) == 2 && parts[0] == "Bearer" {
+			secret := os.Getenv("SUPABASE_JWT_SECRET")
+			if secret != "" {
+				token, err := jwt.Parse(parts[1], func(token *jwt.Token) (interface{}, error) {
+					return []byte(secret), nil
+				})
+				
+				if err == nil && token.Valid {
+					if claims, ok := token.Claims.(jwt.MapClaims); ok {
+						var email string
+						if e, ok := claims["email"].(string); ok {
+							email = e
+						}
+
+						if email != "" {
+							initVercelDB()
+							if dbVercel != nil {
+								var internalID int
+								errDB := dbVercel.QueryRow(`SELECT id FROM "User" WHERE email = $1`, email).Scan(&internalID)
+								if errDB == sql.ErrNoRows {
+									name := email
+									if rawMeta, ok := claims["user_metadata"].(map[string]interface{}); ok {
+										if n, ok := rawMeta["name"].(string); ok && n != "" {
+											name = n
+										} else if fn, ok := rawMeta["full_name"].(string); ok && fn != "" {
+											name = fn
+										}
+									}
+									dbVercel.QueryRow(`INSERT INTO "User" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
+								}
+								if internalID > 0 {
+									q := r.URL.Query()
+									q.Set("userId", fmt.Sprintf("%d", internalID))
+									r.URL.RawQuery = q.Encode()
+								}
+							}
+						} else if sub, ok := claims["sub"].(string); ok {
+							q := r.URL.Query()
+							q.Set("userId", sub)
+							r.URL.RawQuery = q.Encode()
+						}
+					}
+				}
+			}
+		}
+	}
+
 	route := r.URL.Query().Get("route")
 
 	switch route {

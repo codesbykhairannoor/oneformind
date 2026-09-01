@@ -10,6 +10,8 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://api:8080
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
     depends_on:
       - api
     restart: always
@@ -22,7 +24,8 @@ services:
       - "8080:8080"
     environment:
       - REDIS_URL=redis:6379
-      # Add other environment variables needed for Go backend here
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - redis
     restart: always

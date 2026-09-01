@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { ShieldCheck, Check, Clock, X, ArrowRight } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 
 interface PaymentStatusPageProps {
     params: Promise<{ locale: string }>;

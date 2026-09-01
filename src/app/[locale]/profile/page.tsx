@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { useSession } from 'next-auth/react';
+import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import ModalPortal from '@/components/ModalPortal';
 import {

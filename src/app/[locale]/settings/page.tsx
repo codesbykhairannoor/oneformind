@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { useSession } from 'next-auth/react';
+import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { 
     User, Lock, LayoutGrid, Bell, CreditCard, ShieldCheck, 

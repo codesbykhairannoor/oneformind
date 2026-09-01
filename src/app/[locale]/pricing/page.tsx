@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link, useRouter } from '@/i18n/routing';
-import { useSession } from 'next-auth/react';
+import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { ChevronDown, Check, Lock, Sparkles, Star } from 'lucide-react';
 
 export default function PricingPage() {

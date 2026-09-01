@@ -11,11 +11,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('userId', token.sub);
+  searchParams.set('userId', token.accessToken);
   searchParams.set('id', resolvedParams.id);
   searchParams.set('milestoneId', resolvedParams.milestoneId);
   
-  return proxyToGo(req as any, 'goals-milestones', searchParams.toString(), token.sub);
+  return proxyToGo(req as any, 'goals-milestones', searchParams.toString(), token.accessToken);
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string; milestoneId: string }> }) {
@@ -24,10 +24,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('userId', token.sub);
+  searchParams.set('userId', token.accessToken);
   searchParams.set('id', resolvedParams.id);
   searchParams.set('milestoneId', resolvedParams.milestoneId);
   
-  return proxyToGo(req as any, 'goals-milestones', searchParams.toString(), token.sub);
+  return proxyToGo(req as any, 'goals-milestones', searchParams.toString(), token.accessToken);
 }
 

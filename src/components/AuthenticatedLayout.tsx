@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import ModalPortal from '@/components/ModalPortal';
-import { useSession, signOut } from 'next-auth/react';
+import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
+import { createClient } from "@/utils/supabase/client";
 import {
     LayoutDashboard,
     Zap,
@@ -212,7 +213,9 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         } catch (e) {
             console.error(e);
         }
-        await signOut({ callbackUrl: '/login' });
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        router.push('/login');
     };
 
     const goToCoachWithContext = () => {

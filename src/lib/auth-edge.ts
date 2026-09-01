@@ -1,28 +1,29 @@
-import { getToken } from 'next-auth/jwt';
-import type { NextRequest } from 'next/server';
-
-// NextAuth v5 changed the default cookie name from "next-auth.session-token"
-// to "authjs.session-token". We must explicitly pass the correct cookie name.
-// On HTTPS (production), the cookie is prefixed with __Secure-
-const COOKIE_NAME = process.env.NODE_ENV === 'production'
-  ? '__Secure-authjs.session-token'
-  : 'authjs.session-token';
+import { createServerClient } from '@supabase/ssr'
+import type { NextRequest } from 'next/server'
 
 export async function getAuthToken(req: NextRequest) {
-  // Try the new v5 cookie name first
-  let token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET,
-    cookieName: COOKIE_NAME,
-  });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
+        },
+        setAll() {
+          // Read-only in edge API routes
+        },
+      },
+    }
+  )
 
-  // Fallback: try without cookieName (lets next-auth auto-detect)
-  if (!token?.sub) {
-    token = await getToken({
-      req,
-      secret: process.env.AUTH_SECRET,
-    });
-  }
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  if (!session?.user) return null;
 
-  return token;
+  return {
+    sub: session.user.id,
+    email: session.user.email,
+    accessToken: session.access_token,
+  };
 }

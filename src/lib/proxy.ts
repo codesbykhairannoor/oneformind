@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function proxyToGo(req: Request, route: string, queryParams: string, userId: string) {
+export async function proxyToGo(req: Request, route: string, queryParams: string, accessToken: string) {
   try {
     const proto = req.headers.get('x-forwarded-proto') || 'http';
     const host = req.headers.get('host');
@@ -8,7 +8,7 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'X-User-Id': userId,
+      'Authorization': `Bearer ${accessToken}`,
     };
 
     const origin = req.headers.get('origin');

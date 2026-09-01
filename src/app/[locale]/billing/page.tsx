@@ -6,7 +6,7 @@ import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { Link, useRouter } from '@/i18n/routing';
 import { ChevronDown, Check, Lock, Sparkles, Star, Loader2 } from 'lucide-react';
 import { loadScript } from '@paypal/paypal-js';
-import { useSession } from 'next-auth/react';
+import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import ModalPortal from '@/components/ModalPortal';
 import { useEffect } from 'react';
 
