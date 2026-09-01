@@ -1,66 +1,33 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { proxyToGo } from '@/lib/proxy';
+import { getToken } from 'next-auth/jwt';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
-async function proxyToGo(req: Request, userId: string, method: string, goalId: string, milestoneId: string, body?: any) {
-  const host = req.headers.get('host');
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string; milestoneId: string }> }) {
+  const resolvedParams = await params;
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', token.sub);
+  searchParams.set('id', resolvedParams.id);
+  searchParams.set('milestoneId', resolvedParams.milestoneId);
   
-  const { search } = new URL(req.url);
-  const goUrl = `${protocol}://${host}/api?route=goals-milestones${search ? '&' + search.slice(1) : ''}&userId=${userId}&goalId=${goalId}&id=${milestoneId}`;
-
-  try {
-    const response = await fetch(goUrl, {
-      cache: 'no-store',
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-User-Id': userId,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Go API returned ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Go Proxy Error:', error);
-    throw error;
-  }
+  return proxyToGo(req as any, 'goals-milestones', searchParams.toString(), token.sub);
 }
 
-export async function PUT(req: Request, props: { params: Promise<{ id: string; milestoneId: string }> }) {
-  const params = await props.params;
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string; milestoneId: string }> }) {
+  const resolvedParams = await params;
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  try {
-    const body = await req.json();
-    const data = await proxyToGo(req, session.user.id, 'PUT', params.id, params.milestoneId, body);
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error proxying PUT goal milestone:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', token.sub);
+  searchParams.set('id', resolvedParams.id);
+  searchParams.set('milestoneId', resolvedParams.milestoneId);
+  
+  return proxyToGo(req as any, 'goals-milestones', searchParams.toString(), token.sub);
 }
 
-export async function DELETE(req: Request, props: { params: Promise<{ id: string; milestoneId: string }> }) {
-  const params = await props.params;
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const data = await proxyToGo(req, session.user.id, 'DELETE', params.id, params.milestoneId);
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error proxying DELETE goal milestone:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}

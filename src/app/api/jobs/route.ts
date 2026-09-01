@@ -7,9 +7,7 @@ export const runtime = 'edge';
 
 export async function GET(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  if (!token?.sub) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   searchParams.set('userId', token.sub);
@@ -19,12 +17,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  if (!token?.sub) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   searchParams.set('userId', token.sub);
   
   return proxyToGo(req as any, 'jobs', searchParams.toString(), token.sub);
 }
+

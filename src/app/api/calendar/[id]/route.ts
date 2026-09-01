@@ -1,33 +1,31 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { proxyToGo } from '@/lib/proxy';
-import { auth } from '@/auth';
+import { getToken } from 'next-auth/jwt';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(req.url);
-  searchParams.set('userId', session.user.id);
-  searchParams.set('id', id);
-  
-  return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
-}
-
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
-  searchParams.set('userId', session.user.id);
-  searchParams.set('id', id);
+  searchParams.set('userId', token.sub);
+  searchParams.set('id', resolvedParams.id);
   
-  return proxyToGo(req, 'calendar', searchParams.toString(), session.user.id);
+  return proxyToGo(req as any, 'calendar', searchParams.toString(), token.sub);
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', token.sub);
+  searchParams.set('id', resolvedParams.id);
+  
+  return proxyToGo(req as any, 'calendar', searchParams.toString(), token.sub);
+}
+

@@ -1,48 +1,17 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { proxyToGo } from '@/lib/proxy';
+import { getToken } from 'next-auth/jwt';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
-async function proxyToGo(req: Request, userId: string, method: string, body?: any) {
-  const host = req.headers.get('host');
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+export async function GET(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', token.sub);
   
-  const { search } = new URL(req.url);
-  const goUrl = `${protocol}://${host}/api?route=finance-yearly${search ? '&' + search.slice(1) : ''}&userId=${userId}`;
-
-  try {
-    const response = await fetch(goUrl, {
-      cache: 'no-store',
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-User-Id': userId,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Go API returned ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Go Proxy Error:', error);
-    throw error;
-  }
+  return proxyToGo(req as any, 'finance-yearly', searchParams.toString(), token.sub);
 }
 
-export async function GET(req: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const data = await proxyToGo(req, session.user.id, 'GET');
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error proxying GET yearly stats:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}

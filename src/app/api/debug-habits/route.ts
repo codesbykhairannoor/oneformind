@@ -1,13 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { proxyToGo } from '@/lib/proxy';
+import { getToken } from 'next-auth/jwt';
+
 export const dynamic = 'force-dynamic';
-export async function GET(req: Request) {
-  try {
-    const host = req.headers.get('host');
-    const goUrl = 'https://' + host + '/api?route=habits&period=2026-08';
-    const goRes = await fetch(goUrl, { headers: { 'X-User-Id': '1' }, cache: 'no-store' });
-    const text = await goRes.text();
-    return NextResponse.json({ success: true, status: goRes.status, url: goUrl, body: text });
-  } catch(e: any) {
-    return NextResponse.json({ success: false, error: e.message, stack: e.stack });
-  }
+export const runtime = 'edge';
+
+export async function GET(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  searchParams.set('userId', token.sub);
+  
+  return proxyToGo(req as any, 'debug-habits', searchParams.toString(), token.sub);
 }
+
