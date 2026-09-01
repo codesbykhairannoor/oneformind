@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import useSWR from 'swr';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import ModalPortal from '@/components/ModalPortal';
 import { useSearchParams } from 'next/navigation';
@@ -33,7 +32,6 @@ interface InboxTask {
 }
 
 export default function PlannerPage() {
-    const fetcher = (url: string) => fetch(url).then(res => res.json());
     usePageTitle('Planner');
     const t = useTranslations();
     const locale = useLocale();
@@ -56,61 +54,11 @@ export default function PlannerPage() {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    const { data: fetchedTasks, mutate: mutateTasks } = useSWR(`/api/planner/tasks?date=${selectedDate}`, fetcher, { 
-        revalidateOnMount: true,
-        revalidateOnFocus: true,
-        dedupingInterval: 0,
-    });
-    const { data: fetchedDaily, mutate: mutateDaily } = useSWR(`/api/planner/daily?date=${selectedDate}`, fetcher, { 
-        revalidateOnMount: true,
-        revalidateOnFocus: true,
-        dedupingInterval: 0,
-    });
-    
-    const parsedTasks = React.useMemo(() => {
-        if (!fetchedTasks || !Array.isArray(fetchedTasks)) return null;
-        return fetchedTasks.map((t: any) => {
-            const extractTime = (isoString: string) => {
-                if (!isoString) return '';
-                // Handle both full ISO strings and already formatted "HH:MM" strings
-                if (isoString.includes('T')) {
-                    const date = new Date(isoString);
-                    // Use UTC hours if it was stored as UTC, or local hours. The Z indicates UTC.
-                    // Actually, let's just extract the HH:MM substring directly to avoid timezone shifts
-                    // 1970-01-01T09:00:00Z -> "09:00"
-                    const timePart = isoString.split('T')[1];
-                    return timePart ? timePart.substring(0, 5) : '';
-                }
-                return isoString;
-            };
-
-            return {
-                id: t.id,
-                date: t.date ? t.date.split('T')[0] : '',
-                title: t.title,
-                start_time: extractTime(t.startTime),
-                end_time: extractTime(t.endTime),
-                type: t.type,
-                notes: t.notes || '',
-                completed: t.isCompleted || false
-            };
-        });
-    }, [fetchedTasks]);
-
-    const parsedDaily = React.useMemo(() => {
-        if (!fetchedDaily || typeof fetchedDaily !== 'object' || Array.isArray(fetchedDaily)) return null;
-        return fetchedDaily as any;
-    }, [fetchedDaily]);
-
-    const [tasks, setTasks] = useState<TaskItem[]>(parsedTasks || []);
-    const [notes, setNotes] = useState(parsedDaily?.notes || '');
-    const [meals, setMeals] = useState({
-        breakfast: parsedDaily?.meals?.breakfast || '',
-        lunch: parsedDaily?.meals?.lunch || '',
-        dinner: parsedDaily?.meals?.dinner || ''
-    });
-    const [waterGlasses, setWaterGlasses] = useState(parsedDaily?.waterGlasses || 0);
-    const [taskInbox, setTaskInbox] = useState<InboxTask[]>(parsedDaily?.inbox || []);
+    const [tasks, setTasks] = useState<TaskItem[]>([]);
+    const [notes, setNotes] = useState('');
+    const [meals, setMeals] = useState({ breakfast: '', lunch: '', dinner: '' });
+    const [waterGlasses, setWaterGlasses] = useState(0);
+    const [taskInbox, setTaskInbox] = useState<InboxTask[]>([]);
     
     const [pomodoroTime, setPomodoroTime] = useState(25 * 60);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -119,29 +67,6 @@ export default function PlannerPage() {
     const [startHour, setStartHour] = useState(6);
     const [now, setNow] = useState(new Date());
     const [isLoaded, setIsLoaded] = useState(false);
-
-    // Sync SWR fetched data into local states
-    useEffect(() => {
-        if (parsedTasks !== null) {
-            setTasks(parsedTasks);
-        }
-    }, [parsedTasks]);
-
-    useEffect(() => {
-        if (parsedDaily !== null) {
-            setNotes(parsedDaily.notes || '');
-            setMeals({
-                breakfast: parsedDaily.meals?.breakfast || '',
-                lunch: parsedDaily.meals?.lunch || '',
-                dinner: parsedDaily.meals?.dinner || ''
-            });
-            setWaterGlasses(parsedDaily.waterGlasses || 0);
-            setTaskInbox(parsedDaily.inbox || []);
-        } else {
-            // While fetching new date, we don't necessarily reset to avoid flicker,
-            // but if the fetch returns empty object {}, the properties above will evaluate to empty.
-        }
-    }, [parsedDaily]);
 
     // Modal state
     const [showTaskModal, setShowTaskModal] = useState(false);
@@ -163,16 +88,73 @@ export default function PlannerPage() {
         }
     }, [dateParam]);
 
-
-
     // Initial Hydration
     useEffect(() => {
         const savedStart = localStorage.getItem('planner_start_time');
         if (savedStart) setStartHour(parseInt(savedStart));
         
+        const fetchTasks = async () => {
+            try {
+                const res = await fetch(`/api/planner/tasks?date=${selectedDate}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setTasks(data.map((t: any) => ({
+                        id: t.id,
+                        date: t.date.split('T')[0],
+                        title: t.title,
+                        start_time: t.startTime ? t.startTime.substring(11, 16) : '',
+                        end_time: t.endTime ? t.endTime.substring(11, 16) : '',
+                        type: t.type,
+                        notes: t.notes || '',
+                        completed: t.isCompleted
+                    })));
+                }
+            } catch (error) {
+                console.error('Failed to fetch tasks:', error);
+            } finally {
+                setIsLoaded(true);
+            }
+        };
+
+        fetchTasks();
+
         const clockInterval = setInterval(() => setNow(new Date()), 60000);
         return () => clearInterval(clockInterval);
-    }, []);
+    }, [selectedDate]);
+
+    // Effect for loading specific date data when selectedDate changes
+    useEffect(() => {
+        if (!isLoaded) return;
+        
+        const fetchDaily = async () => {
+            try {
+                const res = await fetch(`/api/planner/daily?date=${selectedDate}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    setNotes(data.notes || '');
+                    
+                    if (data.meals) {
+                        setMeals(data.meals);
+                    } else {
+                        setMeals({ breakfast: '', lunch: '', dinner: '' });
+                    }
+                    
+                    setWaterGlasses(data.waterGlasses || 0);
+                    
+                    if (data.inbox) {
+                        setTaskInbox(data.inbox);
+                    } else {
+                        setTaskInbox([]);
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch daily data", e);
+            }
+        };
+
+        fetchDaily();
+    }, [selectedDate, isLoaded]);
 
     const syncDaily = (payload: any) => {
         fetch('/api/planner/daily', {
@@ -370,25 +352,19 @@ export default function PlannerPage() {
             return;
         }
 
-        setShowTaskModal(false); // Close immediately for instant feel
-
         try {
             if (editingTaskId) {
-                // Optimistic Update
-                updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { ...t, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes } : t));
-                
-                await fetch(`/api/planner/tasks/${editingTaskId}`, {
+                const res = await fetch(`/api/planner/tasks/${editingTaskId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
                     })
                 });
+                if (res.ok) {
+                    updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { ...t, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes } : t));
+                }
             } else {
-                // Optimistic Update
-                const tempId = Date.now();
-                updateTasksState(prev => [...prev, { id: tempId, date: selectedDate, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes, completed: false }]);
-
                 const res = await fetch('/api/planner/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -398,13 +374,13 @@ export default function PlannerPage() {
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    // Replace temp ID with real ID
-                    updateTasksState(prev => prev.map(t => t.id === tempId ? { ...t, id: data.id } : t));
+                    updateTasksState(prev => [...prev, { id: data.id, date: selectedDate, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes, completed: false }]);
                 }
             }
         } catch (error) {
             console.error('Failed to save task:', error);
         }
+        setShowTaskModal(false);
     };
 
     const handleMoveTask = async (taskId: number, newStartTime: string) => {
@@ -455,7 +431,15 @@ export default function PlannerPage() {
         setShowTaskModal(false);
     };
 
-    // No more full-screen spinner! Render skeleton or empty state instantly!
+    if (!isLoaded) {
+        return (
+            <AuthenticatedLayout>
+                <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
+                </div>
+            </AuthenticatedLayout>
+        );
+    }
 
     return (
         <AuthenticatedLayout>
