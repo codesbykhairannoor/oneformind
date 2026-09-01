@@ -4,7 +4,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile.next
+      dockerfile: web.Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -19,7 +19,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile.go
+      dockerfile: api.Dockerfile
     environment:
       - REDIS_URL=redis:6379
       - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
