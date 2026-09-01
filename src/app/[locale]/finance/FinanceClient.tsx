@@ -44,7 +44,13 @@ export default function FinanceClient({
     usePageTitle('Finance');
     const t = useTranslations();
     const locale = useLocale();
-    const fetcher = (url: string) => fetch(url).then(res => res.json());
+    const fetcher = async (url: string) => {
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error('API Error');
+        }
+        return res.json();
+    };
 
     // ===== 1. CURRENCY SYSTEM (1:1 from useFinanceFormat.js) =====
     const [activeCurrency, setActiveCurrency] = useState('IDR');
