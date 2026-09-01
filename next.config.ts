@@ -4,6 +4,9 @@ import type { NextConfig } from 'next';
 const withNextIntl = createNextIntlPlugin();
  
 const nextConfig: NextConfig = {
+    // Required for Docker deployment
+    output: 'standalone',
+
     // Enable React Compiler for automatic memoization
     reactCompiler: true,
 
