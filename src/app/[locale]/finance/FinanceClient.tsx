@@ -104,10 +104,11 @@ export default function FinanceClient({
     const [selectedMonthKey, setSelectedMonthKey] = useState(initialMonthKey);
 
     // ===== 3. SWR DATA FETCHING & CACHING =====
-    const { data: txRawData, mutate: mutateTx } = useSWR(`/api/finance/transactions?month=${selectedMonthKey}`, fetcher, { keepPreviousData: true });
-    const { data: catRawData, mutate: mutateCat } = useSWR(`/api/finance/categories`, fetcher, { keepPreviousData: true });
-    const { data: budRawData, mutate: mutateBud } = useSWR(`/api/finance/budgets?month=${selectedMonthKey}`, fetcher, { keepPreviousData: true });
-    const { data: savRawData, mutate: mutateSav } = useSWR(`/api/finance/savings`, fetcher, { keepPreviousData: true });
+    const swrOptions = { keepPreviousData: true, revalidateOnMount: true, revalidateOnFocus: true, dedupingInterval: 0 };
+    const { data: txRawData, mutate: mutateTx } = useSWR(`/api/finance/transactions?month=${selectedMonthKey}`, fetcher, swrOptions);
+    const { data: catRawData, mutate: mutateCat } = useSWR(`/api/finance/categories`, fetcher, swrOptions);
+    const { data: budRawData, mutate: mutateBud } = useSWR(`/api/finance/budgets?month=${selectedMonthKey}`, fetcher, swrOptions);
+    const { data: savRawData, mutate: mutateSav } = useSWR(`/api/finance/savings`, fetcher, swrOptions);
 
     // Derive parsed data from SWR cache or fallback to initial data
     const transactions: TransactionItem[] = (txRawData || initialTransactions).map((t: any) => ({
