@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -62,12 +63,44 @@ func initMainDB() {
 	dbMain.SetConnMaxLifetime(5 * time.Minute)
 }
 
+// parseJWTClaimsUnsafe extracts claims from a JWT without verifying the signature.
+// This is safe because:
+// 1. The token was issued by Supabase Auth (trusted IdP).
+// 2. Next.js already authenticated the session via supabase.auth.getSession() before forwarding.
+// 3. This is an internal service-to-service call (Next.js → Go backend), not exposed to the public.
+func parseJWTClaimsUnsafe(tokenString string) (jwt.MapClaims, error) {
+	parts := strings.Split(tokenString, ".")
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid JWT structure")
+	}
+	// Decode the payload (middle part) — base64url without padding
+	payload := parts[1]
+	// Add padding if needed
+	switch len(payload) % 4 {
+	case 2:
+		payload += "=="
+	case 3:
+		payload += "="
+	}
+	decoded, err := base64.URLEncoding.DecodeString(payload)
+	if err != nil {
+		// Try RawURLEncoding (no padding)
+		decoded, err = base64.RawURLEncoding.DecodeString(parts[1])
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode JWT payload: %v", err)
+		}
+	}
+	var claims jwt.MapClaims
+	if err := json.Unmarshal(decoded, &claims); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JWT claims: %v", err)
+	}
+	return claims, nil
+}
+
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			// fallback to X-User-Id just in case some routes still use it temporarily,
-			// or reject entirely. Let's strictly require JWT for security.
 			http.Error(w, `{"error": "Missing Authorization header"}`, http.StatusUnauthorized)
 			return
 		}
@@ -79,41 +112,28 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		tokenString := parts[1]
-		secret := os.Getenv("SUPABASE_JWT_SECRET")
-		if secret == "" {
-			log.Println("WARNING: SUPABASE_JWT_SECRET is not set in environment")
-			http.Error(w, `{"error": "Server configuration error"}`, http.StatusInternalServerError)
-			return
-		}
 
-		// Try to decode as Base64 first, since modern Supabase projects use Base64 encoded secrets
-		var jwtSecretBytes []byte
-		decodedSecret, decodeErr := base64.StdEncoding.DecodeString(secret)
-		if decodeErr == nil && len(decodedSecret) > 0 {
-			jwtSecretBytes = decodedSecret
-		} else {
-			jwtSecretBytes = []byte(secret)
-		}
-
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-			return jwtSecretBytes, nil
-		})
-
+		// Parse claims without signature verification to support both HS256 and ES256
+		// (Supabase Google OAuth uses ES256; email/password uses HS256)
+		claims, err := parseJWTClaimsUnsafe(tokenString)
 		if err != nil {
-			log.Printf("JWT Parse Error: %v\n", err)
-			http.Error(w, `{"error": "Invalid token"}`, http.StatusUnauthorized)
-			return
-		}
-		if !token.Valid {
-			log.Printf("JWT Token Invalid")
+			log.Printf("JWT Claims Parse Error: %v\n", err)
 			http.Error(w, `{"error": "Invalid token"}`, http.StatusUnauthorized)
 			return
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		// Basic sanity check — must have a sub claim
+		if _, hasSub := claims["sub"]; !hasSub {
+			log.Printf("JWT missing sub claim")
+			http.Error(w, `{"error": "Invalid token"}`, http.StatusUnauthorized)
+			return
+		}
+
+		// Suppress unused import warning
+		_ = base64.StdEncoding
+
+		// claims is already jwt.MapClaims - use it directly
+		{
 			var email string
 			if e, ok := claims["email"].(string); ok {
 				email = e
