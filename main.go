@@ -165,6 +165,9 @@ func main() {
 	// Define our protected routes under /api
 	r.Group(func(r chi.Router) {
 		r.Use(AuthMiddleware)
+		r.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
+			handler.Handler(w, r)
+		})
 		r.HandleFunc("/api/*", func(w http.ResponseWriter, r *http.Request) {
 			handler.Handler(w, r)
 		})
