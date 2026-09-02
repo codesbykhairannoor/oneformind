@@ -74,6 +74,7 @@ function LocaleSwitcherListener({
       if (newLocale && newLocale !== locale) {
         setLocale(newLocale);
         localStorage.setItem('tranvas_locale', newLocale);
+        document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
         // next-intl's custom router automatically formats the URL prefix depending on the newLocale
         const currentSearch = window.location.search;
