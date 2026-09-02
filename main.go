@@ -143,7 +143,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 			if email != "" && dbMain != nil {
 				var internalID int
-				err := dbMain.QueryRow(`SELECT id FROM "User" WHERE email = $1`, email).Scan(&internalID)
+				err := dbMain.QueryRow(`SELECT id FROM "users" WHERE email = $1`, email).Scan(&internalID)
 				log.Printf("AuthMiddleware: DB lookup for %q: internalID=%d err=%v", email, internalID, err)
 				if err == sql.ErrNoRows {
 					// Auto-create user if not exists to map the integer ID
@@ -156,7 +156,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 						}
 					}
 					
-					errInsert := dbMain.QueryRow(`INSERT INTO "User" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
+					errInsert := dbMain.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
 					if errInsert != nil {
 						log.Printf("AuthMiddleware: Error creating auto user: %v", errInsert)
 					} else {
