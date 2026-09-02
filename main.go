@@ -139,9 +139,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				email = e
 			}
 
+			log.Printf("AuthMiddleware: email=%q dbMain=%v", email, dbMain != nil)
+
 			if email != "" && dbMain != nil {
 				var internalID int
 				err := dbMain.QueryRow(`SELECT id FROM "User" WHERE email = $1`, email).Scan(&internalID)
+				log.Printf("AuthMiddleware: DB lookup for %q: internalID=%d err=%v", email, internalID, err)
 				if err == sql.ErrNoRows {
 					// Auto-create user if not exists to map the integer ID
 					name := email
@@ -155,22 +158,29 @@ func AuthMiddleware(next http.Handler) http.Handler {
 					
 					errInsert := dbMain.QueryRow(`INSERT INTO "User" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
 					if errInsert != nil {
-						log.Printf("Error creating auto user: %v", errInsert)
+						log.Printf("AuthMiddleware: Error creating auto user: %v", errInsert)
+					} else {
+						log.Printf("AuthMiddleware: Created new user with id=%d", internalID)
 					}
+				} else if err != nil {
+					log.Printf("AuthMiddleware: DB error (not ErrNoRows): %v", err)
 				}
 
 				if internalID > 0 {
 					q := r.URL.Query()
 					q.Set("userId", fmt.Sprintf("%d", internalID))
 					r.URL.RawQuery = q.Encode()
+					log.Printf("AuthMiddleware: Set userId=%d", internalID)
+				} else {
+					// Cannot resolve to integer ID - block the request
+					log.Printf("AuthMiddleware: Could not resolve integer userId for email=%q, blocking request", email)
+					http.Error(w, `{"error": "Could not resolve user. Please try again."}`, http.StatusInternalServerError)
+					return
 				}
 			} else {
-				// Fallback to SUB if DB lookup fails (will probably break Go handlers expecting INT)
-				if sub, ok := claims["sub"].(string); ok {
-					q := r.URL.Query()
-					q.Set("userId", sub)
-					r.URL.RawQuery = q.Encode()
-				}
+				log.Printf("AuthMiddleware: email empty or dbMain nil, cannot resolve userId")
+				http.Error(w, `{"error": "Could not resolve user. Please try again."}`, http.StatusInternalServerError)
+				return
 			}
 		}
 

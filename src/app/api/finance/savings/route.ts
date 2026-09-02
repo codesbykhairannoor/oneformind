@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('userId', token.accessToken);
   
   return proxyToGo(req as any, 'finance-savings', searchParams.toString(), token.accessToken);
 }
@@ -20,7 +19,6 @@ export async function POST(req: NextRequest) {
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('userId', token.accessToken);
   
   return proxyToGo(req as any, 'finance-savings', searchParams.toString(), token.accessToken);
 }
@@ -30,8 +28,8 @@ export async function PUT(req: NextRequest) {
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('userId', token.accessToken);
   
   return proxyToGo(req as any, 'finance-savings', searchParams.toString(), token.accessToken);
 }
+
 

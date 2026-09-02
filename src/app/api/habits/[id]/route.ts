@@ -11,7 +11,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('userId', token.accessToken);
   searchParams.set('id', resolvedParams.id);
   
   return proxyToGo(req as any, 'habits', searchParams.toString(), token.accessToken);
@@ -23,7 +22,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('userId', token.accessToken);
   searchParams.set('id', resolvedParams.id);
   
   return proxyToGo(req as any, 'habits', searchParams.toString(), token.accessToken);
