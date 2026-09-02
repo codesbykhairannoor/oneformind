@@ -15,12 +15,6 @@ services:
     depends_on:
       - api
     restart: always
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID}-web.rule=Host(`${COOLIFY_FQDN}`)"
-      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID}-web.entrypoints=http"
-      - "traefik.http.services.${COOLIFY_RESOURCE_UUID}-web.loadbalancer.server.port=3000"
-
   api:
     build:
       context: .
