@@ -8,7 +8,7 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
     let goUrl = '';
     if (process.env.NEXT_PUBLIC_API_URL) {
       // Docker / Coolify Environment
-      goUrl = `${process.env.NEXT_PUBLIC_API_URL}/${route}?${queryParams}`;
+      goUrl = `${process.env.NEXT_PUBLIC_API_URL}?route=${route}&${queryParams}`;
     } else {
       // Vercel Serverless Environment
       goUrl = `${proto}://${host}/api?route=${route}&${queryParams}`;
