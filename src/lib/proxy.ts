@@ -39,10 +39,8 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
 
     const goRes = await fetch(goUrl, fetchOptions);
 
-    if (!goRes.ok) {
-      const text = await goRes.text();
-      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
-    }
+    // Forward all responses transparently, including 401s and 400s
+    // so the frontend can handle token expiration or bad requests correctly.
 
     // Stream the raw Go response bytes directly to the client.
     // This avoids double JSON serialization which can turn null → {} in some runtimes.
