@@ -1,6 +1,6 @@
 # Dockerfile.next
 # Clean build: No Prisma, no postinstall scripts, just Next.js + Supabase
-FROM node:22-slim AS builder
+FROM public.ecr.aws/docker/library/node:22-slim AS builder
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # --- Production runner ---
-FROM node:22-slim AS runner
+FROM public.ecr.aws/docker/library/node:22-slim AS runner
 
 WORKDIR /app
 

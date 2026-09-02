@@ -1,5 +1,5 @@
 # Dockerfile.go
-FROM golang:1.23-alpine AS builder
+FROM public.ecr.aws/docker/library/golang:1.23-alpine AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 ######## Start a new stage from scratch #######
-FROM alpine:3.20
+FROM public.ecr.aws/docker/library/alpine:3.20
 
 RUN apk --no-cache add ca-certificates tzdata
 
