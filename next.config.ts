@@ -37,12 +37,12 @@ const nextConfig: NextConfig = {
     async headers() {
         return [
             {
-                // Cache static marketing pages for 5 minutes on CDN (stale-while-revalidate 60s)
+                // Cache static marketing pages for 1 hour on CDN (stale-while-revalidate 1 day)
                 source: '/:locale(en|id)/:path*',
                 headers: [
                     {
                         key: 'Cache-Control',
-                        value: 'public, s-maxage=300, stale-while-revalidate=60',
+                        value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
                     },
                 ],
                 // Only for non-authenticated marketing routes
