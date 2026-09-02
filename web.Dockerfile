@@ -1,23 +1,19 @@
 # Dockerfile.next
-# Using node:22-slim (Debian) instead of Alpine for maximum Prisma compatibility
-# Alpine uses musl libc which can cause binary incompatibility with Prisma engine
+# Clean build: No Prisma, no postinstall scripts, just Next.js + Supabase
 FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# Install openssl (required by Prisma on Debian slim)
+# Install openssl (required by some packages on Debian slim)
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files first (layer caching)
 COPY package.json package-lock.json* ./
 
-# Copy prisma schema so postinstall can generate client
-COPY prisma ./prisma/
-
-# Install all dependencies (runs postinstall = prisma generate automatically)
+# Install dependencies — no postinstall scripts, clean and fast
 RUN npm ci
 
-# Copy the rest of source code
+# Copy source code
 COPY . .
 
 # Next.js telemetry is disabled
@@ -30,8 +26,6 @@ RUN npm run build
 FROM node:22-slim AS runner
 
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

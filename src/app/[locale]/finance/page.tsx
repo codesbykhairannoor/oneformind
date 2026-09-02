@@ -1,7 +1,7 @@
-import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import FinanceClient from './FinanceClient';
+import { goFetchJson } from '@/lib/go-fetch';
 
 export async function generateMetadata() {
     return {
@@ -15,16 +15,11 @@ export default async function FinancePage({ searchParams }: { searchParams: { mo
     if (!user?.email) {
         redirect('/login');
     }
-    let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
-    if (!dbUser) {
-        dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
-    }
-    const userId = dbUser.id;
-    
+
     // Default to current month if not provided in URL
     let year = new Date().getFullYear();
     let month = new Date().getMonth() + 1;
-    
+
     if (searchParams?.month) {
         const parts = searchParams.month.split('-');
         if (parts.length === 2) {
@@ -34,35 +29,19 @@ export default async function FinancePage({ searchParams }: { searchParams: { mo
     }
 
     const initialDateStr = `${year}-${String(month).padStart(2, '0')}`;
-    
-    // Fetch data for the requested month
-    const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
-    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
-    
-    const [transactions, categories, budgets, savings] = await Promise.all([
-        prisma.financeTransaction.findMany({
-            where: {
-                userId,
-                date: {
-                    gte: startDate,
-                    lte: endDate,
-                },
-            },
-            orderBy: [
-                { date: 'desc' },
-                { id: 'desc' }
-            ]
-        }),
-        prisma.financeCategory.findMany({
-            where: { userId }
-        }),
-        prisma.financeBudget.findMany({
-            where: { userId, month: initialDateStr }
-        }),
-        prisma.financeSaving.findMany({
-            where: { userId }
-        })
+
+    // Fetch all finance data from Go API in parallel (no Prisma!)
+    const [transactionsData, categoriesData, budgetsData, savingsData] = await Promise.all([
+        goFetchJson<any[]>('finance-transactions', `month=${initialDateStr}`),
+        goFetchJson<any[]>('finance-categories', ''),
+        goFetchJson<any[]>('finance-budgets', `month=${initialDateStr}`),
+        goFetchJson<any[]>('finance-savings', ''),
     ]);
+
+    const transactions = transactionsData[0] || [];
+    const categories = categoriesData[0] || [];
+    const budgets = budgetsData[0] || [];
+    const savings = savingsData[0] || [];
 
     const serializedCategories = categories.map((c: any) => ({
         slug: c.slug,
@@ -74,28 +53,28 @@ export default async function FinancePage({ searchParams }: { searchParams: { mo
     const serializedTransactions = transactions.map((t: any) => ({
         ...t,
         amount: Number(t.amount),
-        date: t.date.toISOString().split('T')[0]
+        date: t.date ? t.date.split('T')[0] : t.date,
     }));
 
     const serializedBudgets = budgets.map((b: any) => ({
         ...b,
-        limit: Number(b.limitAmount),
-        spent: 0 // Will be computed client-side
+        limit: Number(b.limit_amount || b.limitAmount || b.limit),
+        spent: 0, // computed client-side
     }));
 
     const serializedSavings = savings.map((s: any) => ({
         id: s.id,
-        name: s.title,
-        target: Number(s.targetAmount),
-        current: Number(s.currentAmount),
+        name: s.title || s.name,
+        target: Number(s.target_amount || s.targetAmount || s.target),
+        current: Number(s.current_amount || s.currentAmount || s.current),
         icon: s.icon,
         color: s.color || '#6366f1'
     }));
 
     return (
-        <FinanceClient 
-            initialMonthKey={initialDateStr} 
-            initialTransactions={serializedTransactions} 
+        <FinanceClient
+            initialMonthKey={initialDateStr}
+            initialTransactions={serializedTransactions}
             initialCategories={serializedCategories}
             initialBudgets={serializedBudgets}
             initialSavings={serializedSavings}

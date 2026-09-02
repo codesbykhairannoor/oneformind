@@ -1,38 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
+// Duitku callback — called directly by Duitku servers (not authenticated users)
+// No Prisma, no auth needed. Just forward to Go.
 export async function POST(req: NextRequest) {
     try {
-        const body = await req.json(); // or formData if they send it as form-urlencoded, but usually JSON
-        // Duitku sends application/x-www-form-urlencoded by default for callbacks!
-        // Wait, Next.js handles form-urlencoded differently. Let's try parsing as text first or use request.formData()
-        // Legacy code used $request->input('amount') which handles both JSON and form data.
-        
         const contentType = req.headers.get('content-type') || '';
         const proto = req.headers.get('x-forwarded-proto') || 'http';
         const host = req.headers.get('host');
-        const goUrl = `${proto}://${host}/api?route=payment-duitku-callback`;
-        
-        // Pass everything directly to Go (either form or json)
-        let requestBody;
-        if (contentType.includes('application/x-www-form-urlencoded')) {
-            const formData = await req.text(); // Get raw URL encoded text
-            requestBody = formData;
-        } else {
-            const json = await req.json();
-            requestBody = JSON.stringify(json);
-        }
+        const apiBase = process.env.NEXT_PUBLIC_API_URL
+            ? process.env.NEXT_PUBLIC_API_URL
+            : `${proto}://${host}/api`;
+        const goUrl = `${apiBase}?route=payment-duitku-callback`;
+
+        // Read the body once as text (works for both form-urlencoded and JSON)
+        const requestBody = await req.text();
 
         const goRes = await fetch(goUrl, {
-      cache: 'no-store',
+            cache: 'no-store',
             method: 'POST',
             headers: {
                 'Content-Type': contentType,
             },
-            body: requestBody
+            body: requestBody,
         });
 
         if (!goRes.ok) {

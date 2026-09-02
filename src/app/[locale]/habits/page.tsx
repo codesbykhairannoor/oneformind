@@ -1,7 +1,7 @@
-import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import HabitsClient from './HabitsClient';
+import { goFetchJson } from '@/lib/go-fetch';
 
 export async function generateMetadata() {
     return {
@@ -15,16 +15,11 @@ export default async function HabitsPage({ searchParams }: { searchParams: { mon
     if (!user?.email) {
         redirect('/login');
     }
-    let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
-    if (!dbUser) {
-        dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
-    }
-    const userId = dbUser.id;
-    
+
     // Default to current month if not provided in URL
     let year = new Date().getFullYear();
     let month = new Date().getMonth() + 1;
-    
+
     if (searchParams?.month) {
         const parts = searchParams.month.split('-');
         if (parts.length === 2) {
@@ -34,38 +29,26 @@ export default async function HabitsPage({ searchParams }: { searchParams: { mon
     }
 
     const initialDateStr = `${year}-${String(month).padStart(2, '0')}`;
-    
-    // Fetch data for the requested month
-    const habits = await prisma.habit.findMany({
-      where: {
-        userId,
-        isArchived: false,
-        period: initialDateStr,
-      },
-      orderBy: {
-        position: 'asc',
-      },
-      include: {
-        logs: true,
-      }
-    });
 
-    const serializedHabits = habits.map(h => ({
+    // Fetch habits from Go API (no Prisma!)
+    const [habits] = await goFetchJson<any[]>('habits', `month=${initialDateStr}`);
+
+    const serializedHabits = (habits || []).map((h: any) => ({
         ...h,
-        createdAt: h.createdAt ? h.createdAt.toISOString() : null,
-        updatedAt: h.updatedAt ? h.updatedAt.toISOString() : null,
-        logs: h.logs.map(l => ({
+        createdAt: h.createdAt || h.created_at || null,
+        updatedAt: h.updatedAt || h.updated_at || null,
+        logs: (h.logs || []).map((l: any) => ({
             ...l,
-            date: l.date.toISOString(),
-            createdAt: l.createdAt ? l.createdAt.toISOString() : null,
-            updatedAt: l.updatedAt ? l.updatedAt.toISOString() : null,
+            date: l.date,
+            createdAt: l.createdAt || l.created_at || null,
+            updatedAt: l.updatedAt || l.updated_at || null,
         }))
     }));
 
     return (
-        <HabitsClient 
-            initialDateStr={initialDateStr} 
-            initialHabits={serializedHabits} 
+        <HabitsClient
+            initialDateStr={initialDateStr}
+            initialHabits={serializedHabits}
         />
     );
 }

@@ -1,11 +1,10 @@
-import { getLocale, getTranslations } from 'next-intl/server';
-import { prisma } from '@/lib/prisma';
+import { getLocale } from 'next-intl/server';
 import { createClient } from '@/utils/supabase/server';
 import DashboardClient from './DashboardClient';
 import { redirect } from 'next/navigation';
+import { goFetchJson } from '@/lib/go-fetch';
 
 export async function generateMetadata() {
-    const t = await getTranslations();
     return {
         title: `Dashboard - Tranvas`,
     };
@@ -20,63 +19,36 @@ export default async function DashboardPage() {
     if (!user?.email) {
         redirect(`/${locale}/login`);
     }
-    
-    let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
-    if (!dbUser) {
-        dbUser = await prisma.user.create({ data: { email: user.email, name: user.user_metadata?.name || user.user_metadata?.full_name || user.email } });
-    }
-    const userId = dbUser.id;
+
     const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T00:00:00.000Z`;
-    const today = new Date(todayStr);
+    const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const monthStr = todayStr.substring(0, 7); // YYYY-MM
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    // Run queries in parallel for maximum performance
-    const [habits, plannerTasks, transactions, goals, journals] = await Promise.all([
-        prisma.habit.findMany({ 
-            where: { userId, isArchived: false },
-            include: {
-                logs: {
-                    where: { date: { gte: today, lt: tomorrow } }
-                }
-            }
-        }),
-        prisma.plannerTask.findMany({
-            where: { 
-                userId,
-                date: { gte: today, lt: tomorrow }
-            }
-        }),
-        prisma.financeTransaction.findMany({
-            where: {
-                userId,
-                date: { gte: new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)) }
-            }
-        }),
-        prisma.goal.findMany({ 
-            where: { userId },
-            include: { milestones: true },
-            orderBy: { id: 'desc' },
-            take: 1
-        }),
-        prisma.journal.findMany({
-            where: {
-                userId,
-                date: { gte: today, lt: tomorrow }
-            }
-        })
+    // Fetch data from Go API in parallel (no Prisma!)
+    const [habitsData, tasksData, transactionsData, goalsData, journalsData] = await Promise.all([
+        goFetchJson<any[]>('habits', `month=${monthStr}`),
+        goFetchJson<any[]>('planner-tasks', `date=${todayStr}`),
+        goFetchJson<any[]>('finance-transactions', `month=${monthStr}`),
+        goFetchJson<any[]>('goals', ''),
+        goFetchJson<any[]>('journals', `date=${todayStr}`),
     ]);
+
+    const habits = habitsData[0] || [];
+    const plannerTasks = tasksData[0] || [];
+    const transactions = transactionsData[0] || [];
+    const goals = goalsData[0] || [];
+    const journals = journalsData[0] || [];
 
     // Habits calculation
     const totalHabits = habits.length;
-    const completedHabits = habits.filter(h => h.logs.some(l => l.status === 'completed')).length;
+    const completedHabits = habits.filter((h: any) =>
+        h.logs?.some((l: any) => l.status === 'completed' && l.date?.startsWith(todayStr))
+    ).length;
 
     // Finance calculation
     let expense = 0;
     let income = 0;
-    transactions.forEach(t => {
+    transactions.forEach((t: any) => {
         if (t.type === 'expense') expense += Number(t.amount);
         if (t.type === 'income') income += Number(t.amount);
     });
@@ -86,7 +58,7 @@ export default async function DashboardPage() {
     if (goals.length > 0) {
         const g = goals[0];
         const ms = g.milestones || [];
-        const comp = ms.filter(m => m.completed).length;
+        const comp = ms.filter((m: any) => m.completed).length;
         const percent = ms.length === 0 ? 0 : Math.round((comp / ms.length) * 100);
         topGoal = { title: g.title, percent };
     } else {
@@ -94,7 +66,9 @@ export default async function DashboardPage() {
     }
 
     const synergy = {
-        date_formatted: now.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+        date_formatted: now.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        }),
         habits: {
             completed: completedHabits,
             total: totalHabits,
@@ -102,16 +76,19 @@ export default async function DashboardPage() {
         },
         planner: {
             total: plannerTasks.length,
-            completed: plannerTasks.filter(t => t.isCompleted).length,
-            upcoming: plannerTasks.filter(t => !t.isCompleted).slice(0, 4).map(t => ({
-                id: t.id,
-                title: t.title,
-                type: t.type,
-                start_time: t.startTime 
-                    ? new Date(t.startTime).toISOString().substring(11, 16)
-                    : null,
-                isCompleted: t.isCompleted,
-            }))
+            completed: plannerTasks.filter((t: any) => t.isCompleted || t.is_completed).length,
+            upcoming: plannerTasks
+                .filter((t: any) => !(t.isCompleted || t.is_completed))
+                .slice(0, 4)
+                .map((t: any) => ({
+                    id: t.id,
+                    title: t.title,
+                    type: t.type,
+                    start_time: t.startTime || t.start_time
+                        ? new Date(t.startTime || t.start_time).toISOString().substring(11, 16)
+                        : null,
+                    isCompleted: t.isCompleted || t.is_completed,
+                }))
         },
         finance: { expense, income },
         goals: { top_goal: topGoal },
