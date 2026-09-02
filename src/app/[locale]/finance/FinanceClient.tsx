@@ -513,16 +513,35 @@ export default function FinanceClient({
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(cat)
                     });
-                    mutateCat();
-                    if (cat.limit) {
+                    
+                    if (cat.type === 'expense' || cat.limit !== undefined) {
+                        await fetch('/api/finance/budgets', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                category: cat.slug,
+                                limitAmount: cat.limit || 0,
+                                month: selectedMonthKey
+                            })
+                        });
                         mutateBud();
                     }
+                    
+                    mutateCat();
                     setShowCategoryModal(false);
                 }}
                 onDeleteCategory={async (slug: string) => {
+                    const budgetToDelete = budgets.find(b => b.category === slug);
+                    
                     mutateCat(categories.filter(c => c.slug !== slug), false);
                     mutateBud(budgets.filter(b => b.category !== slug), false);
+                    
                     await fetch(`/api/finance/categories?slug=${slug}`, { method: 'DELETE' });
+                    
+                    if (budgetToDelete) {
+                        await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
+                    }
+                    
                     mutateCat();
                     mutateBud();
                 }}

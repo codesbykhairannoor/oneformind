@@ -309,9 +309,53 @@ export default function GuestLayout({ children, user = null }: { children: React
                 {mobileMenuOpen && (
                     <div className="lg:hidden fixed inset-x-0 top-[72px] sm:top-16 z-[95] bg-white/95 backdrop-blur-2xl flex flex-col h-[calc(100vh-[72px])] sm:h-[calc(100vh-4rem)] w-full overflow-hidden border-t border-slate-200/50 text-left animate-in slide-in-from-top-4 duration-300">
                         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto px-6 pt-8 pb-10 space-y-6">
-                            <Link href="/features/planner" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-[22px] font-black text-slate-900 tracking-tight">Features</Link>
-                            <Link href="/solutions/student" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-[22px] font-black text-slate-900 tracking-tight">Solutions</Link>
-                            <Link href="/resources/guide" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-[22px] font-black text-slate-900 tracking-tight">Resources</Link>
+                            {/* Features */}
+                            <div>
+                                <button onClick={() => setMobilePanel(mobilePanel === 'features' ? null : 'features')} className="w-full flex justify-between items-center py-2 text-[22px] font-black text-slate-900 tracking-tight">
+                                    Features
+                                    <svg className={`w-5 h-5 transition-transform ${mobilePanel === 'features' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                {mobilePanel === 'features' && (
+                                    <div className="flex flex-col gap-3 pl-4 pt-2">
+                                        <Link href="/features/planner" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Daily Planner</Link>
+                                        <Link href="/features/habit" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Habit Tracker</Link>
+                                        <Link href="/features/finance" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Finance OS</Link>
+                                        <Link href="/features/journal" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Digital Journal</Link>
+                                        <Link href="/features/goal" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Goal Tracker</Link>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Solutions */}
+                            <div>
+                                <button onClick={() => setMobilePanel(mobilePanel === 'solutions' ? null : 'solutions')} className="w-full flex justify-between items-center py-2 text-[22px] font-black text-slate-900 tracking-tight">
+                                    Solutions
+                                    <svg className={`w-5 h-5 transition-transform ${mobilePanel === 'solutions' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                {mobilePanel === 'solutions' && (
+                                    <div className="flex flex-col gap-3 pl-4 pt-2">
+                                        <Link href="/solutions/student" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">For Students</Link>
+                                        <Link href="/solutions/freelancer" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">For Freelancers</Link>
+                                        <Link href="/solutions/personalgrowth" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Personal Growth</Link>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Resources */}
+                            <div>
+                                <button onClick={() => setMobilePanel(mobilePanel === 'resources' ? null : 'resources')} className="w-full flex justify-between items-center py-2 text-[22px] font-black text-slate-900 tracking-tight">
+                                    Resources
+                                    <svg className={`w-5 h-5 transition-transform ${mobilePanel === 'resources' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                {mobilePanel === 'resources' && (
+                                    <div className="flex flex-col gap-3 pl-4 pt-2">
+                                        <Link href="/resources/guide" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">User Guide</Link>
+                                        <Link href="/resources/blog" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Blog</Link>
+                                        <Link href="/resources/community" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Community</Link>
+                                    </div>
+                                )}
+                            </div>
+
                             <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-[22px] font-black text-slate-900 tracking-tight">Pricing</Link>
                             
                             <div className="pt-8 mt-4 border-t border-slate-200/50 space-y-6">
