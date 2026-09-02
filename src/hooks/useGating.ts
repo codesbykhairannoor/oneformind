@@ -50,7 +50,7 @@ export const useGating = () => {
     const tier = useMemo(() => {
         if (!user) return 1;
 
-        if (user.isPremium || user.planType === 'trial') {
+        if (user.isPremium || user.planType === 'trial' || user.planType === 'legendary' || user.planType === 'quantum') {
             return PLAN_LEVELS[user.planType?.toLowerCase()] || 2;
         }
 

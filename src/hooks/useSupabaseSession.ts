@@ -16,16 +16,12 @@ export function useSupabaseSession() {
       }
       
       try {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('is_premium, plan_type')
-          .eq('email', baseSession.user.email)
-          .single();
-          
-        if (profile) {
+        const res = await fetch('/api/user');
+        if (res.ok) {
+           const profile = await res.json();
            // Attach custom fields for NextAuth legacy compatibility
-           (baseSession.user as any).isPremium = profile.is_premium;
-           (baseSession.user as any).planType = profile.plan_type;
+           (baseSession.user as any).isPremium = profile.isPremium;
+           (baseSession.user as any).planType = profile.planType;
         }
       } catch (e) {
         console.error("Error fetching user profile", e);

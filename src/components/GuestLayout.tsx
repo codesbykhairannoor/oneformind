@@ -323,8 +323,14 @@ export default function GuestLayout({ children, user = null }: { children: React
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3 pt-4">
-                                    <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-slate-800 bg-white border-2 border-slate-200 rounded-2xl text-[15px] hover:border-slate-300 transition-colors">Log in</Link>
-                                    <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-white bg-indigo-600 rounded-2xl text-[15px] shadow-xl shadow-indigo-200 active:scale-95 transition-transform">Get started</Link>
+                                    {user ? (
+                                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-white bg-slate-900 rounded-2xl text-[15px] shadow-xl active:scale-95 transition-transform">Dashboard</Link>
+                                    ) : (
+                                        <>
+                                            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-slate-800 bg-white border-2 border-slate-200 rounded-2xl text-[15px] hover:border-slate-300 transition-colors">Log in</Link>
+                                            <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-white bg-indigo-600 rounded-2xl text-[15px] shadow-xl shadow-indigo-200 active:scale-95 transition-transform">Get started</Link>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
