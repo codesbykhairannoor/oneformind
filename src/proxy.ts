@@ -28,7 +28,7 @@ export const proxy = async (req: any) => {
   // Since we don't want to make a network request to Supabase on every single static route,
   // we let the server components (layout.tsx) handle the strict redirect.
   // But for simple middleware protection, if it's protected and they have no supabase cookie:
-  const hasAuthCookie = req.cookies.has('sb-access-token') || req.cookies.getAll().some((c: any) => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
+  const hasAuthCookie = req.cookies.has('sb-access-token') || req.cookies.getAll().some((c: any) => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
   
   if (isProtectedRoute && !hasAuthCookie) {
     const loginUrl = new URL('/id/login', req.url);
