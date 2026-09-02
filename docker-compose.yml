@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: web.Dockerfile
-    ports:
-      - "3000:3000"
+    networks:
+      - coolify
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://api:8080
@@ -15,11 +15,18 @@ services:
     depends_on:
       - api
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID}-web.rule=Host(`${COOLIFY_FQDN}`)"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID}-web.entrypoints=http"
+      - "traefik.http.services.${COOLIFY_RESOURCE_UUID}-web.loadbalancer.server.port=3000"
 
   api:
     build:
       context: .
       dockerfile: api.Dockerfile
+    networks:
+      - coolify
     environment:
       - REDIS_URL=redis:6379
       - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
@@ -30,6 +37,8 @@ services:
 
   redis:
     image: redis:7-alpine
+    networks:
+      - coolify
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
@@ -37,3 +46,7 @@ services:
 
 volumes:
   redis_data:
+
+networks:
+  coolify:
+    external: true

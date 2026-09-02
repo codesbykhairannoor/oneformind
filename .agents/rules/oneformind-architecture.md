@@ -9,6 +9,7 @@ description: Critical architecture rules for OneForMind - Monorepo (Next.js + Go
    - Both reside in the same repository (Monorepo).
 
 2. **Coolify Deployment Invariants**:
-   - The Next.js frontend MUST ALWAYS be deployed using `web.Dockerfile` as the Build Strategy.
-   - **NEVER** switch the Coolify Build Pack/Strategy to Nixpacks. Nixpacks auto-detects the `go.mod` file in the root and mistakenly builds the Go backend instead of the Node frontend, causing fatal 404 errors.
-   - The longer build time (6-10 minutes) for `web.Dockerfile` is an acceptable tradeoff for deployment stability. Do not attempt to "optimize" it by switching to Nixpacks.
+   - The application MUST ALWAYS be deployed using **Docker Compose** (`docker-compose.yml`) as the Build Strategy.
+   - This ensures both the Next.js frontend (`web`) and the Golang backend (`api`) are spun up together.
+   - **NEVER** use `web.Dockerfile` as a standalone build strategy in Coolify, as it will leave the Go backend offline.
+   - **NEVER** switch the Coolify Build Pack to Nixpacks, as Nixpacks auto-detects `go.mod` and breaks the frontend build.
