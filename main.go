@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -85,11 +86,20 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		// Try to decode as Base64 first, since modern Supabase projects use Base64 encoded secrets
+		var jwtSecretBytes []byte
+		decodedSecret, decodeErr := base64.StdEncoding.DecodeString(secret)
+		if decodeErr == nil && len(decodedSecret) > 0 {
+			jwtSecretBytes = decodedSecret
+		} else {
+			jwtSecretBytes = []byte(secret)
+		}
+
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return []byte(secret), nil
+			return jwtSecretBytes, nil
 		})
 
 		if err != nil {
