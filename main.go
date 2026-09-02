@@ -92,7 +92,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return []byte(secret), nil
 		})
 
-		if err != nil || !token.Valid {
+		if err != nil {
+			log.Printf("JWT Parse Error: %v\n", err)
+			http.Error(w, `{"error": "Invalid token"}`, http.StatusUnauthorized)
+			return
+		}
+		if !token.Valid {
+			log.Printf("JWT Token Invalid")
 			http.Error(w, `{"error": "Invalid token"}`, http.StatusUnauthorized)
 			return
 		}
