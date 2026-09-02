@@ -31,7 +31,7 @@ export const proxy = async (req: any) => {
   const hasAuthCookie = req.cookies.has('sb-access-token') || req.cookies.getAll().some((c: any) => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
   
   if (isProtectedRoute && !hasAuthCookie) {
-    const loginUrl = new URL('/id/login', req.nextUrl.origin);
+    const loginUrl = new URL('/id/login', req.url);
     return Response.redirect(loginUrl);
   }
 
@@ -40,7 +40,7 @@ export const proxy = async (req: any) => {
   
   if ((pathname === '/' || pathname === '/id' || pathname === '/en' || isAuthPage) && hasAuthCookie) {
     const locale = (pathname.startsWith('/en') || pathname === '/en') ? 'en' : 'id';
-    return Response.redirect(new URL(`/${locale}/dashboard`, req.nextUrl.origin));
+    return Response.redirect(new URL(`/${locale}/dashboard`, req.url));
   }
 
   // Copy cookies from supabaseResponse to the final intlResponse
