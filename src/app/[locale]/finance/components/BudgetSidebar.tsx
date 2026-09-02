@@ -23,9 +23,6 @@ interface BudgetSidebarProps {
     categories: CategoryItem[];
     expenseStats: Record<string, number>;
     incomeStats: Record<string, number>;
-    onAddBudget: () => void;
-    onEditBudget: (b: BudgetItem) => void;
-    onDeleteBudget: (id: number) => void;
     onAddCategory: () => void;
     onEditCategory: (c: CategoryItem) => void;
     onDeleteCategory: (c: CategoryItem) => void;
@@ -38,9 +35,6 @@ export default function BudgetSidebar({
     categories,
     expenseStats,
     incomeStats,
-    onAddBudget,
-    onEditBudget,
-    onDeleteBudget,
     onAddCategory,
     onEditCategory,
     onDeleteCategory,
@@ -80,6 +74,22 @@ export default function BudgetSidebar({
             }))
             .sort((a, b) => b.amount - a.amount);
     }, [categories, incomeStats]);
+
+    // Expense list
+    const expenseList = useMemo(() => {
+        return categories
+            .filter(c => c.type === 'expense')
+            .map(cat => {
+                const b = budgets.find(b => b.category === cat.slug);
+                return {
+                    ...cat,
+                    budget: b,
+                    limit: b ? Number(b.limit) : 0,
+                    spent: expenseStats[cat.slug] || 0
+                };
+            })
+            .sort((a, b) => b.spent - a.spent);
+    }, [categories, budgets, expenseStats]);
 
     // Total budget — 1:1 from BudgetSidebar.vue line 31-38
     const totalBudget = budgets.reduce((sum, b) => sum + Number(b.limit), 0);
@@ -121,7 +131,7 @@ export default function BudgetSidebar({
                             {t('budget_target') || 'Target Budget'}
                         </h3>
                         <button
-                            onClick={onAddBudget}
+                            onClick={onAddCategory}
                             className="shrink-0 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition duration-300 flex items-center gap-1.5"
                         >
                             <span>+</span>
@@ -129,10 +139,10 @@ export default function BudgetSidebar({
                         </button>
                     </div>
 
-                    {budgets.length === 0 ? (
+                    {expenseList.length === 0 ? (
                         <div className="text-center py-8 text-xs text-slate-400 dark:text-slate-600 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-800/30 transition-colors duration-500">
                             <span className="text-2xl block mb-2">🎯</span>
-                            {t('no_budget') || 'Belum ada budget yang di-set'}
+                            {t('no_budget') || 'Belum ada kategori pengeluaran'}
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -152,46 +162,48 @@ export default function BudgetSidebar({
 
                             {/* Budget Items — 1:1 from BudgetSidebar.vue line 89 */}
                             <div className="space-y-3">
-                                {budgets.map(b => {
-                                    const cat = getCat(b.category);
-                                    const progress = getProgress(b.category, b.limit);
+                                {expenseList.map(item => {
+                                    const progress = getProgress(item.slug, item.limit);
                                     const barColor = getBarColor(progress);
-                                    const spent = expenseStats[b.category] || 0;
 
                                     return (
-                                        <div key={b.id} className="relative pb-3 border-b border-slate-100 dark:border-slate-800/50 last:border-0 last:pb-0 transition-colors duration-500">
+                                        <div key={item.slug} className="relative pb-3 border-b border-slate-100 dark:border-slate-800/50 last:border-0 last:pb-0 transition-colors duration-500">
                                             <div className="flex justify-between items-end text-sm mb-2">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-sm transition-all duration-500">
-                                                        {cat.icon}
+                                                        {item.icon}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-bold text-slate-700 dark:text-slate-200 capitalize text-sm leading-tight transition-colors duration-500">{cat.name}</span>
+                                                        <span className="font-bold text-slate-700 dark:text-slate-200 capitalize text-sm leading-tight transition-colors duration-500">{item.name}</span>
                                                         <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 mt-0.5 transition-colors duration-500">
-                                                            {formatMoney(spent)} / {formatMoney(b.limit)}
+                                                            {formatMoney(item.spent)} {item.limit > 0 ? `/ ${formatMoney(item.limit)}` : ''}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col items-end gap-1">
                                                     <div className="flex gap-1">
-                                                        <button onClick={() => onEditBudget(b)} className="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 px-1.5 py-0.5 rounded transition">
+                                                        <button onClick={() => onEditCategory(item)} className="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 px-1.5 py-0.5 rounded transition">
                                                             ✏️{t('edit') || 'Edit'}
                                                         </button>
-                                                        <button onClick={() => onDeleteBudget(b.id)} className="text-[10px] font-bold text-rose-400 dark:text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-500/10 px-1.5 py-0.5 rounded transition">
+                                                        <button onClick={() => onDeleteCategory(item)} className="text-[10px] font-bold text-rose-400 dark:text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-500/10 px-1.5 py-0.5 rounded transition">
                                                             🗑️{t('delete') || 'Hapus'}
                                                         </button>
                                                     </div>
-                                                    <span className={`text-[10px] font-black font-mono transition-colors duration-500 ${progress > 90 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-400 dark:text-slate-600'}`}>
-                                                        {Math.round(progress)}%
-                                                    </span>
+                                                    {item.limit > 0 && (
+                                                        <span className={`text-[10px] font-black font-mono transition-colors duration-500 ${progress > 90 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-400 dark:text-slate-600'}`}>
+                                                            {Math.round(progress)}%
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner relative transition-colors duration-500">
-                                                <div
-                                                    className={`absolute top-0 left-0 h-full transition-all duration-1000 rounded-full ${barColor}`}
-                                                    style={{ width: `${progress}%` }}
-                                                ></div>
-                                            </div>
+                                            {item.limit > 0 && (
+                                                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner relative transition-colors duration-500">
+                                                    <div
+                                                        className={`absolute top-0 left-0 h-full transition-all duration-1000 rounded-full ${barColor}`}
+                                                        style={{ width: `${progress}%` }}
+                                                    ></div>
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}

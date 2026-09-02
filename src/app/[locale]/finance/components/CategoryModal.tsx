@@ -16,17 +16,17 @@ interface CategoryItem {
 interface CategoryModalProps {
     show: boolean;
     categories: CategoryItem[];
+    editingCategory?: CategoryItem | null;
     onClose: () => void;
-    onAddCategory: (cat: CategoryItem) => void;
-    onDeleteCategory: (slug: string) => void;
+    onSaveCategory: (cat: CategoryItem) => void;
 }
 
 export default function CategoryModal({
     show,
     categories,
+    editingCategory,
     onClose,
-    onAddCategory,
-    onDeleteCategory
+    onSaveCategory
 }: CategoryModalProps) {
     const t = useTranslations();
     const iconPalette = ['💰', '💸', '🏦', '💎', '🎥', '🎤', '🚗', '🏠', '🎓', '🛒', '🔧', '🎨', '🖥️', '📱', '🪙', '💵'];
@@ -39,11 +39,20 @@ export default function CategoryModal({
 
     useEffect(() => {
         if (show) {
-            setName('');
-            setIcon('📦');
+            if (editingCategory) {
+                setName(editingCategory.name);
+                setType(editingCategory.type || 'expense');
+                setIcon(editingCategory.icon || '📦');
+                setLimit(editingCategory.limit ? String(editingCategory.limit) : '');
+            } else {
+                setName('');
+                setType('expense');
+                setIcon('📦');
+                setLimit('');
+            }
             setShowIconGrid(false);
         }
-    }, [show]);
+    }, [show, editingCategory]);
 
     if (!show) return null;
 
@@ -51,10 +60,11 @@ export default function CategoryModal({
         e.preventDefault();
         if (!name.trim()) return;
 
-        const slug = name.trim().toLowerCase().replace(/\s+/g, '_');
+        const slug = editingCategory ? editingCategory.slug : name.trim().toLowerCase().replace(/\s+/g, '_');
         const budgetLimit = type === 'expense' ? Number(limit.replace(/[^0-9]/g, '')) : undefined;
 
-        onAddCategory({
+        onSaveCategory({
+            ...editingCategory,
             slug,
             name: name.trim(),
             icon: icon || '📦',
@@ -78,7 +88,7 @@ export default function CategoryModal({
                 {/* Header — 1:1 from CategoryModal.vue line 28-33 */}
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-black text-slate-800 dark:text-white transition-colors duration-500">
-                        ✨ {t('add_source') || 'Tambah Sumber / Kategori'}
+                        ✨ {editingCategory ? (t('edit') || 'Edit Kategori') : (t('add_source') || 'Tambah Sumber / Kategori')}
                     </h3>
                     <button onClick={onClose} className="bg-slate-50 dark:bg-slate-800 p-2 rounded-full text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-300">
                         <X size={18} />

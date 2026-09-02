@@ -22,6 +22,7 @@ import { Wallet, Plus } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 interface CategoryOption {
+    id?: number;
     slug: string;
     name: string;
     icon: string;
@@ -150,6 +151,7 @@ export default function FinanceClient({
     const [showTrxModal, setShowTrxModal] = useState(false);
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<any>(null);
     const [showSavingModal, setShowSavingModal] = useState(false);
     const [showVaultTxModal, setShowVaultTxModal] = useState(false);
     const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -346,19 +348,22 @@ export default function FinanceClient({
                                 categories={categories}
                                 expenseStats={expenseStats}
                                 incomeStats={incomeStats}
-                                onAddBudget={() => setShowCategoryModal(true)}
-                                onEditBudget={() => setShowCategoryModal(true)}
-                                onDeleteBudget={async (id) => {
-                                    mutateBud(budgets.filter(b => b.id !== id), false);
-                                    await fetch(`/api/finance/budgets?id=${id}`, { method: 'DELETE' });
-                                    mutateBud();
-                                }}
-                                onAddCategory={() => setShowCategoryModal(true)}
-                                onEditCategory={() => setShowCategoryModal(true)}
+                                onAddCategory={() => { setEditingCategory(null); setShowCategoryModal(true); }}
+                                onEditCategory={(cat) => { setEditingCategory(cat); setShowCategoryModal(true); }}
                                 onDeleteCategory={async (cat) => {
+                                    const budgetToDelete = budgets.find(b => b.category === cat.slug);
+                                    
                                     mutateCat(categories.filter(c => c.slug !== cat.slug), false);
+                                    mutateBud(budgets.filter(b => b.category !== cat.slug), false);
+                                    
                                     await fetch(`/api/finance/categories?slug=${cat.slug}`, { method: 'DELETE' });
+                                    
+                                    if (budgetToDelete) {
+                                        await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
+                                    }
+                                    
                                     mutateCat();
+                                    mutateBud();
                                 }}
                                 activeCurrency={activeCurrency}
                                 currencyLocale={currencyLocale}
@@ -506,17 +511,28 @@ export default function FinanceClient({
             <CategoryModal
                 show={showCategoryModal}
                 categories={categories}
-                onClose={() => setShowCategoryModal(false)}
-                onAddCategory={async (cat: any) => {
-                    await fetch('/api/finance/categories', {
-                        method: 'POST',
+                editingCategory={editingCategory}
+                onClose={() => {
+                    setShowCategoryModal(false);
+                    setEditingCategory(null);
+                }}
+                onSaveCategory={async (cat: any) => {
+                    const method = editingCategory ? 'PUT' : 'POST';
+                    const endpoint = editingCategory && cat.id ? `/api/finance/categories?id=${cat.id}` : '/api/finance/categories';
+                    
+                    await fetch(endpoint, {
+                        method,
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(cat)
                     });
                     
                     if (cat.type === 'expense' || cat.limit !== undefined) {
-                        await fetch('/api/finance/budgets', {
-                            method: 'POST',
+                        const existingBudget = budgets.find(b => b.category === cat.slug);
+                        const budMethod = existingBudget ? 'PUT' : 'POST';
+                        const budEndpoint = existingBudget ? `/api/finance/budgets?id=${existingBudget.id}` : '/api/finance/budgets';
+                        
+                        await fetch(budEndpoint, {
+                            method: budMethod,
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 category: cat.slug,
@@ -529,21 +545,7 @@ export default function FinanceClient({
                     
                     mutateCat();
                     setShowCategoryModal(false);
-                }}
-                onDeleteCategory={async (slug: string) => {
-                    const budgetToDelete = budgets.find(b => b.category === slug);
-                    
-                    mutateCat(categories.filter(c => c.slug !== slug), false);
-                    mutateBud(budgets.filter(b => b.category !== slug), false);
-                    
-                    await fetch(`/api/finance/categories?slug=${slug}`, { method: 'DELETE' });
-                    
-                    if (budgetToDelete) {
-                        await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
-                    }
-                    
-                    mutateCat();
-                    mutateBud();
+                    setEditingCategory(null);
                 }}
             />
 
