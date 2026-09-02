@@ -8,23 +8,49 @@ export function useSupabaseSession() {
   const supabase = createClient();
 
   useEffect(() => {
+    const fetchProfile = async (baseSession: Session | null) => {
+      if (!baseSession) {
+        setSession(null);
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('is_premium, plan_type')
+          .eq('email', baseSession.user.email)
+          .single();
+          
+        if (profile) {
+           // Attach custom fields for NextAuth legacy compatibility
+           (baseSession.user as any).isPremium = profile.is_premium;
+           (baseSession.user as any).planType = profile.plan_type;
+        }
+      } catch (e) {
+        console.error("Error fetching user profile", e);
+      }
+      
+      setSession(baseSession);
+      setIsLoading(false);
+    };
+
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setIsLoading(false);
+      await fetchProfile(session);
     };
 
     getSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setIsLoading(false);
+    } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      setIsLoading(true);
+      await fetchProfile(newSession);
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  }, [supabase]);
 
   return { data: session, status: isLoading ? 'loading' : (session ? 'authenticated' : 'unauthenticated') };
 }
