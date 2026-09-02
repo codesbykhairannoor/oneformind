@@ -94,7 +94,7 @@ export default function TransactionModal({
 
     const availableCategories = categories.filter(c => c.type === type);
     const activeCategories = availableCategories.filter(c => activeSlugs.has(c.slug));
-    const displayCategories = type === 'income' || activeCategories.length === 0 ? availableCategories : activeCategories;
+    const displayCategories = type === 'income' ? availableCategories : activeCategories;
 
     const formatDisplay = (val: string) => {
         if (!val) return '';
