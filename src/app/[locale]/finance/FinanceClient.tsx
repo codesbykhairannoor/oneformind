@@ -18,6 +18,7 @@ import SavingModal, { SavingVault } from './components/SavingModal';
 import VaultTransactionModal from './components/VaultTransactionModal';
 import ArchiveModal from './components/ArchiveModal';
 import FinanceInsights from './components/FinanceInsights';
+import { DeleteConfirmModal } from './components/FinanceModals';
 import { Wallet, Plus } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
@@ -152,6 +153,7 @@ export default function FinanceClient({
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState<any>(null);
+    const [deleteTarget, setDeleteTarget] = useState<{type: 'transaction'|'category', data: any} | null>(null);
     const [showSavingModal, setShowSavingModal] = useState(false);
     const [showVaultTxModal, setShowVaultTxModal] = useState(false);
     const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -241,11 +243,35 @@ export default function FinanceClient({
     };
 
     const handleDeleteTrx = async (id: number) => {
-        if (confirm(t('common.delete_confirm'))) {
+        setDeleteTarget({ type: 'transaction', data: { id } });
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteTarget) return;
+
+        if (deleteTarget.type === 'transaction') {
+            const { id } = deleteTarget.data;
             mutateTx(transactions.filter(t => t.id !== id), false);
             await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
             mutateTx();
+        } else if (deleteTarget.type === 'category') {
+            const cat = deleteTarget.data;
+            const budgetToDelete = budgets.find(b => b.category === cat.slug);
+            
+            mutateCat(categories.filter(c => c.slug !== cat.slug), false);
+            mutateBud(budgets.filter(b => b.category !== cat.slug), false);
+            
+            await fetch(`/api/finance/categories?slug=${cat.slug}`, { method: 'DELETE' });
+            
+            if (budgetToDelete) {
+                await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
+            }
+            
+            mutateCat();
+            mutateBud();
         }
+
+        setDeleteTarget(null);
     };
 
     const handleSaveVault = async (data: SavingVault) => {
@@ -350,21 +376,7 @@ export default function FinanceClient({
                                 incomeStats={incomeStats}
                                 onAddCategory={() => { setEditingCategory(null); setShowCategoryModal(true); }}
                                 onEditCategory={(cat) => { setEditingCategory(cat); setShowCategoryModal(true); }}
-                                onDeleteCategory={async (cat) => {
-                                    const budgetToDelete = budgets.find(b => b.category === cat.slug);
-                                    
-                                    mutateCat(categories.filter(c => c.slug !== cat.slug), false);
-                                    mutateBud(budgets.filter(b => b.category !== cat.slug), false);
-                                    
-                                    await fetch(`/api/finance/categories?slug=${cat.slug}`, { method: 'DELETE' });
-                                    
-                                    if (budgetToDelete) {
-                                        await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
-                                    }
-                                    
-                                    mutateCat();
-                                    mutateBud();
-                                }}
+                                onDeleteCategory={(cat) => setDeleteTarget({ type: 'category', data: cat })}
                                 activeCurrency={activeCurrency}
                                 currencyLocale={currencyLocale}
                             />
@@ -547,6 +559,13 @@ export default function FinanceClient({
                     setShowCategoryModal(false);
                     setEditingCategory(null);
                 }}
+            />
+
+            <DeleteConfirmModal
+                isOpen={!!deleteTarget}
+                onClose={() => setDeleteTarget(null)}
+                onConfirm={confirmDelete}
+                itemName={deleteTarget?.type === 'category' ? deleteTarget.data.name : 'Transaksi'}
             />
 
             <SavingModal

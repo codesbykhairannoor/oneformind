@@ -160,18 +160,27 @@ export const TransactionModal = ({
 // Delete Modal
 // ==========================
 export const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, itemName }: any) => {
+    const t = useTranslations();
+    
     return (
-        <BaseModal isOpen={isOpen} onClose={onClose} title="Hapus Transaksi?">
+        <BaseModal isOpen={isOpen} onClose={onClose} title={t('confirm_delete_title') || 'Apakah Anda yakin?'}>
             <div className="flex flex-col items-center justify-center text-center">
                 <div className="w-16 h-16 bg-rose-100 dark:bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center mb-4">
                     <AlertCircle size={32} strokeWidth={2.5} />
                 </div>
-                <p className="text-slate-600 dark:text-slate-300 font-medium mb-6">
-                    Apakah Anda yakin ingin menghapus <strong className="text-slate-800 dark:text-white">{itemName}</strong>? Tindakan ini tidak dapat dibatalkan.
+                <p className="text-slate-600 dark:text-slate-300 font-medium mb-2">
+                    {t('habit_delete_desc') || 'Are you sure you want to delete'} <strong className="text-slate-800 dark:text-white">{itemName}</strong>?
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                    {t('delete_confirm_msg') || 'Tindakan ini tidak dapat dibatalkan.'}
                 </p>
                 <div className="flex w-full gap-3">
-                    <button onClick={onClose} className="flex-1 px-6 py-3.5 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Batal</button>
-                    <button onClick={onConfirm} className="flex-1 px-6 py-3.5 rounded-xl font-bold text-white bg-rose-500 shadow-lg shadow-rose-200 dark:shadow-none hover:bg-rose-600 transition-all active:scale-95">Ya, Hapus!</button>
+                    <button onClick={onClose} className="flex-1 px-6 py-3.5 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        {t('btn_cancel') || 'Batal'}
+                    </button>
+                    <button onClick={onConfirm} className="flex-1 px-6 py-3.5 rounded-xl font-bold text-white bg-rose-500 shadow-lg shadow-rose-200 dark:shadow-none hover:bg-rose-600 transition-all active:scale-95">
+                        {t('btn_delete') || 'Hapus!'}
+                    </button>
                 </div>
             </div>
         </BaseModal>
