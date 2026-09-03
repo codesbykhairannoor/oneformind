@@ -3,7 +3,6 @@ import { proxyToGo } from '@/lib/proxy';
 import { getAuthToken } from '@/lib/auth-edge';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string; milestoneId: string }> }) {
   const resolvedParams = await params;

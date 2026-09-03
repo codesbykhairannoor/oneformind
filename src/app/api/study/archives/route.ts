@@ -3,7 +3,6 @@ import { proxyToGo } from '@/lib/proxy';
 import { getAuthToken } from '@/lib/auth-edge';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
   const token = await getAuthToken(req);
