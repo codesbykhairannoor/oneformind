@@ -48,6 +48,14 @@ func initDB() {
 		}
 	}
 
+	if !strings.Contains(connStr, "default_query_exec_mode=") { 
+		if strings.Contains(connStr, "?") { 
+			connStr += "&default_query_exec_mode=simple_protocol" 
+		} else { 
+			connStr += "?default_query_exec_mode=simple_protocol" 
+		} 
+	}
+
 	var err error
 	dbTasks, err = sql.Open("pgx", connStr)
 	if err != nil {

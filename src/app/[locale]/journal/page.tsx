@@ -154,32 +154,28 @@ export default function JournalIndexPage() {
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
                             <div className="absolute inset-0" onClick={() => setDeleteModalOpen(false)}></div>
                             <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 w-full max-w-sm flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-                                <div className="p-8 md:p-10 flex flex-col items-center text-center relative overflow-hidden">
-                                    <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-rose-500/10 to-transparent"></div>
-                                    <div className="w-20 h-20 rounded-[2rem] bg-white dark:bg-slate-900 border-2 border-rose-100 dark:border-rose-500/20 shadow-xl shadow-rose-500/20 flex items-center justify-center text-rose-500 mb-6 shrink-0 relative z-10 animate-in zoom-in-95 duration-500 delay-100">
-                                        <Trash2 size={32} strokeWidth={2.5} />
-                                    </div>
-                                    <h3 className="font-black text-slate-800 dark:text-white text-2xl tracking-tight mb-3 relative z-10">
+                                <div className="p-6 md:p-8 w-full max-w-sm relative z-10 text-center">
+                                    <div className="w-16 h-16 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm border border-rose-100">🗑️</div>
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-2">
                                         {t('journal_confirm_delete_title') || 'Hapus Jurnal?'}
                                     </h3>
-                                    <p className="text-sm font-bold text-slate-500 dark:text-slate-400 relative z-10 leading-relaxed px-2">
-                                        {t('journal_confirm_delete') || 'Jurnal ini akan dihapus secara permanen dan tidak dapat dikembalikan lagi.'}
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                                        {t('journal_confirm_delete') || 'Jurnal ini akan dihapus secara permanen dan tidak dapat dikembalikan.'}
                                     </p>
-                                </div>
-                                <div className="p-5 bg-slate-50/80 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex gap-4 backdrop-blur-sm">
-                                    <button 
-                                        onClick={() => setDeleteModalOpen(false)}
-                                        className="flex-1 py-3.5 px-4 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all active:scale-95 border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-700"
-                                    >
-                                        Batal
-                                    </button>
-                                    <button 
-                                        onClick={confirmDelete}
-                                        className="flex-[1.5] py-3.5 px-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white bg-rose-500 hover:bg-rose-600 shadow-xl shadow-rose-500/30 dark:shadow-rose-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
-                                    >
-                                        <Trash2 size={16} strokeWidth={3} />
-                                        Hapus Permanen
-                                    </button>
+                                    <div className="flex gap-3">
+                                        <button 
+                                            onClick={() => setDeleteModalOpen(false)}
+                                            className="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition"
+                                        >
+                                            {t('cancel') || 'Batal'}
+                                        </button>
+                                        <button 
+                                            onClick={confirmDelete}
+                                            className="flex-1 py-3 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg shadow-rose-200 dark:shadow-none transition"
+                                        >
+                                            {t('yes_delete') || 'Hapus Permanen'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
