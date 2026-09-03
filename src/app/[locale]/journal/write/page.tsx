@@ -57,13 +57,22 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                         
                         // Parse legacy HTML content to plain text
                         let rawContent = item.content || '';
+                        
+                        // Unescape HTML entities first (e.g., &lt;p&gt; -> <p>)
+                        const txt = document.createElement("textarea");
+                        txt.innerHTML = rawContent;
+                        rawContent = txt.value;
+
                         if (rawContent.includes('<')) {
                             rawContent = rawContent.replace(/<br\s*[\/]?>/gi, '\n')
                                 .replace(/<\/p>/gi, '\n\n')
+                                .replace(/<\/div>/gi, '\n\n')
+                                .replace(/<\/h[1-6]>/gi, '\n\n')
                                 .replace(/<\/li>/gi, '\n')
-                                .replace(/<li>/gi, '- ')
+                                .replace(/<li[^>]*>/gi, '- ')
                                 .replace(/<[^>]+>/g, '')
-                                .replace(/\n{3,}/g, '\n\n'); // Clean up excessive newlines
+                                .replace(/\n{3,}/g, '\n\n')
+                                .trim(); 
                         }
                         
                         setContent(rawContent);

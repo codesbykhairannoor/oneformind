@@ -605,7 +605,6 @@ export default function PlannerPage() {
                     </div></ModalPortal>
                 )}
 
-                {/* BATCH MODAL */}
                 <PlannerBatchModal 
                     show={showBatchModal}
                     onClose={() => setShowBatchModal(false)}
@@ -615,11 +614,47 @@ export default function PlannerPage() {
                     }}
                     tasks={batchTasks}
                     setTasks={setBatchTasks}
-                    onSubmit={() => {
-                        // Submit batch logic would go here
+                    onSubmit={async () => {
+                        try {
+                            const newTasks = [];
+                            for (const bTask of batchTasks) {
+                                if (!bTask.title.trim()) continue;
+                                const res = await fetch('/api/planner/tasks', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        date: selectedDate,
+                                        title: bTask.title,
+                                        startTime: bTask.start_time,
+                                        endTime: bTask.end_time,
+                                        type: bTask.type,
+                                        notes: ''
+                                    })
+                                });
+                                if (res.ok) {
+                                    const data = await res.json();
+                                    newTasks.push({
+                                        id: data.id,
+                                        date: selectedDate,
+                                        title: bTask.title,
+                                        start_time: bTask.start_time,
+                                        end_time: bTask.end_time,
+                                        type: bTask.type,
+                                        notes: '',
+                                        completed: false
+                                    });
+                                }
+                            }
+                            if (newTasks.length > 0) {
+                                updateTasksState(prev => [...prev, ...newTasks]);
+                            }
+                        } catch (error) {
+                            console.error('Batch save failed', error);
+                        }
                         setShowBatchModal(false);
+                        setBatchTasks([{ title: '', start_time: '09:00', end_time: '10:00', type: 2 }]);
                     }}
-                    isExplorer={false} // Currently set to false so the user can test the batch UI
+                    isExplorer={false}
                 />
 
             </div>
