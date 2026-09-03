@@ -123,6 +123,9 @@ func PaymentPaypalCheckoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID := r.Header.Get("X-User-Id")
 	if userID == "" {
+		userID = r.URL.Query().Get("userId")
+	}
+	if userID == "" {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
 	}

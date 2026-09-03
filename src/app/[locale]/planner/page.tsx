@@ -138,12 +138,30 @@ export default function PlannerPage() {
         return () => clearInterval(clockInterval);
     }, [selectedDate]);
 
-    const syncDaily = (payload: any) => {
+    const syncDaily = (payload: Partial<{
+        notes: string;
+        meals: { breakfast: string; lunch: string; dinner: string };
+        waterGlasses: number;
+        inbox: InboxTask[];
+    }>) => {
+        // Build full state - always send complete snapshot so Go doesn't re-SELECT
+        const body = {
+            date: selectedDate,
+            notes: payload.notes !== undefined ? payload.notes : notes,
+            meals: payload.meals !== undefined ? payload.meals : meals,
+            waterGlasses: payload.waterGlasses !== undefined ? payload.waterGlasses : waterGlasses,
+            inbox: payload.inbox !== undefined ? payload.inbox : taskInbox,
+        };
+
         fetch('/api/planner/daily', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date: selectedDate, ...payload })
-        }).catch(e => console.error("Sync failed", e));
+            body: JSON.stringify(body)
+        }).then(res => {
+            if (!res.ok) {
+                res.text().then(text => console.error('Sync daily failed:', res.status, text));
+            }
+        }).catch(e => console.error("Sync daily network error:", e));
     };
 
     const handleSetNotes = (val: string) => {
