@@ -72,8 +72,8 @@ type PlannerTask struct {
 	ID          int        `json:"id"`
 	UserID      int        `json:"userId"`
 	Date        time.Time  `json:"date"`
-	StartTime   *time.Time `json:"startTime"`
-	EndTime     *time.Time `json:"endTime"`
+	StartTime   *string    `json:"startTime"`
+	EndTime     *string    `json:"endTime"`
 	Title       string     `json:"title"`
 	Notes       *string    `json:"notes"`
 	Type        int        `json:"type"`
@@ -131,17 +131,25 @@ func PlannerTasksHandler(w http.ResponseWriter, r *http.Request) {
 		tasks := []PlannerTask{}
 		for rows.Next() {
 			var t PlannerTask
-			var sTime, eTime, createdAt, updatedAt sql.NullTime
-			var notes sql.NullString
+			var sTime, eTime, notes sql.NullString
+			var createdAt, updatedAt sql.NullTime
 			
 			err := rows.Scan(&t.ID, &t.UserID, &t.Date, &sTime, &eTime, &t.Title, &notes, &t.Type, &t.IsCompleted, &createdAt, &updatedAt)
 			if err == nil {
-				if sTime.Valid { t.StartTime = &sTime.Time }
-				if eTime.Valid { t.EndTime = &eTime.Time }
+				if sTime.Valid { 
+					formatted := "0000-01-01T" + sTime.String + "Z"
+					t.StartTime = &formatted 
+				}
+				if eTime.Valid { 
+					formatted := "0000-01-01T" + eTime.String + "Z"
+					t.EndTime = &formatted 
+				}
 				if notes.Valid { t.Notes = &notes.String }
 				if createdAt.Valid { t.CreatedAt = createdAt.Time }
 				if updatedAt.Valid { t.UpdatedAt = updatedAt.Time }
 				tasks = append(tasks, t)
+			} else {
+				fmt.Printf("Error scanning task row: %v\n", err)
 			}
 		}
 

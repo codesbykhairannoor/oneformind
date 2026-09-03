@@ -95,7 +95,7 @@ export default function PlannerPage() {
         
         const fetchTasks = async () => {
             try {
-                const res = await fetch(`/api/planner/tasks?date=${selectedDate}`);
+                const res = await fetch(`/api/planner/tasks?date=${selectedDate}`, { cache: 'no-store' });
                 if (res.ok) {
                     const data = await res.json();
                     setTasks(data.map((t: any) => ({
@@ -128,7 +128,7 @@ export default function PlannerPage() {
         
         const fetchDaily = async () => {
             try {
-                const res = await fetch(`/api/planner/daily?date=${selectedDate}`);
+                const res = await fetch(`/api/planner/daily?date=${selectedDate}`, { cache: 'no-store' });
                 if (res.ok) {
                     const data = await res.json();
                     
