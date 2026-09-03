@@ -151,6 +151,10 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         });
     }, [router]);
 
+    useEffect(() => {
+        setIsMobileDrawerOpen(false);
+    }, [pathname]);
+
     const toggleTheme = () => {
         if (isDark) {
             document.documentElement.classList.remove('dark');
@@ -486,7 +490,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
 						!isDesktop ? 'fixed top-[72px] sm:top-16 bottom-0 left-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-4rem)] z-[61]' : 'relative z-[10]'
 					} ${
                         !isDesktop 
-                            ? (isMobileDrawerOpen ? 'translate-x-0 w-[280px]' : '-translate-x-full w-[280px]') 
+                            ? (isMobileDrawerOpen ? 'translate-x-0 w-full' : '-translate-x-full w-full') 
                             : (isSidebarCollapsed ? 'w-[68px] translate-x-0' : 'w-[232px] translate-x-0')
                     }`}
                 >
@@ -526,7 +530,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                     }`}
                                 >
                                     <LayoutDashboard size={18} className={isActive('/dashboard') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                    {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Dashboard</span>}
+                                    {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Dashboard</span>}
                                     {isActive('/dashboard') && !isSidebarCollapsed && (
                                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                     )}
@@ -545,7 +549,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         }`}
                                     >
                                         <Flame size={18} className={isActive('/habits') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                        {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Habits</span>}
+                                        {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Habits</span>}
                                         {isActive('/habits') && !isSidebarCollapsed && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                         )}
@@ -565,7 +569,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         }`}
                                     >
                                         <Calendar size={18} className={isActive('/planner') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                        {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Planner</span>}
+                                        {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Planner</span>}
                                         {isActive('/planner') && !isSidebarCollapsed && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                         )}
@@ -585,7 +589,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         }`}
                                     >
                                         <Wallet size={18} className={isActive('/finance') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                        {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Finance</span>}
+                                        {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Finance</span>}
                                         {isActive('/finance') && !isSidebarCollapsed && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                         )}
@@ -604,7 +608,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                     }`}
                                 >
                                     <GraduationCap size={18} className={isActive('/study') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                    {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Study</span>}
+                                    {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Study</span>}
                                     {isActive('/study') && !isSidebarCollapsed && (
                                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                     )}
@@ -649,7 +653,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         }`}
                                     >
                                         <BookOpen size={18} className={isActive('/journal') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                        {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Journal</span>}
+                                        {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Journal</span>}
                                         {isActive('/journal') && !isSidebarCollapsed && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                         )}
@@ -669,7 +673,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         }`}
                                     >
                                         <CalendarDays size={18} className={isActive('/calendar') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                        {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Calendar</span>}
+                                        {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Calendar</span>}
                                         {isActive('/calendar') && !isSidebarCollapsed && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                         )}
@@ -689,7 +693,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         }`}
                                     >
                                         <Briefcase size={18} className={isActive('/jobs') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                        {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Jobs</span>}
+                                        {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Jobs</span>}
                                         {isActive('/jobs') && !isSidebarCollapsed && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                         )}
@@ -709,7 +713,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         }`}
                                     >
                                         <Target size={18} className={isActive('/goals') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                        {!isSidebarCollapsed && <span className="text-[13px] font-semibold tracking-tight truncate">Goals</span>}
+                                        {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Goals</span>}
                                         {isActive('/goals') && !isSidebarCollapsed && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full"></div>
                                         )}
@@ -742,7 +746,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                             <Sparkles size={18} className="text-indigo-500 shrink-0" />
                             {!isSidebarCollapsed && (
                                 <>
-                                    <span className="text-[13px] font-semibold tracking-tight truncate flex-1 text-left">Coach</span>
+                                    <span className="text-[15px] font-semibold tracking-tight truncate flex-1 text-left">Coach</span>
                                     <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-100 dark:bg-indigo-500/20 px-1.5 py-0.5 rounded-full shrink-0">AI</span>
                                 </>
                             )}
