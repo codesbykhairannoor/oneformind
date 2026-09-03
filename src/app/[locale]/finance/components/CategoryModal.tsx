@@ -69,7 +69,7 @@ export default function CategoryModal({
             name: name.trim(),
             icon: icon || '📦',
             type,
-            limit: isNaN(budgetLimit!) ? 0 : budgetLimit
+            limit: type === 'income' ? 0 : (isNaN(budgetLimit!) ? 0 : budgetLimit)
         });
 
         setName('');

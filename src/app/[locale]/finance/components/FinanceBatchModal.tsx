@@ -72,7 +72,7 @@ export default function FinanceBatchModal({
     const getDisplayCategories = (type: 'income' | 'expense') => {
         const available = categories.filter(c => c.type === type);
         const active = available.filter(c => activeSlugs.has(c.slug));
-        const rawDisplay = type === 'income' || active.length === 0 ? available : active;
+        const rawDisplay = active.length === 0 ? available : active;
         return Array.from(new Map(rawDisplay.map(c => [c.slug, c])).values());
     };
 

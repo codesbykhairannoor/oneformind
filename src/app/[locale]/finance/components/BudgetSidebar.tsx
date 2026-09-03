@@ -64,16 +64,17 @@ export default function BudgetSidebar({
     const getProgress = (cat: string, limit: number) => limit > 0 ? Math.min(((expenseStats[cat] || 0) / limit) * 100, 100) : 0;
     const getBarColor = (p: number) => p > 90 ? 'bg-rose-500' : p > 75 ? 'bg-orange-500' : 'bg-indigo-500';
 
-    // Income list — 1:1 from BudgetSidebar.vue line 20-28
+    // Income list — filtered by active budgets or having transactions this month
     const incomeList = useMemo(() => {
+        const activeSlugs = new Set(budgets.map(b => b.category));
         return categories
-            .filter(c => c.type === 'income')
+            .filter(c => c.type === 'income' && (activeSlugs.has(c.slug) || (incomeStats[c.slug] || 0) > 0))
             .map(cat => ({
                 ...cat,
                 amount: incomeStats[cat.slug] || 0
             }))
             .sort((a, b) => b.amount - a.amount);
-    }, [categories, incomeStats]);
+    }, [categories, incomeStats, budgets]);
 
     // Total budget — 1:1 from BudgetSidebar.vue line 31-38
     const totalBudget = budgets.reduce((sum, b) => sum + Number(b.limit), 0);
