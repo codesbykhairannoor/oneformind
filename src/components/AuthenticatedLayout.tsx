@@ -269,7 +269,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                             <div className="w-9 h-9 sm:w-8 sm:h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-lg shadow-indigo-200 dark:shadow-none shrink-0">
                                 <img src="/favicon.svg" alt="Tranvas Logo" className="w-5 h-5 sm:w-4 sm:h-4 brightness-0 invert" />
                             </div>
-                            <span className="text-[17px] font-black text-slate-900 dark:text-white tracking-tight hidden sm:block">Tranvas</span>
+                            <span className="text-[17px] font-black text-slate-900 dark:text-white tracking-tight">Tranvas</span>
                         </Link>
                     </div>
 
@@ -487,7 +487,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                 {/* 1:1 DESKTOP & MOBILE SIDEBAR */}
                 <aside 
                     className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out ${
-						!isDesktop ? 'fixed top-[72px] sm:top-16 bottom-0 left-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-4rem)] z-[61]' : 'relative z-[10]'
+						!isDesktop ? 'fixed top-[72px] sm:top-16 bottom-0 left-0 z-[61]' : 'relative z-[10]'
 					} ${
                         !isDesktop 
                             ? (isMobileDrawerOpen ? 'translate-x-0 w-full' : '-translate-x-full w-full') 
