@@ -8,7 +8,8 @@ import JournalHeader from './components/JournalHeader';
 import JournalCard, { JournalItem } from './components/JournalCard';
 import NeuralBridge from '@/components/NeuralBridge';
 import GatedPage from '@/components/GatedPage';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2, X } from 'lucide-react';
+import ModalPortal from '@/components/ModalPortal';
 
 export default function JournalIndexPage() {
     const t = useTranslations();
@@ -21,6 +22,10 @@ export default function JournalIndexPage() {
         expense_total: 0
     });
     const [hasMounted, setHasMounted] = useState(false);
+    
+    // Delete Modal State
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [journalToDelete, setJournalToDelete] = useState<number | string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -62,15 +67,21 @@ export default function JournalIndexPage() {
         fetchData();
     }, []);
 
-    const handleDelete = async (id: number | string) => {
-        if (typeof window !== 'undefined' && window.confirm(t('journal_confirm_delete') || 'Hapus Jurnal? Data ini akan hilang selamanya.')) {
-            try {
-                await fetch(`/api/journals/${id}`, { method: 'DELETE' });
-                setJournals(prev => prev.filter(j => j.id !== id));
-            } catch (error) {
-                console.error('Failed to delete journal:', error);
-            }
+    const handleDelete = (id: number | string) => {
+        setJournalToDelete(id);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!journalToDelete) return;
+        try {
+            await fetch(`/api/journals/${journalToDelete}`, { method: 'DELETE' });
+            setJournals(prev => prev.filter(j => j.id !== journalToDelete));
+        } catch (error) {
+            console.error('Failed to delete journal:', error);
         }
+        setDeleteModalOpen(false);
+        setJournalToDelete(null);
     };
 
     if (!hasMounted) {
@@ -136,6 +147,43 @@ export default function JournalIndexPage() {
 
                 </div>
                 </div>
+
+                {/* DELETE CONFIRMATION MODAL */}
+                {deleteModalOpen && (
+                    <ModalPortal>
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                            <div className="absolute inset-0" onClick={() => setDeleteModalOpen(false)}></div>
+                            <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 w-full max-w-sm flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+                                <div className="p-6 md:p-8 flex flex-col items-center text-center">
+                                    <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-500 mb-4 shrink-0">
+                                        <Trash2 size={32} strokeWidth={2} />
+                                    </div>
+                                    <h3 className="font-black text-slate-800 dark:text-white text-xl tracking-tight mb-2">
+                                        {t('journal_confirm_delete_title') || 'Hapus Jurnal?'}
+                                    </h3>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                                        {t('journal_confirm_delete') || 'Jurnal ini akan dihapus secara permanen dan tidak dapat dikembalikan.'}
+                                    </p>
+                                </div>
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex gap-3">
+                                    <button 
+                                        onClick={() => setDeleteModalOpen(false)}
+                                        className="flex-1 py-3 px-4 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button 
+                                        onClick={confirmDelete}
+                                        className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg shadow-rose-200 dark:shadow-none transition-all active:scale-95"
+                                    >
+                                        Hapus
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ModalPortal>
+                )}
+
             </GatedPage>
         </AuthenticatedLayout>
     );

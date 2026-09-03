@@ -280,7 +280,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                     </div>
 
                     {/* RIGHT: ACTIONS & PROFILE */}
-                    <div className="flex shrink-0 items-center gap-1 sm:gap-1">
+                    <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
                         {/* Date Pill */}
                         <div className="hidden md:block relative mr-1.5">
                             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-xs font-black text-slate-600 dark:text-slate-300 shadow-sm border border-transparent hover:bg-white dark:hover:bg-slate-800 transition-colors">
@@ -312,11 +312,11 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                         </Link>
 
                         {/* Theme Toggle */}
-                        <button type="button" onClick={toggleTheme} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                        <button type="button" onClick={toggleTheme} className="hidden sm:flex w-8 h-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                             {isDark ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
                         </button>
 
-                        <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-1.5"></div>
+                        <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1 sm:mx-1.5"></div>
 
                         {/* PROFILE DROPDOWN */}
                         <div className="relative">

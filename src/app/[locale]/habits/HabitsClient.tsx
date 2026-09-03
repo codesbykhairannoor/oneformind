@@ -673,7 +673,10 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                                     {habit.is_stagnant && <span className="text-[8px] font-black bg-rose-50 text-rose-500 px-1 rounded-md">Dormant</span>}
                                                 </h4>
                                                 <div className="flex items-center gap-1">
-                                                    <button onClick={() => confirmDelete(habit)} className="p-2 text-slate-300 dark:text-slate-600 hover:text-rose-500 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                                                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); editHabit(habit); }} className="p-2 text-slate-300 dark:text-slate-600 hover:text-indigo-500 bg-slate-50 dark:bg-slate-800/50 rounded-lg" aria-label="Edit Habit">
+                                                        <Edit3 size={14} />
+                                                    </button>
+                                                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmDelete(habit); }} className="p-2 text-slate-300 dark:text-slate-600 hover:text-rose-500 bg-slate-50 dark:bg-slate-800/50 rounded-lg" aria-label="Delete Habit">
                                                         <Trash2 size={14} />
                                                     </button>
                                                 </div>
@@ -693,7 +696,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                         </div>
 
                                         <button
-                                            onClick={() => toggleStatus(habit.id, selectedMobileDate)}
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleStatus(habit.id, selectedMobileDate); }}
                                             className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden ${
                                                 status === 'completed'
                                                     ? 'shadow-lg text-white'

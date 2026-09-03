@@ -147,8 +147,8 @@ func PlannerTasksHandler(w http.ResponseWriter, r *http.Request) {
 		dateStr := body["date"].(string)
 		
 		var sTime, eTime interface{} = nil, nil
-		if st, ok := body["startTime"].(string); ok && st != "" { sTime = "1970-01-01T" + st + ":00Z" }
-		if et, ok := body["endTime"].(string); ok && et != "" { eTime = "1970-01-01T" + et + ":00Z" }
+		if st, ok := body["startTime"].(string); ok && st != "" { sTime = st + ":00" }
+		if et, ok := body["endTime"].(string); ok && et != "" { eTime = et + ":00" }
 		
 		var notes interface{} = nil
 		if n, ok := body["notes"].(string); ok && n != "" { notes = n }
@@ -216,12 +216,12 @@ func PlannerTasksHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if val, ok := body["startTime"].(string); ok {
 			query += fmt.Sprintf(", start_time = $%d", argId)
-			if val == "" { args = append(args, nil) } else { args = append(args, "1970-01-01T" + val + ":00Z") }
+			if val == "" { args = append(args, nil) } else { args = append(args, val + ":00") }
 			argId++
 		}
 		if val, ok := body["endTime"].(string); ok {
 			query += fmt.Sprintf(", end_time = $%d", argId)
-			if val == "" { args = append(args, nil) } else { args = append(args, "1970-01-01T" + val + ":00Z") }
+			if val == "" { args = append(args, nil) } else { args = append(args, val + ":00") }
 			argId++
 		}
 

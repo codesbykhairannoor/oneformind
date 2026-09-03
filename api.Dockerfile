@@ -1,5 +1,5 @@
 # Dockerfile.go
-FROM public.ecr.aws/docker/library/golang:1.25-alpine AS builder
+FROM public.ecr.aws/docker/library/golang:1.23-alpine AS builder
 
 WORKDIR /app
 

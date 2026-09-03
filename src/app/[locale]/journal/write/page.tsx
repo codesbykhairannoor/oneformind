@@ -54,7 +54,19 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                     const item = data.find((j: any) => String(j.id) === String(journalId));
                     if (item) {
                         setTitle(item.title || '');
-                        setContent(item.content || '');
+                        
+                        // Parse legacy HTML content to plain text
+                        let rawContent = item.content || '';
+                        if (rawContent.includes('<')) {
+                            rawContent = rawContent.replace(/<br\s*[\/]?>/gi, '\n')
+                                .replace(/<\/p>/gi, '\n\n')
+                                .replace(/<\/li>/gi, '\n')
+                                .replace(/<li>/gi, '- ')
+                                .replace(/<[^>]+>/g, '')
+                                .replace(/\n{3,}/g, '\n\n'); // Clean up excessive newlines
+                        }
+                        
+                        setContent(rawContent);
                         setMood(item.mood || 'awesome');
                         setImageUrl(item.imagePath || null);
                     }
