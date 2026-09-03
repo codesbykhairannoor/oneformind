@@ -39,19 +39,28 @@ const PLAN_LEVELS: Record<string, number> = {
     'legendary': 4,
 };
 
+const PLAN_LABELS: Record<string, string> = {
+    explorer:  'Explorer',
+    architect: 'Architect',
+    quantum:   'Quantum',
+    legendary: 'Legendary',
+};
+
 export const useGating = () => {
     const { data: session, status } = useSession();
     
     const isLoading = status === 'loading';
     
-    // In NextAuth v5 custom adapter, we pass planType and isPremium to the token/session
+    // In NextAuth v5 custom adapter or Supabase, we pass planType and isPremium to the token/session
     const user = session?.user as any;
     
     const tier = useMemo(() => {
         if (!user) return 1;
 
-        if (user.isPremium || user.planType === 'trial' || user.planType === 'legendary' || user.planType === 'quantum') {
-            return PLAN_LEVELS[user.planType?.toLowerCase()] || 2;
+        // Jika user adalah premium ATAU sedang trial
+        if (user.isPremium || user.is_premium || user.planType?.toLowerCase() === 'trial' || user.plan_type?.toLowerCase() === 'trial') {
+            const plan = (user.planType || user.plan_type)?.toLowerCase();
+            return PLAN_LEVELS[plan] || 2;
         }
 
         return 1; // Explorer
@@ -62,13 +71,22 @@ export const useGating = () => {
     const isQuantum   = tier === 3;
     const isLegendary = tier === 4;
 
-    // AI: quantum + legendary
+    // AI: quantum + legendary 2 bulan
     const isAiEnabled = useMemo(() => {
         if (!user) return false;
-        const plan = user.planType?.toLowerCase();
+        const plan = (user.planType || user.plan_type)?.toLowerCase();
         if (plan === 'quantum') return true;
+        
         if (plan === 'legendary') {
-            return true; // Simplified: Legendary always gets AI access
+            const createdAtStr = user.created_at || user.createdAt;
+            if (createdAtStr) {
+                const createdAt = new Date(createdAtStr);
+                const limitDate = new Date(createdAt);
+                limitDate.setMonth(limitDate.getMonth() + 2);
+                
+                return new Date() < limitDate;
+            }
+            return true; // Fallback if no creation date exists
         }
         return false;
     }, [user]);
@@ -96,5 +114,6 @@ export const useGating = () => {
         isLegendary,
         user,
         isLoading,
+        PLAN_LABELS,
     };
 };

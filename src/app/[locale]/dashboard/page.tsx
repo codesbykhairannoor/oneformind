@@ -25,12 +25,13 @@ export default async function DashboardPage() {
     const monthStr = todayStr.substring(0, 7); // YYYY-MM
 
     // Fetch data from Go API in parallel (no Prisma!)
-    const [habitsData, tasksData, transactionsData, goalsData, journalsData] = await Promise.all([
+    const [habitsData, tasksData, transactionsData, goalsData, journalsData, userData] = await Promise.all([
         goFetchJson<any[]>('habits', `month=${monthStr}`),
         goFetchJson<any[]>('planner-tasks', `date=${todayStr}`),
         goFetchJson<any[]>('finance-transactions', `month=${monthStr}`),
         goFetchJson<any[]>('goals', ''),
         goFetchJson<any[]>('journals', `date=${todayStr}`),
+        goFetchJson<any>('user', ''),
     ]);
 
     const habits = habitsData[0] || [];
@@ -38,6 +39,7 @@ export default async function DashboardPage() {
     const transactions = transactionsData[0] || [];
     const goals = goalsData[0] || [];
     const journals = journalsData[0] || [];
+    const userProfile = userData[0] || {};
 
     // Habits calculation
     const totalHabits = habits.length;
@@ -99,9 +101,11 @@ export default async function DashboardPage() {
     };
 
     const clientUser = {
-        name: user.user_metadata?.name || user.user_metadata?.full_name || 'User',
-        email: user.email || '',
-        plan_type: 'Architect',
+        name: userProfile.name || user.user_metadata?.name || user.user_metadata?.full_name || 'User',
+        email: userProfile.email || user.email || '',
+        plan_type: userProfile.planType || userProfile.plan_type || (user as any).planType || 'explorer',
+        isPremium: userProfile.isPremium || false,
+        created_at: user.created_at || new Date().toISOString(),
     };
 
     return <DashboardClient user={clientUser} synergy={synergy} locale={locale} />;

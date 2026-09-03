@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import { useGating } from '@/hooks/useGating';
 import {
     Sparkles,
     Target,
@@ -26,8 +27,7 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
         summary: 'Performa habit dan planner Anda sangat konsisten minggu ini. Tingkat penyelesaian tugas pagi mencapai 85%.'
     });
 
-    const isExplorer = false;
-    const isAiEnabled = true;
+    const { isExplorer, isAiEnabled } = useGating();
 
     const plannerData = synergy.planner;
 
