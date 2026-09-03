@@ -307,76 +307,84 @@ export default function GuestLayout({ children, user = null }: { children: React
 
                 {/* MOBILE MENU */}
                 {mobileMenuOpen && (
-                    <div className="lg:hidden fixed inset-x-0 top-[72px] sm:top-16 z-[95] bg-white/95 backdrop-blur-2xl flex flex-col h-[calc(100vh-72px)] sm:h-[calc(100vh-4rem)] w-full overflow-hidden border-t border-slate-200/50 text-left animate-in slide-in-from-top-4 duration-300">
-                        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto px-6 pt-6 pb-12 space-y-4">
+                    <div className="lg:hidden fixed inset-0 top-0 bg-white dark:bg-slate-950 z-[90] pt-24 px-6 pb-24 flex flex-col h-[100dvh] overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="flex-grow space-y-2">
                             {/* Features */}
-                            <div>
-                                <button onClick={() => setMobilePanel(mobilePanel === 'features' ? null : 'features')} className="w-full flex justify-between items-center py-3 text-xl font-black text-slate-900 tracking-tight">
-                                    Features
-                                    <svg className={`w-5 h-5 transition-transform ${mobilePanel === 'features' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                            <div className="border-b border-slate-50 dark:border-slate-800/50">
+                                <button onClick={() => setMobilePanel(mobilePanel === 'features' ? null : 'features')} className="w-full py-5 flex justify-between items-center text-xl font-black text-slate-900 dark:text-white">
+                                    <span>Features</span>
+                                    <svg className={`w-5 h-5 text-slate-400 transition-transform ${mobilePanel === 'features' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                                 </button>
                                 {mobilePanel === 'features' && (
-                                    <div className="flex flex-col gap-4 pl-4 pt-1 pb-3">
-                                        <Link href="/features/planner" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Daily Planner</Link>
-                                        <Link href="/features/habit" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Habit Tracker</Link>
-                                        <Link href="/features/finance" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Finance OS</Link>
-                                        <Link href="/features/journal" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Digital Journal</Link>
-                                        <Link href="/features/goal" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Goal Tracker</Link>
+                                    <div className="grid grid-cols-1 gap-1 pb-4">
+                                        <Link href="/features/planner" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>🎯</span> Daily Planner</Link>
+                                        <Link href="/features/habit" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>🌱</span> Habit Tracker</Link>
+                                        <Link href="/features/finance" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>💰</span> Finance OS</Link>
+                                        <Link href="/features/journal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>📔</span> Digital Journal</Link>
+                                        <Link href="/features/goal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>🎯</span> Goal Tracker</Link>
+                                        <Link href="/features/calendar" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>📅</span> Smart Calendar</Link>
+                                        <Link href="/features/job" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>💼</span> Job Tracker</Link>
                                     </div>
                                 )}
                             </div>
 
                             {/* Solutions */}
-                            <div>
-                                <button onClick={() => setMobilePanel(mobilePanel === 'solutions' ? null : 'solutions')} className="w-full flex justify-between items-center py-3 text-xl font-black text-slate-900 tracking-tight">
-                                    Solutions
-                                    <svg className={`w-5 h-5 transition-transform ${mobilePanel === 'solutions' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                            <div className="border-b border-slate-50 dark:border-slate-800/50">
+                                <button onClick={() => setMobilePanel(mobilePanel === 'solutions' ? null : 'solutions')} className="w-full py-5 flex justify-between items-center text-xl font-black text-slate-900 dark:text-white">
+                                    <span>Solutions</span>
+                                    <svg className={`w-5 h-5 text-slate-400 transition-transform ${mobilePanel === 'solutions' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                                 </button>
                                 {mobilePanel === 'solutions' && (
-                                    <div className="flex flex-col gap-4 pl-4 pt-1 pb-3">
-                                        <Link href="/solutions/student" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">For Students</Link>
-                                        <Link href="/solutions/freelancer" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">For Freelancers</Link>
-                                        <Link href="/solutions/personalgrowth" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Personal Growth</Link>
+                                    <div className="pb-6 space-y-6">
+                                        <div>
+                                            <p className="text-[10px] font-black tracking-wide text-slate-400 mb-3 px-3 uppercase">By Role</p>
+                                            <div className="grid grid-cols-1 gap-1">
+                                                <Link href="/solutions/student" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>🎓</span> For Students</Link>
+                                                <Link href="/solutions/freelancer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>💻</span> For Freelancers</Link>
+                                                <Link href="/solutions/personalgrowth" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>🚀</span> Personal Growth</Link>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
 
                             {/* Resources */}
-                            <div>
-                                <button onClick={() => setMobilePanel(mobilePanel === 'resources' ? null : 'resources')} className="w-full flex justify-between items-center py-3 text-xl font-black text-slate-900 tracking-tight">
-                                    Resources
-                                    <svg className={`w-5 h-5 transition-transform ${mobilePanel === 'resources' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                            <div className="border-b border-slate-50 dark:border-slate-800/50">
+                                <button onClick={() => setMobilePanel(mobilePanel === 'resources' ? null : 'resources')} className="w-full py-5 flex justify-between items-center text-xl font-black text-slate-900 dark:text-white">
+                                    <span>Resources</span>
+                                    <svg className={`w-5 h-5 text-slate-400 transition-transform ${mobilePanel === 'resources' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                                 </button>
                                 {mobilePanel === 'resources' && (
-                                    <div className="flex flex-col gap-4 pl-4 pt-1 pb-3">
-                                        <Link href="/resources/guide" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">User Guide</Link>
-                                        <Link href="/resources/blog" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Blog</Link>
-                                        <Link href="/resources/community" onClick={() => setMobileMenuOpen(false)} className="text-slate-600 font-bold">Community</Link>
+                                    <div className="grid grid-cols-1 gap-1 pb-4">
+                                        <Link href="/resources/guide" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>📖</span> User Guide</Link>
+                                        <Link href="/resources/blog" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>✍️</span> Blog</Link>
+                                        <Link href="/resources/community" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>🌍</span> Community</Link>
                                     </div>
                                 )}
                             </div>
 
-                            <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block py-3 text-xl font-black text-slate-900 tracking-tight">Pricing</Link>
-                            
-                            <div className="pt-8 mt-4 border-t border-slate-200/50 space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Language</span>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => switchLang('id')} className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${locale === 'id' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>ID</button>
-                                        <button onClick={() => switchLang('en')} className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${locale === 'en' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>EN</button>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-3 pt-4">
-                                    {user ? (
-                                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-white bg-slate-900 rounded-2xl text-[15px] shadow-xl active:scale-95 transition-transform">Dashboard</Link>
-                                    ) : (
-                                        <>
-                                            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-slate-800 bg-white border-2 border-slate-200 rounded-2xl text-[15px] hover:border-slate-300 transition-colors">Log in</Link>
-                                            <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-white bg-indigo-600 rounded-2xl text-[15px] shadow-xl shadow-indigo-200 active:scale-95 transition-transform">Get started</Link>
-                                        </>
-                                    )}
+                            <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block py-5 text-xl font-black text-slate-900 dark:text-white border-b border-slate-50 dark:border-slate-800/50">Pricing</Link>
+                        </div>
+
+                        <div className="pt-8 space-y-6">
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+                                <span className="text-sm font-bold text-slate-500">Language</span>
+                                <div className="flex gap-2">
+                                    <button onClick={() => switchLang('id')} className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'id' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}>ID</button>
+                                    <button onClick={() => switchLang('en')} className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'en' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}>EN</button>
                                 </div>
                             </div>
+                            
+                            {!user ? (
+                                <div className="grid grid-cols-1 gap-3">
+                                    <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:border-slate-200">Log in</Link>
+                                    <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-black text-white bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none active:scale-95 transition-transform">Get Started</Link>
+                                </div>
+                            ) : (
+                                <div>
+                                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block w-full py-4 text-center font-black text-white bg-slate-900 dark:bg-slate-800 rounded-2xl shadow-xl active:scale-95 transition-transform">Go to Dashboard</Link>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

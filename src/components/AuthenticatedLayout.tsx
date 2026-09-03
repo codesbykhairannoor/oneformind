@@ -475,18 +475,18 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
 				{/* Mobile Drawer Overlay */}
 				{(!isDesktop && isMobileDrawerOpen) && (
 					<div 
-						className="fixed inset-0 bg-slate-900/50 z-[80] md:hidden backdrop-blur-sm transition-opacity" 
+						className="fixed inset-0 top-[72px] sm:top-16 bg-slate-900/50 z-[60] md:hidden backdrop-blur-sm transition-opacity animate-in fade-in" 
 						onClick={() => setIsMobileDrawerOpen(false)}
 					></div>
 				)}
 
                 {/* 1:1 DESKTOP & MOBILE SIDEBAR */}
                 <aside 
-                    className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col z-[90] shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out ${
-						!isDesktop ? 'fixed top-0 bottom-0 left-0 h-[100dvh]' : 'relative'
+                    className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out ${
+						!isDesktop ? 'fixed top-[72px] sm:top-16 bottom-0 left-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-4rem)] z-[61]' : 'relative z-[10]'
 					} ${
                         !isDesktop 
-                            ? (isMobileDrawerOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full w-[260px]') 
+                            ? (isMobileDrawerOpen ? 'translate-x-0 w-[280px]' : '-translate-x-full w-[280px]') 
                             : (isSidebarCollapsed ? 'w-[68px] translate-x-0' : 'w-[232px] translate-x-0')
                     }`}
                 >
