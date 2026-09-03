@@ -247,7 +247,7 @@ func handleGetHabits(w http.ResponseWriter, r *http.Request, userID int) {
 		habits = []Habit{} // Ensure we return [] instead of null
 	}
 
-	w.Header().Set("Cache-Control", "private, max-age=30, stale-while-revalidate=10")
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 	json.NewEncoder(w).Encode(habits)
 }
 

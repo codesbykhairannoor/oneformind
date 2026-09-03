@@ -49,6 +49,13 @@ func initDB() {
 	}
 
 	var err error
+	if !strings.Contains(connStr, "default_query_exec_mode=") { 
+		if strings.Contains(connStr, "?") { 
+			connStr += "&default_query_exec_mode=simple_protocol" 
+		} else { 
+			connStr += "?default_query_exec_mode=simple_protocol" 
+		} 
+	}
 	dbGoals, err = sql.Open("pgx", connStr)
 	if err != nil {
 		fmt.Printf("Error opening database: %v\n", err)
@@ -234,7 +241,7 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "private, max-age=120, stale-while-revalidate=30")
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 	json.NewEncoder(w).Encode(goals)
 }
 

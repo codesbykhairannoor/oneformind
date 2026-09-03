@@ -119,7 +119,7 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Cache-Control", "private, max-age=300, stale-while-revalidate=60")
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 		json.NewEncoder(w).Encode(u)
 
 	case http.MethodPut:
