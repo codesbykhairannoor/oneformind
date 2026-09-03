@@ -8,12 +8,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
-
-	"database/sql"
-	"time"
 	"sync"
+	"database/sql"
 
 	handler "tranvas-api/api"
+	"tranvas-api/backend/shareddb"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -21,53 +20,13 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
+// Single shared DB pool — used by AuthMiddleware AND all handlers.
+// No more duplicate pools (was: dbMain=50 + shareddb=20 = 70 total connections).
 var dbMain *sql.DB
 var (
 	userCacheMutex sync.RWMutex
 	userCache      = make(map[string]int)
 )
-
-func initMainDB() {
-	connStr := os.Getenv("POSTGRES_PRISMA_URL")
-	if connStr == "" {
-		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
-	}
-	if connStr == "" {
-		connStr = os.Getenv("POSTGRES_URL")
-	}
-	if connStr == "" {
-		connStr = os.Getenv("DATABASE_URL")
-	}
-	if connStr == "" {
-		log.Println("WARNING: No database connection string found for main")
-		return
-	}
-
-	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
-	connStr = strings.Replace(connStr, "?&", "?", -1)
-	connStr = strings.Replace(connStr, "&&", "&", -1)
-	if strings.HasSuffix(connStr, "?") {
-		connStr = strings.TrimSuffix(connStr, "?")
-	}
-	if !strings.Contains(connStr, "sslmode=") {
-		if strings.Contains(connStr, "?") {
-			connStr += "&sslmode=require"
-		} else {
-			connStr += "?sslmode=require"
-		}
-	}
-
-	var err error
-	dbMain, err = sql.Open("pgx", connStr)
-	if err != nil {
-		log.Printf("Error opening database in main: %v\n", err)
-		return
-	}
-	// Increase connection pool to prevent connection exhaustion deadlocks on parallel fetches
-	dbMain.SetMaxOpenConns(50)
-	dbMain.SetMaxIdleConns(10)
-	dbMain.SetConnMaxLifetime(5 * time.Minute)
-}
 
 // parseJWTClaimsUnsafe extracts claims from a JWT without verifying the signature.
 // This is safe because:
@@ -203,7 +162,18 @@ func AuthMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	initMainDB()
+	// Pre-warm the single shared DB pool at startup.
+	// This ensures the first real user request doesn't wait for pool init.
+	log.Println("Pre-warming shared DB connection pool...")
+	dbMain = shareddb.Get()
+	if dbMain != nil {
+		if err := dbMain.Ping(); err != nil {
+			log.Printf("WARNING: DB ping failed at startup: %v", err)
+		} else {
+			log.Println("DB pool ready. Server starting...")
+		}
+	}
+
 	r := chi.NewRouter()
 
 	// A good base middleware stack
