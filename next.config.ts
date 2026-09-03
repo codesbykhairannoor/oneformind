@@ -32,29 +32,54 @@ const nextConfig: NextConfig = {
         optimizePackageImports: ['chart.js', 'react-chartjs-2', 'sweetalert2'],
     },
 
-    // Vercel Hobby Plan: no custom headers needed (handled by CDN)
-    // But add security headers for marketing pages
+    // HTTP Cache Headers — tuned for Cloudflare CDN
     async headers() {
         return [
             {
-                // Cache static marketing pages for 1 hour on CDN (stale-while-revalidate 1 day)
-                source: '/:locale(en|id)/:path*',
+                // Next.js static chunks: browser + CDN cache 1 year (content-hashed, immutable)
+                source: '/_next/static/:path*',
                 headers: [
-                    {
-                        key: 'Cache-Control',
-                        value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
-                    },
+                    { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+                    { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
                 ],
-                // Only for non-authenticated marketing routes
             },
             {
-                // Never cache authenticated routes
+                // Public images/icons in /public
+                source: '/images/:path*',
+                headers: [
+                    { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
+                ],
+            },
+            {
+                // Marketing/public pages: edge cache 1 hour, serve stale up to 1 day
+                source: '/:locale(en|id)/(|resources|pricing|compare|about|blog|changelog|security)/:path*',
+                headers: [
+                    { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                ],
+            },
+            {
+                // API routes: NEVER cache (always private, always fresh)
+                source: '/api/:path*',
+                headers: [
+                    { key: 'Cache-Control', value: 'private, no-store, no-cache' },
+                    { key: 'Pragma', value: 'no-cache' },
+                ],
+            },
+            {
+                // All authenticated dashboard routes: never cache
                 source: '/:locale(en|id)/(dashboard|habits|finance|planner|goals|journal|coach|calendar|jobs|study|settings|billing|profile|payment|verify-email|confirm-password|reset-password|forgot-password)/:path*',
                 headers: [
-                    {
-                        key: 'Cache-Control',
-                        value: 'private, no-cache, no-store',
-                    },
+                    { key: 'Cache-Control', value: 'private, no-store, no-cache' },
+                    { key: 'Pragma', value: 'no-cache' },
+                ],
+            },
+            {
+                // Security headers for all pages
+                source: '/(.*)',
+                headers: [
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'X-Frame-Options', value: 'DENY' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
                 ],
             },
         ];

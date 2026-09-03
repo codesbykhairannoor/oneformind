@@ -12,54 +12,14 @@ import (
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
+
+	"tranvas-api/backend/shareddb"
 )
 
 var dbPaypal *sql.DB
 
 func initDB() {
-	connStr := os.Getenv("POSTGRES_PRISMA_URL")
-	if connStr == "" {
-		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
-	}
-	if connStr == "" {
-		connStr = os.Getenv("POSTGRES_URL")
-	}
-	if connStr == "" {
-		connStr = os.Getenv("DATABASE_URL")
-	}
-	if connStr == "" {
-		fmt.Println("FATAL: No database connection string found in any env var")
-		return
-	}
-
-	// Strip pgbouncer=true because lib/pq doesn't support it
-	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
-	connStr = strings.Replace(connStr, "?&", "?", -1)
-	connStr = strings.Replace(connStr, "&&", "&", -1)
-	if strings.HasSuffix(connStr, "?") {
-		connStr = strings.TrimSuffix(connStr, "?")
-	}
-
-	// Ensure sslmode=require is present
-	if !strings.Contains(connStr, "sslmode=") {
-		if strings.Contains(connStr, "?") {
-			connStr += "&sslmode=require"
-		} else {
-			connStr += "?sslmode=require"
-		}
-	}
-
-	var err error
-    if !strings.Contains(connStr, "default_query_exec_mode=") { if strings.Contains(connStr, "?") { connStr += "&default_query_exec_mode=simple_protocol" } else { connStr += "?default_query_exec_mode=simple_protocol" } }
-	dbPaypal, err = sql.Open("pgx", connStr)
-	if err != nil {
-		fmt.Printf("Error opening database: %v\n", err)
-		return
-	}
-
-	dbPaypal.SetMaxOpenConns(2)
-	dbPaypal.SetMaxIdleConns(1)
-	dbPaypal.SetConnMaxLifetime(5 * time.Minute)
+	dbPaypal = shareddb.Get()
 }
 
 func getPayPalAccessToken() (string, string, error) {
