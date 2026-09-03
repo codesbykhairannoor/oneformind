@@ -31,7 +31,6 @@ func initDB() {
 		return
 	}
 
-	// Strip pgbouncer=true because lib/pq doesn't support it
 	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
 	connStr = strings.Replace(connStr, "?&", "?", -1)
 	connStr = strings.Replace(connStr, "&&", "&", -1)
@@ -39,7 +38,6 @@ func initDB() {
 		connStr = strings.TrimSuffix(connStr, "?")
 	}
 
-	// Ensure sslmode=require is present
 	if !strings.Contains(connStr, "sslmode=") {
 		if strings.Contains(connStr, "?") {
 			connStr += "&sslmode=require"
@@ -49,12 +47,12 @@ func initDB() {
 	}
 
 	var err error
-	if !strings.Contains(connStr, "default_query_exec_mode=") { 
-		if strings.Contains(connStr, "?") { 
-			connStr += "&default_query_exec_mode=simple_protocol" 
-		} else { 
-			connStr += "?default_query_exec_mode=simple_protocol" 
-		} 
+	if !strings.Contains(connStr, "default_query_exec_mode=") {
+		if strings.Contains(connStr, "?") {
+			connStr += "&default_query_exec_mode=simple_protocol"
+		} else {
+			connStr += "?default_query_exec_mode=simple_protocol"
+		}
 	}
 	dbDaily, err = sql.Open("pgx", connStr)
 	if err != nil {
@@ -84,7 +82,7 @@ func PlannerDailyHandler(w http.ResponseWriter, r *http.Request) {
 		initDB()
 	}
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	userIdStr := r.Header.Get("X-User-Id")
 	if userIdStr == "" {
 		userIdStr = r.URL.Query().Get("userId")
@@ -106,11 +104,11 @@ func PlannerDailyHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, `{"error": "Missing date"}`, 400)
 			return
 		}
-		
+
 		var pd PlannerDaily
 		var createdAt, updatedAt sql.NullTime
 		var notes, meals, inbox sql.NullString
-		
+
 		err := dbDaily.QueryRow(`SELECT id, user_id, date, notes, meals, water_glasses, inbox, created_at, updated_at 
 			FROM planner_daily WHERE user_id = $1 AND date = $2`, userID, dateStr).Scan(
 			&pd.ID, &pd.UserID, &pd.Date, &notes, &meals, &pd.WaterGlasses, &inbox, &createdAt, &updatedAt,
@@ -125,29 +123,29 @@ func PlannerDailyHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if notes.Valid { pd.Notes = &notes.String }
-		// Prisma returns JSON objects for meals/inbox, so we need to return json.RawMessage if we want to be exact,
-		// but since they are null or json strings in postgres, we'll unmarshal them.
-		
-		response := map[string]interface{}{
-			"id": pd.ID,
-			"userId": pd.UserID,
-			"date": pd.Date,
-			"notes": pd.Notes,
-			"waterGlasses": pd.WaterGlasses,
-			"createdAt": createdAt.Time,
-			"updatedAt": updatedAt.Time,
+		if notes.Valid {
+			pd.Notes = &notes.String
 		}
-		
-		if meals.Valid {
+
+		response := map[string]interface{}{
+			"id":           pd.ID,
+			"userId":       pd.UserID,
+			"date":         pd.Date,
+			"notes":        pd.Notes,
+			"waterGlasses": pd.WaterGlasses,
+			"createdAt":    createdAt.Time,
+			"updatedAt":    updatedAt.Time,
+		}
+
+		if meals.Valid && meals.String != "" {
 			var m interface{}
 			json.Unmarshal([]byte(meals.String), &m)
 			response["meals"] = m
 		} else {
 			response["meals"] = nil
 		}
-		
-		if inbox.Valid {
+
+		if inbox.Valid && inbox.String != "" {
 			var i interface{}
 			json.Unmarshal([]byte(inbox.String), &i)
 			response["inbox"] = i
@@ -159,58 +157,59 @@ func PlannerDailyHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else if r.Method == http.MethodPut {
 		var body map[string]interface{}
-		json.NewDecoder(r.Body).Decode(&body)
-		
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, `{"error": "Invalid JSON"}`, 400)
+			return
+		}
+
 		dateStr, ok := body["date"].(string)
-		if !ok {
+		if !ok || dateStr == "" {
 			http.Error(w, `{"error": "Missing date"}`, 400)
 			return
 		}
 
-		// Prepare updates
+		// waterGlasses
 		var waterGlasses int
 		if wg, ok := body["waterGlasses"].(float64); ok {
 			waterGlasses = int(wg)
-		} else {
-			dbDaily.QueryRow(`SELECT water_glasses FROM planner_daily WHERE user_id = $1 AND date = $2`, userID, dateStr).Scan(&waterGlasses)
 		}
 
-		var notes interface{} = nil
-		if n, ok := body["notes"].(string); ok { notes = n } else {
-			var existingNotes sql.NullString
-			dbDaily.QueryRow(`SELECT notes FROM planner_daily WHERE user_id = $1 AND date = $2`, userID, dateStr).Scan(&existingNotes)
-			if existingNotes.Valid { notes = existingNotes.String }
+		// notes
+		var notesVal interface{} = nil
+		if n, ok := body["notes"].(string); ok {
+			notesVal = n
 		}
 
-		var mealsBytes, inboxBytes []byte
-		if m, ok := body["meals"]; ok { mealsBytes, _ = json.Marshal(m) } else {
-			var existingMeals sql.NullString
-			dbDaily.QueryRow(`SELECT meals FROM planner_daily WHERE user_id = $1 AND date = $2`, userID, dateStr).Scan(&existingMeals)
-			if existingMeals.Valid { mealsBytes = []byte(existingMeals.String) }
+		// meals — MUST pass as string for jsonb column (pgx treats []byte as bytea)
+		var mealsStr interface{} = nil
+		if m, ok := body["meals"]; ok && m != nil {
+			mBytes, _ := json.Marshal(m)
+			mealsStr = string(mBytes)
 		}
-		
-		if i, ok := body["inbox"]; ok { inboxBytes, _ = json.Marshal(i) } else {
-			var existingInbox sql.NullString
-			dbDaily.QueryRow(`SELECT inbox FROM planner_daily WHERE user_id = $1 AND date = $2`, userID, dateStr).Scan(&existingInbox)
-			if existingInbox.Valid { inboxBytes = []byte(existingInbox.String) }
+
+		// inbox — same fix: pass as string not []byte
+		var inboxStr interface{} = nil
+		if i, ok := body["inbox"]; ok && i != nil {
+			iBytes, _ := json.Marshal(i)
+			inboxStr = string(iBytes)
 		}
 
 		query := `
 			INSERT INTO planner_daily (user_id, date, notes, meals, water_glasses, inbox, created_at, updated_at)
-			VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+			VALUES ($1, $2, $3, $4::jsonb, $5, $6::jsonb, NOW(), NOW())
 			ON CONFLICT (user_id, date) DO UPDATE SET 
 			notes = EXCLUDED.notes, meals = EXCLUDED.meals, water_glasses = EXCLUDED.water_glasses, inbox = EXCLUDED.inbox, updated_at = NOW()
 			RETURNING id
 		`
-		
+
 		var id int
-		err := dbDaily.QueryRow(query, userID, dateStr, notes, mealsBytes, waterGlasses, inboxBytes).Scan(&id)
+		err := dbDaily.QueryRow(query, userID, dateStr, notesVal, mealsStr, waterGlasses, inboxStr).Scan(&id)
 		if err != nil {
-			fmt.Println("Upsert Error:", err)
+			fmt.Println("Planner daily upsert error:", err)
 			http.Error(w, `{"error": "Internal Error"}`, 500)
 			return
 		}
-		
+
 		w.Write([]byte(fmt.Sprintf(`{"id": %d, "success": true}`, id)))
 	}
 }
