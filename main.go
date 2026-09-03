@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 	"database/sql"
 
 	handler "tranvas-api/api"
@@ -27,6 +28,113 @@ var (
 	userCacheMutex sync.RWMutex
 	userCache      = make(map[string]int)
 )
+
+// --- GLOBAL CACHE SYSTEM ---
+type cacheEntry struct {
+	Body       []byte
+	StatusCode int
+	Headers    http.Header
+	ExpiresAt  time.Time
+}
+
+var (
+	apiCacheMutex sync.RWMutex
+	// map[userID]map[requestURI]cacheEntry
+	apiCache = make(map[string]map[string]cacheEntry)
+)
+
+type responseRecorder struct {
+	http.ResponseWriter
+	body       []byte
+	statusCode int
+}
+
+func (rw *responseRecorder) Write(b []byte) (int, error) {
+	rw.body = append(rw.body, b...)
+	return rw.ResponseWriter.Write(b)
+}
+
+func (rw *responseRecorder) WriteHeader(statusCode int) {
+	rw.statusCode = statusCode
+	rw.ResponseWriter.WriteHeader(statusCode)
+}
+
+func CacheMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Only run for authenticated users
+		userId := r.URL.Query().Get("userId")
+		if userId == "" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			// Mutation request. Invalidate all cache for this user to ensure freshness.
+			apiCacheMutex.Lock()
+			delete(apiCache, userId)
+			apiCacheMutex.Unlock()
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		// It's a GET request. Check cache.
+		cacheKey := r.URL.RequestURI() // Includes path and ALL query params
+		
+		apiCacheMutex.RLock()
+		userCacheMap, userExists := apiCache[userId]
+		if userExists {
+			entry, entryExists := userCacheMap[cacheKey]
+			if entryExists && time.Now().Before(entry.ExpiresAt) {
+				apiCacheMutex.RUnlock()
+				// Cache HIT - Serve from RAM
+				for k, v := range entry.Headers {
+					for _, val := range v {
+						w.Header().Add(k, val)
+					}
+				}
+				w.Header().Set("X-Cache", "HIT")
+				w.WriteHeader(entry.StatusCode)
+				w.Write(entry.Body)
+				return
+			}
+		}
+		apiCacheMutex.RUnlock()
+
+		// Cache MISS. Record the response.
+		recorder := &responseRecorder{
+			ResponseWriter: w,
+			statusCode:     http.StatusOK, // Default
+		}
+
+		w.Header().Set("X-Cache", "MISS")
+		next.ServeHTTP(recorder, r)
+
+		// Save to cache if successful
+		if recorder.statusCode >= 200 && recorder.statusCode < 300 {
+			headersCopy := make(http.Header)
+			for k, v := range w.Header() {
+				if k != "X-Cache" {
+					headersCopy[k] = v
+				}
+			}
+
+			entry := cacheEntry{
+				Body:       append([]byte(nil), recorder.body...),
+				StatusCode: recorder.statusCode,
+				Headers:    headersCopy,
+				ExpiresAt:  time.Now().Add(5 * time.Minute), // Cache duration 5 minutes
+			}
+
+			apiCacheMutex.Lock()
+			if apiCache[userId] == nil {
+				apiCache[userId] = make(map[string]cacheEntry)
+			}
+			apiCache[userId][cacheKey] = entry
+			apiCacheMutex.Unlock()
+		}
+	})
+}
+// --- END GLOBAL CACHE SYSTEM ---
 
 // parseJWTClaimsUnsafe extracts claims from a JWT without verifying the signature.
 // This is safe because:
@@ -195,6 +303,7 @@ func main() {
 	// Define our protected routes under /api
 	r.Group(func(r chi.Router) {
 		r.Use(AuthMiddleware)
+		r.Use(CacheMiddleware) // <-- apply cache middleware AFTER auth
 		r.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
 			handler.Handler(w, r)
 		})
