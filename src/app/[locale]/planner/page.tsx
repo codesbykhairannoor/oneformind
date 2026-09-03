@@ -616,7 +616,7 @@ export default function PlannerPage() {
                     setTasks={setBatchTasks}
                     onSubmit={async () => {
                         try {
-                            const newTasks = [];
+                            const newTasks: TaskItem[] = [];
                             for (const bTask of batchTasks) {
                                 if (!bTask.title.trim()) continue;
                                 const res = await fetch('/api/planner/tasks', {
