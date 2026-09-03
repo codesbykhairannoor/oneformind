@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Clickup | Tranvas',
+  title: 'Tranvas vs Clickup — Which is Better?',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

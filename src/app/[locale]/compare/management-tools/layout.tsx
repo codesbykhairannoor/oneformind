@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Best Management Tools | Tranvas',
+  title: 'Tranvas vs Management-tools — Which is Better?',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

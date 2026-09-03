@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Help Center | Tranvas',
+  title: 'Help Center — Find Solutions',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

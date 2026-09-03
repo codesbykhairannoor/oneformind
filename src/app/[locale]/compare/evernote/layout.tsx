@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Evernote | Tranvas',
+  title: 'Tranvas vs Evernote — Which is Better?',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

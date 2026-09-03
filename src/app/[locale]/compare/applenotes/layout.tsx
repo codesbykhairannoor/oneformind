@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Applenotes | Tranvas',
+  title: 'Tranvas vs Applenotes — Which is Better?',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

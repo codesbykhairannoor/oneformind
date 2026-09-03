@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Asana | Tranvas',
+  title: 'Tranvas vs Asana — Which is Better?',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
