@@ -57,9 +57,12 @@ export const useGating = () => {
     const tier = useMemo(() => {
         if (!user) return 1;
 
-        // Jika user adalah premium ATAU sedang trial
-        if (user.isPremium || user.is_premium || user.planType?.toLowerCase() === 'trial' || user.plan_type?.toLowerCase() === 'trial') {
-            const plan = (user.planType || user.plan_type)?.toLowerCase();
+        // Match Laravel logic exactly:
+        // User hanya dapat elevated tier jika isPremium=true (dari DB) ATAU plan_type='trial'
+        const plan = (user.planType || user.plan_type)?.toLowerCase();
+        const isPrem = user.isPremium === true || user.is_premium === true;
+        
+        if (isPrem || plan === 'trial') {
             return PLAN_LEVELS[plan] || 2;
         }
 
