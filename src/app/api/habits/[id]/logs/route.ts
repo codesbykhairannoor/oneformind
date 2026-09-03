@@ -11,8 +11,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('id', resolvedParams.id);
+  searchParams.set('habitId', resolvedParams.id);
+  searchParams.set('action', 'logs');
   
-  return proxyToGo(req as any, 'habits-logs', searchParams.toString(), token.accessToken);
+  return proxyToGo(req as any, 'habits', searchParams.toString(), token.accessToken);
 }
 
