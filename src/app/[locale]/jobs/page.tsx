@@ -141,7 +141,7 @@ export default function JobsPage() {
                         company: updatedJob.company || 'Unknown',
                         status: updatedJob.status || 'wishlist',
                         location: updatedJob.location,
-                        applied_date: updatedJob.applied_date,
+                        appliedDate: updatedJob.applied_date,
                         notes: updatedJob.notes
                     })
                 });
@@ -158,7 +158,7 @@ export default function JobsPage() {
                         company: updatedJob.company,
                         status: updatedJob.status,
                         location: updatedJob.location,
-                        applied_date: updatedJob.applied_date,
+                        appliedDate: updatedJob.applied_date,
                         notes: updatedJob.notes
                     })
                 });
