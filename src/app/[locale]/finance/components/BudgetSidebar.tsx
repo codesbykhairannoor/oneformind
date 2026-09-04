@@ -76,9 +76,10 @@ export default function BudgetSidebar({
             .sort((a, b) => b.amount - a.amount);
     }, [categories, incomeStats, budgets]);
 
-    // Total budget — 1:1 from BudgetSidebar.vue line 31-38
-    const totalBudget = budgets.reduce((sum, b) => sum + Number(b.limit), 0);
-    const totalBudgetExpense = budgets.reduce((sum, b) => sum + Number(expenseStats[b.category] || 0), 0);
+    // Total budget
+    const expenseBudgets = budgets.filter(b => getCat(b.category).type === 'expense');
+    const totalBudget = expenseBudgets.reduce((sum, b) => sum + Number(b.limit), 0);
+    const totalBudgetExpense = expenseBudgets.reduce((sum, b) => sum + Number(expenseStats[b.category] || 0), 0);
 
     return (
         // 1:1 from BudgetSidebar.vue line 45
@@ -124,7 +125,7 @@ export default function BudgetSidebar({
                         </button>
                     </div>
 
-                    {budgets.length === 0 ? (
+                    {expenseBudgets.length === 0 ? (
                         <div className="text-center py-8 text-xs text-slate-400 dark:text-slate-600 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-800/30 transition-colors duration-500">
                             <span className="text-2xl block mb-2">🎯</span>
                             {t('no_budget') || 'Belum ada budget yang di-set'}
@@ -145,9 +146,9 @@ export default function BudgetSidebar({
                                 </div>
                             </div>
 
-                            {/* Budget Items — 1:1 from BudgetSidebar.vue line 89 */}
+                            {/* Budget Items */}
                             <div className="space-y-3">
-                                {budgets.map(b => {
+                                {expenseBudgets.map(b => {
                                     const cat = getCat(b.category);
                                     const progress = getProgress(b.category, b.limit);
                                     const barColor = getBarColor(progress);

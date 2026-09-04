@@ -71,8 +71,7 @@ export default function FinanceBatchModal({
     // For Batch Modal, we process available categories per row based on its type
     const getDisplayCategories = (type: 'income' | 'expense') => {
         const available = categories.filter(c => c.type === type);
-        const active = available.filter(c => activeSlugs.has(c.slug));
-        const rawDisplay = active.length === 0 ? available : active;
+        const rawDisplay = available.filter(c => activeSlugs.has(c.slug));
         return Array.from(new Map(rawDisplay.map(c => [c.slug, c])).values());
     };
 
