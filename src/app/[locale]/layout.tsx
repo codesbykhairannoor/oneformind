@@ -43,7 +43,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale} className={`${plusJakartaSans.variable} antialiased`} suppressHydrationWarning>
+    <html lang={locale} translate="no" className={`${plusJakartaSans.variable} antialiased`} suppressHydrationWarning>
       <body className="selection:bg-indigo-100 selection:text-indigo-700 font-sans min-h-screen flex flex-col bg-white text-slate-900" suppressHydrationWarning>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-7PNK1P4WZN" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
