@@ -1,0 +1,9 @@
+PR,URL,Title,Content type,Is rendered page,HTTP status code,Organic traffic,Redirect URL,Redirect URL code,Redirect URL patch,Redirect URL patch status,Redirect chain URLs,Redirect chain URLs codes,Is redirect loop,No. of all inlinks,No. of redirect inlinks,First found at
+0,https://tranvas.com/id/features/planner,,,false,302,0,https://tranvas.com/id/login,200,,,https://tranvas.com/id/login,200,false,0,0,
+0,http://tranvas.com/,,,false,302,0,https://tranvas.com/,200,,,https://tranvas.com/,200,false,0,0,
+0,http://www.tranvas.com/,,,false,302,0,https://www.tranvas.com/,200,,,https://www.tranvas.com/,200,false,0,0,
+0,https://tranvas.com/en/solutions/finance-mastery,,,false,302,0,https://tranvas.com/id/login,200,,,https://tranvas.com/id/login,200,false,0,0,
+0,https://tranvas.com/en/features/finance,,,false,302,0,https://tranvas.com/id/login,200,,,https://tranvas.com/id/login,200,false,0,0,
+0,https://tranvas.com/en/features/planner,,,false,302,0,https://tranvas.com/id/login,200,,,https://tranvas.com/id/login,200,false,0,0,
+0,https://tranvas.com/id/features/finance,,,false,302,0,https://tranvas.com/id/login,200,,,https://tranvas.com/id/login,200,false,0,0,
+0,https://tranvas.com/id/solutions/finance-mastery,,,false,302,0,https://tranvas.com/id/login,200,,,https://tranvas.com/id/login,200,false,0,0,

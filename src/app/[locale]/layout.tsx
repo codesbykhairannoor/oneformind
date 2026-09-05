@@ -15,11 +15,54 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tranvas.com'),
   title: {
     template: '%s | Tranvas',
     default: 'Tranvas | The Unified Life Operating System'
   },
-  description: "The all-in-one productivity OS for growth, clarity, and control.",
+  description: "Tranvas is the all-in-one Life Operating System designed for clarity, growth, and control. Master habits, plan daily tasks, track finances, and achieve your goals.",
+  alternates: {
+    canonical: './',
+    languages: {
+      'en': 'https://tranvas.com',
+      'id': 'https://tranvas.com/id',
+      'x-default': 'https://tranvas.com',
+    },
+  },
+  openGraph: {
+    title: 'Tranvas | The Unified Life Operating System',
+    description: 'Tranvas is the all-in-one Life Operating System designed for clarity, growth, and control. Master habits, plan daily tasks, track finances, and achieve your goals.',
+    url: 'https://tranvas.com',
+    siteName: 'Tranvas',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/icon.png',
+        width: 512,
+        height: 512,
+        alt: 'Tranvas - Unified Life Operating System',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tranvas | The Unified Life Operating System',
+    description: 'Tranvas is the all-in-one Life Operating System designed for clarity, growth, and control. Master habits, plan daily tasks, track finances, and achieve your goals.',
+    images: ['/icon.png'],
+    creator: '@tranvas_app',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 // PERF: Pre-generate both locale routes at build time so they're served

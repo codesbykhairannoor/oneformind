@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:seo": "node scripts/test-seo-audit.mjs"
   },
   "dependencies": {
     "@paypal/paypal-js": "^10.1.0",

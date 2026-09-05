@@ -10,15 +10,16 @@ export const proxy = async (req: any) => {
   // Update Supabase session
   const supabaseResponse = await updateSession(req);
   
-  const isProtectedRoute = 
-    req.nextUrl.pathname.includes('/dashboard') || 
-    req.nextUrl.pathname.includes('/planner') || 
-    req.nextUrl.pathname.includes('/finance') || 
-    req.nextUrl.pathname.includes('/habits') ||
-    req.nextUrl.pathname.includes('/goals') ||
-    req.nextUrl.pathname.includes('/study') ||
-    req.nextUrl.pathname.includes('/jobs') ||
-    req.nextUrl.pathname.includes('/journals');
+  const pathname = req.nextUrl.pathname;
+  
+  // Strictly match top-level application / dashboard routes, NOT public marketing pages like /features/* or /solutions/*
+  const isProtectedRoute = /^\/(?:en|id)?\/?(?:dashboard|habits|goals|study|jobs|journals|journal|coach|calendar|settings|billing|profile|finance|planner)(?:\/.*)?$/.test(pathname) &&
+    !pathname.startsWith('/features') &&
+    !pathname.startsWith('/id/features') &&
+    !pathname.startsWith('/en/features') &&
+    !pathname.startsWith('/solutions') &&
+    !pathname.startsWith('/id/solutions') &&
+    !pathname.startsWith('/en/solutions');
 
   // Supabase stores user session in cookies which updateSession verifies
   // However, in Next.js middleware it's often easier to check auth status by retrieving the user.
@@ -35,7 +36,6 @@ export const proxy = async (req: any) => {
     return Response.redirect(loginUrl);
   }
 
-  const pathname = req.nextUrl.pathname;
   const isAuthPage = pathname.includes('/login') || pathname.includes('/register');
   
   if ((pathname === '/' || pathname === '/id' || pathname === '/en' || isAuthPage) && hasAuthCookie) {
