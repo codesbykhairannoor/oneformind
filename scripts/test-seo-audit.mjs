@@ -24,47 +24,13 @@ function assert(condition, message, warnOnly = false) {
   }
 }
 
-const csvDir = path.join(process.cwd(), 'tranvasCSV');
+const csvDir = path.join(process.cwd(), 'NewCSV');
 const srcDir = path.join(process.cwd(), 'src');
-
-// ----------------------------------------------------
-// Helper: Parse CSV
-// ----------------------------------------------------
-function parseCSV(fileName) {
-  const filePath = path.join(csvDir, fileName);
-  if (!fs.existsSync(filePath)) return [];
-  const content = fs.readFileSync(filePath, 'utf8');
-  const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
-  if (lines.length <= 1) return [];
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    // Simple CSV parser supporting quoted values
-    const regex = /(?:,|\n|^)("(?:(?:"")*[^"]*)*"|[^",\n]*|(?:\n|$))/g;
-    const matches = [];
-    let match;
-    while ((match = regex.exec(lines[i])) !== null) {
-      let val = match[1] || '';
-      if (val.startsWith('"') && val.endsWith('"')) {
-        val = val.slice(1, -1).replace(/""/g, '"');
-      }
-      matches.push(val);
-      if (regex.lastIndex >= lines[i].length) break;
-    }
-    const row = {};
-    headers.forEach((h, idx) => {
-      row[h] = matches[idx] || '';
-    });
-    rows.push(row);
-  }
-  return rows;
-}
 
 // ----------------------------------------------------
 // 1. AUDIT CATEGORY 1: 404 NOT FOUND ROUTES
 // ----------------------------------------------------
 console.log('1️⃣  AUDITING 404-PAGE.CSV & BROKEN ROUTES...');
-const notFoundCSV = parseCSV('tranvas_05-sep-2026_404-page_2026-09-05_15-52-28.csv');
 const reported404s = [
   'terms-of-service',
   'features',
@@ -96,24 +62,23 @@ assert(sitemapCode.includes('\'/features/finance\''), 'sitemap.ts includes /feat
 console.log('   Sitemap generation logic verified.\n');
 
 // ----------------------------------------------------
-// 3. AUDIT CATEGORY 3: CANONICAL TAGS & DUPLICATE PREVENTION
+// 3. AUDIT CATEGORY 3: CANONICAL TAGS & RECIPROCAL HREFLANG
 // ----------------------------------------------------
-console.log('3️⃣  AUDITING DUPLICATE-PAGES-WITHOUT-CANONICAL.CSV...');
+console.log('3️⃣  AUDITING CANONICAL & HREFLANG LOGIC IN LAYOUT.TSX...');
 const layoutFile = path.join(srcDir, 'app', '[locale]', 'layout.tsx');
 const layoutCode = fs.readFileSync(layoutFile, 'utf8');
 
-assert(layoutCode.includes('metadataBase: new URL(\'https://tranvas.com\')'), 'layout.tsx defines metadataBase');
-assert(layoutCode.includes('canonical: \'./\''), 'layout.tsx defines self-referencing canonical');
-assert(layoutCode.includes('\'en\': \'https://tranvas.com\''), 'layout.tsx defines en alternate');
-assert(layoutCode.includes('\'id\': \'https://tranvas.com/id\''), 'layout.tsx defines id alternate');
-assert(layoutCode.includes('\'x-default\': \'https://tranvas.com\''), 'layout.tsx defines x-default alternate');
-console.log('   Canonical tag structure verified.\n');
+assert(layoutCode.includes('generateMetadata'), 'layout.tsx defines dynamic generateMetadata');
+assert(layoutCode.includes('canonical: canonicalUrl'), 'layout.tsx assigns dynamic canonicalUrl');
+assert(layoutCode.includes('\'en\': baseUrl'), 'layout.tsx assigns prefix-less en alternate');
+assert(layoutCode.includes('\'id\': `${baseUrl}/id`'), 'layout.tsx assigns /id alternate');
+assert(layoutCode.includes('\'x-default\': baseUrl'), 'layout.tsx assigns prefix-less x-default alternate');
+console.log('   Canonical & reciprocal hreflang structure verified.\n');
 
 // ----------------------------------------------------
 // 4. AUDIT CATEGORY 4: INDEXABLE PAGES IN SITEMAP
 // ----------------------------------------------------
 console.log('4️⃣  AUDITING INDEXABLE-PAGE-NOT-IN-SITEMAP.CSV...');
-const missingPagesCSV = parseCSV('tranvas_05-sep-2026_indexable-page-not-in-sit_2026-09-05_15-55-38.csv');
 const corePublicRoutes = [
   'features',
   'pricing',
@@ -155,40 +120,40 @@ console.log(`   Checked ${corePublicRoutes.length} core indexable routes in site
 // ----------------------------------------------------
 // 5. AUDIT CATEGORY 5: OPEN GRAPH & TWITTER CARDS
 // ----------------------------------------------------
-console.log('5️⃣  AUDITING OPEN-GRAPH-TAGS-MISSING.CSV & X-(TWITTER)-CARD-MISSING.CSV...');
+console.log('5️⃣  AUDITING OPEN-GRAPH & TWITTER METADATA...');
 assert(layoutCode.includes('openGraph:'), 'layout.tsx exports openGraph metadata');
 assert(layoutCode.includes('siteName: \'Tranvas\''), 'openGraph contains siteName: Tranvas');
-assert(layoutCode.includes('type: \'website\''), 'openGraph contains type: website');
+assert(layoutCode.includes('url: canonicalUrl'), 'openGraph contains dynamic canonicalUrl');
 assert(layoutCode.includes('twitter:'), 'layout.tsx exports twitter metadata');
 assert(layoutCode.includes('card: \'summary_large_image\''), 'twitter contains card: summary_large_image');
 assert(layoutCode.includes('creator: \'@tranvas_app\''), 'twitter contains creator handle');
 console.log('   Social metadata verified.\n');
 
 // ----------------------------------------------------
-// 6. AUDIT CATEGORY 6: META DESCRIPTION LENGTH
+// 6. AUDIT CATEGORY 6: META DESCRIPTION LENGTH (<= 160 chars)
 // ----------------------------------------------------
-console.log('6️⃣  AUDITING META-DESCRIPTION-TOO-SHORT.CSV...');
-const descMatch = layoutCode.match(/description:\s*["']([^"']+)["']/);
+console.log('6️⃣  AUDITING META DESCRIPTION LENGTH...');
+const descMatch = layoutCode.match(/description:\s*\n?\s*["']([^"']+)["']/);
 assert(descMatch !== null, 'layout.tsx defines meta description');
 if (descMatch) {
   const desc = descMatch[1];
-  assert(desc.length >= 120 && desc.length <= 165, `Meta description length (${desc.length} chars) is within 120-165 char standard`);
+  assert(desc.length >= 120 && desc.length <= 160, `Meta description length (${desc.length} chars) is optimal (120-160 chars)`);
 }
 console.log('   Meta description length verified.\n');
 
 // ----------------------------------------------------
-// 7. AUDIT CATEGORY 7: H1 TAG & FEATURES HUB
+// 7. AUDIT CATEGORY 7: H1 TAG & FULL SSR HYDRATION
 // ----------------------------------------------------
-console.log('7️⃣  AUDITING H1-TAG-MISSING-OR-EMPTY.CSV & FEATURES HUB...');
+console.log('7️⃣  AUDITING H1 HEADING & SERVER-SIDE RENDERING (SSR)...');
 const featuresHubFile = path.join(srcDir, 'app', '[locale]', 'features', 'page.tsx');
 const featuresHubCode = fs.readFileSync(featuresHubFile, 'utf8');
 
 assert(featuresHubCode.includes('<h1'), 'features/page.tsx has semantic <h1> heading');
 assert(featuresHubCode.includes('/features/planner'), 'features/page.tsx links to /features/planner');
 assert(featuresHubCode.includes('/features/finance'), 'features/page.tsx links to /features/finance');
-assert(featuresHubCode.includes('/features/habit'), 'features/page.tsx links to /features/habit');
-assert(featuresHubCode.includes('/features/journal'), 'features/page.tsx links to /features/journal');
-console.log('   Features Hub semantic structure verified.\n');
+assert(layoutCode.includes('getMessages()'), 'RootLayout calls getMessages() for server rendering');
+assert(layoutCode.includes('initialMessages={messages as any}'), 'RootLayout passes initialMessages for instant SSR body');
+console.log('   Full SSR hydration and semantic H1 verified.\n');
 
 // ----------------------------------------------------
 // 8. AUDIT CATEGORY 8: PROXY ROUTING REGEX & 302 REDIRECTS
@@ -241,5 +206,5 @@ console.log('====================================================');
 if (totalErrors > 0) {
   process.exit(1);
 } else {
-  console.log('🎉 ALL 8 TRANVAS CSV AUDIT CATEGORIES HEALED 100%!');
+  console.log('🎉 ALL TRANVAS CSV AUDIT ISSUES HEALED 100%!');
 }

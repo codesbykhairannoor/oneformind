@@ -1,0 +1,14 @@
+PR,URL,Title,Content type,Is rendered page,HTTP status code,Organic traffic,Size (bytes),Time to first byte (ms),Loading time (ms),Depth,Is indexable page,No. of all inlinks,First found at
+30,https://tranvas.com/id,Tranvas | The Unified Life Operating System,text/html; charset=utf-8,false,200,0,3483,2101,2101,0,true,68,
+20,https://tranvas.com/id/features,Features Overview — All-in-One Life Operating System | Tranvas,text/html; charset=utf-8,false,200,0,3457,2198,2198,0,true,1,
+20,https://tranvas.com/id/solutions/atomic-system,"Atomic Habits — Small Steps, Big Results | Tranvas",text/html; charset=utf-8,false,200,0,3563,2180,2180,0,true,1,
+20,https://tranvas.com/id/terms-of-service,Terms of Service — User Agreement & Usage Rules | Tranvas,text/html; charset=utf-8,false,200,0,3624,2098,2098,0,true,1,
+20,https://tranvas.com/,Tranvas | The Unified Life Operating System,text/html; charset=utf-8,false,200,0,3484,2216,2216,0,false,136,
+20,https://tranvas.com/id/features/calendar,Smart Calendar — Sync Your Schedules,text/html; charset=utf-8,false,200,0,3505,2177,2177,0,true,1,
+0,https://tranvas.com/solutions/mental-clarity,Mental Health — Journaling & Mindfulness | Tranvas,text/html; charset=utf-8,false,200,0,3575,2227,2227,0,false,3,
+0,https://www.tranvas.com/,Tranvas | The Unified Life Operating System,text/html; charset=utf-8,false,200,0,3484,2055,2055,0,false,3,
+0,https://tranvas.com/solutions/second-brain,Second Brain — Your Digital Knowledge Map | Tranvas,text/html; charset=utf-8,false,200,0,3557,2245,2246,0,false,3,
+0,https://tranvas.com/features,Features Overview — All-in-One Life Operating System | Tranvas,text/html; charset=utf-8,false,200,0,3458,2090,2090,0,false,3,
+0,https://www.tranvas.com/id,Tranvas | The Unified Life Operating System,text/html; charset=utf-8,false,200,0,3483,2084,2084,1,false,1,https://www.tranvas.com/
+0,https://tranvas.com/features/neural-os,Neural OS AI — Powered by Gemini Brain,text/html; charset=utf-8,false,200,0,3483,2171,2172,0,false,3,
+0,https://tranvas.com/solutions/finance-mastery,Financial Clarity — Manage Assets & Cashflow | Tranvas,text/html; charset=utf-8,false,200,0,3572,2058,2058,0,false,3,

@@ -22,20 +22,22 @@ async function loadMessages(locale: string): Promise<Messages> {
 export default function InstantIntlProvider({
   children,
   initialLocale,
+  initialMessages,
 }: {
   children: React.ReactNode;
   initialLocale: string;
+  initialMessages?: Messages;
 }) {
   const [locale, setLocale] = useState(initialLocale);
-  const [messages, setMessages] = useState<Messages | null>(null);
-  const loadedLocaleRef = useRef<string | null>(null);
+  const [messages, setMessages] = useState<Messages | null>(initialMessages || null);
+  const loadedLocaleRef = useRef<string | null>(initialMessages ? initialLocale : null);
 
-  // Load messages for the current locale (only once per locale)
+  // Load messages for the current locale if changed or not provided
   useEffect(() => {
-    if (loadedLocaleRef.current === locale) return;
+    if (loadedLocaleRef.current === locale && messages) return;
     loadedLocaleRef.current = locale;
     loadMessages(locale).then(setMessages);
-  }, [locale]);
+  }, [locale, messages]);
 
   // Sync state if initialLocale changes externally (e.g. user manually changes URL prefix)
   useEffect(() => {
