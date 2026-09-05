@@ -254,20 +254,24 @@ export default function GuestLayout({ children, user = null }: { children: React
 
                             {langOpen && (
                                 <div className="absolute top-full right-0 mt-3 w-40 bg-white border border-slate-100 shadow-2xl rounded-2xl overflow-hidden z-50 p-2 text-left">
-                                    <button 
+                                    <Link 
+                                        href={pathname}
+                                        locale="id"
                                         onClick={() => switchLang('id')} 
                                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${locale === 'id' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'}`}
                                     >
                                         <span>Bahasa Indonesia</span>
                                         {locale === 'id' && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
-                                    </button>
-                                    <button 
+                                    </Link>
+                                    <Link 
+                                        href={pathname}
+                                        locale="en"
                                         onClick={() => switchLang('en')} 
                                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${locale === 'en' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'}`}
                                     >
                                         <span>English</span>
                                         {locale === 'en' && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
-                                    </button>
+                                    </Link>
                                 </div>
                             )}
                         </div>
@@ -370,8 +374,22 @@ export default function GuestLayout({ children, user = null }: { children: React
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/50">
                                 <span className="text-sm font-bold text-slate-500">Language</span>
                                 <div className="flex gap-2">
-                                    <button onClick={() => switchLang('id')} className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'id' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}>ID</button>
-                                    <button onClick={() => switchLang('en')} className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'en' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}>EN</button>
+                                    <Link 
+                                        href={pathname} 
+                                        locale="id" 
+                                        onClick={() => { switchLang('id'); setMobileMenuOpen(false); }} 
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'id' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}
+                                    >
+                                        ID
+                                    </Link>
+                                    <Link 
+                                        href={pathname} 
+                                        locale="en" 
+                                        onClick={() => { switchLang('en'); setMobileMenuOpen(false); }} 
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'en' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}
+                                    >
+                                        EN
+                                    </Link>
                                 </div>
                             </div>
                             
@@ -490,6 +508,11 @@ export default function GuestLayout({ children, user = null }: { children: React
 
                     <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-slate-700">
                         <p>&copy; {new Date().getFullYear()} Tranvas. All rights reserved.</p>
+                        <div className="flex items-center gap-4 text-xs text-slate-500">
+                            <Link href={pathname} locale="en" onClick={() => switchLang('en')} className={`hover:text-indigo-600 transition ${locale === 'en' ? 'text-indigo-600 font-black' : ''}`}>English</Link>
+                            <span>•</span>
+                            <Link href={pathname} locale="id" onClick={() => switchLang('id')} className={`hover:text-indigo-600 transition ${locale === 'id' ? 'text-indigo-600 font-black' : ''}`}>Bahasa Indonesia</Link>
+                        </div>
                         <p>Made with ❤️ for better focus.</p>
                     </div>
                 </div>

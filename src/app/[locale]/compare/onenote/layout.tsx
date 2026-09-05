@@ -1,19 +1,20 @@
-import { getTranslations } from 'next-intl/server';
 import { Metadata } from 'next';
+import { constructPageMetadata } from '@/lib/seo';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-    const { locale } = await params;
-    const t = await getTranslations({ locale });
-    return {
-        title: t('onenote_alt_title'),
-        description: t('onenote_alt_desc'),
-        openGraph: {
-            title: t('onenote_alt_og_title'),
-            description: t('onenote_alt_og_desc'),
-        }
-    };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return constructPageMetadata({
+    locale,
+    path: '/compare/onenote',
+    title: 'Tranvas vs Onenote — Detailed Feature Comparison',
+    description: 'Compare Tranvas and Onenote. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
+  });
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
+export default function CompareOnenoteLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

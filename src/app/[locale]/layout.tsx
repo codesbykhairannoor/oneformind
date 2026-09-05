@@ -15,67 +15,30 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap", // PERF: Use font-display:swap to prevent invisible text during font load
 });
 
+import { constructPageMetadata } from "@/lib/seo";
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const isEn = locale === 'en';
   const baseUrl = 'https://tranvas.com';
-  const canonicalUrl = isEn ? baseUrl : `${baseUrl}/id`;
+
+  const baseMeta = constructPageMetadata({
+    locale,
+    path: '',
+    title: 'Tranvas | The Unified Life Operating System',
+    description:
+      'Tranvas is the all-in-one Life Operating System. Master daily habits, plan tasks, track finances, and achieve your goals with total clarity and control.',
+  });
 
   return {
     metadataBase: new URL(baseUrl),
+    ...baseMeta,
     title: {
       template: '%s | Tranvas',
       default: 'Tranvas | The Unified Life Operating System',
-    },
-    description:
-      'Tranvas is the all-in-one Life Operating System. Master daily habits, plan tasks, track finances, and achieve your goals with total clarity and control.',
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        'en': baseUrl,
-        'id': `${baseUrl}/id`,
-        'x-default': baseUrl,
-      },
-    },
-    openGraph: {
-      title: 'Tranvas | The Unified Life Operating System',
-      description:
-        'Tranvas is the all-in-one Life Operating System. Master daily habits, plan tasks, track finances, and achieve your goals with total clarity and control.',
-      url: canonicalUrl,
-      siteName: 'Tranvas',
-      locale: isEn ? 'en_US' : 'id_ID',
-      type: 'website',
-      images: [
-        {
-          url: '/icon.png',
-          width: 512,
-          height: 512,
-          alt: 'Tranvas - Unified Life Operating System',
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: 'Tranvas | The Unified Life Operating System',
-      description:
-        'Tranvas is the all-in-one Life Operating System. Master daily habits, plan tasks, track finances, and achieve your goals with total clarity and control.',
-      images: ['/icon.png'],
-      creator: '@tranvas_app',
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
     },
   };
 }

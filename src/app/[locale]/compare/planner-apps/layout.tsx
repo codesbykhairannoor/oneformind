@@ -1,19 +1,20 @@
-import { getTranslations } from 'next-intl/server';
 import { Metadata } from 'next';
+import { constructPageMetadata } from '@/lib/seo';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-    const { locale } = await params;
-    const t = await getTranslations({ locale });
-    return {
-        title: t('plan_meta_title'),
-        description: t('plan_meta_desc'),
-        openGraph: {
-            title: t('plan_meta_og_title'),
-            description: t('plan_meta_og_desc'),
-        }
-    };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return constructPageMetadata({
+    locale,
+    path: '/compare/planner-apps',
+    title: 'Tranvas vs Planner Apps — Detailed Feature Comparison',
+    description: 'Compare Tranvas and Planner Apps. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
+  });
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
+export default function ComparePlannerappsLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

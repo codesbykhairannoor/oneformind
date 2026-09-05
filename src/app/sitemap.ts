@@ -43,6 +43,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/resources/ai-trust', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/resources/help', priority: 0.7, changeFrequency: 'weekly' as const },
 
+    // Company Subpages
+    { path: '/company/security', priority: 0.6, changeFrequency: 'monthly' as const },
+    { path: '/company/refund', priority: 0.5, changeFrequency: 'monthly' as const },
+    { path: '/company/status', priority: 0.5, changeFrequency: 'weekly' as const },
+
+    // Compare Pages (Key competitors from footer)
+    { path: '/compare/notion', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/compare/clickup', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/compare/todoist', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/compare/trello', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/compare/asana', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/compare/habitica', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/compare/obsidian', priority: 0.75, changeFrequency: 'weekly' as const },
+
     // Auth
     { path: '/login', priority: 0.6, changeFrequency: 'monthly' as const },
     { path: '/register', priority: 0.7, changeFrequency: 'monthly' as const },

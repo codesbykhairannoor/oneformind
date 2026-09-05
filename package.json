@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:seo": "node scripts/test-seo-audit.mjs"
+    "test:seo": "npx tsx scripts/test-seo-audit.mjs"
   },
   "dependencies": {
     "@paypal/paypal-js": "^10.1.0",

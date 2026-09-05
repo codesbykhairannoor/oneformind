@@ -1,9 +1,20 @@
 import { Metadata } from 'next';
+import { constructPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Tranvas vs Clickup — Which is Better?',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return constructPageMetadata({
+    locale,
+    path: '/compare/clickup',
+    title: 'Tranvas vs Clickup — Detailed Feature Comparison',
+    description: 'Compare Tranvas and Clickup. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
+  });
+}
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function CompareClickupLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
