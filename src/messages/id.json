@@ -5806,7 +5806,7 @@
   "label_tomorrow": "Besok",
   "label_yesterday": "Kemarin",
   "select_today": "Ke Hari Ini",
-  "error_duration_min": "⛔ Minimal 15 menit!",
+  "error_duration_min": "⛔ Minimal 5 menit!",
   "module_calendar_title": "Kalender",
   "module_calendar_desc": "Jadwal lini masa terintegrasi",
   "module_job_title": "Karir & Lamaran",

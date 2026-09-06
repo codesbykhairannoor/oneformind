@@ -5817,7 +5817,7 @@
   "label_tomorrow": "Tomorrow",
   "label_yesterday": "Yesterday",
   "select_today": "To Today",
-  "error_duration_min": "⛔ Minimum 15 minutes!",
+  "error_duration_min": "⛔ Minimum 5 minutes!",
   "journal_mockup_typing": "Analyzing your thoughts...",
   "module_calendar_title": "Calendar",
   "module_calendar_desc": "Integrated timeline calendar",

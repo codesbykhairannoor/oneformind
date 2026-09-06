@@ -198,8 +198,8 @@ export default function PlannerPage() {
         if (newEnd < newStart) newEnd += 1440;
 
         const duration = newEnd - newStart;
-        if (duration < 15) {
-            return t('error_duration_min') || 'Minimal 15 menit!';
+        if (duration < 5) {
+            return t('error_duration_min') || 'Minimal 5 menit!';
         }
 
         const hasConflict = tasks.some(task => {

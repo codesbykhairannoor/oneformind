@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronDown, CheckCircle2, Circle } from 'lucide-react';
 
-const VIEW_LIMIT = 17;
+const VIEW_LIMIT = 24;
 const HOUR_HEIGHT = 80;
 const TIME_COL_WIDTH = 80;
 
@@ -25,6 +25,17 @@ export default function PlannerTimeline({
 }: PlannerTimelineProps) {
     const t = useTranslations();
     const [isStartHourOpen, setIsStartHourOpen] = useState(false);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (scrollContainerRef.current) {
+            const currentH = now.getHours();
+            let diff = currentH - startHour;
+            if (diff < 0) diff += 24;
+            const scrollTarget = Math.max(0, (diff - 1) * HOUR_HEIGHT);
+            scrollContainerRef.current.scrollTop = scrollTarget;
+        }
+    }, [startHour]);
 
     const handleDragStart = (e: React.DragEvent, taskId: number) => {
         e.dataTransfer.dropEffect = 'move';
@@ -87,14 +98,17 @@ export default function PlannerTimeline({
     };
 
     const getDurationMinutes = (task: any) => {
+        if (!task.start_time) return 30;
         const [startH, startM] = task.start_time.split(':').map(Number);
-        let [endH, endM] = task.end_time ? task.end_time.split(':').map(Number) : [startH + 1, startM];
+        let [endH, endM] = task.end_time ? task.end_time.split(':').map(Number) : [startH, startM + 30];
         let duration = (endH * 60 + endM) - (startH * 60 + startM);
         if (duration < 0) duration += 1440;
+        if (duration === 0) duration = 30;
         return duration;
     };
 
     const getTaskStyle = (task: any) => {
+        if (!task.start_time) return { display: 'none' };
         const [startH, startM] = task.start_time.split(':').map(Number);
         
         let duration = getDurationMinutes(task);
@@ -103,13 +117,11 @@ export default function PlannerTimeline({
         const viewStartMinutes = startHour * 60;
 
         let relStart = taskStartMinutes - viewStartMinutes;
-        if (relStart < -720) relStart += 1440; 
-        else if (relStart > 720) relStart -= 1440;
+        if (relStart < 0) relStart += 1440;
 
         const relEnd = relStart + duration;
 
-        if (relEnd <= 0) return { display: 'none' };
-        if (relStart >= VIEW_LIMIT * 60 && relEnd > VIEW_LIMIT * 60) return { display: 'none' }; 
+        if (relStart >= VIEW_LIMIT * 60) return { display: 'none' };
 
         const renderStart = Math.max(0, relStart);
         const renderEnd = Math.min(VIEW_LIMIT * 60, relEnd);
@@ -200,7 +212,7 @@ export default function PlannerTimeline({
                 </div>
 
                 {/* Timeline Body */}
-                <div className="flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500">
+                <div ref={scrollContainerRef} className="flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar">
                     <div className="relative w-full" style={{ height: `${VIEW_LIMIT * HOUR_HEIGHT}px` }}>
                         
                         {/* Grid Lines & Time Slots */}
