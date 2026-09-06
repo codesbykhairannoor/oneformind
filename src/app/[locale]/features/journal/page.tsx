@@ -288,49 +288,83 @@ export default function FeatureJournalPage() {
                     </div>
                 </section>
 
-                {/* NEW SECTION: SCIENTIFIC PILLAR (E-E-A-T) - ZEN MINIMALIST REFLECTION STYLE */}
-                <section className="py-32 bg-white relative overflow-hidden">
-                    <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-                        
-                        {/* Floating Seal of Quality */}
-                        <div className="relative mb-20">
-                            <div className="absolute inset-0 bg-indigo-50 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-                            <div className="relative w-24 h-24 mx-auto bg-white border border-indigo-100 rounded-full flex items-center justify-center text-3xl shadow-xl transform hover:rotate-12 transition duration-700 group font-black select-none">
-                                ✨
-                                <div className="absolute inset-0 border-2 border-dashed border-indigo-200 rounded-full animate-spin-slow group-hover:animate-spin"></div>
+                {/* SECTION: SCIENTIFIC PILLAR - WARM EDITORIAL RESEARCH CARDS */}
+                <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+                    <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+                    <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+                    
+                    <div className="max-w-6xl mx-auto px-6 relative z-10">
+                        <div className="text-center max-w-3xl mx-auto mb-20">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 text-purple-300 font-bold text-[10px] uppercase tracking-[0.25em] mb-6 border border-purple-500/20">
+                                📖 Clinical Psychology & Expressive Writing
                             </div>
-                        </div>
-
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 text-slate-400 text-[10px] uppercase tracking-[0.3em] mb-10">
-                            🧬 {t('journal_science_badge')}
-                        </div>
-                        
-                        <h2 className="text-4xl md:text-5xl font-serif italic text-gray-900 mb-12 leading-tight font-black">
-                            {t('journal_science_title')}
-                        </h2>
-
-                        <div className="relative py-12 px-8 md:px-20 border-y border-gray-100">
-                            {/* Quote Marks */}
-                            <div className="absolute top-0 left-0 text-8xl text-indigo-50 font-serif leading-none -translate-x-1/2 -translate-y-1/2 font-black select-none">“</div>
-                            <div className="absolute bottom-0 right-0 text-8xl text-indigo-50 font-serif leading-none translate-x-1/2 translate-y-1/2 font-black select-none">”</div>
-                            
-                            <p className="text-gray-600 text-2xl md:text-3xl font-serif italic leading-[1.6] opacity-80 decoration-indigo-100 underline-offset-8 font-black">
-                                {t('journal_science_desc')}
+                            <h2 className="text-3xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6 font-serif italic">
+                                {t('journal_science_title_1')}{' '}
+                                <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-amber-300 bg-clip-text text-transparent not-italic font-sans">
+                                    {t('journal_science_title_highlight')}
+                                </span>
+                            </h2>
+                            <p className="text-slate-400 text-base md:text-lg font-medium leading-relaxed max-w-2xl mx-auto font-sans">
+                                Journaling isn't just passive recording—it is active cognitive offloading that physically frees working memory and resets emotional equilibrium.
                             </p>
                         </div>
 
-                        <div className="mt-16 flex flex-wrap justify-center gap-12">
-                            <div className="flex flex-col items-center">
-                                <span className="text-[10px] uppercase tracking-widest text-indigo-300 mb-2 font-bold">Technique</span>
-                                <span className="text-sm font-bold text-gray-400 italic">Affect Labeling</span>
+                        {/* Warm Editorial Research Grid */}
+                        <div className="grid md:grid-cols-2 gap-8">
+                            {/* Card 1: Pennebaker Expressive Writing */}
+                            <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-purple-500/40 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl">
+                                <div>
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-2xl font-serif">
+                                            ✒️
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20 font-mono">
+                                            Psychological Science (1997)
+                                        </span>
+                                    </div>
+                                    <h3 className="text-2xl font-black text-white mb-4 group-hover:text-purple-300 transition-colors">
+                                        {t('journal_science_card1_title')}
+                                    </h3>
+                                    <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-8 font-medium">
+                                        {t('journal_science_card1_desc')}
+                                    </p>
+                                </div>
+                                
+                                <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 flex items-center justify-between font-mono">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></div>
+                                        <span className="text-xs font-bold text-slate-300">Cortisol Index Reduction</span>
+                                    </div>
+                                    <span className="text-xs font-black text-purple-400">-50% Physiological Stress</span>
+                                </div>
                             </div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-[10px] uppercase tracking-widest text-indigo-300 mb-2 font-bold">Foundation</span>
-                                <span className="text-sm font-bold text-gray-400 italic">Reflective Practice</span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-[10px] uppercase tracking-widest text-indigo-300 mb-2 font-bold">Outcome</span>
-                                <span className="text-sm font-bold text-gray-400 italic">Emotional Regulation</span>
+
+                            {/* Card 2: Ramirez & Beilock Working Memory Offload */}
+                            <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-pink-500/40 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl">
+                                <div>
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-2xl font-serif">
+                                            🧠
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-pink-400 bg-pink-500/10 px-3 py-1 rounded-full border border-pink-500/20 font-mono">
+                                            Science Magazine (2011)
+                                        </span>
+                                    </div>
+                                    <h3 className="text-2xl font-black text-white mb-4 group-hover:text-pink-300 transition-colors">
+                                        {t('journal_science_card2_title')}
+                                    </h3>
+                                    <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-8 font-medium">
+                                        {t('journal_science_card2_desc')}
+                                    </p>
+                                </div>
+                                
+                                <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 flex items-center justify-between font-mono">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-pink-400 animate-pulse"></div>
+                                        <span className="text-xs font-bold text-slate-300">RAM Capacity Restored</span>
+                                    </div>
+                                    <span className="text-xs font-black text-pink-400">+100% Unclogged</span>
+                                </div>
                             </div>
                         </div>
                     </div>

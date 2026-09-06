@@ -316,80 +316,121 @@ export default function HomePage() {
     </section>
     
     {/* ================================================================= */}
-    {/* SECTION 3.1: SCIENTIFIC FOUNDATION (E-E-A-T) - REDESIGNED */}
+    {/* SECTION 3.1: SCIENTIFIC FOUNDATION (BENTO BOX SCIENCE MATRIX) */}
     {/* ================================================================= */}
-    <section className="py-32 bg-slate-950 relative overflow-hidden">
-        {/* High-tech Background */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_800px_at_50%_-100px,#3b82f620,transparent)]"></div>
+    <section className="py-32 bg-slate-950 relative overflow-hidden border-y border-slate-800/80">
+        {/* Ambient Grid & Glow */}
+        <div className="absolute inset-0 opacity-25 pointer-events-none">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-600/10 rounded-full blur-[140px]"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="flex flex-col lg:flex-row gap-20 items-center">
-                <div className="lg:w-1/2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-[0.3em] mb-8 border border-emerald-500/20">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        {t('home_science_badge')}
-                    </div>
-                    <h2 className="text-[36px] leading-[1.1] md:text-6xl text-white mb-8 tracking-tighter font-black">
-                        {t('home_science_title')}
-                    </h2>
-                    <p className="text-slate-400 text-xl leading-relaxed mb-12 font-medium">
-                        {t('home_science_desc')}
-                    </p>
+            {/* Section Header */}
+            <div className="text-center max-w-3xl mx-auto mb-20">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-[10px] mb-6 uppercase tracking-[0.25em] border border-indigo-500/20">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Cognitive Architecture
+                </div>
+                <h2 className="text-3xl md:text-5xl lg:text-6xl text-white font-[900] tracking-tight leading-[1.15] mb-6">
+                    {t('home_science_title_1')} <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">{t('home_science_title_highlight')}</span>
+                </h2>
+                <p className="text-slate-400 text-base md:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+                    Tranvas is built upon verified cognitive neuroscience and behavioral economics frameworks—engineered to eliminate cognitive friction and sustain peak execution.
+                </p>
+            </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-emerald-500/50 transition duration-500 group">
-                            <div className="text-emerald-400 font-black text-xs mb-2 flex justify-between">
-                                Cognitive Load
-                                <span className="group-hover:translate-x-1 transition">→</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                                <div className="h-full bg-emerald-500 w-[85%] group-hover:w-[15%] transition-all duration-1000"></div>
-                            </div>
-                            <p className="mt-4 text-slate-500 text-xs font-bold leading-relaxed">Reduced by 70% in Tranvas.</p>
+            {/* Bento Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Bento Card 1: Habit Automaticity */}
+                <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 hover:border-emerald-500/50 hover:bg-slate-900 transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-6">
+                            <span className="text-xs font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                                {t('home_science_card1_tag')}
+                            </span>
+                            <span className="text-2xl">🌱</span>
                         </div>
-                        <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-indigo-500/50 transition duration-500 group">
-                            <div className="text-indigo-400 font-black text-xs mb-2 flex justify-between">
-                                Flow Velocity
-                                <span className="group-hover:translate-x-1 transition">→</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                                <div className="h-full bg-indigo-500 w-[20%] group-hover:w-[95%] transition-all duration-1000"></div>
-                            </div>
-                            <p className="mt-4 text-slate-500 text-xs font-bold leading-relaxed">Optimized for rapid task transitions.</p>
+                        <div className="text-4xl lg:text-5xl font-[900] text-white tracking-tight mb-2 group-hover:text-emerald-300 transition-colors">
+                            {t('home_science_card1_stat')}
                         </div>
+                        <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium">
+                            {t('home_science_card1_desc')}
+                        </p>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-slate-500 italic">
+                            {t('home_science_card1_author')}
+                        </span>
                     </div>
                 </div>
 
-                <div className="lg:w-1/2 relative">
-                    {/* Lab Visual */}
-                    <div className="relative bg-slate-900/50 border border-white/10 p-2 rounded-[3rem] shadow-2xl ">
-                        <div className="grid grid-cols-3 gap-2 overflow-hidden rounded-[2.5rem]">
-                            <div className="h-64 bg-slate-800 flex flex-col items-center justify-center p-6 text-center transform hover:scale-105 transition duration-500">
-                                <div className="text-3xl mb-4 group-hover:rotate-12 transition font-black">🌀</div>
-                                <span className="text-white font-black text-[10px] tracking-widest">Flow State</span>
-                                <div className="mt-2 text-[8px] text-slate-500 font-black tracking-tighter uppercase">M. Csikszentmihalyi</div>
-                            </div>
-                            <div className="h-64 bg-slate-800 flex flex-col items-center justify-center p-6 text-center border-x border-white/5 transform hover:scale-105 transition duration-500">
-                                <div className="text-3xl mb-4 font-black">⚛️</div>
-                                <span className="text-white font-black text-[10px] tracking-widest">Atomic Habits</span>
-                                <div className="mt-2 text-[8px] text-slate-500 font-black tracking-tighter uppercase">James Clear</div>
-                            </div>
-                            <div className="h-64 bg-slate-800 flex flex-col items-center justify-center p-6 text-center transform hover:scale-105 transition duration-500">
-                                <div className="text-3xl mb-4 font-black">🧠</div>
-                                <span className="text-white font-black text-[10px] tracking-widest">Second Brain</span>
-                                <div className="mt-2 text-[8px] text-slate-500 font-black tracking-tighter uppercase">Tiago Forte</div>
-                            </div>
+                {/* Bento Card 2: Attention Residue */}
+                <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 hover:border-indigo-500/50 hover:bg-slate-900 transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-6">
+                            <span className="text-xs font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
+                                {t('home_science_card2_tag')}
+                            </span>
+                            <span className="text-2xl">⚡</span>
                         </div>
-                        
-                        {/* Decorative Schematics */}
-                        <div className="absolute -top-10 -right-10 w-32 h-32 border-t-2 border-r-2 border-white/20 rounded-tr-[3rem]"></div>
-                        <div className="absolute -bottom-10 -left-10 w-32 h-32 border-b-2 border-l-2 border-white/20 rounded-bl-[3rem]"></div>
+                        <div className="text-4xl lg:text-5xl font-[900] text-white tracking-tight mb-2 group-hover:text-indigo-300 transition-colors">
+                            {t('home_science_card2_stat')}
+                        </div>
+                        <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium">
+                            {t('home_science_card2_desc')}
+                        </p>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-slate-500 italic">
+                            {t('home_science_card2_author')}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Bento Card 3: Goal Achievement */}
+                <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 hover:border-purple-500/50 hover:bg-slate-900 transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-6">
+                            <span className="text-xs font-black uppercase tracking-widest text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+                                {t('home_science_card3_tag')}
+                            </span>
+                            <span className="text-2xl">🎯</span>
+                        </div>
+                        <div className="text-4xl lg:text-5xl font-[900] text-white tracking-tight mb-2 group-hover:text-purple-300 transition-colors">
+                            {t('home_science_card3_stat')}
+                        </div>
+                        <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium">
+                            {t('home_science_card3_desc')}
+                        </p>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-slate-500 italic">
+                            {t('home_science_card3_author')}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Bento Card 4: Mental Accounting */}
+                <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 hover:border-amber-500/50 hover:bg-slate-900 transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-6">
+                            <span className="text-xs font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                                {t('home_science_card4_tag')}
+                            </span>
+                            <span className="text-2xl">💰</span>
+                        </div>
+                        <div className="text-4xl lg:text-5xl font-[900] text-white tracking-tight mb-2 group-hover:text-amber-300 transition-colors">
+                            {t('home_science_card4_stat')}
+                        </div>
+                        <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium">
+                            {t('home_science_card4_desc')}
+                        </p>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-slate-500 italic">
+                            {t('home_science_card4_author')}
+                        </span>
                     </div>
                 </div>
             </div>

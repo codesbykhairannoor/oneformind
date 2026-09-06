@@ -412,85 +412,73 @@ export default function FeatureFinancePage() {
                     </div>
                 </section>
 
-                {/* NEW SECTION: SCIENTIFIC PILLAR (E-E-A-T) - GLASSMORPHIC LAYOUT */}
-                <section className="py-32 bg-indigo-50/30 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/money.png')] opacity-[0.03] grayscale"></div>
-                    <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
-
+                {/* SECTION: SCIENTIFIC PILLAR - BEHAVIORAL ECONOMICS & MENTAL ACCOUNTING */}
+                <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:32px_32px] pointer-events-none"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+                    
                     <div className="max-w-6xl mx-auto px-6 relative z-10">
-                        <div className="bg-white/60 rounded-[4rem] border border-white p-12 md:p-20 shadow-2xl flex flex-col lg:flex-row items-center gap-16">
-                            
-                            <div className="flex-1 text-left">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-[10px] uppercase tracking-widest mb-8">
-                                    🧬 {t('finance_science_badge')}
+                        <div className="text-center max-w-3xl mx-auto mb-20">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-400 font-bold text-[10px] uppercase tracking-[0.25em] mb-6 border border-amber-500/20">
+                                💰 Behavioral Economics Architecture
+                            </div>
+                            <h2 className="text-3xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
+                                {t('finance_science_title_1')}{' '}
+                                <span className="bg-gradient-to-r from-amber-400 via-orange-300 to-rose-400 bg-clip-text text-transparent">
+                                    {t('finance_science_title_highlight')}
+                                </span>
+                            </h2>
+                            <p className="text-slate-400 text-base md:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+                                Tranvas applies Nobel Prize-winning behavioral decision frameworks to construct frictionless budgeting vaults that protect long-term wealth.
+                            </p>
+                        </div>
+
+                        {/* Science Quote & Metric Grid */}
+                        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+                            {/* Left: Nobel Quote & Impact Box */}
+                            <div className="lg:col-span-7 bg-slate-950/80 border border-slate-800 p-8 lg:p-12 rounded-[2.5rem] flex flex-col justify-between group shadow-2xl relative overflow-hidden">
+                                <div>
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl mb-8">
+                                        🏆
+                                    </div>
+                                    <p className="text-slate-300 text-lg md:text-xl font-medium leading-relaxed italic mb-8">
+                                        "{t('finance_science_quote_text')}"
+                                    </p>
                                 </div>
-                                <h2 className="text-5xl md:text-5xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
-                                    {t('finance_science_title')}
-                                </h2>
-                                <p className="text-gray-600 text-xl leading-relaxed mb-10 italic font-medium opacity-80">
-                                    {t('finance_science_desc')}
-                                </p>
-                                
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                        <span className="text-xs text-gray-400 uppercase tracking-widest">Mindful Spending</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                                        <span className="text-xs text-gray-400 uppercase tracking-widest">Kakeibo Method</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                                        <span className="text-xs text-gray-400 uppercase tracking-widest">Zero-Based Budgeting</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                        <span className="text-xs text-gray-400 uppercase tracking-widest">Trust & Accuracy</span>
-                                    </div>
+                                <div className="pt-6 border-t border-slate-800 flex items-center justify-between">
+                                    <span className="text-xs font-bold text-amber-400">
+                                        {t('finance_science_quote_author')}
+                                    </span>
+                                    <span className="text-xs font-mono text-slate-500">Journal of Behavioral Decision Making</span>
                                 </div>
                             </div>
 
-                            {/* Dashboard Visual Side */}
-                            <div className="flex-1 w-full max-w-md bg-indigo-900 rounded-[3rem] p-8 text-white shadow-2xl relative group overflow-hidden text-left">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-800 to-indigo-600 opacity-50 group-hover:scale-110 transition duration-700"></div>
-                                
-                                <div className="relative z-10">
-                                    <div className="flex justify-between items-center mb-10">
-                                        <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-xl font-bold">🛡️</div>
-                                        <span className="text-[10px] uppercase tracking-[0.3em] text-indigo-300">verified system</span>
+                            {/* Right: 3 Pillars Architecture */}
+                            <div className="lg:col-span-5 flex flex-col gap-4">
+                                <div className="bg-slate-950/80 border border-slate-800 p-6 rounded-3xl flex items-center gap-4 hover:border-amber-500/40 transition">
+                                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold">1</div>
+                                    <div>
+                                        <h4 className="font-bold text-white text-base">{t('finance_science_pillar1')}</h4>
+                                        <p className="text-slate-400 text-xs mt-0.5">Partitioning funds into rigid psychological envelopes.</p>
                                     </div>
-                                    
-                                    <div className="space-y-6">
-                                        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                                            <div className="flex justify-between items-center mb-3">
-                                                <span className="text-xs font-bold text-indigo-200">Probability of Success</span>
-                                                <span className="text-xs text-emerald-400">+98.2%</span>
-                                            </div>
-                                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                                <div className="w-[98%] h-full bg-emerald-500"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="bg-white/5 rounded-2xl p-4 border border-white/10 text-center">
-                                                <span className="text-[10px] text-indigo-300 uppercase block mb-1">Dopamine Score</span>
-                                                <span className="text-xl font-bold">Optimal</span>
-                                            </div>
-                                            <div className="bg-white/5 rounded-2xl p-4 border border-white/10 text-center">
-                                                <span className="text-[10px] text-indigo-300 uppercase block mb-1">Error Rate</span>
-                                                <span className="text-xl font-bold">0.02%</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                </div>
 
-                                    <div className="mt-8 flex items-center justify-center gap-3">
-                                        <div className="p-2 bg-indigo-500/20 rounded-lg"><span className="text-xs font-semibold">Daniel Kahneman</span></div>
-                                        <div className="p-2 bg-indigo-500/20 rounded-lg"><span className="text-xs font-semibold">Kakeibo Philosophy</span></div>
+                                <div className="bg-slate-950/80 border border-slate-800 p-6 rounded-3xl flex items-center gap-4 hover:border-orange-500/40 transition">
+                                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-xl font-bold">2</div>
+                                    <div>
+                                        <h4 className="font-bold text-white text-base">{t('finance_science_pillar2')}</h4>
+                                        <p className="text-slate-400 text-xs mt-0.5">Creating micro-friction before non-essential purchases.</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-950/80 border border-slate-800 p-6 rounded-3xl flex items-center gap-4 hover:border-rose-500/40 transition">
+                                    <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-xl font-bold">3</div>
+                                    <div>
+                                        <h4 className="font-bold text-white text-base">{t('finance_science_pillar3')}</h4>
+                                        <p className="text-slate-400 text-xs mt-0.5">Continuous cognitive feedback on net worth velocity.</p>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </section>

@@ -335,52 +335,82 @@ export default function FeatureGoalPage() {
                     </div>
                 </section>
 
-                {/* SECTION: SCIENTIFIC PILLAR (E-E-A-T) - ACHIEVEMENT PEAK STYLE */}
-                <section className="py-32 bg-rose-50/20 relative overflow-hidden">
-                    <div className="absolute inset-0 z-0">
-                        <svg className="w-full h-full text-rose-100/30" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-                            <path d="M0,1000 L300,400 L500,700 L800,200 L1000,1000 Z" fill="currentColor" />
-                        </svg>
-                    </div>
+                {/* SECTION: SCIENTIFIC PILLAR - MILESTONE & IMPLEMENTATION INTENTION ARCHITECTURE */}
+                <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#a855f7_1px,transparent_1px)] [background-size:32px_32px] pointer-events-none"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
 
                     <div className="max-w-6xl mx-auto px-6 relative z-10">
-                        <div className="bg-white/80 rounded-[4rem] border border-white p-12 md:p-24 text-center shadow-2xl relative overflow-hidden">
-                            <div className="absolute -top-12 -left-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl"></div>
-                            <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
-
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-100 text-rose-700 text-xs uppercase tracking-[0.2em] mb-10 shadow-sm border border-rose-200">
-                                🏆 {t('goal_science_badge')}
+                        <div className="text-center max-w-3xl mx-auto mb-20">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 text-purple-300 font-bold text-[10px] uppercase tracking-[0.25em] mb-6 border border-purple-500/20">
+                                🎯 Goal Science & Intention Design
                             </div>
-                            
-                            <h2 className="text-5xl md:text-6xl text-gray-900 mb-10 leading-tight tracking-tight font-black">
-                                {t('goal_science_title')}
+                            <h2 className="text-3xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
+                                {t('goal_science_title_1')}{' '}
+                                <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-indigo-400 bg-clip-text text-transparent">
+                                    {t('goal_science_title_highlight')}
+                                </span>
                             </h2>
-                            
-                            <p className="text-gray-600 text-2xl leading-relaxed mb-16 italic font-medium max-w-3xl mx-auto">
-                                {t('goal_science_desc')}
+                            <p className="text-slate-400 text-base md:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+                                Goals without behavioral science remain wishful thinking. Tranvas builds upon empirical studies proving how structural accountability drives execution.
                             </p>
-                            
-                            <div className="flex flex-wrap justify-center gap-6">
-                                <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-rose-50 group hover:bg-rose-600 transition duration-500">
-                                    <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-xl group-hover:bg-white/20 transition font-black">🎯</div>
-                                    <div className="text-left">
-                                        <span className="text-[10px] text-rose-600 uppercase tracking-widest block group-hover:text-rose-100 transition">Method 01</span>
-                                        <span className="font-black text-gray-900 group-hover:text-white transition">OKR Framework</span>
+                        </div>
+
+                        {/* Dual Research Cards */}
+                        <div className="grid md:grid-cols-2 gap-8">
+                            {/* Card 1: Gail Matthews Study */}
+                            <div className="bg-slate-900/80 backdrop-blur-2xl border border-slate-800 hover:border-purple-500/40 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl">
+                                <div>
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-2xl">
+                                            📊
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20 font-mono">
+                                            Dominican Univ. (Matthews)
+                                        </span>
                                     </div>
+                                    <h3 className="text-2xl font-black text-white mb-4 group-hover:text-purple-300 transition-colors">
+                                        {t('goal_science_step1_title')}
+                                    </h3>
+                                    <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-8 font-medium">
+                                        {t('goal_science_step1_desc')}
+                                    </p>
                                 </div>
-                                <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-indigo-50 group hover:bg-indigo-600 transition duration-500">
-                                    <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-xl group-hover:bg-white/20 transition font-black">🧠</div>
-                                    <div className="text-left">
-                                        <span className="text-[10px] text-indigo-600 uppercase tracking-widest block group-hover:text-indigo-100 transition">Method 02</span>
-                                        <span className="font-black text-gray-900 group-hover:text-white transition">SMART Goals</span>
+                                
+                                <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 flex items-center justify-between font-mono">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></div>
+                                        <span className="text-xs font-bold text-slate-300">Success Rate Delta</span>
                                     </div>
+                                    <span className="text-xs font-black text-purple-400">43% → 76% Achieved</span>
                                 </div>
-                                <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-purple-50 group hover:bg-purple-600 transition duration-500">
-                                    <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-xl group-hover:bg-white/20 transition font-black">🧬</div>
-                                    <div className="text-left">
-                                        <span className="text-[10px] text-purple-600 uppercase tracking-widest block group-hover:text-purple-100 transition">Method 03</span>
-                                        <span className="font-black text-gray-900 group-hover:text-white transition">Identity Shift</span>
+                            </div>
+
+                            {/* Card 2: Gollwitzer If-Then */}
+                            <div className="bg-slate-900/80 backdrop-blur-2xl border border-slate-800 hover:border-indigo-500/40 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl">
+                                <div>
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl">
+                                            ⚡
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 font-mono">
+                                            American Psychologist (1999)
+                                        </span>
                                     </div>
+                                    <h3 className="text-2xl font-black text-white mb-4 group-hover:text-indigo-300 transition-colors">
+                                        {t('goal_science_step2_title')}
+                                    </h3>
+                                    <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-8 font-medium">
+                                        {t('goal_science_step2_desc')}
+                                    </p>
+                                </div>
+                                
+                                <div className="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 flex items-center justify-between font-mono">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></div>
+                                        <span className="text-xs font-bold text-slate-300">Implementation Intentions</span>
+                                    </div>
+                                    <span className="text-xs font-black text-indigo-400">Pre-Committed Action</span>
                                 </div>
                             </div>
                         </div>
