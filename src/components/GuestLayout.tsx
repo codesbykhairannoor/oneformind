@@ -16,6 +16,10 @@ export default function GuestLayout({ children, user = null }: { children: React
     const router = useRouter();
     const pathname = usePathname();
 
+    const cleanPath = pathname === '/' || pathname === '' ? '' : pathname;
+    const enHref = cleanPath === '' ? '/' : cleanPath;
+    const idHref = `/id${cleanPath}`;
+
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
@@ -60,12 +64,12 @@ export default function GuestLayout({ children, user = null }: { children: React
                     <div className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
                         {/* DROPDOWN: FEATURES */}
                         <div className="relative group" onMouseEnter={() => setActiveMenu('features')} onMouseLeave={() => setActiveMenu(null)}>
-                            <button className="px-3 py-1.5 rounded-full text-[13px] font-bold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition-all flex items-center gap-1 group-hover:text-indigo-600">
+                            <Link href="/features" className="px-3 py-1.5 rounded-full text-[13px] font-bold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition-all flex items-center gap-1 group-hover:text-indigo-600">
                                 Features
                                 <svg className={`w-3.5 h-3.5 opacity-50 transition-transform ${activeMenu === 'features' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                                 </svg>
-                            </button>
+                            </Link>
                             
                             {activeMenu === 'features' && (
                                 <div className="absolute top-full left-0 w-[500px] pt-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -254,24 +258,22 @@ export default function GuestLayout({ children, user = null }: { children: React
 
                             {langOpen && (
                                 <div className="absolute top-full right-0 mt-3 w-40 bg-white border border-slate-100 shadow-2xl rounded-2xl overflow-hidden z-50 p-2 text-left">
-                                    <Link 
-                                        href={pathname}
-                                        locale="id"
-                                        onClick={() => switchLang('id')} 
+                                    <a 
+                                        href={idHref}
+                                        onClick={(e) => { e.preventDefault(); switchLang('id'); }} 
                                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${locale === 'id' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'}`}
                                     >
                                         <span>Bahasa Indonesia</span>
                                         {locale === 'id' && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
-                                    </Link>
-                                    <Link 
-                                        href={pathname}
-                                        locale="en"
-                                        onClick={() => switchLang('en')} 
+                                    </a>
+                                    <a 
+                                        href={enHref}
+                                        onClick={(e) => { e.preventDefault(); switchLang('en'); }} 
                                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${locale === 'en' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'}`}
                                     >
                                         <span>English</span>
                                         {locale === 'en' && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
-                                    </Link>
+                                    </a>
                                 </div>
                             )}
                         </div>
@@ -374,22 +376,20 @@ export default function GuestLayout({ children, user = null }: { children: React
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/50">
                                 <span className="text-sm font-bold text-slate-500">Language</span>
                                 <div className="flex gap-2">
-                                    <Link 
-                                        href={pathname} 
-                                        locale="id" 
-                                        onClick={() => { switchLang('id'); setMobileMenuOpen(false); }} 
+                                    <a 
+                                        href={idHref} 
+                                        onClick={(e) => { e.preventDefault(); switchLang('id'); setMobileMenuOpen(false); }} 
                                         className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'id' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}
                                     >
                                         ID
-                                    </Link>
-                                    <Link 
-                                        href={pathname} 
-                                        locale="en" 
-                                        onClick={() => { switchLang('en'); setMobileMenuOpen(false); }} 
+                                    </a>
+                                    <a 
+                                        href={enHref} 
+                                        onClick={(e) => { e.preventDefault(); switchLang('en'); setMobileMenuOpen(false); }} 
                                         className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${locale === 'en' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'}`}
                                     >
                                         EN
-                                    </Link>
+                                    </a>
                                 </div>
                             </div>
                             
@@ -427,7 +427,7 @@ export default function GuestLayout({ children, user = null }: { children: React
                                 The unified productivity system designed to bring clarity to your life, habits, and finances.
                             </p>
                             <div className="text-xs text-slate-600 space-y-2 mt-4 font-bold">
-                                <p><strong>Email:</strong> tranvasapp@gmail.com</p>
+                                <p><strong>Email:</strong> <span dangerouslySetInnerHTML={{ __html: '<!--email_off--><a href="mailto:tranvasapp@gmail.com" class="hover:underline">tranvasapp@gmail.com</a><!--/email_off-->' }} /></p>
                                 <p><strong>Status:</strong> HQ Jakarta, ID</p>
                             </div>
                         </div>
@@ -436,6 +436,7 @@ export default function GuestLayout({ children, user = null }: { children: React
                         <div>
                             <p className="text-xs font-semibold text-slate-500 mb-5">Product</p>
                             <ul className="space-y-4 text-sm font-bold text-slate-700">
+                                <li><Link href="/features" className="hover:text-indigo-600 transition">All Features</Link></li>
                                 <li><Link href="/features/habit" className="hover:text-indigo-600 transition">Habit Tracker</Link></li>
                                 <li><Link href="/features/finance" className="hover:text-indigo-600 transition">Finance OS</Link></li>
                                 <li><Link href="/features/planner" className="hover:text-indigo-600 transition">Daily Planner</Link></li>
@@ -453,6 +454,8 @@ export default function GuestLayout({ children, user = null }: { children: React
                             <ul className="space-y-4 text-sm font-bold text-slate-700">
                                 <li><Link href="/compare/notion" className="hover:text-indigo-600 transition">Vs. Notion</Link></li>
                                 <li><Link href="/compare/clickup" className="hover:text-indigo-600 transition">Vs. ClickUp</Link></li>
+                                <li><Link href="/compare/onenote" className="hover:text-indigo-600 transition">Vs. OneNote</Link></li>
+                                <li><Link href="/compare/planner-apps" className="hover:text-indigo-600 transition">Vs. Planner Apps</Link></li>
                                 <li><Link href="/compare/todoist" className="hover:text-indigo-600 transition">Vs. Todoist</Link></li>
                                 <li><Link href="/compare/trello" className="hover:text-indigo-600 transition">Vs. Trello</Link></li>
                                 <li><Link href="/compare/asana" className="hover:text-indigo-600 transition">Vs. Asana</Link></li>
@@ -479,10 +482,10 @@ export default function GuestLayout({ children, user = null }: { children: React
                         <div>
                             <p className="text-xs font-semibold text-slate-500 mb-5">Company</p>
                             <ul className="space-y-4 text-sm font-bold text-slate-700">
-                                <li><Link href="/company/privacy" className="hover:text-indigo-600 transition">Privacy policy</Link></li>
-                                <li><Link href="/company/terms" className="hover:text-indigo-600 transition">Terms of service</Link></li>
+                                <li><Link href="/privacy-policy" className="hover:text-indigo-600 transition">Privacy policy</Link></li>
+                                <li><Link href="/terms-of-service" className="hover:text-indigo-600 transition">Terms of service</Link></li>
                                 <li><Link href="/company/refund" className="hover:text-indigo-600 transition">Refund policy</Link></li>
-                                <li><Link href="/company/contact" className="hover:text-indigo-600 transition">Contact us</Link></li>
+                                <li><Link href="/contact" className="hover:text-indigo-600 transition">Contact us</Link></li>
                                 <li><Link href="/company/security" className="hover:text-indigo-600 transition">Security</Link></li>
                                 <li><Link href="/about" className="hover:text-indigo-600 transition">About us</Link></li>
                                 <li><Link href="/company/status" className="hover:text-indigo-600 transition">System status</Link></li>
@@ -509,9 +512,9 @@ export default function GuestLayout({ children, user = null }: { children: React
                     <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-slate-700">
                         <p>&copy; {new Date().getFullYear()} Tranvas. All rights reserved.</p>
                         <div className="flex items-center gap-4 text-xs text-slate-500">
-                            <Link href={pathname} locale="en" onClick={() => switchLang('en')} className={`hover:text-indigo-600 transition ${locale === 'en' ? 'text-indigo-600 font-black' : ''}`}>English</Link>
+                            <a href={enHref} onClick={(e) => { e.preventDefault(); switchLang('en'); }} className={`hover:text-indigo-600 transition ${locale === 'en' ? 'text-indigo-600 font-black' : ''}`}>English</a>
                             <span>•</span>
-                            <Link href={pathname} locale="id" onClick={() => switchLang('id')} className={`hover:text-indigo-600 transition ${locale === 'id' ? 'text-indigo-600 font-black' : ''}`}>Bahasa Indonesia</Link>
+                            <a href={idHref} onClick={(e) => { e.preventDefault(); switchLang('id'); }} className={`hover:text-indigo-600 transition ${locale === 'id' ? 'text-indigo-600 font-black' : ''}`}>Bahasa Indonesia</a>
                         </div>
                         <p>Made with ❤️ for better focus.</p>
                     </div>

@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/custom-apps',
-    title: 'Tranvas vs Custom Apps — Detailed Feature Comparison',
+    title: 'Tranvas vs Custom Apps — Feature Comparison',
     description: 'Compare Tranvas and Custom Apps. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

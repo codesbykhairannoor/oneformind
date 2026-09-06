@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/ticktick',
-    title: 'Tranvas vs Ticktick — Detailed Feature Comparison',
+    title: 'Tranvas vs Ticktick — Feature Comparison',
     description: 'Compare Tranvas and Ticktick. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

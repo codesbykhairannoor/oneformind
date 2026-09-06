@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features',
-    title: 'Features Overview — All-in-One Life Operating System',
+    title: 'Features Overview — Life Operating System',
     description: 'Explore the 8 core modules of Tranvas: Task Planner, Atomic Habits, Smart Finance, Mindful Journal, Gemini Neural OS AI, and more.',
   });
 }

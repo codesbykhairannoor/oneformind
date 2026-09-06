@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/notes-apps',
-    title: 'Tranvas vs Notes Apps — Detailed Feature Comparison',
+    title: 'Tranvas vs Notes Apps — Feature Comparison',
     description: 'Compare Tranvas and Notes Apps. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

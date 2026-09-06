@@ -12,6 +12,7 @@ export async function generateMetadata({
     path: '/register',
     title: 'Sign Up — Start Your Journey with Tranvas',
     description: 'Create your free Tranvas account and experience the unified life operating system designed for clarity and daily focus.',
+    noIndex: true,
   });
 }
 

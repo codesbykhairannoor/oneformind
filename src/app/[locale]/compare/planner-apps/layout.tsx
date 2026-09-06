@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/planner-apps',
-    title: 'Tranvas vs Planner Apps — Detailed Feature Comparison',
+    title: 'Tranvas vs Planner Apps — Feature Comparison',
     description: 'Compare Tranvas and Planner Apps. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

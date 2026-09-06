@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/asana',
-    title: 'Tranvas vs Asana — Detailed Feature Comparison',
+    title: 'Tranvas vs Asana — Feature Comparison',
     description: 'Compare Tranvas and Asana. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

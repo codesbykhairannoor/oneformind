@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/management-tools',
-    title: 'Tranvas vs Management Tools — Detailed Feature Comparison',
+    title: 'Tranvas vs Management Tools — Feature Comparison',
     description: 'Compare Tranvas and Management Tools. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

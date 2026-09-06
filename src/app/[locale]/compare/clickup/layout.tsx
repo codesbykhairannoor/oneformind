@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/clickup',
-    title: 'Tranvas vs Clickup — Detailed Feature Comparison',
+    title: 'Tranvas vs Clickup — Feature Comparison',
     description: 'Compare Tranvas and Clickup. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

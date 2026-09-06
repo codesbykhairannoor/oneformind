@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/spreadsheet',
-    title: 'Tranvas vs Spreadsheet — Detailed Feature Comparison',
+    title: 'Tranvas vs Spreadsheet — Feature Comparison',
     description: 'Compare Tranvas and Spreadsheet. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/monday',
-    title: 'Tranvas vs Monday — Detailed Feature Comparison',
+    title: 'Tranvas vs Monday — Feature Comparison',
     description: 'Compare Tranvas and Monday. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

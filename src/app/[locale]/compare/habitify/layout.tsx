@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/habitify',
-    title: 'Tranvas vs Habitify — Detailed Feature Comparison',
+    title: 'Tranvas vs Habitify — Feature Comparison',
     description: 'Compare Tranvas and Habitify. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

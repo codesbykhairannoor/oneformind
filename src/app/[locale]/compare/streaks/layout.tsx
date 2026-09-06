@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/streaks',
-    title: 'Tranvas vs Streaks — Detailed Feature Comparison',
+    title: 'Tranvas vs Streaks — Feature Comparison',
     description: 'Compare Tranvas and Streaks. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

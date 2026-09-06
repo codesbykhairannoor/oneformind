@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/todoist',
-    title: 'Tranvas vs Todoist — Detailed Feature Comparison',
+    title: 'Tranvas vs Todoist — Feature Comparison',
     description: 'Compare Tranvas and Todoist. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

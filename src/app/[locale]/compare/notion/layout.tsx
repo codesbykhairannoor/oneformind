@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/notion',
-    title: 'Tranvas vs Notion — Detailed Feature Comparison',
+    title: 'Tranvas vs Notion — Feature Comparison',
     description: 'Compare Tranvas and Notion. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

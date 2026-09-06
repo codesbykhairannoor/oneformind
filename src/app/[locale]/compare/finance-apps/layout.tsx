@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/finance-apps',
-    title: 'Tranvas vs Finance Apps — Detailed Feature Comparison',
+    title: 'Tranvas vs Finance Apps — Feature Comparison',
     description: 'Compare Tranvas and Finance Apps. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

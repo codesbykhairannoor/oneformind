@@ -56,10 +56,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/compare/asana', priority: 0.75, changeFrequency: 'weekly' as const },
     { path: '/compare/habitica', priority: 0.75, changeFrequency: 'weekly' as const },
     { path: '/compare/obsidian', priority: 0.75, changeFrequency: 'weekly' as const },
-
-    // Auth
-    { path: '/login', priority: 0.6, changeFrequency: 'monthly' as const },
-    { path: '/register', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/compare/onenote', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/compare/planner-apps', priority: 0.75, changeFrequency: 'weekly' as const },
   ];
 
   const sitemapEntries: MetadataRoute.Sitemap = [];

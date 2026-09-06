@@ -151,17 +151,17 @@ companyPages.forEach(slug => {
 console.log('   Compare and Company layouts verified.\n');
 
 // ----------------------------------------------------
-// 5. AUDIT CRAWLABLE LANGUAGE SWITCHER (INCOMING INLINKS)
+// 5. AUDIT CRAWLABLE LANGUAGE SWITCHER (INCOMING INLINKS & NO 307 REDIRECTS)
 // ----------------------------------------------------
 console.log('5️⃣  AUDITING CRAWLABLE LANGUAGE SWITCHER IN GUESTLAYOUT...');
 const guestLayoutFile = path.join(srcDir, 'components', 'GuestLayout.tsx');
 const guestLayoutCode = fs.readFileSync(guestLayoutFile, 'utf8');
 
-assert(guestLayoutCode.includes('<Link') && guestLayoutCode.includes('locale="id"'), 'Desktop menu uses <Link locale="id"> for crawlable language switch');
-assert(guestLayoutCode.includes('<Link') && guestLayoutCode.includes('locale="en"'), 'Desktop menu uses <Link locale="en"> for crawlable language switch');
-assert(guestLayoutCode.includes('Bahasa Indonesia</Link>'), 'Footer provides direct crawlable anchor link to Bahasa Indonesia');
-assert(guestLayoutCode.includes('English</Link>'), 'Footer provides direct crawlable anchor link to English');
-console.log('   Crawlable language switcher verified (fixes canonical-url-has-no-inlinks).\n');
+assert(guestLayoutCode.includes('href={idHref}') && guestLayoutCode.includes('href={enHref}'), 'Menu uses direct href={idHref} and href={enHref} to eliminate 307 redirects');
+assert(guestLayoutCode.includes('Bahasa Indonesia</a>'), 'Footer provides direct crawlable anchor link to Bahasa Indonesia');
+assert(guestLayoutCode.includes('English</a>'), 'Footer provides direct crawlable anchor link to English');
+assert(guestLayoutCode.includes('<!--email_off-->'), 'Footer uses Cloudflare email obfuscation prevention to prevent 404s');
+console.log('   Crawlable language switcher verified (fixes 3xx redirects and 404 broken links).\n');
 
 // ----------------------------------------------------
 // 6. AUDIT SITEMAP SYNCHRONIZATION
@@ -172,8 +172,11 @@ const sitemapCode = fs.readFileSync(sitemapFile, 'utf8');
 
 assert(!sitemapCode.includes('`${baseUrl}/en${route'), 'sitemap.ts does NOT prepend /en to default English routes');
 assert(sitemapCode.includes('process.env.APP_URL || \'https://tranvas.com\''), 'sitemap.ts uses canonical base URL');
+assert(!sitemapCode.includes('\'/login\''), 'sitemap.ts does not index /login (auth pages noIndex prevents low-word-count)');
+assert(!sitemapCode.includes('\'/register\''), 'sitemap.ts does not index /register (auth pages noIndex prevents low-word-count)');
 
-coreRoutes.forEach(r => {
+const indexableRoutes = coreRoutes.filter(r => r !== 'login' && r !== 'register');
+indexableRoutes.forEach(r => {
   assert(sitemapCode.includes(`'/${r}'`), `sitemap.ts contains /${r}`);
 });
 console.log('   Sitemap routes verified.\n');

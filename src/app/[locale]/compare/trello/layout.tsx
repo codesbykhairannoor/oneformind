@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/trello',
-    title: 'Tranvas vs Trello — Detailed Feature Comparison',
+    title: 'Tranvas vs Trello — Feature Comparison',
     description: 'Compare Tranvas and Trello. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

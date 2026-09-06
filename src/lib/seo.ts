@@ -52,13 +52,16 @@ export function constructPageMetadata({
       ? trimmedDesc.substring(0, 152).trim() + '...'
       : trimmedDesc;
 
-  const fullTitle = title.includes('Tranvas') ? title : `${title} | Tranvas`;
+  // Clean title: remove any pre-existing " | Tranvas" so Next.js template doesn't duplicate it
+  const cleanTitle = title.replace(/\s*\|\s*Tranvas\s*$/i, '').trim();
+  const fullTitle = `${cleanTitle} | Tranvas`;
   const absoluteImageUrl = image.startsWith('http')
     ? image
     : `${BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
 
   return {
-    title: fullTitle,
+    // For root (cleanPath === ''), use fullTitle. For subpages, use cleanTitle so template applies cleanly.
+    title: cleanPath === '' ? fullTitle : cleanTitle,
     description: cleanDescription,
     keywords: keywords || [
       'Tranvas',

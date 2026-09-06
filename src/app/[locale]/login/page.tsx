@@ -171,8 +171,8 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
                 <div className="mt-10 text-center font-medium">
                     <div className="text-[11px] text-slate-500 leading-relaxed">
                         <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 font-medium">
-                            <Link href="/company/privacy" className="text-[11px] text-slate-500 hover:text-indigo-600 transition-colors">{t('footer_privacy') || 'Kebijakan Privasi'}</Link>
-                            <Link href="/company/terms" className="text-[11px] text-slate-500 hover:text-indigo-600 transition-colors">{t('footer_terms') || 'Ketentuan Layanan'}</Link>
+                            <Link href="/privacy-policy" className="text-[11px] text-slate-500 hover:text-indigo-600 transition-colors">{t('footer_privacy') || 'Kebijakan Privasi'}</Link>
+                            <Link href="/terms-of-service" className="text-[11px] text-slate-500 hover:text-indigo-600 transition-colors">{t('footer_terms') || 'Ketentuan Layanan'}</Link>
                             <Link href="/resources/help" className="text-[11px] text-slate-500 hover:text-indigo-600 transition-colors">{t('auth_footer_help') || 'Pusat Bantuan'}</Link>
                         </div>
                     </div>

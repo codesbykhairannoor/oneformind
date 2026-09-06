@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/ynab',
-    title: 'Tranvas vs Ynab — Detailed Feature Comparison',
+    title: 'Tranvas vs Ynab — Feature Comparison',
     description: 'Compare Tranvas and Ynab. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

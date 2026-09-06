@@ -12,6 +12,7 @@ export async function generateMetadata({
     path: '/login',
     title: 'Log In — Welcome Back to Tranvas',
     description: 'Sign in to access your personal dashboard, habits, daily planner, finance tracking, and neural productivity tools.',
+    noIndex: true,
   });
 }
 

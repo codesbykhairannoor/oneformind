@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/evernote',
-    title: 'Tranvas vs Evernote — Detailed Feature Comparison',
+    title: 'Tranvas vs Evernote — Feature Comparison',
     description: 'Compare Tranvas and Evernote. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

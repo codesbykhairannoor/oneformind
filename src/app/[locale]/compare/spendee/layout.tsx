@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/spendee',
-    title: 'Tranvas vs Spendee — Detailed Feature Comparison',
+    title: 'Tranvas vs Spendee — Feature Comparison',
     description: 'Compare Tranvas and Spendee. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }
