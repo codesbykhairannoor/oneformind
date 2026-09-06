@@ -29,11 +29,35 @@ export default function GuestLayout({ children, user = null }: { children: React
     }, []);
 
     useEffect(() => {
-        // Programmatically prefetch all public route bundles for instant transitions
-        const publicRoutes = ['/login', '/register', '/pricing', '/about', '/features'];
-        publicRoutes.forEach(route => {
-            router.prefetch(route);
-        });
+        // Programmatically prefetch core public routes during idle time for instant page switching
+        const timer = typeof window !== 'undefined' && 'requestIdleCallback' in window
+            ? (window as any).requestIdleCallback(() => {
+                const publicRoutes = [
+                    '/features/planner',
+                    '/features/habit',
+                    '/features/finance',
+                    '/features/journal',
+                    '/features/goal',
+                    '/features/neural-os',
+                    '/pricing',
+                    '/about',
+                    '/login',
+                    '/register'
+                ];
+                publicRoutes.forEach(route => router.prefetch(route));
+            })
+            : setTimeout(() => {
+                const publicRoutes = ['/features/planner', '/features/habit', '/features/finance', '/pricing', '/login'];
+                publicRoutes.forEach(route => router.prefetch(route));
+            }, 1200);
+
+        return () => {
+            if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+                (window as any).cancelIdleCallback(timer);
+            } else {
+                clearTimeout(timer);
+            }
+        };
     }, [router]);
 
     const switchLang = (newLang: 'id' | 'en') => {

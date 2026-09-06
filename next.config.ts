@@ -29,20 +29,12 @@ const nextConfig: NextConfig = {
 
     // Optimize heavy package imports (tree-shake only used icons/modules)
     experimental: {
-        optimizePackageImports: ['chart.js', 'react-chartjs-2', 'sweetalert2'],
+        optimizePackageImports: ['chart.js', 'react-chartjs-2', 'sweetalert2', 'lucide-react', '@supabase/supabase-js'],
     },
 
     // HTTP Cache Headers — tuned for Cloudflare CDN
     async headers() {
         return [
-            {
-                // Next.js static chunks: browser + CDN cache 1 year (content-hashed, immutable)
-                source: '/_next/static/:path*',
-                headers: [
-                    { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-                    { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
-                ],
-            },
             {
                 // Public images/icons in /public
                 source: '/images/:path*',
@@ -51,8 +43,15 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Marketing/public pages: edge cache 1 hour, serve stale up to 1 day
-                source: '/:locale(en|id)/(|resources|pricing|compare|about|blog|changelog|security)/:path*',
+                // Marketing/public pages (English/default): edge cache 1 hour, serve stale up to 1 day
+                source: '/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company)?/:subpath*',
+                headers: [
+                    { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                ],
+            },
+            {
+                // Marketing/public pages (Indonesian /id prefix): edge cache 1 hour, serve stale up to 1 day
+                source: '/id/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company)?/:subpath*',
                 headers: [
                     { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
                 ],

@@ -4,19 +4,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/routing';
 
-// PERF: Do NOT statically import both JSON files here.
-// Doing `import enMessages from '@/messages/en.json'` would bundle 800KB of
-// translation data into every page's JS, even for users who only need one lang.
-// Instead we lazy-load only the active locale's messages at runtime.
+// PERF: In-memory cache to store loaded translation dictionaries.
+// Prevents redundant network requests or dynamic imports on subsequent language switches.
+const messageCache: Record<string, Messages> = {};
+
 type Messages = Record<string, string>;
 
 async function loadMessages(locale: string): Promise<Messages> {
+  if (messageCache[locale]) {
+    return messageCache[locale];
+  }
+  let loaded: Messages;
   if (locale === 'id') {
     const mod = await import('../messages/id.json');
-    return mod.default as unknown as Messages;
+    loaded = mod.default as unknown as Messages;
+  } else {
+    const mod = await import('../messages/en.json');
+    loaded = mod.default as unknown as Messages;
   }
-  const mod = await import('../messages/en.json');
-  return mod.default as unknown as Messages;
+  messageCache[locale] = loaded;
+  return loaded;
 }
 
 export default function InstantIntlProvider({
@@ -28,9 +35,29 @@ export default function InstantIntlProvider({
   initialLocale: string;
   initialMessages?: Messages;
 }) {
+  if (initialMessages && !messageCache[initialLocale]) {
+    messageCache[initialLocale] = initialMessages;
+  }
+
   const [locale, setLocale] = useState(initialLocale);
   const [messages, setMessages] = useState<Messages | null>(initialMessages || null);
   const loadedLocaleRef = useRef<string | null>(initialMessages ? initialLocale : null);
+
+  // Preload alternate language in background during idle time for 0ms language switches
+  useEffect(() => {
+    const alternateLocale = initialLocale === 'id' ? 'en' : 'id';
+    const timer = typeof window !== 'undefined' && 'requestIdleCallback' in window
+      ? (window as any).requestIdleCallback(() => loadMessages(alternateLocale))
+      : setTimeout(() => loadMessages(alternateLocale), 300);
+
+    return () => {
+      if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+        (window as any).cancelIdleCallback(timer);
+      } else {
+        clearTimeout(timer);
+      }
+    };
+  }, [initialLocale]);
 
   // Load messages for the current locale if changed or not provided
   useEffect(() => {
@@ -39,7 +66,7 @@ export default function InstantIntlProvider({
     loadMessages(locale).then(setMessages);
   }, [locale, messages]);
 
-  // Sync state if initialLocale changes externally (e.g. user manually changes URL prefix)
+  // Sync state if initialLocale changes externally
   useEffect(() => {
     setLocale(initialLocale);
   }, [initialLocale]);
@@ -49,12 +76,12 @@ export default function InstantIntlProvider({
     document.documentElement.lang = locale;
   }, [locale]);
 
-  // Don't render children until messages are loaded (prevents flash of untranslated content)
+  // Don't render children until messages are loaded
   if (!messages) return null;
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <LocaleSwitcherListener locale={locale} setLocale={setLocale} />
+      <LocaleSwitcherListener locale={locale} setLocale={setLocale} setMessages={setMessages} />
       {children}
     </NextIntlClientProvider>
   );
@@ -63,9 +90,11 @@ export default function InstantIntlProvider({
 function LocaleSwitcherListener({
   locale,
   setLocale,
+  setMessages,
 }: {
   locale: string;
   setLocale: (l: string) => void;
+  setMessages: (m: Messages) => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -74,11 +103,21 @@ function LocaleSwitcherListener({
     const handleSwitch = (e: CustomEvent<{ locale: string }>) => {
       const newLocale = e.detail.locale;
       if (newLocale && newLocale !== locale) {
-        setLocale(newLocale);
+        // Instant synchronous update if message dictionary is already cached in memory
+        if (messageCache[newLocale]) {
+          setMessages(messageCache[newLocale]);
+          setLocale(newLocale);
+        } else {
+          loadMessages(newLocale).then((msgs) => {
+            setMessages(msgs);
+            setLocale(newLocale);
+          });
+        }
+
         localStorage.setItem('tranvas_locale', newLocale);
         document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
-        // next-intl's custom router automatically formats the URL prefix depending on the newLocale
+        // Update URL prefix smoothly without page reload or scroll disruption
         const currentSearch = window.location.search;
         const currentHash = window.location.hash;
         router.replace(`${pathname}${currentSearch}${currentHash}`, { locale: newLocale, scroll: false });
@@ -89,7 +128,7 @@ function LocaleSwitcherListener({
     return () => {
       window.removeEventListener('switch-locale' as any, handleSwitch);
     };
-  }, [locale, pathname, router, setLocale]);
+  }, [locale, pathname, router, setLocale, setMessages]);
 
   return null;
 }
