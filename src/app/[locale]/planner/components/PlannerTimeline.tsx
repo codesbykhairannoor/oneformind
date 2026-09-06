@@ -51,6 +51,37 @@ export default function PlannerTimeline({
         onMoveTask(taskId, newStartTime);
     };
 
+    const normalizeDate = (d: any) => {
+        if (!d) return '';
+        return String(d).split('T')[0];
+    };
+
+    const parseTimeMinutes = (timeStr: any): number => {
+        if (!timeStr) return 0;
+        const clean = String(timeStr).trim();
+        let timePart = clean;
+        if (clean.includes('T')) {
+            timePart = clean.split('T')[1];
+        }
+        const parts = timePart.split(':');
+        const h = parseInt(parts[0] || '0', 10);
+        const m = parseInt(parts[1] || '0', 10);
+        return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m);
+    };
+
+    const formatDisplayTime = (timeStr: any): string => {
+        if (!timeStr) return '';
+        const clean = String(timeStr).trim();
+        let timePart = clean;
+        if (clean.includes('T')) {
+            timePart = clean.split('T')[1];
+        }
+        const parts = timePart.split(':');
+        const h = String(parseInt(parts[0] || '0', 10)).padStart(2, '0');
+        const m = String(parseInt(parts[1] || '0', 10)).padStart(2, '0');
+        return `${h}:${m}`;
+    };
+
     // Helpers
     const getTaskTheme = (type: number) => {
         switch (type) {
@@ -98,33 +129,35 @@ export default function PlannerTimeline({
     };
 
     const getDurationMinutes = (task: any) => {
-        if (!task.start_time) return 30;
-        const [startH, startM] = task.start_time.split(':').map(Number);
-        let [endH, endM] = task.end_time ? task.end_time.split(':').map(Number) : [startH, startM + 30];
-        let duration = (endH * 60 + endM) - (startH * 60 + startM);
+        const rawStart = task.start_time || task.startTime;
+        const rawEnd = task.end_time || task.endTime;
+        if (!rawStart) return 30;
+        
+        const startM = parseTimeMinutes(rawStart);
+        let endM = rawEnd ? parseTimeMinutes(rawEnd) : startM + 30;
+        let duration = endM - startM;
         if (duration < 0) duration += 1440;
         if (duration === 0) duration = 30;
         return duration;
     };
 
     const getTaskStyle = (task: any) => {
-        if (!task.start_time) return { display: 'none' };
-        const [startH, startM] = task.start_time.split(':').map(Number);
+        const rawStart = task.start_time || task.startTime;
+        const rawEnd = task.end_time || task.endTime;
+        if (!rawStart) return { display: 'none' };
         
+        const taskStartMinutes = parseTimeMinutes(rawStart);
         let duration = getDurationMinutes(task);
 
-        const taskStartMinutes = startH * 60 + startM;
         const viewStartMinutes = startHour * 60;
 
         let relStart = taskStartMinutes - viewStartMinutes;
         if (relStart < 0) relStart += 1440;
 
-        const relEnd = relStart + duration;
-
         if (relStart >= VIEW_LIMIT * 60) return { display: 'none' };
 
         const renderStart = Math.max(0, relStart);
-        const renderEnd = Math.min(VIEW_LIMIT * 60, relEnd);
+        const renderEnd = Math.min(VIEW_LIMIT * 60, relStart + duration);
         const renderDuration = renderEnd - renderStart;
 
         if (renderDuration <= 0) return { display: 'none' };
@@ -150,7 +183,7 @@ export default function PlannerTimeline({
             return `${today.getFullYear()}-${m}-${d}`;
         })();
         
-        if (selectedDate !== todayStr) return { display: 'none' };
+        if (normalizeDate(selectedDate) !== todayStr) return { display: 'none' };
 
         const currentH = now.getHours();
         const currentM = now.getMinutes();
@@ -166,7 +199,7 @@ export default function PlannerTimeline({
         return `${String(h).padStart(2, '0')}:00`;
     });
 
-    const activeTasks = tasks.filter(t => t.date === selectedDate);
+    const activeTasks = tasks.filter(t => normalizeDate(t.date) === normalizeDate(selectedDate));
 
     return (
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden select-none flex flex-col h-full transition-colors duration-500">
@@ -268,7 +301,7 @@ export default function PlannerTimeline({
                                                         {task.title}
                                                     </span>
                                                     <span className={`text-[10px] font-mono opacity-60 whitespace-nowrap shrink-0 ${theme.subtext}`}>
-                                                        ({task.start_time} - {task.end_time || '??'})
+                                                        ({formatDisplayTime(task.start_time || task.startTime)} - {formatDisplayTime(task.end_time || task.endTime) || '??'})
                                                     </span>
                                                 </div>
                                                 <button 
@@ -286,7 +319,7 @@ export default function PlannerTimeline({
                                                             {theme.icon} {theme.label}
                                                         </span>
                                                         <span className={`text-[10px] font-mono font-bold opacity-60 ${theme.text}`}>
-                                                            {task.start_time} - {task.end_time || '??'}
+                                                            {formatDisplayTime(task.start_time || task.startTime)} - {formatDisplayTime(task.end_time || task.endTime) || '??'}
                                                         </span>
                                                     </div>
                                                     <button 

@@ -89,7 +89,26 @@ export default function PlannerPage() {
     }, [dateParam]);
 
     // Initial Hydration
-    // Load tasks AND daily data together whenever selectedDate changes
+    const normalizeTime = (timeVal: any): string => {
+        if (!timeVal) return '';
+        const str = String(timeVal).trim();
+        if (str.includes('T')) {
+            const timePart = str.split('T')[1];
+            return timePart.substring(0, 5);
+        }
+        const parts = str.split(':');
+        if (parts.length >= 2) {
+            return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+        }
+        return str.substring(0, 5);
+    };
+
+    const normalizeDate = (d: any): string => {
+        if (!d) return '';
+        return String(d).split('T')[0];
+    };
+
+    // Load initial data
     useEffect(() => {
         const savedStart = localStorage.getItem('planner_start_time');
         if (savedStart) setStartHour(parseInt(savedStart));
@@ -108,13 +127,13 @@ export default function PlannerPage() {
                     const data = await tasksRes.json();
                     setTasks(Array.isArray(data) ? data.map((t: any) => ({
                         id: t.id,
-                        date: t.date.split('T')[0],
+                        date: normalizeDate(t.date),
                         title: t.title,
-                        start_time: t.startTime ? t.startTime.substring(11, 16) : '',
-                        end_time: t.endTime ? t.endTime.substring(11, 16) : '',
+                        start_time: normalizeTime(t.startTime || t.start_time),
+                        end_time: normalizeTime(t.endTime || t.end_time),
                         type: t.type,
                         notes: t.notes || '',
-                        completed: t.isCompleted
+                        completed: t.isCompleted || t.completed || false
                     })) : []);
                 }
 
@@ -353,28 +372,52 @@ export default function PlannerPage() {
         }
 
         try {
+            const cleanDate = normalizeDate(selectedDate);
             if (editingTaskId) {
-                const res = await fetch(`/api/planner/tasks/${editingTaskId}`, {
+                updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { 
+                    ...t, 
+                    title: taskTitle, 
+                    start_time: taskStartTime, 
+                    end_time: taskEndTime, 
+                    type: taskType, 
+                    notes: taskNotes 
+                } : t));
+
+                await fetch(`/api/planner/tasks/${editingTaskId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
                     })
                 });
-                if (res.ok) {
-                    updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { ...t, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes } : t));
-                }
             } else {
+                const tempId = Date.now();
+                const newTaskItem: TaskItem = { 
+                    id: tempId, 
+                    date: cleanDate, 
+                    title: taskTitle, 
+                    start_time: taskStartTime, 
+                    end_time: taskEndTime, 
+                    type: taskType, 
+                    notes: taskNotes, 
+                    completed: false 
+                };
+
+                updateTasksState(prev => [...prev, newTaskItem]);
+
                 const res = await fetch('/api/planner/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        date: selectedDate, title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
+                        date: cleanDate, title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
                     })
                 });
+
                 if (res.ok) {
                     const data = await res.json();
-                    updateTasksState(prev => [...prev, { id: data.id, date: selectedDate, title: taskTitle, start_time: taskStartTime, end_time: taskEndTime, type: taskType, notes: taskNotes, completed: false }]);
+                    if (data?.id) {
+                        updateTasksState(prev => prev.map(t => t.id === tempId ? { ...t, id: data.id } : t));
+                    }
                 }
             }
         } catch (error) {
