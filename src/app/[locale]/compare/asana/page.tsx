@@ -57,7 +57,7 @@ export default function AsanaComparePage() {
                         </div>
                         
                         <div className="lg:col-span-5 relative h-[400px] flex items-center justify-center">
-                            <div className="absolute top-10 right-10 w-64 bg-white p-6 rounded-3xl shadow-xl border border-slate-100 transform rotate-6 animate-[float_6s_ease-in-out_infinite]">
+                            <div className="absolute top-10 right-10 w-64 bg-white p-6 rounded-3xl shadow-xl border border-slate-100 transform-gpu rotate-6 animate-[float_6s_ease-in-out_infinite] pointer-events-none">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-10 h-10 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center">!</div>
                                     <div className="text-sm font-bold text-slate-700">Assignee Needed</div>
@@ -65,7 +65,7 @@ export default function AsanaComparePage() {
                                 <div className="w-full h-2 bg-slate-100 rounded-full"></div>
                             </div>
                             
-                            <div className="absolute bottom-10 left-0 w-72 bg-indigo-600 p-6 rounded-3xl shadow-2xl border border-indigo-500 transform -rotate-3 animate-[float_5s_ease-in-out_infinite_reverse] z-10 text-white">
+                            <div className="absolute bottom-10 left-0 w-72 bg-indigo-600 p-6 rounded-3xl shadow-2xl border border-indigo-500 transform-gpu -rotate-3 animate-[float_5s_ease-in-out_infinite_reverse] z-10 text-white pointer-events-none">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">✓</div>
                                     <div className="text-sm font-bold">Deep Work Complete</div>

@@ -22,11 +22,18 @@ export default function BlogPostPage() {
 
     // Reading progress bar
     useEffect(() => {
+        let ticking = false;
         const handleScroll = () => {
-            const height = document.documentElement.scrollHeight - window.innerHeight;
-            if (height > 0) setProgress((window.scrollY / height) * 100);
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const height = document.documentElement.scrollHeight - window.innerHeight;
+                    if (height > 0) setProgress((window.scrollY / height) * 100);
+                    ticking = false;
+                });
+                ticking = true;
+            }
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 

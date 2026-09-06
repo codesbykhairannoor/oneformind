@@ -42,28 +42,28 @@ export default function HomePage() {
         {/* High-End Ambient Lighting */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-full bg-indigo-50/40 rounded-full blur-2xl -z-10"></div>
         
-        {/* Unique & Cool Floating UI Elements */}
-        <div className="absolute top-32 left-[5%] w-16 h-16 bg-white/60 backdrop-blur-md rounded-[1.5rem] shadow-[0_10px_40px_rgba(79,70,229,0.15)] flex items-center justify-center text-2xl animate-[float_6s_ease-in-out_infinite] hidden xl:flex border border-white/80 z-20 group hover:scale-110 transition-transform duration-500 rotate-6">
+        {/* Unique & Cool Floating UI Elements (Hardware Accelerated) */}
+        <div className="absolute top-32 left-[5%] w-16 h-16 bg-white/90 rounded-[1.5rem] shadow-[0_10px_40px_rgba(79,70,229,0.15)] flex items-center justify-center text-2xl animate-[float_6s_ease-in-out_infinite] hidden xl:flex border border-white/80 z-20 pointer-events-none transform-gpu will-change-transform rotate-6">
             <span className="relative drop-shadow-sm">🚀</span>
         </div>
         
-        <div className="absolute top-56 left-[18%] w-12 h-12 bg-white/60 backdrop-blur-md rounded-full shadow-[0_10px_40px_rgba(16,185,129,0.15)] flex items-center justify-center text-xl animate-[bounce-slow_5s_ease-in-out_infinite_0.5s] hidden xl:flex border border-white/80 z-20 group hover:scale-110 transition-transform duration-500 -rotate-12">
+        <div className="absolute top-56 left-[18%] w-12 h-12 bg-white/90 rounded-full shadow-[0_10px_40px_rgba(16,185,129,0.15)] flex items-center justify-center text-xl animate-[bounce-slow_5s_ease-in-out_infinite_0.5s] hidden xl:flex border border-white/80 z-20 pointer-events-none transform-gpu will-change-transform -rotate-12">
             <span className="relative drop-shadow-sm">💎</span>
         </div>
 
-        <div className="absolute top-24 right-[10%] w-20 h-20 bg-white/60 backdrop-blur-md rounded-[2rem] shadow-[0_20px_50px_rgba(245,158,11,0.15)] flex items-center justify-center text-3xl animate-[float_7s_ease-in-out_infinite_1s] hidden xl:flex border border-white/80 z-20 group hover:scale-110 transition-transform duration-500 -rotate-6">
+        <div className="absolute top-24 right-[10%] w-20 h-20 bg-white/90 rounded-[2rem] shadow-[0_20px_50px_rgba(245,158,11,0.15)] flex items-center justify-center text-3xl animate-[float_7s_ease-in-out_infinite_1s] hidden xl:flex border border-white/80 z-20 pointer-events-none transform-gpu will-change-transform -rotate-6">
             <span className="relative drop-shadow-sm">🧠</span>
         </div>
 
-        <div className="absolute bottom-60 left-[8%] w-14 h-14 bg-white/60 backdrop-blur-md rounded-2xl shadow-[0_15px_40px_rgba(168,85,247,0.15)] flex items-center justify-center text-2xl animate-[bounce-slow_6s_ease-in-out_infinite_1.5s] hidden xl:flex border border-white/80 z-20 group hover:scale-110 transition-transform duration-500 rotate-12">
+        <div className="absolute bottom-60 left-[8%] w-14 h-14 bg-white/90 rounded-2xl shadow-[0_15px_40px_rgba(168,85,247,0.15)] flex items-center justify-center text-2xl animate-[bounce-slow_6s_ease-in-out_infinite_1.5s] hidden xl:flex border border-white/80 z-20 pointer-events-none transform-gpu will-change-transform rotate-12">
             <span className="relative drop-shadow-sm">📈</span>
         </div>
 
-        <div className="absolute bottom-80 right-[8%] w-16 h-16 bg-white/60 backdrop-blur-md rounded-[1.5rem] shadow-[0_15px_40px_rgba(239,68,68,0.15)] flex items-center justify-center text-2xl animate-[float_5.5s_ease-in-out_infinite_0.2s] hidden xl:flex border border-white/80 z-20 group hover:scale-110 transition-transform duration-500 rotate-3">
+        <div className="absolute bottom-80 right-[8%] w-16 h-16 bg-white/90 rounded-[1.5rem] shadow-[0_15px_40px_rgba(239,68,68,0.15)] flex items-center justify-center text-2xl animate-[float_5.5s_ease-in-out_infinite_0.2s] hidden xl:flex border border-white/80 z-20 pointer-events-none transform-gpu will-change-transform rotate-3">
             <span className="relative drop-shadow-sm">⚡</span>
         </div>
 
-        <div className="absolute bottom-40 right-[20%] w-10 h-10 bg-slate-900/5 backdrop-blur-sm rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.05)] flex items-center justify-center text-lg animate-[bounce-slow_4.5s_ease-in-out_infinite_2s] hidden xl:flex border border-white/50 z-20 group hover:scale-110 transition-transform duration-500 -rotate-6">
+        <div className="absolute bottom-40 right-[20%] w-10 h-10 bg-white/80 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.05)] flex items-center justify-center text-lg animate-[bounce-slow_4.5s_ease-in-out_infinite_2s] hidden xl:flex border border-white/50 z-20 pointer-events-none transform-gpu will-change-transform -rotate-6">
             <span className="relative drop-shadow-sm">🔥</span>
         </div>
 

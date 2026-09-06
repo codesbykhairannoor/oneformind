@@ -33,10 +33,10 @@ export default function HabitifyComparePage() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-indigo-50/50 to-transparent pointer-events-none"></div>
                     
                     {/* Floating Icons */}
-                    <div className="absolute top-20 left-[10%] w-16 h-16 bg-white border border-slate-100 shadow-lg rounded-2xl flex items-center justify-center text-3xl animate-[bounce_4s_infinite] opacity-80 z-0 rotate-12">📅</div>
-                    <div className="absolute bottom-20 left-[15%] w-12 h-12 bg-white border border-slate-100 shadow-lg rounded-full flex items-center justify-center text-2xl animate-[bounce_5s_infinite_0.5s] opacity-60 z-0 -rotate-12">🌱</div>
-                    <div className="absolute top-32 right-[10%] w-20 h-20 bg-white border border-slate-100 shadow-xl rounded-[1.5rem] flex items-center justify-center text-4xl animate-[bounce_6s_infinite_1s] opacity-90 z-0 -rotate-6">🧠</div>
-                    <div className="absolute bottom-32 right-[15%] w-14 h-14 bg-white border border-slate-100 shadow-md rounded-xl flex items-center justify-center text-2xl animate-[bounce_4.5s_infinite_0.2s] opacity-70 z-0 rotate-6">💰</div>
+                    <div className="absolute top-20 left-[10%] w-16 h-16 bg-white border border-slate-100 shadow-lg rounded-2xl flex items-center justify-center text-3xl animate-[bounce_4s_infinite] opacity-80 z-0 rotate-12 pointer-events-none transform-gpu">📅</div>
+                    <div className="absolute bottom-20 left-[15%] w-12 h-12 bg-white border border-slate-100 shadow-lg rounded-full flex items-center justify-center text-2xl animate-[bounce_5s_infinite_0.5s] opacity-60 z-0 -rotate-12 pointer-events-none transform-gpu">🌱</div>
+                    <div className="absolute top-32 right-[10%] w-20 h-20 bg-white border border-slate-100 shadow-xl rounded-[1.5rem] flex items-center justify-center text-4xl animate-[bounce_6s_infinite_1s] opacity-90 z-0 -rotate-6 pointer-events-none transform-gpu">🧠</div>
+                    <div className="absolute bottom-32 right-[15%] w-14 h-14 bg-white border border-slate-100 shadow-md rounded-xl flex items-center justify-center text-2xl animate-[bounce_4.5s_infinite_0.2s] opacity-70 z-0 rotate-6 pointer-events-none transform-gpu">💰</div>
 
                     <div className="max-w-4xl mx-auto text-center relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                         <div className="mb-4">
