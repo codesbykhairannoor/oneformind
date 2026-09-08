@@ -97,7 +97,7 @@ console.log('   Canonical and reciprocal hreflang logic verified.\n');
 // ----------------------------------------------------
 // 3. AUDIT ALL SUBPAGE LAYOUTS (EXPLICIT CANONICAL OVERRIDES)
 // ----------------------------------------------------
-console.log('3️⃣  AUDITING 32 CORE MARKETING SUBPAGE LAYOUTS...');
+console.log('3️⃣  AUDITING 33 CORE MARKETING SUBPAGE LAYOUTS...');
 const coreRoutes = [
   'pricing', 'about', 'contact', 'privacy-policy', 'terms-of-service', 'features',
   'features/planner', 'features/habit', 'features/finance', 'features/journal',
@@ -106,7 +106,7 @@ const coreRoutes = [
   'solutions/career-accelerator', 'solutions/mental-clarity', 'solutions/atomic-system',
   'solutions/freelancer', 'solutions/personalgrowth',
   'resources/blog', 'resources/guide', 'resources/changelog', 'resources/community',
-  'resources/stories', 'resources/ai-trust', 'resources/help',
+  'resources/stories', 'resources/affiliate', 'resources/ai-trust', 'resources/help',
   'login', 'register'
 ];
 

@@ -41,6 +41,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/resources/changelog', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/resources/community', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/resources/stories', priority: 0.7, changeFrequency: 'weekly' as const },
+    { path: '/resources/affiliate', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/resources/ai-trust', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/resources/help', priority: 0.7, changeFrequency: 'weekly' as const },
 

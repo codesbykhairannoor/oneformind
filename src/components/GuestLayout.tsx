@@ -267,6 +267,10 @@ export default function GuestLayout({ children, user = null }: { children: React
                                                     <span className="text-lg group-hover/item:scale-110 transition-transform">✨</span>
                                                     <div><h4 className="font-bold text-slate-900 text-sm">Success Stories</h4><p className="text-[10px] font-medium text-slate-500">User transformations.</p></div>
                                                 </Link>
+                                                <Link href="/resources/affiliate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition group/item">
+                                                    <span className="text-lg group-hover/item:scale-110 transition-transform">💎</span>
+                                                    <div><h4 className="font-bold text-slate-900 text-sm">Affiliate Program</h4><p className="text-[10px] font-medium text-slate-500">Earn 60% recurring.</p></div>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
@@ -412,6 +416,7 @@ export default function GuestLayout({ children, user = null }: { children: React
                                         <Link href="/resources/guide" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>📖</span> User Guide</Link>
                                         <Link href="/resources/blog" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>✍️</span> Blog</Link>
                                         <Link href="/resources/community" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>🌍</span> Community</Link>
+                                        <Link href="/resources/affiliate" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"><span>💎</span> Affiliate Program</Link>
                                     </div>
                                 )}
                             </div>
@@ -532,6 +537,7 @@ export default function GuestLayout({ children, user = null }: { children: React
                                 <li><Link href="/resources/changelog" className="hover:text-indigo-600 transition">Changelog</Link></li>
                                 <li><Link href="/resources/community" className="hover:text-indigo-600 transition">Community</Link></li>
                                 <li><Link href="/resources/stories" className="hover:text-indigo-600 transition">Success Stories</Link></li>
+                                <li><Link href="/resources/affiliate" className="hover:text-indigo-600 transition">Affiliate Program</Link></li>
                                 <li><Link href="/resources/guide" className="hover:text-indigo-600 transition">User Guide</Link></li>
                                 <li><Link href="/resources/ai-trust" className="hover:text-indigo-600 transition">AI Transparency</Link></li>
                             </ul>
