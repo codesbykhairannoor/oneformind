@@ -644,13 +644,23 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         }
     }, [todayProgress, todayScheduledHabits.length, isLoaded]);
 
+    // Calculate scheduled days in current month for specific weekdays
+    const calculateScheduledDays = (days: number[]) => {
+        let count = 0;
+        for (let d = 1; d <= daysInCurrentMonth; d++) {
+            const dateObj = new Date(mkYear, mkMonth - 1, d);
+            if (days.includes(dateObj.getDay())) count++;
+        }
+        return count;
+    };
+
     // Modal Form Handlers
     const openCreateModal = () => {
         setEditingHabitId(null);
         setFormName('');
         setFormIcon('🧘');
         setFormColor('#6366f1');
-        setFormTarget(25);
+        setFormTarget(daysInCurrentMonth);
         setFormType('positive');
         setFormMeasure('boolean');
         setFormUnit('ml');
@@ -675,6 +685,22 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         setFormFreqDays(habit.frequencyDays || [1, 2, 3, 4, 5]);
         setFormTimeOfDay(habit.timeOfDay || 'morning');
         setShowCreateModal(true);
+    };
+
+    const loadBatchTemplate = (templateType: 'morning' | 'productivity') => {
+        if (templateType === 'morning') {
+            setBatchRows([
+                { name: isIndo ? 'Minum Air Putih 500ml' : 'Drink 500ml Water', icon: '💧', color: '#06b6d4', target: daysInCurrentMonth, timeOfDay: 'morning' },
+                { name: isIndo ? 'Meditasi Pagi 10 Menit' : 'Morning Meditation 10m', icon: '🧘', color: '#6366f1', target: daysInCurrentMonth, timeOfDay: 'morning' },
+                { name: isIndo ? 'Olahraga Pagi 20 Menit' : 'Morning Workout 20m', icon: '🏃', color: '#10b981', target: daysInCurrentMonth, timeOfDay: 'morning' }
+            ]);
+        } else if (templateType === 'productivity') {
+            setBatchRows([
+                { name: isIndo ? 'Deep Work 90 Menit' : '90-min Deep Work', icon: '💻', color: '#6366f1', target: 20, timeOfDay: 'afternoon' },
+                { name: isIndo ? 'Membaca Buku 20 Halaman' : 'Read 20 Pages', icon: '📚', color: '#f59e0b', target: 25, timeOfDay: 'evening' },
+                { name: isIndo ? 'No Screen 30 Mnt Sebelum Tidur' : 'No Screen Before Bed', icon: '💤', color: '#8b5cf6', target: daysInCurrentMonth, timeOfDay: 'evening' }
+            ]);
+        }
     };
 
     const submitSingleHabit = async (e: React.FormEvent) => {
@@ -1517,9 +1543,9 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                 {numericPopover && (
                     <ModalPortal>
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                            <div className="fixed inset-0 bg-slate-950/50" onClick={() => setNumericPopover(null)} />
+                            <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs" onClick={() => setNumericPopover(null)} />
                             <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 w-full max-w-xs relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 text-center">
-                                <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 mb-1">
+                                <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 mb-1">
                                     {isIndo ? 'Input Progres Harian' : 'Update Daily Progress'}
                                 </h3>
                                 <p className="text-[10px] font-bold text-slate-400 mb-4">
@@ -1532,7 +1558,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                             ...numericPopover,
                                             currentVal: Math.max(0, numericPopover.currentVal - 100)
                                         })}
-                                        className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black text-lg flex items-center justify-center"
+                                        className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                                     >
                                         <Minus size={16} />
                                     </button>
@@ -1543,14 +1569,14 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                             ...numericPopover,
                                             currentVal: Number(e.target.value)
                                         })}
-                                        className="w-24 text-center font-black text-xl py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 outline-none"
+                                        className="w-24 text-center font-black text-xl py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-indigo-500"
                                     />
                                     <button
                                         onClick={() => setNumericPopover({
                                             ...numericPopover,
                                             currentVal: numericPopover.currentVal + 100
                                         })}
-                                        className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black text-lg flex items-center justify-center"
+                                        className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                                     >
                                         <Plus size={16} />
                                     </button>
@@ -1559,13 +1585,13 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setNumericPopover(null)}
-                                        className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500"
+                                        className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
                                     >
                                         {isIndo ? 'Batal' : 'Cancel'}
                                     </button>
                                     <button
                                         onClick={() => handleUpdateNumericValue(numericPopover.habitId, numericPopover.dateStr, numericPopover.currentVal)}
-                                        className="flex-1 py-2.5 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-lg"
+                                        className="flex-1 py-2.5 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none transition"
                                     >
                                         {isIndo ? 'Simpan' : 'Save'}
                                     </button>
@@ -1606,15 +1632,31 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                 {/* SINGLE CREATE / EDIT HABIT MODAL */}
                 {showCreateModal && (
                     <ModalPortal>
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                            <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs" onClick={() => setShowCreateModal(false)} />
-                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-8 w-full max-w-lg relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 md:p-6 overflow-y-auto">
+                            <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs" onClick={() => setShowCreateModal(false)} />
+                            
+                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] w-full max-w-xl relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[92vh] flex flex-col overflow-hidden">
                                 
-                                <div className="flex justify-between items-center mb-6">
-                                    <div>
-                                        <h3 className="text-xl font-black text-slate-800 dark:text-slate-100">
-                                            {editingHabitId ? (isIndo ? 'Edit Habit' : 'Edit Habit') : (isIndo ? 'Tambah Habit Baru' : 'Add New Habit')}
-                                        </h3>
+                                {/* Modal Header */}
+                                <div className="px-6 md:px-8 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 shrink-0">
+                                    <div className="flex items-center gap-3">
+                                        <div 
+                                            className="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shadow-sm shrink-0"
+                                            style={{ backgroundColor: `${formColor}15`, color: formColor }}
+                                        >
+                                            {formIcon}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 leading-tight">
+                                                {editingHabitId ? (isIndo ? 'Edit Habit' : 'Edit Habit') : (isIndo ? 'Tambah Habit Baru' : 'Create New Habit')}
+                                            </h3>
+                                            <p className="text-[10px] font-bold text-slate-400">
+                                                {isIndo ? 'Atur target harian dan komitmen bulanan Anda' : 'Set your daily target and monthly commitment'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
                                         {!editingHabitId && (
                                             <button
                                                 type="button"
@@ -1622,334 +1664,509 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                                     setShowCreateModal(false);
                                                     setShowBatchModal(true);
                                                 }}
-                                                className="text-[10px] font-black tracking-tight px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition flex items-center gap-1.5 w-fit border border-indigo-100 dark:border-indigo-500/30 mt-2"
+                                                className="hidden sm:flex text-[10px] font-black px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition items-center gap-1 border border-indigo-100 dark:border-indigo-500/30"
                                             >
                                                 <span>⚡</span> Batch Mode
                                             </button>
                                         )}
+                                        <button 
+                                            onClick={() => setShowCreateModal(false)} 
+                                            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition"
+                                        >
+                                            <X size={16} strokeWidth={2.5} />
+                                        </button>
                                     </div>
-                                    <button onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
-                                        <X size={16} />
-                                    </button>
                                 </div>
 
-                                <form onSubmit={submitSingleHabit} className="space-y-4">
+                                {/* Modal Body */}
+                                <form onSubmit={submitSingleHabit} className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-6 bg-slate-50/50 dark:bg-slate-950/40">
                                     
-                                    {/* Habit Type (Positive vs Negative) */}
+                                    {/* LIVE PREVIEW SUMMARY CARD */}
+                                    <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl border-2 border-indigo-100 dark:border-indigo-900/40 shadow-xs flex items-center gap-4">
+                                        <div 
+                                            className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 shadow-sm"
+                                            style={{ backgroundColor: `${formColor}20`, color: formColor }}
+                                        >
+                                            {formIcon}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h4 className="font-black text-sm text-slate-900 dark:text-white truncate">
+                                                    {formName.trim() ? formName : (isIndo ? 'Nama Habit Belum Diisi' : 'Habit Name Preview')}
+                                                </h4>
+                                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${
+                                                    formType === 'positive'
+                                                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 border border-emerald-200/50'
+                                                        : 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 border border-rose-200/50'
+                                                }`}>
+                                                    {formType === 'positive' ? (isIndo ? '✨ Membangun' : '✨ Build') : (isIndo ? '🛡️ Bebas dari' : '🛡️ Quit')}
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1 leading-snug">
+                                                {formMeasure === 'numeric'
+                                                    ? `🎯 ${formTargetValue} ${formUnit} / ${isIndo ? 'hari' : 'day'} • `
+                                                    : `✓ ${isIndo ? 'Centang Harian' : 'Daily Check'} • `
+                                                }
+                                                {formFreqType === 'daily'
+                                                    ? `${isIndo ? 'Setiap Hari' : 'Every Day'} (${formTarget} ${isIndo ? 'hari/bulan' : 'days/mo'})`
+                                                    : `${formFreqDays.length}x / ${isIndo ? 'minggu' : 'week'} (${formTarget} ${isIndo ? 'hari aktif' : 'scheduled days'})`
+                                                }
+                                                {' • '}
+                                                {formTimeOfDay === 'morning' ? '🌅 Pagi' : formTimeOfDay === 'afternoon' ? '☀️ Siang' : formTimeOfDay === 'evening' ? '🌙 Malam' : '🔄 Kapan Saja'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* SECTION 1: TIPE KEBIASAAN */}
                                     <div>
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
-                                            {isIndo ? 'Tipe Kebiasaan' : 'Habit Type'}
+                                            1. {isIndo ? 'Tipe Kebiasaan' : 'Habit Type'}
                                         </label>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-2 gap-3">
                                             <button
                                                 type="button"
                                                 onClick={() => setFormType('positive')}
-                                                className={`py-2.5 px-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 border ${
+                                                className={`p-3.5 rounded-2xl text-left transition-all border-2 flex flex-col justify-between ${
                                                     formType === 'positive'
-                                                        ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                                                        : 'border-slate-200 dark:border-slate-800 text-slate-500'
+                                                        ? 'bg-indigo-50/70 dark:bg-indigo-500/10 border-indigo-600 dark:border-indigo-500 shadow-sm'
+                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                                 }`}
                                             >
-                                                <span>✨</span> {isIndo ? 'Membangun (+)' : 'Build (+)'}
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-lg">✨</span>
+                                                    <span className="text-xs font-black text-slate-900 dark:text-white">
+                                                        {isIndo ? 'Membangun Kebiasaan (+)' : 'Build Positive (+)'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] font-medium text-slate-400">
+                                                    {isIndo ? 'Aktivitas rutin positif (Olahraga, Minum Air, Belajar)' : 'Positive habits you want to accomplish'}
+                                                </p>
                                             </button>
+
                                             <button
                                                 type="button"
                                                 onClick={() => setFormType('negative')}
-                                                className={`py-2.5 px-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 border ${
+                                                className={`p-3.5 rounded-2xl text-left transition-all border-2 flex flex-col justify-between ${
                                                     formType === 'negative'
-                                                        ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-500 text-rose-600 dark:text-rose-400 shadow-xs'
-                                                        : 'border-slate-200 dark:border-slate-800 text-slate-500'
+                                                        ? 'bg-rose-50/70 dark:bg-rose-500/10 border-rose-600 dark:border-rose-500 shadow-sm'
+                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                                 }`}
                                             >
-                                                <span>🛡️</span> {isIndo ? 'Hentikan (Quit)' : 'Quit (Avoid)'}
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-lg">🛡️</span>
+                                                    <span className="text-xs font-black text-slate-900 dark:text-white">
+                                                        {isIndo ? 'Hentikan Kebiasaan (Quit)' : 'Quit Bad Habit (Avoid)'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] font-medium text-slate-400">
+                                                    {isIndo ? 'Hindari hal negatif (Stop Merokok, No Sugar)' : 'Negative habits you want to eliminate'}
+                                                </p>
                                             </button>
                                         </div>
                                     </div>
 
-                                    {/* Name Input */}
+                                    {/* SECTION 2: NAMA HABIT */}
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-                                            {isIndo ? 'Nama Habit' : 'Habit Name'}
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
+                                            2. {isIndo ? 'Nama Kebiasaan' : 'Habit Name'}
                                         </label>
                                         <input
                                             type="text"
                                             value={formName}
                                             onChange={(e) => setFormName(e.target.value)}
-                                            placeholder={formType === 'positive' ? 'Misal: Meditasi Pagi 15 Menit...' : 'Misal: Berhenti Merokok / No Sugar...'}
-                                            className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-xs text-slate-800 dark:text-white focus:border-indigo-500 outline-none"
+                                            placeholder={formType === 'positive' 
+                                                ? (isIndo ? 'Misal: Minum Air 2000 ml, Meditasi Pagi 15 Menit...' : 'E.g., Drink 2000 ml water, Morning Meditation...') 
+                                                : (isIndo ? 'Misal: Berhenti Merokok, No Sugar, Bebas Doomscrolling...' : 'E.g., No Smoking, Zero Sugar, No Doomscrolling...')}
+                                            className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 font-bold text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition"
                                             required
                                         />
                                     </div>
 
-                                    {/* Measurement Mode (Boolean vs Numeric) */}
+                                    {/* SECTION 3: IKON & WARNA */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
+                                                3. {isIndo ? 'Pilih Ikon' : 'Select Icon'}
+                                            </label>
+                                            <div className="grid grid-cols-6 gap-1.5 bg-white dark:bg-slate-950 p-2.5 rounded-2xl border-2 border-slate-200 dark:border-slate-800 max-h-28 overflow-y-auto custom-scrollbar">
+                                                {iconList.map(icon => (
+                                                    <button
+                                                        key={icon}
+                                                        type="button"
+                                                        onClick={() => setFormIcon(icon)}
+                                                        className={`h-9 rounded-xl text-lg flex items-center justify-center transition ${
+                                                            formIcon === icon ? 'bg-indigo-100 dark:bg-indigo-900/50 ring-2 ring-indigo-500 scale-105 shadow-xs' : 'opacity-70 hover:opacity-100'
+                                                        }`}
+                                                    >
+                                                        {icon}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
+                                                4. {isIndo ? 'Warna Label' : 'Label Color'}
+                                            </label>
+                                            <div className="flex flex-wrap gap-2.5 bg-white dark:bg-slate-950 p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-800 items-center min-h-[58px]">
+                                                {colorPalette.map(c => (
+                                                    <button
+                                                        key={c}
+                                                        type="button"
+                                                        onClick={() => setFormColor(c)}
+                                                        className={`w-7 h-7 rounded-full border-2 transition hover:scale-115 ${
+                                                            formColor === c ? 'ring-2 ring-indigo-500 border-white dark:border-slate-900 scale-110 shadow-sm' : 'border-transparent'
+                                                        }`}
+                                                        style={{ backgroundColor: c }}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* SECTION 4: METODE PENGUKURAN (CENTANG VS KUANTITATIF) */}
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-                                            {isIndo ? 'Metode Pengukuran' : 'Measurement'}
-                                        </label>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                5. {isIndo ? 'Metode Pengukuran Harian' : 'Daily Measurement'}
+                                            </label>
+                                            <span className="text-[10px] font-bold text-indigo-500">
+                                                {formMeasure === 'boolean' ? (isIndo ? 'Mode Centang' : 'Checkmark Mode') : (isIndo ? 'Mode Angka & Satuan' : 'Quantity Mode')}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 mb-3">
                                             <button
                                                 type="button"
                                                 onClick={() => setFormMeasure('boolean')}
-                                                className={`py-2 rounded-xl text-xs font-bold border ${
+                                                className={`py-3 px-4 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 border-2 ${
                                                     formMeasure === 'boolean'
-                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                                                        : 'border-slate-200 dark:border-slate-800 text-slate-500'
+                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
+                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                                 }`}
                                             >
-                                                ✓ {isIndo ? 'Centang Selesai' : 'Checkmark'}
+                                                <span>✓</span> {isIndo ? 'Centang (Ya / Tidak)' : 'Checkmark (Yes / No)'}
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setFormMeasure('numeric')}
-                                                className={`py-2 rounded-xl text-xs font-bold border ${
+                                                className={`py-3 px-4 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 border-2 ${
                                                     formMeasure === 'numeric'
-                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                                                        : 'border-slate-200 dark:border-slate-800 text-slate-500'
+                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
+                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                                 }`}
                                             >
-                                                🔢 {isIndo ? 'Angka & Satuan' : 'Numeric Value'}
+                                                <span>🔢</span> {isIndo ? 'Kuantitatif (Angka & Satuan)' : 'Quantitative (Number & Unit)'}
                                             </button>
                                         </div>
 
+                                        {/* Numeric Inputs with 100% High Contrast */}
                                         {formMeasure === 'numeric' && (
-                                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900/50 grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-200">
                                                 <div>
-                                                    <label className="text-[9px] font-bold text-slate-400 block mb-1">Target Harian</label>
+                                                    <label className="text-[10px] font-black text-slate-500 dark:text-slate-300 uppercase tracking-wide block mb-1.5">
+                                                        {isIndo ? 'Target Jumlah per Hari' : 'Target Value per Day'}
+                                                    </label>
                                                     <input
                                                         type="number"
                                                         value={formTargetValue}
                                                         onChange={(e) => setFormTargetValue(Number(e.target.value))}
-                                                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-bold outline-none"
+                                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-base outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition"
+                                                        placeholder="2000"
+                                                        min="1"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="text-[9px] font-bold text-slate-400 block mb-1">Satuan</label>
+                                                    <label className="text-[10px] font-black text-slate-500 dark:text-slate-300 uppercase tracking-wide block mb-1.5">
+                                                        {isIndo ? 'Satuan Pengukuran' : 'Measurement Unit'}
+                                                    </label>
                                                     <select
                                                         value={formUnit}
                                                         onChange={(e) => setFormUnit(e.target.value)}
-                                                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-bold outline-none"
+                                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition cursor-pointer"
                                                     >
-                                                        <option value="ml">ml (Air)</option>
-                                                        <option value="halaman">Halaman</option>
-                                                        <option value="menit">Menit</option>
-                                                        <option value="km">km</option>
-                                                        <option value="reps">Reps</option>
-                                                        <option value="gelas">Gelas</option>
+                                                        <option value="ml" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">ml (Air / Minuman)</option>
+                                                        <option value="halaman" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">Halaman (Buku)</option>
+                                                        <option value="menit" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">Menit (Durasi / Meditasi)</option>
+                                                        <option value="km" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">km (Lari / Bersepeda)</option>
+                                                        <option value="reps" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">Reps (Push Up / Gym)</option>
+                                                        <option value="gelas" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">Gelas (Air)</option>
+                                                        <option value="langkah" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">Langkah (Walking)</option>
+                                                        <option value="x" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">Kali (Frekuensi)</option>
                                                     </select>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Frequency Selection (Daily vs Specific Days) */}
+                                    {/* SECTION 5: JADWAL & KOMITMEN BULANAN */}
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-                                            {isIndo ? 'Frekuensi & Jadwal' : 'Frequency'}
-                                        </label>
-                                        <div className="grid grid-cols-2 gap-2 mb-2">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                6. {isIndo ? 'Jadwal & Komitmen Bulanan' : 'Schedule & Frequency'}
+                                            </label>
+                                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                                                {formTarget} {isIndo ? 'Hari / Bulan' : 'Days / Month'}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 mb-3">
                                             <button
                                                 type="button"
-                                                onClick={() => setFormFreqType('daily')}
-                                                className={`py-2 rounded-xl text-xs font-bold border ${
+                                                onClick={() => {
+                                                    setFormFreqType('daily');
+                                                    setFormTarget(daysInCurrentMonth);
+                                                }}
+                                                className={`py-3 px-4 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 border-2 ${
                                                     formFreqType === 'daily'
-                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                                                        : 'border-slate-200 dark:border-slate-800 text-slate-500'
+                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
+                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                                 }`}
                                             >
-                                                {isIndo ? 'Setiap Hari' : 'Every Day'}
+                                                <span>📅</span> {isIndo ? 'Setiap Hari (30/31 Hari)' : 'Every Day (Full Month)'}
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setFormFreqType('weekly_days')}
-                                                className={`py-2 rounded-xl text-xs font-bold border ${
+                                                onClick={() => {
+                                                    setFormFreqType('weekly_days');
+                                                    setFormTarget(calculateScheduledDays(formFreqDays));
+                                                }}
+                                                className={`py-3 px-4 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 border-2 ${
                                                     formFreqType === 'weekly_days'
-                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                                                        : 'border-slate-200 dark:border-slate-800 text-slate-500'
+                                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
+                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                                 }`}
                                             >
-                                                {isIndo ? 'Hari Tertentu' : 'Specific Days'}
+                                                <span>🗓️</span> {isIndo ? 'Hari Tertentu (Rest Day)' : 'Specific Days (With Rest Days)'}
                                             </button>
                                         </div>
 
+                                        {/* Weekday Selection with Auto Calculation */}
                                         {formFreqType === 'weekly_days' && (
-                                            <div className="flex gap-1 justify-between bg-slate-50 dark:bg-slate-950 p-2 rounded-2xl border border-slate-200 dark:border-slate-800">
-                                                {[
-                                                    { day: 1, label: isIndo ? 'Sen' : 'Mon' },
-                                                    { day: 2, label: isIndo ? 'Sel' : 'Tue' },
-                                                    { day: 3, label: isIndo ? 'Rab' : 'Wed' },
-                                                    { day: 4, label: isIndo ? 'Kam' : 'Thu' },
-                                                    { day: 5, label: isIndo ? 'Jum' : 'Fri' },
-                                                    { day: 6, label: isIndo ? 'Sab' : 'Sat' },
-                                                    { day: 0, label: isIndo ? 'Min' : 'Sun' }
-                                                ].map(item => {
-                                                    const isSelected = formFreqDays.includes(item.day);
-                                                    return (
-                                                        <button
-                                                            key={item.day}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                if (isSelected) {
-                                                                    setFormFreqDays(formFreqDays.filter(d => d !== item.day));
-                                                                } else {
-                                                                    setFormFreqDays([...formFreqDays, item.day]);
-                                                                }
-                                                            }}
-                                                            className={`w-9 h-9 rounded-xl text-xs font-black transition-all ${
-                                                                isSelected
-                                                                    ? 'bg-indigo-600 text-white shadow-xs'
-                                                                    : 'bg-white dark:bg-slate-800 text-slate-400'
-                                                            }`}
-                                                        >
-                                                            {item.label}
-                                                        </button>
-                                                    );
-                                                })}
+                                            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900/50 space-y-3 animate-in fade-in duration-200">
+                                                <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
+                                                    <span>{isIndo ? 'Pilih hari aktif pelaksanaan:' : 'Select scheduled weekdays:'}</span>
+                                                    <span className="text-indigo-600 dark:text-indigo-400 font-black">
+                                                        {formFreqDays.length} {isIndo ? 'hari per minggu' : 'days per week'}
+                                                    </span>
+                                                </div>
+
+                                                <div className="grid grid-cols-7 gap-1.5">
+                                                    {[
+                                                        { day: 1, label: isIndo ? 'Sen' : 'Mon' },
+                                                        { day: 2, label: isIndo ? 'Sel' : 'Tue' },
+                                                        { day: 3, label: isIndo ? 'Rab' : 'Wed' },
+                                                        { day: 4, label: isIndo ? 'Kam' : 'Thu' },
+                                                        { day: 5, label: isIndo ? 'Jum' : 'Fri' },
+                                                        { day: 6, label: isIndo ? 'Sab' : 'Sat' },
+                                                        { day: 0, label: isIndo ? 'Min' : 'Sun' }
+                                                    ].map(item => {
+                                                        const isSelected = formFreqDays.includes(item.day);
+                                                        return (
+                                                            <button
+                                                                key={item.day}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    let nextDays: number[];
+                                                                    if (isSelected) {
+                                                                        nextDays = formFreqDays.filter(d => d !== item.day);
+                                                                    } else {
+                                                                        nextDays = [...formFreqDays, item.day];
+                                                                    }
+                                                                    setFormFreqDays(nextDays);
+                                                                    setFormTarget(calculateScheduledDays(nextDays));
+                                                                }}
+                                                                className={`h-11 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center gap-0.5 border-2 ${
+                                                                    isSelected
+                                                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md scale-105'
+                                                                        : 'bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-indigo-300'
+                                                                }`}
+                                                            >
+                                                                <span>{item.label}</span>
+                                                                {isSelected && <span className="w-1 h-1 bg-white rounded-full" />}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                                                    💡 {isIndo 
+                                                        ? `Otomatis dihitung: Ada ${formTarget} hari jadwal aktif di bulan ${monthNames[selectedMonthIndex]} ${selectedYear}. Hari di luar jadwal otomatis menjadi Rest Day (☕) tanpa merusak streak.` 
+                                                        : `Auto-calculated: ${formTarget} scheduled days in ${monthNames[selectedMonthIndex]} ${selectedYear}. Unscheduled days become Rest Days (☕) without breaking streaks.`}
+                                                </p>
                                             </div>
                                         )}
+
+                                        {/* Slider Target Manual */}
+                                        <div className="mt-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+                                            <span className="text-[10px] font-bold text-slate-400 shrink-0">
+                                                {isIndo ? 'Atur Target Manual:' : 'Adjust Target:'}
+                                            </span>
+                                            <input
+                                                type="range"
+                                                min="1"
+                                                max={daysInCurrentMonth}
+                                                value={formTarget}
+                                                onChange={(e) => setFormTarget(Number(e.target.value))}
+                                                className="flex-1 accent-indigo-600 h-2 bg-slate-200 dark:bg-slate-800 rounded-lg cursor-pointer"
+                                            />
+                                            <span className="text-xs font-black text-slate-800 dark:text-slate-200 shrink-0 w-12 text-right">
+                                                {formTarget} {isIndo ? 'Hari' : 'Days'}
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    {/* Time of Day */}
+                                    {/* SECTION 6: WAKTU PELAKSANAAN */}
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-                                            {isIndo ? 'Waktu Pelaksanaan' : 'Time of Day'}
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
+                                            7. {isIndo ? 'Waktu Pelaksanaan' : 'Time of Day'}
                                         </label>
-                                        <div className="grid grid-cols-4 gap-1.5">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                             {[
-                                                { code: 'morning', label: '🌅 Pagi' },
-                                                { code: 'afternoon', label: '☀️ Siang' },
-                                                { code: 'evening', label: '🌙 Malam' },
-                                                { code: 'anytime', label: '🔄 Bebas' }
+                                                { code: 'morning', label: '🌅 Pagi', desc: '05:00 - 11:00' },
+                                                { code: 'afternoon', label: '☀️ Siang', desc: '11:00 - 17:00' },
+                                                { code: 'evening', label: '🌙 Malam', desc: '17:00 - 23:00' },
+                                                { code: 'anytime', label: '🔄 Kapan Saja', desc: 'Fleksibel' }
                                             ].map(t => (
                                                 <button
                                                     key={t.code}
                                                     type="button"
                                                     onClick={() => setFormTimeOfDay(t.code as any)}
-                                                    className={`py-2 rounded-xl text-[11px] font-bold border ${
+                                                    className={`py-2.5 px-3 rounded-2xl text-left border-2 transition-all flex flex-col justify-between ${
                                                         formTimeOfDay === t.code
-                                                            ? 'bg-indigo-50 border-indigo-500 text-indigo-600 dark:bg-indigo-500/10'
-                                                            : 'border-slate-200 dark:border-slate-800 text-slate-500'
+                                                            ? 'bg-indigo-50/70 dark:bg-indigo-500/10 border-indigo-600 dark:border-indigo-500 shadow-xs'
+                                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                                     }`}
                                                 >
-                                                    {t.label}
+                                                    <span className="text-xs font-black text-slate-900 dark:text-white">{t.label}</span>
+                                                    <span className="text-[9px] font-medium text-slate-400">{t.desc}</span>
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
-                                    {/* Icon Picker */}
-                                    <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Pilih Ikon</label>
-                                        <div className="grid grid-cols-8 gap-1.5 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 max-h-24 overflow-y-auto">
-                                            {iconList.map(icon => (
-                                                <button
-                                                    key={icon}
-                                                    type="button"
-                                                    onClick={() => setFormIcon(icon)}
-                                                    className={`h-9 rounded-xl text-lg flex items-center justify-center transition ${
-                                                        formIcon === icon ? 'bg-white dark:bg-slate-800 shadow-xs ring-2 ring-indigo-500 scale-105' : 'opacity-60'
-                                                    }`}
-                                                >
-                                                    {icon}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                                </form>
 
-                                    {/* Color Picker */}
-                                    <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Warna Label</label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {colorPalette.map(c => (
-                                                <button
-                                                    key={c}
-                                                    type="button"
-                                                    onClick={() => setFormColor(c)}
-                                                    className={`w-7 h-7 rounded-full border-2 transition ${
-                                                        formColor === c ? 'ring-2 ring-indigo-500 border-white scale-110' : 'border-transparent'
-                                                    }`}
-                                                    style={{ backgroundColor: c }}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Target Slider */}
-                                    <div>
-                                        <div className="flex justify-between items-center mb-1">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Target Bulanan</label>
-                                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{formTarget} {isIndo ? 'Hari' : 'Days'}</span>
-                                        </div>
-                                        <input
-                                            type="range"
-                                            min="1"
-                                            max="31"
-                                            value={formTarget}
-                                            onChange={(e) => setFormTarget(Number(e.target.value))}
-                                            className="w-full accent-indigo-600 h-2 bg-slate-200 dark:bg-slate-800 rounded-lg cursor-pointer"
-                                        />
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex gap-3 pt-2">
-                                        {editingHabitId && (
-                                            <button
-                                                type="button"
-                                                onClick={executeDelete}
-                                                className="w-12 h-12 rounded-xl text-xl bg-rose-50 dark:bg-rose-500/10 text-rose-500 hover:bg-rose-100 transition flex items-center justify-center border border-rose-100 shrink-0"
-                                            >
-                                                🗑️
-                                            </button>
-                                        )}
+                                {/* Modal Footer */}
+                                <div className="px-6 md:px-8 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 shrink-0">
+                                    {editingHabitId ? (
                                         <button
-                                            type="submit"
-                                            className="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-2xl shadow-lg transition"
+                                            type="button"
+                                            onClick={executeDelete}
+                                            className="px-4 py-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-500 hover:bg-rose-100 transition font-black text-xs flex items-center gap-1.5 border border-rose-100 dark:border-rose-500/20"
                                         >
-                                            {editingHabitId ? (isIndo ? 'Update Habit' : 'Update Habit') : (isIndo ? 'Simpan Habit' : 'Save Habit')}
+                                            <Trash2 size={14} />
+                                            <span>{isIndo ? 'Hapus' : 'Delete'}</span>
+                                        </button>
+                                    ) : <div />}
+
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCreateModal(false)}
+                                            className="px-5 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                        >
+                                            {isIndo ? 'Batal' : 'Cancel'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={submitSingleHabit}
+                                            className="px-7 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none transition active:scale-95 flex items-center gap-2"
+                                        >
+                                            <Check size={16} strokeWidth={3} />
+                                            <span>{editingHabitId ? (isIndo ? 'Update Habit' : 'Update Habit') : (isIndo ? 'Simpan Habit' : 'Save Habit')}</span>
                                         </button>
                                     </div>
-                                </form>
+                                </div>
+
                             </div>
                         </div>
                     </ModalPortal>
                 )}
 
-                {/* BATCH HABIT MODAL */}
+                {/* BATCH HABIT CREATION MODAL */}
                 {showBatchModal && (
                     <ModalPortal>
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                            <div className="fixed inset-0 bg-slate-950/60" onClick={() => setShowBatchModal(false)} />
-                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] w-full max-w-2xl relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[85vh] flex flex-col overflow-hidden">
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 md:p-6 overflow-y-auto">
+                            <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs" onClick={() => setShowBatchModal(false)} />
+                            
+                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] w-full max-w-2xl relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[88vh] flex flex-col overflow-hidden">
                                 
-                                <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 shrink-0">
+                                {/* Header */}
+                                <div className="px-6 md:px-8 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 shrink-0">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-xl text-white">⚡</div>
+                                        <div className="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center text-2xl text-white shadow-md">
+                                            ⚡
+                                        </div>
                                         <div>
-                                            <h3 className="text-lg font-black text-slate-800 dark:text-slate-100">Batch Habit Creation</h3>
-                                            <p className="text-[10px] font-bold text-slate-400">{isIndo ? 'Tambah beberapa habit sekaligus' : 'Create multiple habits at once'}</p>
+                                            <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100">
+                                                Batch Habit Creation
+                                            </h3>
+                                            <p className="text-[10px] font-bold text-slate-400">
+                                                {isIndo ? 'Buat beberapa habit sekaligus dalam satu klik' : 'Create multiple habits at once'}
+                                            </p>
                                         </div>
                                     </div>
-                                    <button onClick={() => setShowBatchModal(false)} className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center">✕</button>
+
+                                    <button 
+                                        onClick={() => setShowBatchModal(false)} 
+                                        className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition"
+                                    >
+                                        <X size={16} strokeWidth={2.5} />
+                                    </button>
                                 </div>
 
-                                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4 bg-slate-50/50 dark:bg-slate-950/50">
+                                {/* Body */}
+                                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4 bg-slate-50/50 dark:bg-slate-950/40">
+                                    
+                                    {/* Quick Templates */}
+                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                                        <span className="text-[10px] font-black text-slate-400 shrink-0">
+                                            {isIndo ? '💡 Template Kilat:' : '💡 Quick Templates:'}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => loadBatchTemplate('morning')}
+                                            className="px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300 font-black text-[10px] hover:bg-amber-100 transition shrink-0 border border-amber-200/50"
+                                        >
+                                            🌅 {isIndo ? 'Rutinitas Pagi Sehat' : 'Healthy Morning Routine'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => loadBatchTemplate('productivity')}
+                                            className="px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 font-black text-[10px] hover:bg-indigo-100 transition shrink-0 border border-indigo-200/50"
+                                        >
+                                            💻 {isIndo ? 'Produktivitas & Fokus' : 'Productivity & Focus'}
+                                        </button>
+                                    </div>
+
+                                    {/* Batch Rows */}
                                     {batchRows.map((row, index) => (
-                                        <div key={index} className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xs space-y-3">
+                                        <div key={index} className="bg-white dark:bg-slate-900 p-4 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600">
-                                                    Habit #{index + 1}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xl inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800">
+                                                        {row.icon}
+                                                    </span>
+                                                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                                                        Habit #{index + 1}
+                                                    </span>
+                                                </div>
+
                                                 <button
                                                     onClick={() => setBatchRows(batchRows.filter((_, i) => i !== index))}
                                                     disabled={batchRows.length <= 1}
-                                                    className="w-7 h-7 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"
+                                                    className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center transition disabled:opacity-30"
                                                 >
-                                                    <Trash2 size={13} />
+                                                    <Trash2 size={14} />
                                                 </button>
                                             </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                <div>
-                                                    <label className="text-[9px] font-black text-slate-400 block mb-1">Nama Habit</label>
+                                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                                                <div className="sm:col-span-7">
+                                                    <label className="text-[9px] font-black text-slate-400 block mb-1">
+                                                        {isIndo ? 'Nama Habit' : 'Habit Name'}
+                                                    </label>
                                                     <input
                                                         type="text"
                                                         value={row.name}
@@ -1958,12 +2175,15 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                                             upd[index].name = e.target.value;
                                                             setBatchRows(upd);
                                                         }}
-                                                        placeholder="Misal: Minum Air 2L..."
-                                                        className="w-full text-xs font-bold h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none"
+                                                        placeholder={isIndo ? 'Misal: Minum Air 500ml...' : 'E.g., Drink 500ml Water...'}
+                                                        className="w-full text-xs font-bold h-11 px-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition"
                                                     />
                                                 </div>
-                                                <div>
-                                                    <label className="text-[9px] font-black text-slate-400 block mb-1">Waktu</label>
+
+                                                <div className="sm:col-span-5">
+                                                    <label className="text-[9px] font-black text-slate-400 block mb-1">
+                                                        {isIndo ? 'Waktu Rutinitas' : 'Routine Time'}
+                                                    </label>
                                                     <select
                                                         value={row.timeOfDay}
                                                         onChange={(e) => {
@@ -1971,12 +2191,12 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                                             upd[index].timeOfDay = e.target.value as any;
                                                             setBatchRows(upd);
                                                         }}
-                                                        className="w-full text-xs font-bold h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none"
+                                                        className="w-full text-xs font-bold h-11 px-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition cursor-pointer"
                                                     >
-                                                        <option value="morning">🌅 Pagi</option>
-                                                        <option value="afternoon">☀️ Siang</option>
-                                                        <option value="evening">🌙 Malam</option>
-                                                        <option value="anytime">🔄 Bebas</option>
+                                                        <option value="morning" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">🌅 Pagi (Morning)</option>
+                                                        <option value="afternoon" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">☀️ Siang (Afternoon)</option>
+                                                        <option value="evening" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">🌙 Malam (Evening)</option>
+                                                        <option value="anytime" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">🔄 Kapan Saja (Anytime)</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1984,21 +2204,32 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                     ))}
 
                                     <button
-                                        onClick={() => setBatchRows([...batchRows, { name: '', icon: '🎯', color: '#8b5cf6', target: 25, timeOfDay: 'morning' }])}
-                                        className="w-full py-3 border-2 border-dashed border-indigo-200 dark:border-indigo-500/30 rounded-2xl text-indigo-600 dark:text-indigo-400 font-black text-xs flex items-center justify-center gap-2"
+                                        onClick={() => setBatchRows([...batchRows, { name: '', icon: '🎯', color: '#8b5cf6', target: daysInCurrentMonth, timeOfDay: 'morning' }])}
+                                        className="w-full py-3.5 border-2 border-dashed border-indigo-200 dark:border-indigo-500/30 rounded-2xl text-indigo-600 dark:text-indigo-400 font-black text-xs flex items-center justify-center gap-2 hover:bg-indigo-50 dark:hover:bg-indigo-500/5 transition"
                                     >
-                                        <Plus size={14} /> + {isIndo ? 'Tambah Baris Habit' : 'Add Habit Row'}
+                                        <Plus size={15} strokeWidth={3} />
+                                        <span>+ {isIndo ? 'Tambah Baris Habit' : 'Add Habit Row'}</span>
                                     </button>
                                 </div>
 
-                                <div className="px-6 py-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                                    <span className="text-xs font-bold text-slate-400">Total: {batchRows.length}</span>
+                                {/* Footer */}
+                                <div className="px-6 md:px-8 py-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
+                                    <span className="text-xs font-bold text-slate-400">
+                                        Total: <strong className="text-slate-900 dark:text-white">{batchRows.length}</strong> {isIndo ? 'Habit' : 'Habits'}
+                                    </span>
+
                                     <div className="flex gap-2">
-                                        <button onClick={() => setShowBatchModal(false)} className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500">
+                                        <button 
+                                            onClick={() => setShowBatchModal(false)} 
+                                            className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                        >
                                             {isIndo ? 'Batal' : 'Cancel'}
                                         </button>
-                                        <button onClick={submitBatchHabits} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-lg">
-                                            {isIndo ? 'Simpan Semua' : 'Save All'}
+                                        <button 
+                                            onClick={submitBatchHabits} 
+                                            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none transition active:scale-95"
+                                        >
+                                            {isIndo ? 'Simpan Semua Habit' : 'Save All Habits'}
                                         </button>
                                     </div>
                                 </div>
@@ -2012,18 +2243,18 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                 {showDeleteModal && habitToDelete && (
                     <ModalPortal>
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                            <div className="fixed inset-0 bg-slate-950/60" onClick={() => setShowDeleteModal(false)} />
+                            <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs" onClick={() => setShowDeleteModal(false)} />
                             <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-8 w-full max-w-sm relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 text-center">
                                 <div className="w-14 h-14 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">🗑️</div>
-                                <h3 className="text-lg font-black text-slate-800 dark:text-slate-100 mb-1">{isIndo ? 'Hapus Habit Ini?' : 'Delete Habit?'}</h3>
+                                <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 mb-1">{isIndo ? 'Hapus Habit Ini?' : 'Delete Habit?'}</h3>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
                                     {isIndo ? 'Kebiasaan ini dan seluruh riwayat catatannya akan dihapus permanen.' : 'This habit and all its logged history will be permanently deleted.'}
                                 </p>
                                 <div className="flex gap-3">
-                                    <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                    <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">
                                         {isIndo ? 'Batal' : 'Cancel'}
                                     </button>
-                                    <button onClick={executeDelete} className="flex-1 py-3 rounded-xl font-black text-xs bg-rose-500 text-white shadow-lg shadow-rose-200 dark:shadow-none">
+                                    <button onClick={executeDelete} className="flex-1 py-3 rounded-xl font-black text-xs bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-200 dark:shadow-none transition">
                                         {isIndo ? 'Hapus Permanen' : 'Delete'}
                                     </button>
                                 </div>
