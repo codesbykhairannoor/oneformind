@@ -226,7 +226,7 @@ export default function BillingPricingPage() {
                 <BillingPricingCards 
                     isAnnual={isAnnual}
                     userPlanIndex={userPlanIndex}
-                    isExplicitPaid={isExplicitPaid}
+                    isExplicitPaid={Boolean(isExplicitPaid)}
                     trialIsActive={trial.isActive}
                     onCheckout={handleCheckout}
                 />

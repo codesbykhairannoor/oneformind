@@ -1,7 +1,7 @@
 import { HabitItem, ProcessedHabitItem, MonthDateItem, DayInfo } from '../types';
 
 export function getHabitDayInfo(habit: HabitItem, day: MonthDateItem): DayInfo {
-    const isScheduled = habit.frequencyType !== 'weekly_days' || (habit.frequencyDays && habit.frequencyDays.includes(day.dayIndex));
+    const isScheduled = Boolean(habit.frequencyType !== 'weekly_days' || (habit.frequencyDays && habit.frequencyDays.includes(day.dayIndex)));
     const log = habit.logs[day.dateString];
     const rawStatus = log?.status || 'empty';
     const value = log?.value;

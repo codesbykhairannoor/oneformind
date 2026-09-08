@@ -217,9 +217,9 @@ export default function FinanceClient({
         <AuthenticatedLayout>
             <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500">
                 <FinanceHeader
-                    selectedMonth={selectedMonthKey}
-                    onChangeMonth={changeMonth}
-                    onOpenAddModal={() => { setEditingTransaction(null); setShowTrxModal(true); }}
+                    selectedMonthKey={selectedMonthKey}
+                    onMonthChange={changeMonth}
+                    onOpenTrxModal={() => { setEditingTransaction(null); setShowTrxModal(true); }}
                     onOpenBatchModal={() => setShowBatchModal(true)}
                     activeCurrency={activeCurrency}
                     onCurrencyChange={handleCurrencyChange}

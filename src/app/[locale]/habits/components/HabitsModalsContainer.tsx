@@ -24,7 +24,7 @@ interface HabitsModalsContainerProps {
     showBatchModal: boolean;
     setShowBatchModal: (v: boolean) => void;
     batchRows: BatchRow[];
-    setBatchRows: (rows: BatchRow[]) => void;
+    setBatchRows: React.Dispatch<React.SetStateAction<BatchRow[]>>;
     showDeleteModal: boolean;
     setShowDeleteModal: (v: boolean) => void;
     habitToDelete: HabitItem | null;

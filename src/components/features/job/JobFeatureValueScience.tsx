@@ -3,9 +3,15 @@
 import React from 'react';
 import { Link } from '@/i18n/routing';
 
+const DEFAULT_RADAR_ITEMS = [
+    { role: 'Product Manager', prev: '18M', curr: '32M', gain: '+77%', color: 'from-cyan-500 to-blue-500' },
+    { role: 'Senior Software Engineer', prev: '22M', curr: '45M', gain: '+104%', color: 'from-indigo-500 to-purple-500' },
+    { role: 'Growth Lead', prev: '15M', curr: '28M', gain: '+86%', color: 'from-emerald-500 to-teal-500' }
+];
+
 interface JobFeatureValueScienceProps {
     t: any;
-    radarItems: Array<{
+    radarItems?: Array<{
         role: string;
         prev: string;
         curr: string;
@@ -14,7 +20,7 @@ interface JobFeatureValueScienceProps {
     }>;
 }
 
-export default function JobFeatureValueScience({ t, radarItems }: JobFeatureValueScienceProps) {
+export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_ITEMS }: JobFeatureValueScienceProps) {
     return (
         <>
             {/* SECTION 3.5: MARKET VALUE (SPLIT CONTENT) */}

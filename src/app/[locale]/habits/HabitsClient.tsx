@@ -118,27 +118,22 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                 <HabitStatsHeader
                     isIndo={isIndo}
                     t={t}
-                    todayStr={period.todayStr}
-                    currentMonthKey={period.currentMonthKey}
+                    processedHabits={calc.processedHabits}
+                    activeFilter={period.activeFilter}
+                    setActiveFilter={period.setActiveFilter}
+                    soundActive={period.soundActive}
+                    toggleSound={period.toggleSound}
+                    isPeriodDropdownOpen={period.isPeriodDropdownOpen}
+                    setIsPeriodDropdownOpen={period.setIsPeriodDropdownOpen}
                     selectedYear={period.selectedYear}
                     setSelectedYear={period.setSelectedYear}
                     selectedMonthIndex={period.selectedMonthIndex}
                     setSelectedMonthIndex={period.setSelectedMonthIndex}
-                    isPeriodDropdownOpen={period.isPeriodDropdownOpen}
-                    setIsPeriodDropdownOpen={period.setIsPeriodDropdownOpen}
                     monthNames={monthNames}
-                    soundActive={period.soundActive}
-                    toggleSound={period.toggleSound}
-                    activeFilter={period.activeFilter}
-                    setActiveFilter={period.setActiveFilter}
-                    overallPercentage={calc.overallPercentage}
                     todayProgress={calc.todayProgress}
-                    currentStreak={calc.currentStreak}
-                    perfectDaysCount={calc.perfectDaysCount}
-                    openCreateModal={form.openCreateModal}
-                    setShowBatchModal={form.setShowBatchModal}
                     showHint={period.showHint}
                     setShowHint={period.setShowHint}
+                    openCreateModal={form.openCreateModal}
                 />
 
                 <main className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
@@ -146,75 +141,91 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     {calc.filteredHabits.length > 0 ? (
                         <>
                             <HabitMatrixTable
+                                filteredHabits={calc.filteredHabits}
+                                monthDates={monthDates}
                                 isIndo={isIndo}
                                 t={t}
-                                monthDates={monthDates}
-                                filteredHabits={calc.filteredHabits}
-                                todayStr={period.todayStr}
-                                currentMonthKey={period.currentMonthKey}
-                                toggleStatus={actions.toggleStatus}
-                                setNumericPopover={form.setNumericPopover}
-                                setNoteModalData={form.setNoteModalData}
-                                setDetailModalHabit={form.setDetailModalHabit}
-                                setTimerModalHabit={form.setTimerModalHabit}
-                                editHabit={form.editHabit}
-                                confirmDelete={form.confirmDelete}
+                                onSelectHabitDetail={form.setDetailModalHabit}
+                                onSelectHabitTimer={form.setTimerModalHabit}
+                                onEditHabit={form.editHabit}
+                                onConfirmDelete={form.confirmDelete}
+                                onOpenNumericPopover={form.setNumericPopover}
+                                onOpenNoteModal={form.setNoteModalData}
+                                onToggleStatus={actions.toggleStatus}
                             />
 
                             {/* MOBILE VIEW (CARD-BASED + QUICK DATE SELECTOR) */}
                             <HabitMobileView
-                                isIndo={isIndo}
-                                t={t}
                                 monthDates={monthDates}
-                                filteredHabits={calc.filteredHabits}
                                 selectedMobileDate={period.selectedMobileDate}
                                 setSelectedMobileDate={period.setSelectedMobileDate}
-                                todayStr={period.todayStr}
-                                toggleStatus={actions.toggleStatus}
-                                setNumericPopover={form.setNumericPopover}
-                                setNoteModalData={form.setNoteModalData}
-                                setDetailModalHabit={form.setDetailModalHabit}
-                                editHabit={form.editHabit}
-                                confirmDelete={form.confirmDelete}
+                                filteredHabits={calc.filteredHabits}
+                                onSelectHabitDetail={form.setDetailModalHabit}
+                                onSelectHabitTimer={form.setTimerModalHabit}
+                                onOpenNumericPopover={form.setNumericPopover}
+                                onToggleStatus={actions.toggleStatus}
                             />
                         </>
                     ) : (
                         <HabitEmptyState
+                            activeFilter={period.activeFilter}
+                            isIndo={isIndo}
                             t={t}
                             openCreateModal={form.openCreateModal}
-                            setShowBatchModal={form.setShowBatchModal}
                             handleCopyPreviousHabits={actions.handleCopyPreviousHabits}
                         />
                     )}
 
                     {/* BOTTOM SUMMARY STATS & CORRELATION INSIGHTS */}
                     <HabitBottomMetrics
-                        t={t}
                         isIndo={isIndo}
-                        processedHabits={calc.processedHabits}
-                        totalCompletions={calc.totalCompletions}
+                        overallPercentage={calc.overallPercentage}
                         topHabit={calc.topHabit}
+                        currentStreak={calc.currentStreak}
+                        perfectDaysCount={calc.perfectDaysCount}
+                        totalCompletions={calc.totalCompletions}
                     />
                 </main>
 
                 {/* NUMERIC QUICK-ADJUST POPOVER */}
                 {form.numericPopover && (
                     <HabitNumericPopover
-                        popover={form.numericPopover}
+                        data={form.numericPopover}
+                        isIndo={isIndo}
                         onClose={() => form.setNumericPopover(null)}
-                        onSave={actions.handleUpdateNumericValue}
+                        onUpdate={actions.handleUpdateNumericValue}
+                        onChangeVal={(newVal) => form.setNumericPopover(prev => prev ? { ...prev, currentVal: newVal } : null)}
                     />
                 )}
 
                 {/* ALL MODALS CONTAINER */}
                 <HabitsModalsContainer
-                    isIndo={isIndo}
-                    t={t}
-                    todayStr={period.todayStr}
-                    currentMonthKey={period.currentMonthKey}
+                    detailModalHabit={form.detailModalHabit}
+                    setDetailModalHabit={form.setDetailModalHabit}
+                    timerModalHabit={form.timerModalHabit}
+                    setTimerModalHabit={form.setTimerModalHabit}
+                    noteModalData={form.noteModalData}
+                    setNoteModalData={form.setNoteModalData}
                     showCreateModal={form.showCreateModal}
                     setShowCreateModal={form.setShowCreateModal}
                     editingHabitId={form.editingHabitId}
+                    showBatchModal={form.showBatchModal}
+                    setShowBatchModal={form.setShowBatchModal}
+                    batchRows={form.batchRows}
+                    setBatchRows={form.setBatchRows}
+                    showDeleteModal={form.showDeleteModal}
+                    setShowDeleteModal={form.setShowDeleteModal}
+                    habitToDelete={form.habitToDelete}
+                    isIndo={isIndo}
+                    locale={locale}
+                    todayStr={period.todayStr}
+                    monthNames={monthNames}
+                    selectedMonthIndex={period.selectedMonthIndex}
+                    selectedYear={period.selectedYear}
+                    currentMonthKey={period.currentMonthKey}
+                    daysInCurrentMonth={daysInCurrentMonth}
+                    iconList={iconList}
+                    colorPalette={colorPalette}
                     formName={form.formName}
                     setFormName={form.setFormName}
                     formIcon={form.formIcon}
@@ -237,28 +248,11 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setFormFreqDays={form.setFormFreqDays}
                     formTimeOfDay={form.formTimeOfDay}
                     setFormTimeOfDay={form.setFormTimeOfDay}
-                    iconList={iconList}
-                    colorPalette={colorPalette}
-                    daysInCurrentMonth={daysInCurrentMonth}
-                    submitSingleHabit={actions.submitSingleHabit}
-                    showBatchModal={form.showBatchModal}
-                    setShowBatchModal={form.setShowBatchModal}
-                    batchRows={form.batchRows}
-                    setBatchRows={form.setBatchRows}
-                    submitBatchHabits={actions.submitBatchHabits}
-                    showDeleteModal={form.showDeleteModal}
-                    setShowDeleteModal={form.setShowDeleteModal}
-                    habitToDelete={form.habitToDelete}
-                    executeDelete={actions.executeDelete}
-                    detailModalHabit={form.detailModalHabit}
-                    setDetailModalHabit={form.setDetailModalHabit}
-                    monthDates={monthDates}
-                    noteModalData={form.noteModalData}
-                    setNoteModalData={form.setNoteModalData}
-                    handleSaveNote={actions.handleSaveNote}
-                    timerModalHabit={form.timerModalHabit}
-                    setTimerModalHabit={form.setTimerModalHabit}
-                    toggleStatus={actions.toggleStatus}
+                    onToggleStatus={actions.toggleStatus}
+                    onSaveNote={actions.handleSaveNote}
+                    onSubmitSingleHabit={actions.submitSingleHabit}
+                    onSubmitBatchHabits={actions.submitBatchHabits}
+                    onExecuteDelete={actions.executeDelete}
                 />
             </div>
         </AuthenticatedLayout>

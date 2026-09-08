@@ -48,3 +48,12 @@ export interface DayInfo {
     notes?: string;
     hasNote: boolean;
 }
+
+export interface BatchRow {
+    name: string;
+    icon: string;
+    color: string;
+    target: number;
+    timeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
+}
+
