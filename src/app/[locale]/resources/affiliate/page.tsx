@@ -16,12 +16,9 @@ import {
     Award, 
     CheckCircle2, 
     ArrowRight, 
-    Gift, 
     BarChart3, 
     Globe, 
-    Layers, 
-    Lock,
-    ExternalLink
+    Layers
 } from 'lucide-react';
 
 export default function AffiliatePage() {
@@ -34,7 +31,7 @@ export default function AffiliatePage() {
     const [selectedPlan, setSelectedPlan] = useState<'architect' | 'quantum' | 'legendary'>('architect');
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-    // Pricing & commission calculation logic (60% recurring revenue share)
+    // Pricing & commission calculation logic (60% recurring revenue share up to 8 months)
     const planDetails = {
         architect: {
             name: 'Architect Pro',
@@ -62,16 +59,16 @@ export default function AffiliatePage() {
 
         if (plan.isRecurring) {
             const monthlyEarnUsd = referrals * plan.priceUsd * commRate;
-            const yearlyEarnUsd = monthlyEarnUsd * 12;
+            const eightMonthEarnUsd = monthlyEarnUsd * 8;
             const monthlyEarnIdr = referrals * plan.priceIdr * commRate;
-            const yearlyEarnIdr = monthlyEarnIdr * 12;
+            const eightMonthEarnIdr = monthlyEarnIdr * 8;
 
             return {
                 isRecurring: true,
                 monthlyUsd: monthlyEarnUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                yearlyUsd: yearlyEarnUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                eightMonthUsd: eightMonthEarnUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                 monthlyIdr: Math.round(monthlyEarnIdr).toLocaleString('id-ID'),
-                yearlyIdr: Math.round(yearlyEarnIdr).toLocaleString('id-ID'),
+                eightMonthIdr: Math.round(eightMonthEarnIdr).toLocaleString('id-ID'),
             };
         } else {
             const totalEarnUsd = referrals * plan.priceUsd * commRate;
@@ -87,48 +84,42 @@ export default function AffiliatePage() {
 
     // Partner Tier based on referrals
     const partnerTier = useMemo(() => {
-        if (referrals >= 250) return { title: 'Diamond Partner 💎', color: 'from-cyan-500 to-blue-600', badge: 'VIP Priority' };
-        if (referrals >= 100) return { title: 'Gold Partner 👑', color: 'from-amber-400 to-amber-600', badge: 'Bonus Assets' };
-        if (referrals >= 50) return { title: 'Silver Partner ⚡', color: 'from-indigo-500 to-purple-600', badge: 'Accelerated' };
-        return { title: 'Bronze Partner 🌟', color: 'from-slate-600 to-slate-800', badge: 'Standard 60%' };
+        if (referrals >= 250) return { title: 'Diamond Partner 💎', badge: 'Top Tier (60%)' };
+        if (referrals >= 100) return { title: 'Gold Partner 👑', badge: 'High Volume (60%)' };
+        if (referrals >= 50) return { title: 'Silver Partner ⚡', badge: 'Growing (60%)' };
+        return { title: 'Bronze Partner 🌟', badge: 'Standard 60%' };
     }, [referrals]);
 
     const faqs = [
         {
             q: isId ? 'Berapa persen komisi yang saya dapatkan?' : 'What is the commission percentage?',
             a: isId 
-                ? 'Anda mendapatkan 60% recurring revenue share dari setiap pembayaran langganan aktif pengguna (bulanan maupun tahunan), serta 60% flat dari penjualan paket Legendary Lifetime. Komisi ini jauh melampaui standar industri SaaS biasa (20-30%).' 
-                : 'You earn a generous 60% monthly recurring commission for every active paying subscriber you refer, as well as 60% flat on Legendary Lifetime sales. This is double to triple the typical 20-30% SaaS affiliate rate.'
+                ? 'Anda mendapatkan 60% recurring revenue share dari setiap pembayaran langganan aktif pengguna selama hingga 8 bulan masa langganan mereka, serta 60% flat dari penjualan paket Legendary Lifetime. Komisi ini jauh melampaui standar industri SaaS biasa (15-25%).' 
+                : 'You earn a generous 60% monthly recurring commission for every active paying subscriber you refer for up to 8 months of their subscription, as well as 60% flat on Legendary Lifetime sales. This is double to triple the typical 15-25% SaaS affiliate rate.'
         },
         {
-            q: isId ? 'Bagaimana cara kerja Sistem Retensi 8 Bulan (Lifetime Lock)?' : 'How does the 8-Month Retention Lifetime Lock work?',
+            q: isId ? 'Bagaimana cara kerja Komisi 8 Bulan?' : 'How does the 8-Month Recurring Commission work?',
             a: isId
-                ? 'Ketika pengguna yang Anda referensikan telah berlangganan aktif selama 8 bulan berturut-turut, akun Anda secara otomatis dikunci permanen sebagai pemilik referral tersebut. Anda akan terus menerima komisi 60% selama akun mereka tetap aktif, bahkan jika mereka beralih ke paket lain di masa depan.'
-                : 'Once a user referred by you stays subscribed for 8 consecutive months, your affiliate tag is locked in as their permanent partner. You will continue receiving 60% recurring commissions for their entire lifecycle on the platform.'
+                ? 'Cukup ajak pengguna mendaftar melalui link afiliasi unik Anda. Ketika mereka mulai berlangganan, akun Anda otomatis ditandai di sistem kami. Anda akan menerima komisi 60% setiap bulan selama pengguna tersebut aktif berlangganan, hingga maksimal 8 bulan.'
+                : 'Simply share your unique referral link. When your referral subscribes, your affiliate ID is automatically tagged in our system, and you will receive 60% recurring commission every month they stay active, for up to 8 full months.'
         },
         {
             q: isId ? 'Berapa lama masa berlaku cookie tracking?' : 'How long does the cookie tracking last?',
             a: isId
-                ? 'Cookie pelacakan kami berlaku selama 90 hari. Artinya, jika seseorang mengklik link referral Anda hari ini dan baru memutuskan untuk mendaftar 80 hari kemudian, komisi penjualan tetap 100% dialokasikan kepada Anda.'
+                ? 'Cookie pelacakan kami berlaku selama 90 hari. Jika seseorang mengklik link referral Anda hari ini dan baru mendaftar hingga 90 hari ke depan, atribusi referral tetap 100% tercatat atas nama Anda.'
                 : 'We provide a 90-day cookie window. If a visitor clicks your affiliate link today and converts anytime within 90 days, you get 100% attribution for that customer.'
         },
         {
             q: isId ? 'Kapan dan bagaimana pembayaran komisi dicairkan?' : 'When and how are commissions paid out?',
             a: isId
-                ? 'Komisi ditransfer setiap tanggal 1 dan 15 setiap bulannya. Anda dapat memilih metode payout yang paling nyaman: Transfer Bank Lokal Indonesia (BCA, Mandiri, BRI, QRIS), PayPal, Wise, atau melalui portal resmi Lemon Squeezy.'
+                ? 'Komisi ditransfer setiap tanggal 1 dan 15 setiap bulannya secara otomatis melalui Transfer Bank Lokal Indonesia (BCA, Mandiri, BRI, QRIS), PayPal, Wise, atau portal resmi Lemon Squeezy.'
                 : 'Payouts are processed bi-weekly (1st and 15th of every month) directly via PayPal, Wise, Local Bank Transfer, or via your Lemon Squeezy affiliate portal.'
         },
         {
             q: isId ? 'Apakah ada biaya untuk bergabung menjadi affiliate?' : 'Is there any fee to join the affiliate program?',
             a: isId
-                ? 'Sama sekali TIDAK ADA biaya ($0 / 100% Gratis). Tidak ada syarat minimum follower atau kuota bulanan. Siapa saja dapat langsung mendaftar dan mulai membagikan link uniknya.'
-                : 'Zero fees ($0 / 100% Free forever). There are no minimum follower requirements or sales quotas. Anyone can register and start promoting immediately.'
-        },
-        {
-            q: isId ? 'Apakah saya mendapatkan materi promosi dan kode kupon khusus?' : 'Do I get promotional materials and custom discount coupons?',
-            a: isId
-                ? 'Ya! Setiap partner mendapatkan akses ke Brand Kit (logo, screenshot beresolusi tinggi, banner sosmed, email swipe copy) serta dapat meminta kode voucher khusus dengan nama brand / channel Anda.'
-                : 'Yes! Every partner receives access to our complete media kit (logos, high-res UI mockups, banners, email templates) and can request custom branded coupon codes.'
+                ? 'Sama sekali TIDAK ADA biaya ($0 / 100% Gratis). Tidak ada syarat minimum follower atau kuota bulanan. Cukup daftar dan bagikan link unik Anda.'
+                : 'Zero fees ($0 / 100% Free forever). There are no minimum follower requirements or sales quotas. Simply register and start sharing your link immediately.'
         }
     ];
 
@@ -140,10 +131,10 @@ export default function AffiliatePage() {
             highlight: '60% Recurring',
         },
         {
-            icon: '🔒',
+            icon: '⏳',
             title: t('affiliate_adv_2_title'),
             desc: t('affiliate_adv_2_desc'),
-            highlight: isId ? '8 Bulan Lifetime Lock' : '8-Month Lifetime Lock',
+            highlight: isId ? 'Hingga 8 Bulan' : 'Up to 8 Months',
         },
         {
             icon: '🍪',
@@ -162,12 +153,6 @@ export default function AffiliatePage() {
             title: t('affiliate_adv_5_title'),
             desc: t('affiliate_adv_5_desc'),
             highlight: isId ? 'Payout Otomatis' : 'Automated Payouts',
-        },
-        {
-            icon: '🛠️',
-            title: t('affiliate_adv_6_title'),
-            desc: t('affiliate_adv_6_desc'),
-            highlight: isId ? 'Brand Kit & Voucher' : 'Brand Kit & Vouchers',
         },
     ];
 
@@ -222,9 +207,8 @@ export default function AffiliatePage() {
     const comparison = [
         { feature: isId ? 'Bagi Hasil Komisi' : 'Commission Rate', tranvas: '60% Recurring Bulanan', others: '15% - 25% Sekali Bayar' },
         { feature: isId ? 'Masa Berlaku Cookie' : 'Cookie Lifetime', tranvas: '90 Hari Penuh', others: '14 - 30 Hari' },
-        { feature: isId ? 'Retensi 8 Bulan (Lifetime Lock)' : '8-Month Lifetime Lock', tranvas: '✅ Otomatis Aktif', others: '❌ Dibatasi 12 Bulan' },
+        { feature: isId ? 'Durasi Komisi Per User' : 'Commission Duration', tranvas: 'Hingga 8 Bulan Langganan', others: 'Hanya 1 Bulan Pertama' },
         { feature: isId ? 'Hook Konversi User' : 'Conversion Hook', tranvas: '⚡ Free Trial 14 Hari ($0)', others: 'Langsung Bayar Penuh' },
-        { feature: isId ? 'Kode Kupon Custom' : 'Custom Coupon Codes', tranvas: '✅ Gratis Sesuai Brand', others: 'Hanya Link Standar' },
         { feature: isId ? 'Ambang Batas Payout' : 'Minimum Payout Threshold', tranvas: '$20 / Rp 200.000', others: '$100+' },
     ];
 
@@ -299,7 +283,7 @@ export default function AffiliatePage() {
                     </div>
                 </header>
 
-                {/* 2. CORE ADVANTAGES (6 PILLARS) */}
+                {/* 2. CORE ADVANTAGES (5 PILLARS) */}
                 <section className="py-24 px-6 bg-slate-50/70 dark:bg-slate-900/40 border-y border-slate-100 dark:border-slate-800">
                     <div className="max-w-6xl mx-auto space-y-16">
                         <div className="text-center space-y-4 max-w-3xl mx-auto">
@@ -448,9 +432,9 @@ export default function AffiliatePage() {
                                                     {t('affiliate_calc_yearly_earn')}
                                                 </span>
                                                 <div className="text-2xl sm:text-3xl font-black text-indigo-300 tracking-tight">
-                                                    {isId ? `Rp ${calculation.yearlyIdr}` : `$${calculation.yearlyUsd}`}
+                                                    {isId ? `Rp ${calculation.eightMonthIdr}` : `$${calculation.eightMonthUsd}`}
                                                 </div>
-                                                <span className="text-[11px] text-slate-400 font-bold">/ {isId ? 'tahun (passive income)' : 'year (passive income)'}</span>
+                                                <span className="text-[11px] text-slate-400 font-bold">({isId ? 'total 8 bulan langganan' : '8 months total subscription'})</span>
                                             </div>
                                         </>
                                     ) : (
@@ -482,30 +466,30 @@ export default function AffiliatePage() {
                     </div>
                 </section>
 
-                {/* 4. RETENTION MILESTONE HIGHLIGHT (8-MONTH LIFETIME LOCK) */}
+                {/* 4. 8-MONTH COMMISSION DURATION HIGHLIGHT */}
                 <section className="py-20 px-6 bg-gradient-to-r from-indigo-900/10 via-purple-900/10 to-pink-900/10 border-y border-indigo-100 dark:border-indigo-900/40">
                     <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
                         <div className="space-y-4 max-w-xl">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-black uppercase tracking-wider border border-amber-500/20">
-                                🏆 {isId ? 'Fitur Eksklusif Tranvas' : 'Exclusive Tranvas Feature'}
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-wider border border-indigo-500/20">
+                                ⚡ {isId ? 'Sistem Bagi Hasil Adil' : 'Fair Revenue Share System'}
                             </div>
                             <h3 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-                                {isId ? 'Sistem Retensi 8 Bulan = Hak Komisi Seumur Hidup' : '8-Month Retention = Lifetime Commission Lock'}
+                                {isId ? 'Komisi 60% Mengalir Setiap Bulan Hingga 8 Bulan' : '60% Commission Every Month for Up to 8 Months'}
                             </h3>
                             <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
                                 {isId 
-                                    ? 'Di program lain, referral Anda dipotong setelah 12 bulan. Di Tranvas, begitu user Anda setia berlangganan hingga 8 bulan, akun Anda otomatis ditandai sebagai VIP Partner dan menerima hak bagi hasil 60% selamanya seumur hidup produk!'
-                                    : 'Unlike other programs that expire referral cookies after 12 months, Tranvas rewards long-term retention. Once a customer reaches 8 months of active subscription, your affiliate ID is locked for lifetime recurring payouts!'}
+                                    ? 'Cukup ajak pengguna mendaftar sekali. Ketika mereka mulai berlangganan, akun Anda otomatis ditandai di sistem dan Anda langsung menerima 60% komisi setiap bulan selama pengguna tersebut aktif hingga 8 bulan masa langganan!'
+                                    : 'Simply refer a customer once. When they subscribe, your partner account is tagged and you automatically earn 60% monthly recurring commission for every month they remain active, up to 8 full months!'}
                             </p>
                         </div>
 
                         <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 w-full sm:w-auto text-center space-y-3">
-                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-3xl mx-auto">
-                                👑
+                            <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center text-3xl mx-auto">
+                                📈
                             </div>
-                            <h4 className="text-lg font-black text-slate-900 dark:text-white">{isId ? 'VIP Lifetime Partner' : 'VIP Lifetime Partner'}</h4>
+                            <h4 className="text-lg font-black text-slate-900 dark:text-white">{isId ? '60% Komisi Bulanan' : '60% Monthly Commission'}</h4>
                             <p className="text-xs text-slate-500 font-bold max-w-[200px] mx-auto">
-                                {isId ? 'Bagi hasil 60% tanpa batas waktu kadaluarsa.' : '60% revenue share with zero expiration.'}
+                                {isId ? 'Aktif selama hingga 8 bulan masa langganan user.' : 'Active for up to 8 months of user subscription.'}
                             </p>
                         </div>
                     </div>
