@@ -97,6 +97,20 @@ export default function BillingPricingPage() {
         }
     };
 
+    const handleLemonSqueezy = () => {
+        const email = session?.user?.email ? encodeURIComponent(session.user.email) : '';
+        const name = (session?.user as any)?.user_metadata?.full_name ? encodeURIComponent((session?.user as any).user_metadata.full_name) : '';
+        let url = 'https://tranvas.lemonsqueezy.com/checkout/buy/42544b58-35e6-47d2-b6b4-374bf22a3f40';
+        const params: string[] = [];
+        if (email) params.push(`checkout[email]=${email}`);
+        if (name) params.push(`checkout[name]=${name}`);
+        if (session?.user?.id) params.push(`checkout[custom][user_id]=${session.user.id}`);
+        if (params.length > 0) {
+            url += `?${params.join('&')}`;
+        }
+        window.location.href = url;
+    };
+
     const handlePayPal = async () => {
         setCheckout(prev => ({ ...prev, step: 'loading_paypal', error: null }));
         try {
@@ -591,18 +605,54 @@ export default function BillingPricingPage() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <button onClick={handleDuitku} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:-translate-y-1 transition-all group bg-slate-50 dark:bg-slate-800/50">
+                                        <button 
+                                            type="button"
+                                            onClick={handleLemonSqueezy} 
+                                            className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-indigo-500/80 bg-indigo-50/50 dark:bg-indigo-950/30 hover:border-indigo-600 hover:shadow-lg hover:-translate-y-0.5 transition-all group relative overflow-hidden"
+                                        >
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center font-black text-indigo-600 border border-slate-100 dark:border-slate-700">Rp</div>
-                                                <span className="font-bold text-slate-700 dark:text-slate-200">{t('payment_btn_duitku')}</span>
+                                                <div className="w-10 h-10 rounded-xl bg-indigo-600 shadow-sm flex items-center justify-center font-black text-white text-xs">
+                                                    💳
+                                                </div>
+                                                <div className="text-left">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-black text-xs text-slate-900 dark:text-white">{t('payment_btn_card')}</span>
+                                                        <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase">
+                                                            14d Free Trial
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Visa, Mastercard, Amex, Apple Pay</p>
+                                                </div>
+                                            </div>
+                                            <ChevronDown className="w-4 h-4 text-indigo-500 -rotate-90 group-hover:translate-x-0.5 transition-transform" />
+                                        </button>
+
+                                        <button 
+                                            type="button"
+                                            onClick={handleDuitku} 
+                                            className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:-translate-y-0.5 transition-all group bg-slate-50 dark:bg-slate-800/50"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center font-black text-indigo-600 border border-slate-100 dark:border-slate-700 text-xs">Rp</div>
+                                                <div className="text-left">
+                                                    <span className="font-bold text-xs text-slate-700 dark:text-slate-200">{t('payment_btn_duitku')}</span>
+                                                    <p className="text-[10px] font-medium text-slate-500">QRIS, BCA, Mandiri, BRI, BNI</p>
+                                                </div>
                                             </div>
                                             <ChevronDown className="w-4 h-4 text-slate-400 -rotate-90 group-hover:text-indigo-500 transition-colors" />
                                         </button>
 
-                                        <button onClick={handlePayPal} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:-translate-y-1 transition-all group bg-slate-50 dark:bg-slate-800/50">
+                                        <button 
+                                            type="button"
+                                            onClick={handlePayPal} 
+                                            className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:-translate-y-0.5 transition-all group bg-slate-50 dark:bg-slate-800/50"
+                                        >
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center font-black text-sky-500 border border-slate-100 dark:border-slate-700">$</div>
-                                                <span className="font-bold text-slate-700 dark:text-slate-200">{t('payment_btn_paypal')}</span>
+                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center font-black text-sky-500 border border-slate-100 dark:border-slate-700 text-xs">$</div>
+                                                <div className="text-left">
+                                                    <span className="font-bold text-xs text-slate-700 dark:text-slate-200">{t('payment_btn_paypal')}</span>
+                                                    <p className="text-[10px] font-medium text-slate-500">PayPal Balance & International</p>
+                                                </div>
                                             </div>
                                             <ChevronDown className="w-4 h-4 text-slate-400 -rotate-90 group-hover:text-indigo-500 transition-colors" />
                                         </button>
