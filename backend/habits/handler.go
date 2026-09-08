@@ -244,8 +244,13 @@ func handleCreateHabit(w http.ResponseWriter, r *http.Request, userID int) {
 	}
 	position := maxPos + 1
 
-	query := `INSERT INTO habits (user_id, period, name, icon, color, monthly_target, position) 
-			  VALUES ($1, $2, $3, $4, $5, $6, $7) 
+	status := "active"
+	if s, ok := body["status"].(string); ok && s != "" {
+		status = s
+	}
+
+	query := `INSERT INTO habits (user_id, period, name, icon, color, monthly_target, position, status) 
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
 			  RETURNING id, created_at, updated_at, status, is_archived`
 	
 	var h Habit
@@ -256,8 +261,9 @@ func handleCreateHabit(w http.ResponseWriter, r *http.Request, userID int) {
 	h.Icon = icon
 	h.MonthlyTarget = monthlyTarget
 	h.Position = position
+	h.Status = status
 
-	err = db.QueryRow(query, userID, period, name, icon, color, monthlyTarget, position).
+	err = db.QueryRow(query, userID, period, name, icon, color, monthlyTarget, position, status).
 		Scan(&h.ID, &h.CreatedAt, &h.UpdatedAt, &h.Status, &h.IsArchived)
 
 	if err != nil {
