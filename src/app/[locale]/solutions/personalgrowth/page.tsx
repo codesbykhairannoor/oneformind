@@ -313,7 +313,7 @@ export default function SolutionPersonalGrowthPage() {
                 </section>
 
             </main>
-            <style jsx>{`
+            <style>{`
                 .animate-spin-slow {
                     animation: spin 45s linear infinite;
                 }

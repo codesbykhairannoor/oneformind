@@ -296,7 +296,7 @@ export default function SolutionAtomicSystemPage() {
                 </section>
 
             </main>
-            <style jsx>{`
+            <style>{`
                 .animate-spin-slow {
                     animation: spin 20s linear infinite;
                 }

@@ -82,7 +82,7 @@ export default function JobFeatureValueScience({ t, radarItems }: JobFeatureValu
                         </div>
                     </div>
                 </div>
-                <style jsx>{`
+                <style>{`
                     @keyframes grow {
                         0% { transform: scaleX(0); }
                         100% { transform: scaleX(1); }

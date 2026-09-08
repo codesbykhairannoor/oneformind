@@ -85,9 +85,13 @@ export default function CalendarFeatureSyncScience({ t }: CalendarFeatureSyncSci
                         </div>
                     </div>
                 </div>
-                <style jsx>{`
-                    @keyframes dash {
-                        to { stroke-dashoffset: -100; }
+                <style>{`
+                    @keyframes pulse {
+                        0%, 100% { opacity: 0.2; }
+                        50% { opacity: 0.8; }
+                    }
+                    .animate-pulse {
+                        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
                     }
                 `}</style>
             </section>

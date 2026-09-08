@@ -95,7 +95,7 @@ export default function PostArticleContent({ articleRef, postTitle, faqs }: Post
             </div>
 
             {/* Prose style overrides */}
-            <style jsx global>{`
+            <style>{`
                 #article-payload h2 {
                     font-size: 1.875rem;
                     font-weight: 900;

@@ -17,7 +17,7 @@ export default function SolutionStudentPage() {
                 <StudentKitWorkflow />
                 <StudentScienceFaqCta />
             </main>
-            <style jsx>{`
+            <style>{`
                 .animate-spin-slow {
                     animation: spin 45s linear infinite;
                 }

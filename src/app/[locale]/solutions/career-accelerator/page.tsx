@@ -329,7 +329,7 @@ export default function SolutionCareerAcceleratorPage() {
                 </section>
 
             </main>
-            <style jsx>{`
+            <style>{`
                 .animate-spin-slow {
                     animation: spin 30s linear infinite;
                 }

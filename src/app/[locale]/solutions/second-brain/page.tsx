@@ -17,9 +17,9 @@ export default function SolutionSecondBrainPage() {
                 <SecondBrainFeatures />
                 <SecondBrainScienceFaqCta />
             </main>
-            <style jsx>{`
+            <style>{`
                 .animate-spin-slow {
-                    animation: spin 40s linear infinite;
+                    animation: spin 45s linear infinite;
                 }
                 .animate-spin-reverse-slow {
                     animation: spin 45s linear infinite reverse;
