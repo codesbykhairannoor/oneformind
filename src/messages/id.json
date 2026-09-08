@@ -5908,5 +5908,17 @@
   "neural_science_grid1_title": "Gelombang Ultradian 90 Menit",
   "neural_science_grid1_desc": "Berdasarkan Basic Rest-Activity Cycle (Kleitman & Rossi), puncak stamina kognitif berlangsung 90 menit. Neural OS merencanakan jeda secara cerdas.",
   "neural_science_grid2_title": "Habit Chunking di Basal Ganglia",
-  "neural_science_grid2_desc": "Riset Dr. Ann Graybiel (MIT) menemukan bahwa rutinitas terstruktur diolah di basal ganglia, menghemat energi korteks prefrontal."
+  "neural_science_grid2_desc": "Riset Dr. Ann Graybiel (MIT) menemukan bahwa rutinitas terstruktur diolah di basal ganglia, menghemat energi korteks prefrontal.",
+  "trial_badge": "Free Trial 14 Hari",
+  "trial_days_left": "{days} hari tersisa",
+  "trial_active_title": "Free Trial 14 Hari Pro Architect Aktif",
+  "trial_active_desc": "Nikmati akses tak terbatas ke Jurnal, Kalender, Target Goals, & Pelacak Lamaran Kerja gratis.",
+  "trial_header_pill": "⚡ Free Trial: {days} Hari Lagi",
+  "trial_banner_upgrade": "Kunci Akses Pro (Hemat 40%)",
+  "trial_banner_save": "Dapatkan diskon tahunan hemat 40%",
+  "trial_expired_title": "Masa Percobaan 14 Hari Telah Berakhir",
+  "trial_expired_desc": "Tingkatkan ke Pro Architect untuk terus menikmati Jurnal, Kalender, Goals, dan Job Tracker. Fitur dasar Explorer tetap gratis selamanya!",
+  "trial_start_btn": "Mulai Free Trial 14 Hari",
+  "trial_no_cc": "Tanpa Kartu Kredit • Batal Kapan Saja",
+  "register_trial_perk": "Termasuk Free Trial 14 Hari Pro Architect (Tanpa Kartu Kredit)"
 }

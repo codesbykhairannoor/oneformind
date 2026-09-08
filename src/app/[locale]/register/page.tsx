@@ -80,7 +80,11 @@ export default function Register() {
                     </Link>
                 </div>
 
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[11px] font-black uppercase tracking-wider mb-3 shadow-sm">
+                        <span>⚡</span>
+                        <span>{t('register_trial_perk') || 'Free Trial 14 Hari Pro Architect'}</span>
+                    </div>
                     <h1 className="text-2xl font-black text-slate-900 mb-1.5 tracking-tight">
                         {t('auth_register_title') || 'Buat Akun Baru'}
                     </h1>

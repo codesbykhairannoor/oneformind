@@ -19,9 +19,13 @@ export function useSupabaseSession() {
         const res = await fetch('/api/user');
         if (res.ok) {
            const profile = await res.json();
-           // Attach custom fields for NextAuth legacy compatibility
+           // Attach custom fields for NextAuth legacy compatibility & subscription/trial state
            (baseSession.user as any).isPremium = profile.isPremium;
            (baseSession.user as any).planType = profile.planType;
+           (baseSession.user as any).premiumUntil = profile.premiumUntil;
+           (baseSession.user as any).trialStartedAt = profile.trialStartedAt || profile.createdAt || baseSession.user.created_at;
+           (baseSession.user as any).trialEndsAt = profile.trialEndsAt;
+           (baseSession.user as any).hasUsedTrial = profile.hasUsedTrial;
         }
       } catch (e) {
         console.error("Error fetching user profile", e);

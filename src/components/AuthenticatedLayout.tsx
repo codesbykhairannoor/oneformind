@@ -6,6 +6,7 @@ import { Link, usePathname, useRouter } from '@/i18n/routing';
 import ModalPortal from '@/components/ModalPortal';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { createClient } from "@/utils/supabase/client";
+import { getTrialStatus } from '@/lib/auth/subscription';
 import {
     LayoutDashboard,
     Zap,
@@ -56,6 +57,10 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         email: session.user.email || '',
         plan_type: (session.user as any).planType || 'Explorer',
         avatar_url: session.user.user_metadata?.avatar_url || null,
+        created_at: session.user.created_at,
+        trial_started_at: (session.user as any).trialStartedAt,
+        trial_ends_at: (session.user as any).trialEndsAt,
+        is_premium: (session.user as any).isPremium,
     } : initialUser ? initialUser : {
         name: status === 'loading' ? 'Loading...' : 'Guest',
         email: status === 'loading' ? '...' : '',
@@ -63,7 +68,8 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         avatar_url: null,
     };
 
-    const isExplorer = !user?.plan_type || user.plan_type.toLowerCase() === 'explorer';
+    const trial = getTrialStatus(session?.user || user);
+    const isExplorer = (!user?.plan_type || user.plan_type.toLowerCase() === 'explorer') && !trial.isActive;
 
     // State matching AuthenticatedLayout.vue line 17-57
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -293,8 +299,23 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                             </div>
                         </div>
 
-                        {/* Upgrade CTA */}
-                        {isExplorer && (
+                        {/* Upgrade CTA or Active Trial Pill */}
+                        {trial.isActive ? (
+                            <Link 
+                                href="/billing" 
+                                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 hover:from-amber-500/20 hover:to-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 rounded-xl transition-all shadow-sm active:scale-95 mr-1 group"
+                                title="14-Day Free Trial Active"
+                            >
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                                </span>
+                                <Zap size={12} className="text-amber-500 fill-amber-500" />
+                                <span className="text-[11px] font-black tracking-tight">
+                                    {locale === 'id' ? `Trial: ${trial.daysRemaining} Hari Lagi` : `Trial: ${trial.daysRemaining}d left`}
+                                </span>
+                            </Link>
+                        ) : isExplorer ? (
                             <Link 
                                 href="/billing" 
                                 className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-lg transition-all shadow-sm active:scale-95 mr-1"
@@ -302,7 +323,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                 <Crown size={11} />
                                 <span className="text-[10px] font-black uppercase tracking-wide">Upgrade</span>
                             </Link>
-                        )}
+                        ) : null}
 
                         {/* Notifications */}
                         <button type="button" className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all relative">
@@ -363,7 +384,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                                 <p className="text-[10px] text-slate-400 truncate mt-0.5">{user?.email}</p>
                                             </div>
                                             <span className="shrink-0 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
-                                                {user?.plan_type || 'Architect'}
+                                                {trial.isActive ? (locale === 'id' ? `Trial (${trial.daysRemaining}h)` : `Trial (${trial.daysRemaining}d)`) : (user?.plan_type || 'Explorer')}
                                             </span>
                                         </div>
 
@@ -438,7 +459,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                         </div>
 
                                         {/* Upgrade CTA inside dropdown */}
-                                        {isExplorer && (
+                                        {(isExplorer || trial.isActive) && (
                                             <div className="px-2 pb-2">
                                                 <Link 
                                                     href="/billing"
@@ -446,7 +467,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                                     className="flex items-center justify-center gap-2 w-full py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl font-black text-[11px] uppercase tracking-wide transition-all active:scale-95 shadow-sm shadow-indigo-200 dark:shadow-none"
                                                 >
                                                     <Crown size={11} />
-                                                    <span>Upgrade to Architect</span>
+                                                    <span>{trial.isActive ? (locale === 'id' ? 'Kunci Akses Pro (Diskon 40%)' : 'Keep Pro Access (Save 40%)') : 'Upgrade to Architect'}</span>
                                                 </Link>
                                             </div>
                                         )}
@@ -754,6 +775,39 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-500 rounded-r-full"></div>
                             )}
                         </Link>
+
+                        {/* ── 4. TRIAL PROGRESS CARD ── */}
+                        {trial.isActive && !isSidebarCollapsed && (
+                            <div className="pt-4 px-1">
+                                <div className="p-3.5 bg-gradient-to-br from-indigo-50/80 via-purple-50/60 to-pink-50/80 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl shadow-sm">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <div className="flex items-center gap-1.5 text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
+                                            <Zap size={11} className="text-amber-500 fill-amber-500" />
+                                            <span>Pro Free Trial</span>
+                                        </div>
+                                        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400">
+                                            {locale === 'id' ? `${trial.daysRemaining} hari` : `${trial.daysRemaining}d left`}
+                                        </span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2">
+                                        {locale === 'id' ? 'Akses penuh seluruh modul aktif.' : 'Full access to all modules active.'}
+                                    </p>
+                                    <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mb-2.5 overflow-hidden">
+                                        <div 
+                                            className="bg-gradient-to-r from-indigo-600 to-violet-600 h-1.5 rounded-full transition-all duration-500" 
+                                            style={{ width: `${Math.min(100, Math.max(10, ((14 - trial.daysRemaining) / 14) * 100))}%` }}
+                                        />
+                                    </div>
+                                    <Link
+                                        href="/billing"
+                                        className="flex items-center justify-center gap-1.5 w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95"
+                                    >
+                                        <Crown size={10} />
+                                        <span>{locale === 'id' ? 'Kunci Akses' : 'Keep Access'}</span>
+                                    </Link>
+                                </div>
+                            </div>
+                        )}
                     </nav>
                 </aside>
 

@@ -12,6 +12,8 @@ import {
     ExternalLink, Mail, MessageSquare, AlertCircle, ArrowRight
 } from 'lucide-react';
 
+import { getTrialStatus } from '@/lib/auth/subscription';
+
 export default function SettingsPage() {
     const t = useTranslations();
     const locale = useLocale();
@@ -65,7 +67,7 @@ export default function SettingsPage() {
 
     // User subscription details from DB
     const [userData, setUserData] = useState<any>(null);
-    const { status } = useSession();
+    const { data: session, status } = useSession();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -127,19 +129,28 @@ export default function SettingsPage() {
         plan_type: userData.planType || 'Explorer',
         is_premium: userData.isPremium || false,
         premium_until: userData.premiumUntil,
+        created_at: userData.createdAt || session?.user?.created_at,
+        trial_started_at: userData.trialStartedAt || (session?.user as any)?.trialStartedAt,
+        trial_ends_at: userData.trialEndsAt || (session?.user as any)?.trialEndsAt,
     } : {
         name,
         email,
         plan_type: 'Explorer',
         is_premium: false,
         premium_until: null,
+        created_at: session?.user?.created_at,
+        trial_started_at: (session?.user as any)?.trialStartedAt,
+        trial_ends_at: (session?.user as any)?.trialEndsAt,
     };
 
-    const isExplorer = !user.is_premium;
-    const planLabel = user.plan_type || 'Explorer';
+    const trial = getTrialStatus(user);
+    const isExplorer = !user.is_premium && !trial.isActive;
+    const planLabel = trial.isActive 
+        ? (locale === 'id' ? 'Architect (Free Trial 14 Hari)' : 'Architect (14-Day Free Trial)')
+        : (user.plan_type || 'Explorer');
 
     const premiumUntilFormatted = (() => {
-        const raw = user?.premium_until;
+        const raw = user?.premium_until || (trial.isActive ? trial.trialEndsAt : null);
         if (!raw) return null;
         const loc = locale === 'id' ? 'id-ID' : 'en-US';
         return new Date(raw).toLocaleDateString(loc, {
@@ -485,17 +496,40 @@ export default function SettingsPage() {
                                         </p>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <span className="text-2xl font-bold text-slate-900 dark:text-white">{planLabel}</span>
-                                            {user?.is_premium && (
+                                            {trial.isActive ? (
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-500/20 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-300">
+                                                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                                                    {locale === 'id' ? `⚡ Trial: ${trial.daysRemaining} Hari Tersisa` : `⚡ Trial: ${trial.daysRemaining} Days Left`}
+                                                </span>
+                                            ) : user?.is_premium ? (
                                                 <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 dark:bg-indigo-500/20 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300">
                                                     <Sparkles className="w-3.5 h-3.5" />
                                                     {t('settings_billing_active_badge')}
                                                 </span>
-                                            )}
+                                            ) : null}
                                         </div>
+
+                                        {trial.isActive && (
+                                            <div className="max-w-md pt-1">
+                                                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5 font-medium">
+                                                    <span>{locale === 'id' ? `Hari ke-${trial.daysUsed + 1} dari 14` : `Day ${trial.daysUsed + 1} of 14`}</span>
+                                                    <span>{trial.percentRemaining}% tersisa</span>
+                                                </div>
+                                                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                                                    <div 
+                                                        className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-500"
+                                                        style={{ width: `${Math.min(100, Math.max(8, ((14 - trial.daysRemaining) / 14) * 100))}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {premiumUntilFormatted ? (
                                             <p className="text-sm text-slate-600 dark:text-slate-300">
-                                                <span className="text-slate-500 dark:text-slate-400">{t('billing_valid_until')}: </span>
-                                                {premiumUntilFormatted}
+                                                <span className="text-slate-500 dark:text-slate-400">
+                                                    {trial.isActive ? (locale === 'id' ? 'Masa percobaan berakhir pada: ' : 'Trial expires on: ') : `${t('billing_valid_until')}: `}
+                                                </span>
+                                                <span className="font-semibold">{premiumUntilFormatted}</span>
                                             </p>
                                         ) : (
                                             !isExplorer && user?.is_premium && (
@@ -511,7 +545,7 @@ export default function SettingsPage() {
                                         onClick={() => router.push('/billing')}
                                         className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200/40 transition hover:bg-indigo-700 dark:shadow-none"
                                     >
-                                        {t('settings_billing_open_pricing')}
+                                        {trial.isActive ? (locale === 'id' ? 'Kunci Diskon Pro (40%)' : 'Lock Pro Discount (40%)') : t('settings_billing_open_pricing')}
                                         <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </div>

@@ -5920,5 +5920,17 @@
   "neural_science_grid1_title": "90-Minute Ultradian Wave",
   "neural_science_grid1_desc": "Based on Kleitman & Rossi's Basic Rest-Activity Cycle (BRAC), peak cognitive stamina occurs in 90-minute waves followed by a 15-20 min natural trough. Neural OS schedules rest strategically.",
   "neural_science_grid2_title": "Basal Ganglia Habit Chunking",
-  "neural_science_grid2_desc": "Dr. Ann Graybiel (MIT McGovern Institute) discovered that procedural routines become 'chunked' in the basal ganglia, conserving prefrontal cortex energy for complex problem solving."
+  "neural_science_grid2_desc": "Dr. Ann Graybiel (MIT McGovern Institute) discovered that procedural routines become 'chunked' in the basal ganglia, conserving prefrontal cortex energy for complex problem solving.",
+  "trial_badge": "14-Day Free Trial",
+  "trial_days_left": "{days} days left",
+  "trial_active_title": "14-Day Pro Architect Free Trial Active",
+  "trial_active_desc": "Enjoy unlimited access to Journal, Calendar, Goals, and Job Tracker during your trial.",
+  "trial_header_pill": "⚡ Free Trial: {days}d left",
+  "trial_banner_upgrade": "Lock Pro Access (Save 40%)",
+  "trial_banner_save": "Get up to 40% off annual plan",
+  "trial_expired_title": "Your 14-Day Free Trial Has Ended",
+  "trial_expired_desc": "Upgrade to Pro Architect to keep using Journal, Calendar, Goals, and Job Tracker. Explorer features remain 100% free forever!",
+  "trial_start_btn": "Start 14-Day Free Trial",
+  "trial_no_cc": "No Credit Card Required • Cancel Anytime",
+  "register_trial_perk": "Includes 14-Day Pro Architect Free Trial (No Credit Card Required)"
 }

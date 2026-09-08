@@ -2,6 +2,7 @@
 
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { useMemo } from 'react';
+import { getTrialStatus, TrialStatus } from '@/lib/auth/subscription';
 
 // Feature -> tier mapping (1:1 from legacy useGating.js)
 const FEATURE_TIERS: Record<string, string> = {
@@ -37,13 +38,16 @@ const PLAN_LEVELS: Record<string, number> = {
     'trial':     2, 
     'quantum':   3,
     'legendary': 4,
+    'lifetime':  4,
 };
 
 const PLAN_LABELS: Record<string, string> = {
     explorer:  'Explorer',
     architect: 'Architect',
+    trial:     'Trial',
     quantum:   'Quantum',
     legendary: 'Legendary',
+    lifetime:  'Lifetime',
 };
 
 export const useGating = () => {
@@ -53,21 +57,28 @@ export const useGating = () => {
     
     // In NextAuth v5 custom adapter or Supabase, we pass planType and isPremium to the token/session
     const user = session?.user as any;
+
+    const trial: TrialStatus = useMemo(() => {
+        return getTrialStatus(user);
+    }, [user]);
     
     const tier = useMemo(() => {
         if (!user) return 1;
 
-        // Match Laravel logic exactly:
-        // User hanya dapat elevated tier jika isPremium=true (dari DB) ATAU plan_type='trial'
         const plan = (user.planType || user.plan_type)?.toLowerCase();
         const isPrem = user.isPremium === true || user.is_premium === true;
         
-        if (isPrem || plan === 'trial') {
+        if (isPrem) {
             return PLAN_LEVELS[plan] || 2;
         }
 
-        return 1; // Explorer
-    }, [user]);
+        // Active 14-day free trial gives level 2 Architect access
+        if (trial.isActive) {
+            return 2;
+        }
+
+        return 1; // Explorer (free forever)
+    }, [user, trial.isActive]);
 
     const isExplorer  = tier === 1;
     const isArchitect = tier >= 2;
@@ -103,7 +114,7 @@ export const useGating = () => {
             return isAiEnabled;
         }
 
-        // architect, legendary all included
+        // architect, legendary all included (and trial active users)
         return isArchitect;
     };
 
@@ -115,6 +126,9 @@ export const useGating = () => {
         isArchitect,
         isQuantum,
         isLegendary,
+        trial,
+        isTrialActive: trial.isActive,
+        trialDaysRemaining: trial.daysRemaining,
         user,
         isLoading,
         PLAN_LABELS,

@@ -9,6 +9,7 @@ import { loadScript } from '@paypal/paypal-js';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import ModalPortal from '@/components/ModalPortal';
 import { useEffect } from 'react';
+import { getTrialStatus } from '@/lib/auth/subscription';
 
 export default function BillingPricingPage() {
     const t = useTranslations();
@@ -25,17 +26,25 @@ export default function BillingPricingPage() {
         error: string | null;
     }>({ isOpen: false, plan: '', step: 'selection', error: null });
 
-    const userPlan = (session?.user as any)?.planType || 'explorer';
+    const trial = getTrialStatus(session?.user);
+    const rawPlan = (session?.user as any)?.planType || (session?.user as any)?.plan_type || 'explorer';
+    const isExplicitPaid = session?.user && ((session.user as any).isPremium === true || ['architect', 'quantum', 'legendary', 'lifetime'].includes(rawPlan.toLowerCase()));
+    
+    // When on trial, user hasn't paid yet so they can still upgrade to paid Architect or Quantum
+    const userPlan = isExplicitPaid ? rawPlan.toLowerCase() : 'explorer';
     const planHierarchy = ['explorer', 'architect', 'quantum', 'legendary', 'lifetime'];
-    const userPlanIndex = planHierarchy.indexOf(userPlan.toLowerCase());
+    const userPlanIndex = planHierarchy.indexOf(userPlan);
 
     const getBtnProps = (plan: string, baseClass: string, text: string) => {
         const targetIndex = planHierarchy.indexOf(plan.toLowerCase());
-        if (targetIndex === userPlanIndex) {
+        if (targetIndex === userPlanIndex && isExplicitPaid) {
             return { disabled: true, text: t('pricing_btn_current'), className: "w-full py-5 rounded-[2rem] font-black text-xs flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default" };
         }
-        if (targetIndex < userPlanIndex) {
+        if (targetIndex < userPlanIndex && isExplicitPaid) {
             return { disabled: true, text: "Unavailable", className: "w-full py-5 rounded-[2rem] font-black text-xs flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default opacity-50" };
+        }
+        if (plan.toLowerCase() === 'architect' && trial.isActive) {
+            return { disabled: false, text: isAnnual ? (locale === 'id' ? 'Kunci Pro (Hemat 40%)' : 'Lock Pro (Save 40%)') : (locale === 'id' ? 'Langganan Pro' : 'Subscribe to Pro'), className: baseClass };
         }
         return { disabled: false, text, className: baseClass };
     };
@@ -166,7 +175,7 @@ export default function BillingPricingPage() {
                         </p>
 
                         {/* Billing Toggle */}
-                        <div className="flex justify-center mt-8 mb-14">
+                        <div className="flex justify-center mt-8 mb-10">
                             <div className="inline-flex items-center p-1 bg-white dark:bg-slate-950 rounded-[1.8rem] border border-slate-100 dark:border-slate-800 shadow-sm scale-110">
                                 <button
                                     type="button"
@@ -195,6 +204,41 @@ export default function BillingPricingPage() {
                                 </button>
                             </div>
                         </div>
+
+                        {/* 14-Day Free Trial Notice Banner */}
+                        {trial.isActive ? (
+                            <div className="max-w-3xl mx-auto p-6 rounded-[2.2rem] bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-950/40 dark:via-purple-950/40 dark:to-pink-950/40 border border-indigo-200 dark:border-indigo-500/30 text-left shadow-sm mb-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+                                <div className="space-y-1.5 flex-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider">
+                                            {isId ? 'Free Trial 14 Hari Aktif' : '14-Day Free Trial Active'}
+                                        </span>
+                                        <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                                            {isId ? `${trial.daysRemaining} hari tersisa` : `${trial.daysRemaining} days remaining`}
+                                        </span>
+                                    </div>
+                                    <h2 className="text-base font-black text-slate-900 dark:text-white">
+                                        {isId ? 'Anda sedang menikmati Akses Penuh Pro Architect' : 'You are enjoying full Pro Architect Access'}
+                                    </h2>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                        {isId ? 'Kunci diskon 40% tahunan sekarang sebelum masa percobaan berakhir agar integrasi data Anda tetap berjalan lancar.' : 'Lock in your 40% annual discount now before your trial ends to keep your data and streak uninterrupted.'}
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => handleCheckout('Architect')}
+                                    className="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-200 dark:shadow-none transition shrink-0 active:scale-95"
+                                >
+                                    {isId ? 'Kunci Akses Pro' : 'Lock Pro Access'}
+                                </button>
+                            </div>
+                        ) : !isExplicitPaid ? (
+                            <div className="max-w-2xl mx-auto p-4 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center mb-12">
+                                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                    ⚡ {isId ? 'Semua akun baru otomatis mendapatkan Free Trial 14 Hari Pro Architect tanpa perlu kartu kredit!' : 'All new accounts automatically get a 14-day Pro Architect Free Trial with no credit card required!'}
+                                </p>
+                            </div>
+                        ) : null}
                     </div>
                 </header>
 
