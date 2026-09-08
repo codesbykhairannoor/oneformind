@@ -169,7 +169,7 @@ export default function PricingPage() {
                                 <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 tracking-[0.2em] uppercase">{t('pricing_l2_name')}</span>
                                 <div className="mt-4 flex items-baseline gap-1">
                                     <span className="text-4xl font-black text-slate-900 dark:text-white">
-                                        {isAnnual ? (isId ? 'Rp 79k' : '$4.99') : (isId ? 'Rp 99k' : '$6.99')}
+                                        {isAnnual ? (isId ? 'Rp 79k' : '$6.50') : (isId ? 'Rp 99k' : '$8.99')}
                                     </span>
                                     <span className="text-xs font-bold text-slate-400 tracking-tighter">/{t('pricing_per_month_short')}</span>
                                 </div>
@@ -223,7 +223,7 @@ export default function PricingPage() {
                                 <span className="text-[10px] font-black text-indigo-400 tracking-[0.2em] uppercase">{t('pricing_l3_name')}</span>
                                 <div className="mt-4 flex items-baseline gap-1 text-white">
                                     <span className="text-4xl font-black">
-                                        {isAnnual ? (isId ? 'Rp 109k' : '$6.99') : (isId ? 'Rp 159k' : '$9.99')}
+                                        {isAnnual ? (isId ? 'Rp 129k' : '$12.00') : (isId ? 'Rp 169k' : '$15.00')}
                                     </span>
                                     <span className="text-xs font-bold opacity-50 tracking-tighter">/{t('pricing_per_month_short')}</span>
                                 </div>
@@ -275,7 +275,7 @@ export default function PricingPage() {
                             <div className="mb-10">
                                 <span className="text-[10px] font-black text-amber-600 dark:text-amber-500 tracking-[0.2em] uppercase">{t('pricing_l4_name')}</span>
                                 <div className="mt-4 flex items-baseline gap-2">
-                                    <span className="text-3xl font-black text-slate-900 dark:text-white">{isId ? 'Rp 899k' : '$59.00'}</span>
+                                    <span className="text-3xl font-black text-slate-900 dark:text-white">{isId ? 'Rp 1.299k' : '$99.00'}</span>
                                 </div>
                                 <div className="text-[9px] font-black text-amber-500 mt-1 uppercase tracking-tighter">{t('pricing_lifetime')}</div>
                             </div>

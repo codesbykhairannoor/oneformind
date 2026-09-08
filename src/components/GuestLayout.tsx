@@ -547,6 +547,12 @@ export default function GuestLayout({ children, user = null }: { children: React
                                 <li><Link href="/contact" className="hover:text-indigo-600 transition">Contact us</Link></li>
                                 <li><Link href="/company/security" className="hover:text-indigo-600 transition">Security</Link></li>
                                 <li><Link href="/about" className="hover:text-indigo-600 transition">About us</Link></li>
+                                <li>
+                                    <Link href="/affiliates" className="hover:text-indigo-600 transition flex items-center gap-1.5">
+                                        <span>Affiliate Program</span>
+                                        <span className="px-1.5 py-0.5 text-[9px] bg-emerald-100 text-emerald-700 rounded-full font-black">30%</span>
+                                    </Link>
+                                </li>
                                 <li><Link href="/company/status" className="hover:text-indigo-600 transition">System status</Link></li>
                             </ul>
                         </div>

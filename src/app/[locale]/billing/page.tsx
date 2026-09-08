@@ -262,7 +262,7 @@ export default function BillingPricingPage() {
                                 <span className="text-xs font-black tracking-wide text-slate-400 dark:text-slate-500 mb-6 block">{t('pricing_l2_name')}</span>
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-4xl lg:text-5xl font-black text-slate-950 dark:text-white tracking-tighter">
-                                        {isAnnual ? (isId ? 'Rp 79k' : '$4.99') : (isId ? 'Rp 99k' : '$6.99')}
+                                        {isAnnual ? (isId ? 'Rp 79k' : '$6.50') : (isId ? 'Rp 99k' : '$8.99')}
                                     </span>
                                     <span className="text-[10px] font-bold text-slate-400 mb-1">/{t('pricing_per_month_short')}</span>
                                 </div>
@@ -333,7 +333,7 @@ export default function BillingPricingPage() {
                                 <span className="text-xs font-black tracking-wide text-indigo-400 mb-6 block">{t('pricing_l3_name')}</span>
                                 <div className="flex items-baseline gap-2 text-white">
                                     <span className="text-4xl lg:text-5xl font-black tracking-tighter">
-                                        {isAnnual ? (isId ? 'Rp 109k' : '$6.99') : (isId ? 'Rp 159k' : '$9.99')}
+                                        {isAnnual ? (isId ? 'Rp 129k' : '$12.00') : (isId ? 'Rp 169k' : '$15.00')}
                                     </span>
                                     <span className="text-[10px] font-bold opacity-50 mb-1">/{t('pricing_per_month_short')}</span>
                                 </div>
@@ -403,7 +403,7 @@ export default function BillingPricingPage() {
                                 <span className="text-xs font-black tracking-wide text-amber-600 dark:text-amber-500 mb-6 block">{t('pricing_l4_name')}</span>
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-4xl lg:text-5xl font-black text-slate-950 dark:text-white tracking-tighter">
-                                        {isId ? 'Rp 899k' : '$59.00'}
+                                        {isId ? 'Rp 1.299k' : '$99.00'}
                                     </span>
                                 </div>
                                 <div className="text-[9px] font-black text-amber-500 mt-1 uppercase tracking-tighter">{t('pricing_lifetime')}</div>
