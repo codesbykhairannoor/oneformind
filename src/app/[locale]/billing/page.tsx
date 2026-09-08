@@ -97,10 +97,18 @@ export default function BillingPricingPage() {
         }
     };
 
+    const LEMON_CHECKOUT_URLS: Record<string, string> = {
+        architect: 'https://tranvas.lemonsqueezy.com/checkout/buy/42544b58-35e6-47d2-b6b4-374bf22a3f40',
+        quantum: 'https://tranvas.lemonsqueezy.com/checkout/buy/7334c27d-4b2e-4908-92c3-2303655d4915',
+        legendary: 'https://tranvas.lemonsqueezy.com/checkout/buy/ed2c5d53-cd62-4e06-b9ec-242b81b39fd2',
+        enterprise: 'https://tranvas.lemonsqueezy.com/checkout/buy/059f572f-f57a-42a8-922d-487ec15e24e9'
+    };
+
     const handleLemonSqueezy = () => {
+        const planKey = (checkout.plan || 'architect').toLowerCase();
+        let url = LEMON_CHECKOUT_URLS[planKey] || LEMON_CHECKOUT_URLS.architect;
         const email = session?.user?.email ? encodeURIComponent(session.user.email) : '';
         const name = (session?.user as any)?.user_metadata?.full_name ? encodeURIComponent((session?.user as any).user_metadata.full_name) : '';
-        let url = 'https://tranvas.lemonsqueezy.com/checkout/buy/42544b58-35e6-47d2-b6b4-374bf22a3f40';
         const params: string[] = [];
         if (email) params.push(`checkout[email]=${email}`);
         if (name) params.push(`checkout[name]=${name}`);
@@ -618,7 +626,7 @@ export default function BillingPricingPage() {
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-black text-xs text-slate-900 dark:text-white">{t('payment_btn_card')}</span>
                                                         <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase">
-                                                            14d Free Trial
+                                                            {checkout.plan === 'legendary' ? (isId ? 'Akses Seumur Hidup' : 'Lifetime Access') : (isId ? '14 Hari Free Trial' : '14d Free Trial')}
                                                         </span>
                                                     </div>
                                                     <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Visa, Mastercard, Amex, Apple Pay</p>
