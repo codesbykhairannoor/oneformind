@@ -51,8 +51,8 @@ export function getTrialStatus(user: any): TrialStatus {
   const isPaid = user.isPremium === true || user.is_premium === true ||
                  ['architect', 'quantum', 'legendary', 'lifetime'].includes(plan);
 
-  // If paid subscription is active, trial is not needed
-  if (isPaid && plan !== 'trial') {
+  // If paid subscription is active and not an explicit trial status
+  if (isPaid && plan !== 'trial' && !user.is_trial && !user.on_trial) {
     return {
       isTrial: false,
       isActive: false,
@@ -66,18 +66,27 @@ export function getTrialStatus(user: any): TrialStatus {
     };
   }
 
-  // Parse start date from metadata, DB, or user registration timestamp
-  const rawStart = user.trial_started_at || user.trialStartedAt || user.created_at || user.createdAt || user.user_metadata?.created_at;
+  // Modern SaaS Card-Required Free Trial:
+  // User only has active trial if they initiated checkout with card (trial_ends_at is present, or plan is trial)
   const rawEnd = user.trial_ends_at || user.trialEndsAt;
+  const rawStart = user.trial_started_at || user.trialStartedAt;
+
+  if (!rawEnd && plan !== 'trial' && !user.is_trial && !user.on_trial) {
+    return {
+      isTrial: false,
+      isActive: false,
+      isExpired: false,
+      daysRemaining: 0,
+      daysUsed: 0,
+      totalDays: TRIAL_DURATION_DAYS,
+      trialEndsAt: null,
+      trialStartedAt: null,
+      percentRemaining: 0,
+    };
+  }
 
   const startDate = rawStart ? new Date(rawStart) : new Date();
-  let endDate: Date;
-
-  if (rawEnd) {
-    endDate = new Date(rawEnd);
-  } else {
-    endDate = new Date(startDate.getTime() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000);
-  }
+  const endDate = rawEnd ? new Date(rawEnd) : new Date(startDate.getTime() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000);
 
   const now = Date.now();
   const msRemaining = endDate.getTime() - now;
@@ -85,13 +94,12 @@ export function getTrialStatus(user: any): TrialStatus {
   const msUsed = now - startDate.getTime();
   const daysUsed = Math.min(TRIAL_DURATION_DAYS, Math.max(0, Math.floor(msUsed / (1000 * 60 * 60 * 24))));
 
-  const isExplicitTrial = plan === 'trial';
-  const isActive = isExplicitTrial || daysRemaining > 0;
+  const isActive = daysRemaining > 0;
   const isExpired = !isActive;
   const percentRemaining = Math.max(0, Math.min(100, Math.round((daysRemaining / TRIAL_DURATION_DAYS) * 100)));
 
   return {
-    isTrial: isExplicitTrial || daysRemaining > 0 || isExpired,
+    isTrial: true,
     isActive,
     isExpired,
     daysRemaining: isActive ? daysRemaining : 0,

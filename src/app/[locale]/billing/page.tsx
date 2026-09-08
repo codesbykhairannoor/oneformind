@@ -255,9 +255,9 @@ export default function BillingPricingPage() {
                                 </button>
                             </div>
                         ) : !isExplicitPaid ? (
-                            <div className="max-w-2xl mx-auto p-4 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center mb-12">
+                            <div className="max-w-2xl mx-auto p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-500/30 text-center mb-12">
                                 <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    ⚡ {isId ? 'Semua akun baru otomatis mendapatkan Free Trial 14 Hari Pro Architect tanpa perlu kartu kredit!' : 'All new accounts automatically get a 14-day Pro Architect Free Trial with no credit card required!'}
+                                    ⚡ {isId ? 'Mulai Free Trial 14 Hari Pro Architect ($0 Hari Ini • Masukkan Kartu & Batal Kapan Saja)' : 'Start 14-Day Pro Architect Free Trial ($0 Today • Card Required • Cancel Anytime)'}
                                 </p>
                             </div>
                         ) : null}

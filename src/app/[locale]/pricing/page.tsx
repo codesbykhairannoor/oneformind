@@ -119,7 +119,7 @@ export default function PricingPage() {
                         <div className="pt-2">
                             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 shadow-sm text-xs font-bold text-slate-700 dark:text-slate-300">
                                 <span>⚡</span>
-                                <span>{isId ? 'Semua pengguna baru mendapatkan Free Trial 14 Hari Pro Architect tanpa perlu kartu kredit!' : 'All new users get a 14-Day Pro Architect Free Trial with zero credit card required!'}</span>
+                                <span>{isId ? 'Mulai Free Trial 14 Hari Pro Architect ($0 Hari Ini • Masukkan Kartu & Batal Kapan Saja)' : 'Start 14-Day Pro Architect Free Trial ($0 Today • Card Required • Cancel Anytime)'}</span>
                             </div>
                         </div>
                     </div>
