@@ -1,34 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
+import dynamic from 'next/dynamic';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import { usePageTitle } from '@/hooks/usePageTitle';
+
 import FinanceHeader, { SUPPORTED_CURRENCIES } from './components/FinanceHeader';
 import FinanceStats from './components/FinanceStats';
 import BudgetSidebar from './components/BudgetSidebar';
-import SavingCard, { SavingsVaultItem } from './components/SavingCard';
+import { SavingsVaultItem } from './components/SavingCard';
 import TransactionList, { TransactionItem, DayStat } from './components/TransactionList';
-import dynamic from 'next/dynamic';
-const DailyTrendChart = dynamic(() => import('./components/DailyTrendChart'), { ssr: false });
-import TransactionModal from './components/TransactionModal';
-import FinanceBatchModal from './components/FinanceBatchModal';
-import CategoryModal from './components/CategoryModal';
-import SavingModal, { SavingVault } from './components/SavingModal';
-import VaultTransactionModal from './components/VaultTransactionModal';
-import ArchiveModal from './components/ArchiveModal';
 import FinanceInsights from './components/FinanceInsights';
-import { DeleteConfirmModal } from './components/FinanceModals';
-import { Wallet, Plus } from 'lucide-react';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import SavingsVaultSection from './components/SavingsVaultSection';
+import FinanceModalsContainer from './components/FinanceModalsContainer';
+import { SavingVault } from './components/SavingModal';
+import { CategoryOption } from './types';
+import { useFinanceActions } from './hooks/useFinanceActions';
 
-interface CategoryOption {
-    id?: number;
-    slug: string;
-    name: string;
-    icon: string;
-    type: 'income' | 'expense';
-}
+const DailyTrendChart = dynamic(() => import('./components/DailyTrendChart'), { ssr: false });
 
 export default function FinanceClient({
     initialMonthKey,
@@ -45,7 +36,6 @@ export default function FinanceClient({
 }) {
     usePageTitle('Finance');
     const t = useTranslations();
-    const locale = useLocale();
     const fetcher = async (url: string) => {
         const res = await fetch(url);
         if (!res.ok) {
@@ -54,7 +44,7 @@ export default function FinanceClient({
         return res.json();
     };
 
-    // ===== 1. CURRENCY SYSTEM (1:1 from useFinanceFormat.js) =====
+    // ===== 1. CURRENCY SYSTEM =====
     const [activeCurrency, setActiveCurrency] = useState('IDR');
     const currencyObj = SUPPORTED_CURRENCIES.find(c => c.code === activeCurrency) || SUPPORTED_CURRENCIES[0];
     const currencyLocale = currencyObj.locale;
@@ -133,7 +123,7 @@ export default function FinanceClient({
         current: Number(s.currentAmount || s.current)
     }));
 
-    // ===== 7. INCOME TARGET =====
+    // ===== 4. INCOME TARGET =====
     const [incomeTarget, setIncomeTarget] = useState(0);
     
     useEffect(() => {
@@ -148,7 +138,7 @@ export default function FinanceClient({
         saveUserConfig({ [`finance_income_target_${selectedMonthKey}`]: val });
     };
 
-    // ===== 8. MODAL STATES =====
+    // ===== 5. MODAL STATES =====
     const [showTrxModal, setShowTrxModal] = useState(false);
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -165,7 +155,7 @@ export default function FinanceClient({
     const [vaultTxType, setVaultTxType] = useState<'deposit' | 'withdraw'>('deposit');
     const [filterDate, setFilterDate] = useState('');
 
-    // ===== COMPUTED — transactions state is already filtered by selectedMonthKey from API =====
+    // ===== 6. COMPUTED METRICS =====
     const currentMonthTransactions = transactions;
     const totalIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
     const totalExpense = currentMonthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
@@ -178,7 +168,36 @@ export default function FinanceClient({
         if (t.type === 'income') incomeStats[t.category] = (incomeStats[t.category] || 0) + Number(t.amount);
     });
 
-    // HANDLERS
+    // ===== 7. ACTIONS HOOK =====
+    const {
+        handleSaveSingleTrx,
+        handleSaveBatchTrx,
+        handleDeleteTrx,
+        confirmDelete,
+        handleSaveVault,
+        handleVaultMutation,
+        handleSaveCategory,
+        handleAddAssetTransaction
+    } = useFinanceActions({
+        transactions,
+        mutateTx,
+        categories,
+        mutateCat,
+        budgets,
+        mutateBud,
+        mutateSav,
+        selectedMonthKey,
+        deleteTarget,
+        setDeleteTarget,
+        setShowBatchModal,
+        setShowSavingModal,
+        setShowCategoryModal,
+        setEditingCategory,
+        setShowVaultTxModal,
+        activeVault,
+        vaultTxType
+    });
+
     const changeMonth = (val: number | string) => {
         if (typeof val === 'string') {
             setSelectedMonthKey(val);
@@ -194,158 +213,13 @@ export default function FinanceClient({
         setShowArchiveModal(true);
     };
 
-    const handleSaveSingleTrx = async (data: any) => {
-        try {
-            if (data.id) {
-                // Optimistic UI
-                mutateTx(transactions.map(t => t.id === data.id ? { ...data, amount: Number(data.amount), date: data.date.split('T')[0] } : t), false);
-                
-                const res = await fetch(`/api/finance/transactions/${data.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                mutateTx(); // revalidate
-            } else {
-                // Optimistic UI
-                const tempId = Date.now();
-                mutateTx([{ ...data, id: tempId, amount: Number(data.amount), date: data.date.split('T')[0] }, ...transactions], false);
-                
-                const res = await fetch('/api/finance/transactions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                mutateTx(); // revalidate
-            }
-        } catch (error) {
-            console.error('Failed to save transaction:', error);
-        }
-    };
-
-    const handleSaveBatchTrx = async (date: string, rows: any[]) => {
-        try {
-            const newTrxs: TransactionItem[] = [];
-            for (const r of rows) {
-                const res = await fetch('/api/finance/transactions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        date, type: r.type, amount: Number(r.amount), title: r.title, category: r.category || 'other'
-                    })
-                });
-            }
-            mutateTx();
-            setShowBatchModal(false);
-        } catch (error) {
-            console.error('Failed to batch save transactions:', error);
-        }
-    };
-
-    const handleDeleteTrx = async (id: number) => {
-        setDeleteTarget({ type: 'transaction', data: { id } });
-    };
-
-    const confirmDelete = async () => {
-        if (!deleteTarget) return;
-
-        if (deleteTarget.type === 'transaction') {
-            const { id } = deleteTarget.data;
-            mutateTx(transactions.filter(t => t.id !== id), false);
-            await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
-            mutateTx();
-        } else if (deleteTarget.type === 'category') {
-            const cat = deleteTarget.data;
-            const budgetToDelete = budgets.find(b => b.category === cat.slug);
-            
-            mutateCat(categories.filter(c => c.slug !== cat.slug), false);
-            mutateBud(budgets.filter(b => b.category !== cat.slug), false);
-            
-            await fetch(`/api/finance/categories?slug=${cat.slug}`, { method: 'DELETE' });
-            
-            if (budgetToDelete) {
-                await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
-            }
-            
-            mutateCat();
-            mutateBud();
-        }
-
-        setDeleteTarget(null);
-    };
-
-    const handleSaveVault = async (data: SavingVault) => {
-        try {
-            if (data.id) {
-                const res = await fetch('/api/finance/savings', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: data.id, title: data.title, targetAmount: Number(data.target_amount), icon: data.icon })
-                });
-                if (res.ok) {
-                    mutateSav();
-                    setShowSavingModal(false);
-                }
-            } else {
-                const res = await fetch('/api/finance/savings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: data.title, targetAmount: Number(data.target_amount), icon: data.icon, color: data.color })
-                });
-                if (res.ok) {
-                    mutateSav();
-                    setShowSavingModal(false);
-                }
-            }
-        } catch (error) {
-            console.error('Failed to save vault:', error);
-        }
-    };
-
-    const handleVaultMutation = async (amount: number, type: 'deposit' | 'withdraw') => {
-        if (!activeVault) return;
-        try {
-            const currentAmount = activeVault.current_amount || 0;
-            const newAmount = type === 'deposit' ? currentAmount + amount : Math.max(0, currentAmount - amount);
-            const res = await fetch('/api/finance/savings', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: activeVault.id, currentAmount: newAmount })
-            });
-            if (res.ok) {
-                mutateSav();
-                mutateTx();
-                setShowVaultTxModal(false);
-            }
-        } catch (error) {
-            console.error('Failed to mutate vault:', error);
-        }
-    };
-
-    const handleAddAssetTransaction = async (data: any) => {
-        try {
-            const res = await fetch('/api/finance/transactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                mutateTx();
-            }
-        } catch (error) {
-            console.error('Failed to add asset transaction:', error);
-        }
-    };
-
     return (
         <AuthenticatedLayout>
-            <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500 pb-20">
-                
+            <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500">
                 <FinanceHeader
-                    selectedMonthKey={selectedMonthKey}
-                    onMonthChange={changeMonth}
-                    onOpenTrxModal={() => { setEditingTransaction(null); setShowTrxModal(true); }}
-                    onOpenBudgetModal={() => setShowCategoryModal(true)}
+                    selectedMonth={selectedMonthKey}
+                    onChangeMonth={changeMonth}
+                    onOpenAddModal={() => { setEditingTransaction(null); setShowTrxModal(true); }}
                     onOpenBatchModal={() => setShowBatchModal(true)}
                     activeCurrency={activeCurrency}
                     onCurrencyChange={handleCurrencyChange}
@@ -353,7 +227,6 @@ export default function FinanceClient({
                 />
 
                 <div className="w-full min-h-screen px-3 sm:px-6 lg:px-8 py-6 transition-colors duration-500">
-                    
                     <div className="mb-8 overflow-x-auto no-scrollbar -mx-3 px-3 lg:mx-0 lg:px-0">
                         <FinanceStats
                             totalIncome={totalIncome}
@@ -367,7 +240,6 @@ export default function FinanceClient({
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
-                        
                         <div className="lg:col-span-2 w-full lg:sticky lg:top-24 h-fit space-y-8 lg:space-y-6 order-1 lg:order-2">
                             <BudgetSidebar
                                 budgets={budgets}
@@ -391,7 +263,6 @@ export default function FinanceClient({
                         </div>
 
                         <div className="lg:col-span-3 space-y-8 w-full order-2 lg:order-1 pb-24 lg:pb-0">
-                            
                             <TransactionList
                                 transactions={transactions}
                                 categories={categories}
@@ -402,67 +273,23 @@ export default function FinanceClient({
                                 currencyLocale={currencyLocale}
                             />
 
-                            <div className="space-y-6 relative group">
-                                <div className="flex items-center justify-between px-1 lg:px-0">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 shadow-sm">
-                                            <Wallet size={20} />
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div>
-                                                <h3 className="text-base lg:text-lg font-black text-slate-800 dark:text-white tracking-tight">
-                                                    {t('vault_header_title') || 'The Vault'}
-                                                </h3>
-                                                <p className="text-[9px] lg:text-[10px] font-bold text-slate-400 tracking-wider leading-none mt-0.5">
-                                                    {t('vault_header_subtitle') || 'Tabungan & Target'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => { setEditingSaving(null); setShowSavingModal(true); }}
-                                        className="flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-[1.25rem] text-[10px] font-black tracking-widest hover:scale-105 transition-all active:scale-95 shadow-xl shadow-slate-200 dark:shadow-none relative group/btn overflow-hidden"
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
-                                        <Plus size={16} strokeWidth={3} />
-                                        <span className="relative z-10">{t('vault_btn_add') || 'Buat Vault'}</span>
-                                    </button>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
-                                    {savingsVault.length === 0 ? (
-                                        <div className="group bg-white dark:bg-slate-900 rounded-[2.5rem] border border-dashed border-2 border-slate-100 dark:border-slate-800 p-10 text-center transition-colors shadow-sm col-span-1 md:col-span-2">
-                                            <div className="mb-4 text-3xl transform group-hover:scale-110 transition-transform duration-500 animate-bounce">🏦</div>
-                                            <h4 className="text-slate-400 font-bold text-[10px] lg:text-sm mb-4">{t('vault_empty_title') || 'Belum ada tabungan'}</h4>
-                                            <button onClick={() => { setEditingSaving(null); setShowSavingModal(true); }} className="text-[9px] lg:text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-6 py-2.5 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all active:scale-95 shadow-sm border border-indigo-100/50 dark:border-indigo-500/20">
-                                                {t('vault_empty_btn') || 'Buat Target Tabungan'}
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex overflow-x-auto custom-scrollbar gap-4 pb-6 -mx-2 px-2 pt-2 md:col-span-2">
-                                        {savingsVault.map(s => (
-                                            <div key={s.id} className="shrink-0 w-[260px] md:w-[280px]">
-                                                <SavingCard
-                                                    saving={s}
-                                                    onDeposit={(saving) => {
-                                                        setActiveVault({ id: saving.id, title: saving.name, target_amount: saving.target, current_amount: saving.current, icon: saving.icon, color: saving.color });
-                                                        setVaultTxType('deposit');
-                                                        setShowVaultTxModal(true);
-                                                    }}
-                                                    onWithdraw={(saving) => {
-                                                        setActiveVault({ id: saving.id, title: saving.name, target_amount: saving.target, current_amount: saving.current, icon: saving.icon, color: saving.color });
-                                                        setVaultTxType('withdraw');
-                                                        setShowVaultTxModal(true);
-                                                    }}
-                                                    activeCurrency={activeCurrency}
-                                                    currencyLocale={currencyLocale}
-                                                />
-                                            </div>
-                                        ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            <SavingsVaultSection
+                                savingsVault={savingsVault}
+                                t={t}
+                                onOpenCreateVault={() => { setEditingSaving(null); setShowSavingModal(true); }}
+                                onDeposit={(vault) => {
+                                    setActiveVault(vault);
+                                    setVaultTxType('deposit');
+                                    setShowVaultTxModal(true);
+                                }}
+                                onWithdraw={(vault) => {
+                                    setActiveVault(vault);
+                                    setVaultTxType('withdraw');
+                                    setShowVaultTxModal(true);
+                                }}
+                                activeCurrency={activeCurrency}
+                                currencyLocale={currencyLocale}
+                            />
 
                             <div className="lg:hidden relative">
                                 <FinanceInsights 
@@ -486,101 +313,43 @@ export default function FinanceClient({
                 </div>
             </div>
 
-            <ArchiveModal
-                show={showArchiveModal}
-                dayData={selectedDayData}
+            <FinanceModalsContainer
+                showArchiveModal={showArchiveModal}
+                setShowArchiveModal={setShowArchiveModal}
+                selectedDayData={selectedDayData}
                 categories={categories}
-                onClose={() => setShowArchiveModal(false)}
-                onEdit={(trx) => { setEditingTransaction(trx); setShowTrxModal(true); }}
-                onDelete={handleDeleteTrx}
                 activeCurrency={activeCurrency}
                 currencyLocale={currencyLocale}
-            />
-
-            <TransactionModal
-                show={showTrxModal}
+                onEditTransactionFromArchive={(trx) => { setEditingTransaction(trx); setShowTrxModal(true); }}
+                onDeleteTrx={handleDeleteTrx}
+                showTrxModal={showTrxModal}
+                setShowTrxModal={setShowTrxModal}
                 editingTransaction={editingTransaction}
-                categories={categories}
                 transactions={transactions}
                 budgets={budgets}
-                onClose={() => setShowTrxModal(false)}
-                onSubmit={handleSaveSingleTrx}
+                onSaveSingleTrx={handleSaveSingleTrx}
                 onSwitchToBatch={() => { setShowTrxModal(false); setShowBatchModal(true); }}
-                activeCurrency={activeCurrency}
-                currencyLocale={currencyLocale}
-            />
-
-            <FinanceBatchModal
-                show={showBatchModal}
-                categories={categories}
-                budgets={budgets}
-                transactions={transactions}
-                onClose={() => setShowBatchModal(false)}
-                onSubmitBatch={handleSaveBatchTrx}
+                showBatchModal={showBatchModal}
+                setShowBatchModal={setShowBatchModal}
+                onSaveBatchTrx={handleSaveBatchTrx}
                 onSwitchToSingle={() => { setShowBatchModal(false); setShowTrxModal(true); }}
-            />
-
-            <CategoryModal
-                show={showCategoryModal}
-                categories={categories}
+                showCategoryModal={showCategoryModal}
+                setShowCategoryModal={setShowCategoryModal}
                 editingCategory={editingCategory}
-                onClose={() => {
-                    setShowCategoryModal(false);
-                    setEditingCategory(null);
-                }}
-                onSaveCategory={async (cat: any) => {
-                    const method = editingCategory ? 'PUT' : 'POST';
-                    const endpoint = editingCategory && cat.id ? `/api/finance/categories?id=${cat.id}` : '/api/finance/categories';
-                    
-                    await fetch(endpoint, {
-                        method,
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(cat)
-                    });
-                    
-                    if (cat.type === 'expense' || cat.limit !== undefined) {
-                        const existingBudget = budgets.find(b => b.category === cat.slug);
-                        const budMethod = existingBudget ? 'PUT' : 'POST';
-                        const budEndpoint = existingBudget ? `/api/finance/budgets?id=${existingBudget.id}` : '/api/finance/budgets';
-                        
-                        await fetch(budEndpoint, {
-                            method: budMethod,
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                category: cat.slug,
-                                limitAmount: cat.limit || 0,
-                                month: selectedMonthKey
-                            })
-                        });
-                        mutateBud();
-                    }
-                    
-                    mutateCat();
-                    setShowCategoryModal(false);
-                    setEditingCategory(null);
-                }}
-            />
-
-            <DeleteConfirmModal
-                isOpen={!!deleteTarget}
-                onClose={() => setDeleteTarget(null)}
-                onConfirm={confirmDelete}
-                itemName={deleteTarget?.type === 'category' ? deleteTarget.data.name : 'Transaksi'}
-            />
-
-            <SavingModal
-                show={showSavingModal}
-                saving={editingSaving}
-                onClose={() => setShowSavingModal(false)}
-                onSave={handleSaveVault}
-            />
-
-            <VaultTransactionModal
-                show={showVaultTxModal}
-                saving={activeVault}
-                type={vaultTxType}
-                onClose={() => setShowVaultTxModal(false)}
-                onSave={handleVaultMutation}
+                setEditingCategory={setEditingCategory}
+                onSaveCategory={(cat) => handleSaveCategory(cat, editingCategory)}
+                deleteTarget={deleteTarget}
+                setDeleteTarget={setDeleteTarget}
+                confirmDelete={confirmDelete}
+                showSavingModal={showSavingModal}
+                setShowSavingModal={setShowSavingModal}
+                editingSaving={editingSaving}
+                onSaveVault={handleSaveVault}
+                showVaultTxModal={showVaultTxModal}
+                setShowVaultTxModal={setShowVaultTxModal}
+                activeVault={activeVault}
+                vaultTxType={vaultTxType}
+                onVaultMutation={handleVaultMutation}
             />
         </AuthenticatedLayout>
     );

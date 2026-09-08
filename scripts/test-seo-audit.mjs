@@ -155,7 +155,13 @@ console.log('   Compare and Company layouts verified.\n');
 // ----------------------------------------------------
 console.log('5️⃣  AUDITING CRAWLABLE LANGUAGE SWITCHER IN GUESTLAYOUT...');
 const guestLayoutFile = path.join(srcDir, 'components', 'GuestLayout.tsx');
-const guestLayoutCode = fs.readFileSync(guestLayoutFile, 'utf8');
+let guestLayoutCode = fs.readFileSync(guestLayoutFile, 'utf8');
+const guestDir = path.join(srcDir, 'components', 'guest');
+if (fs.existsSync(guestDir)) {
+  fs.readdirSync(guestDir).forEach(f => {
+    guestLayoutCode += '\n' + fs.readFileSync(path.join(guestDir, f), 'utf8');
+  });
+}
 
 assert(guestLayoutCode.includes('href={idHref}') && guestLayoutCode.includes('href={enHref}'), 'Menu uses direct href={idHref} and href={enHref} to eliminate 307 redirects');
 assert(guestLayoutCode.includes('Bahasa Indonesia</a>'), 'Footer provides direct crawlable anchor link to Bahasa Indonesia');

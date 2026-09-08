@@ -1,0 +1,295 @@
+'use client';
+
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { TaskItem, BatchTaskInput } from '../types';
+import { normalizeDate, timeToMin, checkTimeConflict } from '../utils/plannerMath';
+
+export function usePlannerTaskCrud(selectedDate: string) {
+    const t = useTranslations();
+    const [tasks, setTasks] = useState<TaskItem[]>([]);
+
+    // Modal state
+    const [showTaskModal, setShowTaskModal] = useState(false);
+    const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+    const [taskTitle, setTaskTitle] = useState('');
+    const [taskStartTime, setTaskStartTime] = useState('09:00');
+    const [taskEndTime, setTaskEndTime] = useState('10:00');
+    const [taskType, setTaskType] = useState(2);
+    const [taskNotes, setTaskNotes] = useState('');
+    const [showBatchModal, setShowBatchModal] = useState(false);
+    const [batchTasks, setBatchTasks] = useState<BatchTaskInput[]>([
+        { title: '', start_time: '09:00', end_time: '10:00', type: 2 }
+    ]);
+
+    const updateTasksState = (updater: TaskItem[] | ((prev: TaskItem[]) => TaskItem[])) => {
+        setTasks(prev => {
+            const newTasks = typeof updater === 'function' ? updater(prev) : updater;
+            window.dispatchEvent(new Event('planner_updated'));
+            return newTasks;
+        });
+    };
+
+    const toggleTask = async (id: number) => {
+        const task = tasks.find(t => t.id === id);
+        if (!task) return;
+        
+        updateTasksState(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+        
+        try {
+            await fetch(`/api/planner/tasks/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isCompleted: !task.completed })
+            });
+        } catch (error) {
+            console.error('Failed to toggle task:', error);
+            updateTasksState(prev => prev.map(t => t.id === id ? { ...t, completed: task.completed } : t));
+        }
+    };
+
+    const openNewTaskModal = (defaultTime?: string) => {
+        setEditingTaskId(null);
+        setTaskTitle('');
+        
+        let start = defaultTime || '09:00';
+        if (!defaultTime) {
+            const occupied = (timeStr: string) => {
+                const startM = timeToMin(timeStr);
+                const endM = startM + 60;
+                return tasks.some(t => {
+                    if (t.date !== selectedDate || !t.start_time || !t.end_time) return false;
+                    const tS = timeToMin(t.start_time);
+                    let tE = timeToMin(t.end_time);
+                    if (tE < tS) tE += 1440;
+                    return (startM < tE && endM > tS);
+                });
+            };
+
+            for (let h = 8; h <= 20; h++) {
+                const candidate = `${String(h).padStart(2, '0')}:00`;
+                if (!occupied(candidate)) {
+                    start = candidate;
+                    break;
+                }
+            }
+        }
+
+        setTaskStartTime(start);
+        
+        const [h, m] = start.split(':').map(Number);
+        const endH = String((h + 1) % 24).padStart(2, '0');
+        const endM = String(m).padStart(2, '0');
+        setTaskEndTime(`${endH}:${endM}`);
+        
+        setTaskType(2);
+        setTaskNotes('');
+        setShowTaskModal(true);
+    };
+
+    const editTask = (task: TaskItem) => {
+        setEditingTaskId(task.id); 
+        setTaskTitle(task.title); 
+        setTaskStartTime(task.start_time); 
+        setTaskEndTime(task.end_time);
+        setTaskType(task.type); 
+        setTaskNotes(task.notes || ''); 
+        setShowTaskModal(true);
+    };
+
+    const submitSingleTask = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!taskTitle.trim()) return;
+        
+        const err = checkTimeConflict(
+            taskStartTime, 
+            taskEndTime, 
+            tasks, 
+            selectedDate, 
+            editingTaskId,
+            t('error_duration_min') || 'Minimal 5 menit!',
+            t('error_conflict') || 'Jadwal bentrok!'
+        );
+        if (err) return;
+
+        try {
+            const cleanDate = normalizeDate(selectedDate);
+            if (editingTaskId) {
+                updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { 
+                    ...t, 
+                    title: taskTitle, 
+                    start_time: taskStartTime, 
+                    end_time: taskEndTime, 
+                    type: taskType, 
+                    notes: taskNotes 
+                } : t));
+
+                await fetch(`/api/planner/tasks/${editingTaskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
+                    })
+                });
+            } else {
+                const tempId = Date.now();
+                const newTaskItem: TaskItem = { 
+                    id: tempId, 
+                    date: cleanDate, 
+                    title: taskTitle, 
+                    start_time: taskStartTime, 
+                    end_time: taskEndTime, 
+                    type: taskType, 
+                    notes: taskNotes, 
+                    completed: false 
+                };
+
+                updateTasksState(prev => [...prev, newTaskItem]);
+
+                const res = await fetch('/api/planner/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: cleanDate, title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data?.id) {
+                        updateTasksState(prev => prev.map(t => t.id === tempId ? { ...t, id: data.id } : t));
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to save task:', error);
+        }
+        setShowTaskModal(false);
+    };
+
+    const handleMoveTask = async (taskId: number, newStartTime: string) => {
+        const task = tasks.find(t => t.id === taskId);
+        if (!task) return;
+        
+        const [startH, startM] = task.start_time.split(':').map(Number);
+        let [endH, endM] = task.end_time ? task.end_time.split(':').map(Number) : [startH + 1, startM];
+        let duration = (endH * 60 + endM) - (startH * 60 + startM);
+        if (duration < 0) duration += 1440;
+        
+        const [newStartH, newStartM] = newStartTime.split(':').map(Number);
+        const newEndMinutes = (newStartH * 60 + newStartM) + duration;
+        const finalEndH = String(Math.floor(newEndMinutes / 60) % 24).padStart(2, '0');
+        const finalEndM = String(newEndMinutes % 60).padStart(2, '0');
+        const newEndTime = `${finalEndH}:${finalEndM}`;
+
+        const err = checkTimeConflict(
+            newStartTime, 
+            newEndTime, 
+            tasks, 
+            selectedDate, 
+            taskId,
+            t('error_duration_min') || 'Minimal 5 menit!',
+            t('error_conflict') || 'Jadwal bentrok!'
+        );
+        if (err) {
+            alert(`Gagal memindahkan jadwal: ${err}`);
+            return;
+        }
+
+        updateTasksState(prev => prev.map(t => t.id === taskId ? { ...t, start_time: newStartTime, end_time: newEndTime } : t));
+
+        try {
+            await fetch(`/api/planner/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ startTime: newStartTime, endTime: newEndTime })
+            });
+        } catch (error) {
+            console.error('Failed to move task:', error);
+            updateTasksState(prev => prev.map(t => t.id === taskId ? { ...t, start_time: task.start_time, end_time: task.end_time } : t));
+        }
+    };
+
+    const deleteTask = async () => {
+        if (editingTaskId) {
+            updateTasksState(prev => prev.filter(t => t.id !== editingTaskId));
+            try {
+                await fetch(`/api/planner/tasks/${editingTaskId}`, { method: 'DELETE' });
+            } catch (error) {
+                console.error('Failed to delete task:', error);
+            }
+        }
+        setShowTaskModal(false);
+    };
+
+    const submitBatchTasks = async () => {
+        try {
+            const newTasks: TaskItem[] = [];
+            for (const bTask of batchTasks) {
+                if (!bTask.title.trim()) continue;
+                const res = await fetch('/api/planner/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: selectedDate,
+                        title: bTask.title,
+                        startTime: bTask.start_time,
+                        endTime: bTask.end_time,
+                        type: bTask.type,
+                        notes: ''
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    newTasks.push({
+                        id: data.id,
+                        date: selectedDate,
+                        title: bTask.title,
+                        start_time: bTask.start_time,
+                        end_time: bTask.end_time,
+                        type: bTask.type,
+                        notes: '',
+                        completed: false
+                    });
+                }
+            }
+            if (newTasks.length > 0) {
+                updateTasksState(prev => [...prev, ...newTasks]);
+            }
+        } catch (error) {
+            console.error('Batch save failed', error);
+        }
+        setShowBatchModal(false);
+        setBatchTasks([{ title: '', start_time: '09:00', end_time: '10:00', type: 2 }]);
+    };
+
+    return {
+        tasks,
+        setTasks,
+        updateTasksState,
+        showTaskModal,
+        setShowTaskModal,
+        editingTaskId,
+        taskTitle,
+        setTaskTitle,
+        taskStartTime,
+        setTaskStartTime,
+        taskEndTime,
+        setTaskEndTime,
+        taskType,
+        setTaskType,
+        taskNotes,
+        setTaskNotes,
+        showBatchModal,
+        setShowBatchModal,
+        batchTasks,
+        setBatchTasks,
+        toggleTask,
+        openNewTaskModal,
+        editTask,
+        submitSingleTask,
+        handleMoveTask,
+        deleteTask,
+        submitBatchTasks
+    };
+}
