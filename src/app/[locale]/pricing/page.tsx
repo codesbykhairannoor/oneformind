@@ -5,7 +5,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link, useRouter } from '@/i18n/routing';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
-import { ChevronDown, Check, Lock, Sparkles, Star } from 'lucide-react';
+import { ChevronDown, Check, Lock, Sparkles, Star, ShieldCheck, RefreshCw, Zap } from 'lucide-react';
+import { trackPricingSelect, trackCheckoutInitiate } from '@/lib/analytics';
 
 export default function PricingPage() {
     const t = useTranslations();
@@ -41,6 +42,10 @@ export default function PricingPage() {
     ];
 
     const handleCheckout = (planId: string) => {
+        const cycle = planId === 'Legendary' ? 'lifetime' : (isAnnual ? 'yearly' : 'monthly');
+        trackPricingSelect(planId, cycle);
+        trackCheckoutInitiate('duitku', planId);
+
         if (session?.user) {
             router.push(`/billing`);
             return;
@@ -91,7 +96,11 @@ export default function PricingPage() {
                             </span>
 
                             <button
-                                onClick={() => setIsAnnual(!isAnnual)}
+                                onClick={() => {
+                                    const nextAnnual = !isAnnual;
+                                    setIsAnnual(nextAnnual);
+                                    trackPricingSelect('billing_toggle', nextAnnual ? 'yearly' : 'monthly');
+                                }}
                                 className="relative w-20 h-10 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 transition-all duration-500 hover:scale-105 shadow-inner"
                             >
                                 <div className={`w-6 h-6 rounded-full bg-indigo-600 dark:bg-indigo-500 shadow-xl transform transition-transform duration-500 ${isAnnual ? 'translate-x-10' : 'translate-x-0'}`} />
@@ -302,6 +311,25 @@ export default function PricingPage() {
                             <button onClick={() => handleCheckout('Legendary')} className="w-full py-5 rounded-3xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-black text-xs hover:bg-black dark:hover:bg-slate-200 shadow-xl transition-all active:scale-95">
                                 {t('pricing_l4_btn')}
                             </button>
+                        </div>
+                    </div>
+
+                    {/* CRO Trust & Guarantee Bar */}
+                    <div className="max-w-4xl mx-auto mt-16 p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                        <div className="flex flex-col items-center gap-1.5">
+                            <ShieldCheck className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                            <span className="text-xs font-black text-slate-900 dark:text-white">14-Day Money-Back</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">100% risk-free guarantee</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1.5 border-y sm:border-y-0 sm:border-x border-slate-200 dark:border-slate-800 py-3 sm:py-0">
+                            <Lock className="w-6 h-6 text-emerald-500" />
+                            <span className="text-xs font-black text-slate-900 dark:text-white">256-Bit SSL Encrypted</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Bank-grade payment security</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1.5">
+                            <RefreshCw className="w-6 h-6 text-amber-500" />
+                            <span className="text-xs font-black text-slate-900 dark:text-white">Cancel Anytime</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">No questions asked, 1-click</span>
                         </div>
                     </div>
                 </section>

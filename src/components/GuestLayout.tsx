@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter, usePathname } from '@/i18n/routing';
+import { trackCTAClick } from '@/lib/analytics';
 
 export default function GuestLayout({ children, user = null }: { children: React.ReactNode, user?: any }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -324,10 +325,18 @@ export default function GuestLayout({ children, user = null }: { children: React
                                 </Link>
                             ) : (
                                 <>
-                                    <Link href="/login" className="text-[13px] font-bold text-slate-600 hover:text-indigo-600 transition">
+                                    <Link 
+                                        href="/login" 
+                                        onClick={() => trackCTAClick('header_nav', 'Log in', '/login')}
+                                        className="text-[13px] font-bold text-slate-600 hover:text-indigo-600 transition"
+                                    >
                                         Log in
                                     </Link>
-                                    <Link href="/register" className="px-5 py-2 bg-indigo-600 text-white rounded-full text-[13px] font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5 active:scale-95">
+                                    <Link 
+                                        href="/register" 
+                                        onClick={() => trackCTAClick('header_nav', 'Get started', '/register')}
+                                        className="px-5 py-2 bg-indigo-600 text-white rounded-full text-[13px] font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5 active:scale-95"
+                                    >
                                         Get started
                                     </Link>
                                 </>
@@ -433,8 +442,20 @@ export default function GuestLayout({ children, user = null }: { children: React
                             
                             {!user ? (
                                 <div className="grid grid-cols-1 gap-3">
-                                    <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:border-slate-200">Log in</Link>
-                                    <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 text-center font-black text-white bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none active:scale-95 transition-transform">Get Started</Link>
+                                    <Link 
+                                        href="/login" 
+                                        onClick={() => { setMobileMenuOpen(false); trackCTAClick('mobile_menu', 'Log in', '/login'); }} 
+                                        className="w-full py-4 text-center font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:border-slate-200"
+                                    >
+                                        Log in
+                                    </Link>
+                                    <Link 
+                                        href="/register" 
+                                        onClick={() => { setMobileMenuOpen(false); trackCTAClick('mobile_menu', 'Get Started', '/register'); }} 
+                                        className="w-full py-4 text-center font-black text-white bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none active:scale-95 transition-transform"
+                                    >
+                                        Get Started
+                                    </Link>
                                 </div>
                             ) : (
                                 <div>
@@ -558,6 +579,29 @@ export default function GuestLayout({ children, user = null }: { children: React
                     </div>
                 </div>
             </footer>
+
+            {/* FLOATING CONVERSION PILL (CRO ENGINE) */}
+            {scrolled && !mobileMenuOpen && !user && !pathname.includes('/register') && !pathname.includes('/login') && (
+                <aside aria-label="Quick Signup" className="fixed bottom-6 right-6 z-40 animate-in fade-in slide-in-from-bottom-5 duration-300">
+                    <div className="flex items-center gap-3 p-1.5 pl-4 bg-slate-900/90 text-white backdrop-blur-xl border border-white/10 rounded-full shadow-2xl shadow-indigo-500/20 hover:scale-[1.02] transition-all">
+                        <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <span className="hidden sm:inline">Build your Life OS</span>
+                            <span className="text-emerald-400 font-black">• Free</span>
+                        </div>
+                        <Link
+                            href="/register"
+                            onClick={() => trackCTAClick('floating_pill', 'Start Free', '/register')}
+                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-xs font-black transition-all shadow-md shadow-indigo-600/30 active:scale-95 flex items-center gap-1.5"
+                        >
+                            <span>Start Free</span>
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </Link>
+                    </div>
+                </aside>
+            )}
         </div>
     );
 }
