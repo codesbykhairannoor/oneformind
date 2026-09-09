@@ -191,6 +191,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                 onSelectHabitDetail={form.setDetailModalHabit}
                                 onOpenNumericPopover={form.setNumericPopover}
                                 onToggleStatus={actions.toggleStatus}
+                                onOpenNoteModal={form.setNoteModalData}
                             />
                         </>
                     ) : (

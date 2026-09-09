@@ -46,9 +46,18 @@ export default function PlannerTimeline({
     const t = useTranslations();
     const [isStartHourOpen, setIsStartHourOpen] = useState(false);
     const [density, setDensity] = useState<'compact' | 'normal'>('compact');
+    const [isMobile, setIsMobile] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const hourHeight = density === 'compact' ? 52 : 72;
+    const timeColWidth = isMobile ? 56 : 74;
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 640);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         try {
@@ -234,7 +243,7 @@ export default function PlannerTimeline({
         return {
             top: `${topPx}px`,
             height: `${finalHeight}px`,
-            left: `${TIME_COL_WIDTH + 6}px`,  
+            left: `${timeColWidth + 6}px`,  
             right: '8px', 
             zIndex: duration < 30 ? 20 : 10
         };
@@ -270,23 +279,23 @@ export default function PlannerTimeline({
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden select-none flex flex-col h-full transition-colors duration-500">
             
             {/* Timeline Header */}
-            <div className="px-3 sm:px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none flex flex-wrap sm:flex-nowrap min-w-0 justify-between items-center gap-2 shrink-0 transition-colors duration-500">
+            <div className="px-3 sm:px-5 py-2.5 sm:py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none flex min-w-0 justify-between items-center gap-2 shrink-0 transition-colors duration-500">
                 <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-2.5">
                     <div className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm sm:text-base shadow-indigo-200 dark:shadow-none shadow-md">
                         📅
                     </div>
                     <div className="min-w-0">
                         <h3 className="min-w-0 truncate font-black text-slate-800 dark:text-white text-xs sm:text-sm leading-none transition-colors duration-500">
-                            {t('timeline_title') || 'Timeline Jadwal'}
+                            {t('timeline_title') || 'Timeline'}
                         </h3>
                         <p className="text-[10px] text-slate-400 font-bold mt-0.5 truncate">
-                            {activeTasks.length} kegiatan direncanakan
+                            {activeTasks.length} kegiatan
                         </p>
                     </div>
                 </div>
                 
                 {/* Header Controls: Now Jump + Density Switcher + Start Hour */}
-                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                     {isToday && (
                         <button
                             onClick={() => scrollToCurrentTime(true)}
@@ -302,15 +311,15 @@ export default function PlannerTimeline({
                     <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
                         <button
                             onClick={() => toggleDensity('compact')}
-                            title="Tampilan Kompak (52px / jam) - Lebih hemat ruang & sedikit scroll"
-                            className={`px-2 py-1 rounded-lg text-[10px] font-black transition ${density === 'compact' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+                            title="Tampilan Kompak (52px / jam) - Lebih hemat ruang"
+                            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-[10px] font-black transition ${density === 'compact' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
                         >
                             Kompak
                         </button>
                         <button
                             onClick={() => toggleDensity('normal')}
                             title="Tampilan Standar (72px / jam) - Ruang kartu lebih lega"
-                            className={`px-2 py-1 rounded-lg text-[10px] font-black transition ${density === 'normal' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+                            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-[10px] font-black transition ${density === 'normal' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
                         >
                             Standar
                         </button>
@@ -319,15 +328,15 @@ export default function PlannerTimeline({
                     {/* Start Hour Selector */}
                     <div className="relative shrink-0">
                         <button onClick={() => setIsStartHourOpen(!isStartHourOpen)} className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group">
-                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 px-1.5 uppercase tracking-tighter transition-colors duration-500">{t('label_start') || 'Mulai'}</span>
-                            <div className="bg-white dark:bg-slate-900 px-2 py-0.5 rounded-lg shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors duration-500">
-                                <span className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 font-mono">{String(startHour).padStart(2, '0')}:00</span>
-                                <ChevronDown size={11} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
+                            <span className="hidden sm:inline text-[10px] font-black text-slate-400 dark:text-slate-500 px-1.5 uppercase tracking-tighter transition-colors duration-500">{t('label_start') || 'Mulai'}</span>
+                            <div className="bg-white dark:bg-slate-900 px-1.5 sm:px-2 py-0.5 rounded-lg shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors duration-500">
+                                <span className="text-[10px] sm:text-[11px] font-black text-indigo-600 dark:text-indigo-400 font-mono">{String(startHour).padStart(2, '0')}:00</span>
+                                <ChevronDown size={10} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
                             </div>
                         </button>
                         
                         {isStartHourOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-3 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
+                            <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-3 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
                                 <div className="flex justify-between items-center mb-2.5 px-1">
                                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-500">{t('select_hour') || 'Mulai dari Jam'}</span>
                                     <button onClick={() => setIsStartHourOpen(false)} className="text-slate-300 dark:text-slate-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
@@ -354,9 +363,9 @@ export default function PlannerTimeline({
 
             {/* UNFINISHED TASKS ROLLOVER BANNER */}
             {showRolloverBanner && unfinishedYesterdayTasks.length > 0 && (
-                <div className="mx-4 sm:mx-6 mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200/80 dark:border-amber-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-sm font-bold shadow-md shadow-amber-500/20">
+                <div className="mx-3 sm:mx-6 mt-3 p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200/80 dark:border-amber-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-xs sm:text-sm font-bold shadow-md shadow-amber-500/20">
                             ⚡
                         </div>
                         <div>
@@ -379,7 +388,7 @@ export default function PlannerTimeline({
                             onClick={onAcceptRollover}
                             className="px-3.5 py-1.5 rounded-xl text-[11px] font-black bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20 transition active:scale-95 flex items-center gap-1.5"
                         >
-                            <span>Pindahkan ke Hari Ini</span>
+                            <span>Pindahkan</span>
                             <ArrowRight size={13} strokeWidth={2.5} />
                         </button>
                     </div>
@@ -393,8 +402,11 @@ export default function PlannerTimeline({
                     {/* Grid Lines & Time Slots */}
                     {timeSlots.map((time, i) => (
                         <div key={time} className="absolute w-full flex border-b border-slate-100 dark:border-slate-800" style={{ top: `${i * hourHeight}px`, height: `${hourHeight}px` }}>
-                            <div className="w-[76px] shrink-0 border-r border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 flex justify-center pt-2 transition-colors duration-500">
-                                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono transition-colors duration-500">{time}</span>
+                            <div 
+                                style={{ width: `${timeColWidth}px` }}
+                                className="shrink-0 border-r border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 flex justify-center pt-2 transition-colors duration-500"
+                            >
+                                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono transition-colors duration-500">{time}</span>
                             </div>
                             <div 
                                 onClick={() => onOpenTaskModal(time)}
@@ -416,8 +428,8 @@ export default function PlannerTimeline({
 
                     {/* Current Time Indicator */}
                     <div className="absolute z-30 flex items-center pointer-events-none w-full" style={getCurrentTimeIndicatorStyle()}>
-                        <div className="w-[80px] flex justify-end pr-2">
-                            <span className="text-[9px] font-black text-white bg-rose-500 px-1.5 rounded shadow-sm">{t('timeline_now') || 'Sekarang'}</span>
+                        <div style={{ width: `${timeColWidth}px` }} className="flex justify-end pr-1 sm:pr-2">
+                            <span className="text-[8px] sm:text-[9px] font-black text-white bg-rose-500 px-1 sm:px-1.5 rounded shadow-sm">{t('timeline_now') || 'Sekarang'}</span>
                         </div>
                         <div className="flex-1 h-[2px] bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
                     </div>

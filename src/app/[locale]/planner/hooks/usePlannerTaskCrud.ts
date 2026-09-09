@@ -44,9 +44,9 @@ export function usePlannerTaskCrud(selectedDate: string) {
         }
     };
 
-    const openNewTaskModal = (defaultTime?: string) => {
+    const openNewTaskModal = (defaultTime?: string, prefill?: { title?: string; type?: number }) => {
         setEditingTaskId(null);
-        setTaskTitle('');
+        setTaskTitle(prefill?.title || '');
         
         let start = defaultTime || '09:00';
         if (!defaultTime) {
@@ -78,7 +78,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
         const endM = String(m).padStart(2, '0');
         setTaskEndTime(`${endH}:${endM}`);
         
-        setTaskType(2);
+        setTaskType(prefill?.type || 2);
         setTaskNotes('');
         setShowTaskModal(true);
     };

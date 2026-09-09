@@ -117,7 +117,7 @@ export default function PlannerPage() {
                         
                         {/* Sidebar Column: Timer + Inbox + 3-Tab Daily Hub */}
                         <div className={`lg:col-span-2 w-full lg:h-full lg:overflow-y-auto custom-scrollbar pr-0 lg:pr-1 ${
-                            mobileTab === 'sidebar' ? 'block pb-16' : 'hidden lg:block'
+                            mobileTab === 'sidebar' ? 'block pb-24' : 'hidden lg:block'
                         }`}>
                             <PlannerSidebar 
                                 notes={planner.notes} 
@@ -138,12 +138,15 @@ export default function PlannerPage() {
                                 resetTimer={planner.resetTimer} 
                                 formatTimer={planner.formatTimer}
                                 clearFocusedTask={planner.clearFocusedTask}
+                                onScheduleInboxTaskModal={(inboxTask) => {
+                                    planner.openNewTaskModal(undefined, { title: inboxTask.title, type: inboxTask.type });
+                                }}
                             />
                         </div>
 
                         {/* Timeline Column */}
                         <div className={`lg:col-span-3 w-full lg:h-full lg:overflow-hidden min-h-0 ${
-                            mobileTab === 'timeline' ? 'block h-[640px] sm:h-[720px] lg:h-full pb-16 lg:pb-0' : 'hidden lg:block'
+                            mobileTab === 'timeline' ? 'block h-[calc(100vh-210px)] min-h-[500px] lg:h-full pb-20 lg:pb-0' : 'hidden lg:block'
                         }`}>
                              <PlannerTimeline 
                                  tasks={planner.tasks}

@@ -24,6 +24,7 @@ interface PlannerSidebarProps {
     resetTimer: () => void;
     formatTimer: () => string;
     clearFocusedTask?: () => void;
+    onScheduleInboxTaskModal?: (task: InboxTask) => void;
 }
 
 export default function PlannerSidebar({
@@ -37,7 +38,8 @@ export default function PlannerSidebar({
     focusedTaskTitle,
     setTimerPreset,
     toggleTimer, resetTimer, formatTimer,
-    clearFocusedTask
+    clearFocusedTask,
+    onScheduleInboxTaskModal
 }: PlannerSidebarProps) {
     const t = useTranslations();
     const [newInboxTitle, setNewInboxTitle] = useState('');
@@ -245,10 +247,21 @@ export default function PlannerSidebar({
                                         />
                                     </div>
                                     <div className="flex items-center gap-1 shrink-0">
-                                        <GripVertical size={12} className="text-slate-300 dark:text-slate-600 group-hover:text-indigo-400" />
+                                        {onScheduleInboxTaskModal && (
+                                            <button
+                                                type="button"
+                                                onClick={() => onScheduleInboxTaskModal(task)}
+                                                title="Jadwalkan ke timeline"
+                                                className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-[10px] font-black flex items-center gap-1 transition active:scale-95"
+                                            >
+                                                <Clock size={11} strokeWidth={2.5} />
+                                                <span className="hidden xs:inline">Jadwal</span>
+                                            </button>
+                                        )}
+                                        <GripVertical size={12} className="hidden sm:block text-slate-300 dark:text-slate-600 group-hover:text-indigo-400" />
                                         <button 
                                             onClick={() => removeInboxTask(task.id)} 
-                                            className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all p-0.5"
+                                            className="opacity-70 sm:opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all p-0.5"
                                         >
                                             <X size={12} strokeWidth={2.5} />
                                         </button>
