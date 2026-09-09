@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { TaskItem, BatchTaskInput } from '../types';
+import { TaskItem, InboxTask } from '../types';
 import { normalizeDate, timeToMin, checkTimeConflict } from '../utils/plannerMath';
 
 export function usePlannerTaskCrud(selectedDate: string) {
@@ -17,10 +17,6 @@ export function usePlannerTaskCrud(selectedDate: string) {
     const [taskEndTime, setTaskEndTime] = useState('10:00');
     const [taskType, setTaskType] = useState(2);
     const [taskNotes, setTaskNotes] = useState('');
-    const [showBatchModal, setShowBatchModal] = useState(false);
-    const [batchTasks, setBatchTasks] = useState<BatchTaskInput[]>([
-        { title: '', start_time: '09:00', end_time: '10:00', type: 2 }
-    ]);
 
     const updateTasksState = (updater: TaskItem[] | ((prev: TaskItem[]) => TaskItem[])) => {
         setTasks(prev => {
@@ -210,6 +206,54 @@ export function usePlannerTaskCrud(selectedDate: string) {
         }
     };
 
+    // Schedule an inbox task directly onto the timeline
+    const scheduleInboxTask = async (inboxTask: { id: number; title: string; type: number }, startTime: string, durationMinutes: number = 60) => {
+        const cleanDate = normalizeDate(selectedDate);
+        const [sH, sM] = startTime.split(':').map(Number);
+        const endMinutes = (sH * 60 + sM) + durationMinutes;
+        const eH = String(Math.floor(endMinutes / 60) % 24).padStart(2, '0');
+        const eM = String(endMinutes % 60).padStart(2, '0');
+        const endTime = `${eH}:${eM}`;
+
+        const tempId = Date.now();
+        const newTask: TaskItem = {
+            id: tempId,
+            date: cleanDate,
+            title: inboxTask.title,
+            start_time: startTime,
+            end_time: endTime,
+            type: inboxTask.type || 2,
+            notes: '',
+            completed: false
+        };
+
+        updateTasksState(prev => [...prev, newTask]);
+
+        try {
+            const res = await fetch('/api/planner/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: cleanDate,
+                    title: inboxTask.title,
+                    startTime: startTime,
+                    endTime: endTime,
+                    type: inboxTask.type || 2,
+                    notes: ''
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data?.id) {
+                    updateTasksState(prev => prev.map(t => t.id === tempId ? { ...t, id: data.id } : t));
+                }
+            }
+        } catch (e) {
+            console.error('Failed to schedule inbox task:', e);
+        }
+    };
+
     const deleteTask = async () => {
         if (editingTaskId) {
             updateTasksState(prev => prev.filter(t => t.id !== editingTaskId));
@@ -222,45 +266,53 @@ export function usePlannerTaskCrud(selectedDate: string) {
         setShowTaskModal(false);
     };
 
-    const submitBatchTasks = async () => {
+    // Atomic reset board for date
+    const resetBoardForDate = async (dateStr: string) => {
+        updateTasksState(prev => prev.filter(t => normalizeDate(t.date) !== normalizeDate(dateStr)));
         try {
-            const newTasks: TaskItem[] = [];
-            for (const bTask of batchTasks) {
-                if (!bTask.title.trim()) continue;
+            await fetch(`/api/planner/tasks?date=${dateStr}`, { method: 'DELETE' });
+        } catch (error) {
+            console.error('Failed to reset tasks for date:', error);
+        }
+    };
+
+    // Rollover unfinished tasks to current date
+    const rolloverTasks = async (unfinishedTasks: TaskItem[], targetDate: string) => {
+        const cleanTarget = normalizeDate(targetDate);
+        for (const task of unfinishedTasks) {
+            try {
+                // Clone task into target date
+                const tempId = Date.now() + Math.floor(Math.random() * 1000);
+                const rolledTask: TaskItem = {
+                    ...task,
+                    id: tempId,
+                    date: cleanTarget,
+                    completed: false
+                };
+                updateTasksState(prev => [...prev, rolledTask]);
+
                 const res = await fetch('/api/planner/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        date: selectedDate,
-                        title: bTask.title,
-                        startTime: bTask.start_time,
-                        endTime: bTask.end_time,
-                        type: bTask.type,
-                        notes: ''
+                        date: cleanTarget,
+                        title: task.title,
+                        startTime: task.start_time,
+                        endTime: task.end_time,
+                        type: task.type,
+                        notes: task.notes || ''
                     })
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    newTasks.push({
-                        id: data.id,
-                        date: selectedDate,
-                        title: bTask.title,
-                        start_time: bTask.start_time,
-                        end_time: bTask.end_time,
-                        type: bTask.type,
-                        notes: '',
-                        completed: false
-                    });
+                    if (data?.id) {
+                        updateTasksState(prev => prev.map(t => t.id === tempId ? { ...t, id: data.id } : t));
+                    }
                 }
+            } catch (e) {
+                console.error('Failed to rollover task:', task.title, e);
             }
-            if (newTasks.length > 0) {
-                updateTasksState(prev => [...prev, ...newTasks]);
-            }
-        } catch (error) {
-            console.error('Batch save failed', error);
         }
-        setShowBatchModal(false);
-        setBatchTasks([{ title: '', start_time: '09:00', end_time: '10:00', type: 2 }]);
     };
 
     return {
@@ -280,16 +332,14 @@ export function usePlannerTaskCrud(selectedDate: string) {
         setTaskType,
         taskNotes,
         setTaskNotes,
-        showBatchModal,
-        setShowBatchModal,
-        batchTasks,
-        setBatchTasks,
         toggleTask,
         openNewTaskModal,
         editTask,
         submitSingleTask,
         handleMoveTask,
+        scheduleInboxTask,
         deleteTask,
-        submitBatchTasks
+        resetBoardForDate,
+        rolloverTasks
     };
 }

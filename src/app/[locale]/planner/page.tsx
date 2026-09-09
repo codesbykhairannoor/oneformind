@@ -35,7 +35,7 @@ export default function PlannerPage() {
                         pending: planner.pendingCount 
                     }}
                     onOpenTaskModal={() => planner.openNewTaskModal()}
-                    onResetBoard={planner.resetBoard}
+                    onResetBoard={planner.requestResetBoard}
                 />
 
                 <div className="flex-1 w-full bg-slate-50/50 dark:bg-slate-950 px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-500 overflow-y-auto custom-scrollbar">
@@ -50,11 +50,16 @@ export default function PlannerPage() {
                                 setWaterGlasses={planner.handleSetWaterGlasses}
                                 taskInbox={planner.taskInbox} 
                                 setTaskInbox={planner.handleSetTaskInbox}
+                                saveStatus={planner.saveStatus}
+                                durationMinutes={planner.durationMinutes}
                                 pomodoroTime={planner.pomodoroTime} 
                                 isTimerRunning={planner.isTimerRunning}
+                                focusedTaskTitle={planner.focusedTaskTitle}
+                                setTimerPreset={planner.setTimerPreset}
                                 toggleTimer={planner.toggleTimer} 
                                 resetTimer={planner.resetTimer} 
                                 formatTimer={planner.formatTimer}
+                                clearFocusedTask={planner.clearFocusedTask}
                             />
                         </div>
 
@@ -69,6 +74,12 @@ export default function PlannerPage() {
                                  toggleTask={planner.toggleTask}
                                  onOpenTaskModal={planner.openNewTaskModal}
                                  onMoveTask={planner.handleMoveTask}
+                                 onScheduleInboxTask={planner.handleScheduleInboxTask}
+                                 showRolloverBanner={planner.showRolloverBanner}
+                                 unfinishedYesterdayTasks={planner.unfinishedYesterdayTasks}
+                                 onAcceptRollover={planner.handleAcceptRollover}
+                                 onDismissRollover={planner.handleDismissRollover}
+                                 onFocusTask={planner.focusOnTask}
                              />
                         </div>
                     </div>
@@ -92,11 +103,9 @@ export default function PlannerPage() {
                     setTaskNotes={planner.setTaskNotes}
                     submitSingleTask={planner.submitSingleTask}
                     deleteTask={planner.deleteTask}
-                    showBatchModal={planner.showBatchModal}
-                    setShowBatchModal={planner.setShowBatchModal}
-                    batchTasks={planner.batchTasks}
-                    setBatchTasks={planner.setBatchTasks}
-                    submitBatchTasks={planner.submitBatchTasks}
+                    showResetConfirmModal={planner.showResetConfirmModal}
+                    setShowResetConfirmModal={planner.setShowResetConfirmModal}
+                    confirmResetBoard={planner.confirmResetBoard}
                 />
             </div>
         </AuthenticatedLayout>

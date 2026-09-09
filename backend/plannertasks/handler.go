@@ -205,17 +205,33 @@ func PlannerTasksHandler(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodDelete:
 		idStr := r.URL.Query().Get("id")
-		id, _ := strconv.Atoi(idStr)
-		if id == 0 {
-			http.Error(w, `{"error": "Missing ID"}`, 400)
+		dateStr := r.URL.Query().Get("date")
+
+		if idStr != "" {
+			id, _ := strconv.Atoi(idStr)
+			if id == 0 {
+				http.Error(w, `{"error": "Invalid ID"}`, 400)
+				return
+			}
+			_, err := dbTasks.Exec("DELETE FROM planner_tasks WHERE id = $1 AND user_id = $2", id, userID)
+			if err != nil {
+				http.Error(w, `{"error": "Delete Error"}`, 500)
+				return
+			}
+			w.Write([]byte(`{"success": true}`))
 			return
 		}
 
-		_, err := dbTasks.Exec("DELETE FROM planner_tasks WHERE id = $1 AND user_id = $2", id, userID)
-		if err != nil {
-			http.Error(w, `{"error": "Delete Error"}`, 500)
+		if dateStr != "" {
+			_, err := dbTasks.Exec("DELETE FROM planner_tasks WHERE date = $1 AND user_id = $2", dateStr, userID)
+			if err != nil {
+				http.Error(w, `{"error": "Delete Error"}`, 500)
+				return
+			}
+			w.Write([]byte(`{"success": true}`))
 			return
 		}
-		w.Write([]byte(`{"success": true}`))
+
+		http.Error(w, `{"error": "Missing ID or Date"}`, 400)
 	}
 }

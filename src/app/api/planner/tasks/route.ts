@@ -22,4 +22,14 @@ export async function POST(req: NextRequest) {
   return proxyToGo(req as any, 'planner-tasks', searchParams.toString(), token.accessToken);
 }
 
+export async function DELETE(req: NextRequest) {
+  const token = await getAuthToken(req);
+  if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const searchParams = req.nextUrl.searchParams;
+  
+  return proxyToGo(req as any, 'planner-tasks', searchParams.toString(), token.accessToken);
+}
+
+
 

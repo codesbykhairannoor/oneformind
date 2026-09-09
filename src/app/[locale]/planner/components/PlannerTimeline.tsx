@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, CheckCircle2, Circle } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X } from 'lucide-react';
+import { TaskItem } from '../types';
 
 const VIEW_LIMIT = 24;
 const HOUR_HEIGHT = 80;
@@ -18,10 +19,30 @@ interface PlannerTimelineProps {
     toggleTask: (id: number) => void;
     onOpenTaskModal: (defaultTime?: string) => void;
     onMoveTask: (taskId: number, newStartTime: string) => void;
+    onScheduleInboxTask?: (inboxTaskId: number, startTime: string) => void;
+    showRolloverBanner?: boolean;
+    unfinishedYesterdayTasks?: TaskItem[];
+    onAcceptRollover?: () => void;
+    onDismissRollover?: () => void;
+    onFocusTask?: (taskTitle: string) => void;
 }
 
 export default function PlannerTimeline({
-    tasks, selectedDate, now, startHour, setStartHour, editTask, toggleTask, onOpenTaskModal, onMoveTask
+    tasks, 
+    selectedDate, 
+    now, 
+    startHour, 
+    setStartHour, 
+    editTask, 
+    toggleTask, 
+    onOpenTaskModal, 
+    onMoveTask,
+    onScheduleInboxTask,
+    showRolloverBanner,
+    unfinishedYesterdayTasks = [],
+    onAcceptRollover,
+    onDismissRollover,
+    onFocusTask
 }: PlannerTimelineProps) {
     const t = useTranslations();
     const [isStartHourOpen, setIsStartHourOpen] = useState(false);
@@ -45,10 +66,26 @@ export default function PlannerTimeline({
 
     const handleDrop = (e: React.DragEvent, newStartTime: string) => {
         e.preventDefault();
+        
+        // Check if dragged from Inbox
+        const jsonStr = e.dataTransfer.getData('application/json');
+        if (jsonStr) {
+            try {
+                const parsed = JSON.parse(jsonStr);
+                if (parsed && parsed.type === 'INBOX_TASK' && onScheduleInboxTask) {
+                    onScheduleInboxTask(parsed.id, newStartTime);
+                    return;
+                }
+            } catch (err) {}
+        }
+
+        // Standard timeline move
         const taskIdStr = e.dataTransfer.getData('text/plain');
         if (!taskIdStr) return;
         const taskId = parseInt(taskIdStr);
-        onMoveTask(taskId, newStartTime);
+        if (!isNaN(taskId)) {
+            onMoveTask(taskId, newStartTime);
+        }
     };
 
     const normalizeDate = (d: any) => {
@@ -203,153 +240,230 @@ export default function PlannerTimeline({
 
     return (
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden select-none flex flex-col h-full transition-colors duration-500">
+            
             {/* Timeline Header */}
-                <div className="px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none flex min-w-0 justify-between items-center gap-3 shrink-0 transition-colors duration-500">
-                    <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-base sm:text-lg shadow-indigo-200 dark:shadow-none shadow-lg">📅</div>
-                        <h3 className="min-w-0 truncate font-black text-slate-800 dark:text-white text-sm sm:text-base leading-none transition-colors duration-500">{t('timeline_title') || 'Timeline Hari Ini'}</h3>
+            <div className="px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none flex min-w-0 justify-between items-center gap-3 shrink-0 transition-colors duration-500">
+                <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-base sm:text-lg shadow-indigo-200 dark:shadow-none shadow-lg">
+                        📅
                     </div>
-                    
-                    <div className="relative shrink-0">
-                        <button onClick={() => setIsStartHourOpen(!isStartHourOpen)} className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group">
-                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 px-2 uppercase tracking-tighter transition-colors duration-500">{t('label_start') || 'Mulai'}</span>
-                            <div className="bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors duration-500">
-                                <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">{String(startHour).padStart(2, '0')}:00</span>
-                                <ChevronDown size={12} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
-                            </div>
-                        </button>
-                        
-                        {isStartHourOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-slate-900 rounded-[1.5rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-4 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
-                                <div className="flex justify-between items-center mb-4 px-1">
-                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-500">{t('select_hour') || 'Pilih Jam'}</span>
-                                    <button onClick={() => setIsStartHourOpen(false)} className="text-slate-300 dark:text-slate-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-4 gap-2">
-                                    {Array.from({length: 24}).map((_, h) => (
-                                        <button 
-                                            key={h}
-                                            onClick={() => { setStartHour(h); setIsStartHourOpen(false); }}
-                                            className={`py-2.5 flex items-center justify-center rounded-xl text-[10px] font-black font-mono transition-all border-2 ${startHour === h ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-none' : 'bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-100 dark:hover:border-indigo-500/20'}`}
-                                        >
-                                            {String(h).padStart(2, '0')}:00
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        {isStartHourOpen && <div className="fixed inset-0 z-50" onClick={() => setIsStartHourOpen(false)}></div>}
+                    <div>
+                        <h3 className="min-w-0 truncate font-black text-slate-800 dark:text-white text-sm sm:text-base leading-none transition-colors duration-500">
+                            {t('timeline_title') || 'Timeline Jadwal'}
+                        </h3>
+                        <p className="text-[10px] text-slate-400 font-bold mt-1">
+                            {activeTasks.length} kegiatan direncanakan
+                        </p>
                     </div>
                 </div>
-
-                {/* Timeline Body */}
-                <div ref={scrollContainerRef} className="flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar">
-                    <div className="relative w-full" style={{ height: `${VIEW_LIMIT * HOUR_HEIGHT}px` }}>
-                        
-                        {/* Grid Lines & Time Slots */}
-                        {timeSlots.map((time, i) => (
-                            <div key={time} className="absolute w-full flex border-b border-slate-100 dark:border-slate-800" style={{ top: `${i * HOUR_HEIGHT}px`, height: `${HOUR_HEIGHT}px` }}>
-                                <div className="w-[80px] shrink-0 border-r border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 flex justify-center pt-3 transition-colors duration-500">
-                                    <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono transition-colors duration-500">{time}</span>
-                                </div>
-                                <div 
-                                    onClick={() => onOpenTaskModal(time)}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={(e) => handleDrop(e, time)}
-                                    className="flex-1 relative group/slot cursor-pointer hover:bg-indigo-50/10 dark:hover:bg-indigo-500/5 transition-all"
-                                >
-                                    <div className="absolute inset-x-2 top-0.5 bottom-0.5 rounded border border-transparent group-hover/slot:border-indigo-100 dark:group-hover/slot:border-indigo-500/30 flex items-center justify-center transition-all">
-                                        <span className="opacity-0 group-hover/slot:opacity-100 text-indigo-400 dark:text-indigo-500 text-[10px] font-bold tracking-widest">{t('btn_add_timeline') || '+ Tambah Tugas'}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-
-                        {/* Current Time Indicator */}
-                        <div className="absolute z-30 flex items-center pointer-events-none w-full" style={getCurrentTimeIndicatorStyle()}>
-                            <div className="w-[80px] flex justify-end pr-2">
-                                <span className="text-[9px] font-black text-white bg-rose-500 px-1.5 rounded-sm shadow-sm dark:shadow-none">{t('timeline_now') || 'Sekarang'}</span>
-                            </div>
-                            <div className="flex-1 h-[2px] bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)] dark:shadow-none"></div>
+                
+                <div className="relative shrink-0">
+                    <button onClick={() => setIsStartHourOpen(!isStartHourOpen)} className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group">
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 px-2 uppercase tracking-tighter transition-colors duration-500">{t('label_start') || 'Mulai'}</span>
+                        <div className="bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors duration-500">
+                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">{String(startHour).padStart(2, '0')}:00</span>
+                            <ChevronDown size={12} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
                         </div>
+                    </button>
+                    
+                    {isStartHourOpen && (
+                        <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-slate-900 rounded-[1.5rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-4 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
+                            <div className="flex justify-between items-center mb-3 px-1">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-500">{t('select_hour') || 'Mulai dari Jam'}</span>
+                                <button onClick={() => setIsStartHourOpen(false)} className="text-slate-300 dark:text-slate-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
+                                    <X size={14} strokeWidth={3} />
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-4 gap-1.5">
+                                {Array.from({length: 24}).map((_, h) => (
+                                    <button 
+                                        key={h}
+                                        onClick={() => { setStartHour(h); setIsStartHourOpen(false); }}
+                                        className={`py-2 flex items-center justify-center rounded-xl text-[10px] font-black font-mono transition-all border ${startHour === h ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600'}`}
+                                    >
+                                        {String(h).padStart(2, '0')}:00
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {isStartHourOpen && <div className="fixed inset-0 z-50" onClick={() => setIsStartHourOpen(false)}></div>}
+                </div>
+            </div>
 
-                        {/* Tasks */}
-                        {activeTasks.map((task) => {
-                            const theme = getTaskTheme(task.type);
-                            const style = getTaskStyle(task);
-                            const duration = getDurationMinutes(task);
-                            const viewMode = duration < 45 ? 'MICRO' : 'NORMAL';
+            {/* UNFINISHED TASKS ROLLOVER BANNER */}
+            {showRolloverBanner && unfinishedYesterdayTasks.length > 0 && (
+                <div className="mx-4 sm:mx-6 mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200/80 dark:border-amber-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-sm font-bold shadow-md shadow-amber-500/20">
+                            ⚡
+                        </div>
+                        <div>
+                            <p className="text-xs font-black text-amber-900 dark:text-amber-200">
+                                Ada {unfinishedYesterdayTasks.length} tugas kemarin yang belum selesai
+                            </p>
+                            <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium truncate max-w-xs sm:max-w-md">
+                                {unfinishedYesterdayTasks.map(t => t.title).join(', ')}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                        <button
+                            onClick={onDismissRollover}
+                            className="px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 transition"
+                        >
+                            Abaikan
+                        </button>
+                        <button
+                            onClick={onAcceptRollover}
+                            className="px-3.5 py-1.5 rounded-xl text-[11px] font-black bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20 transition active:scale-95 flex items-center gap-1.5"
+                        >
+                            <span>Pindahkan ke Hari Ini</span>
+                            <ArrowRight size={13} strokeWidth={2.5} />
+                        </button>
+                    </div>
+                </div>
+            )}
 
-                            return (
-                                <div 
-                                    key={task.id}
-                                    onClick={() => editTask(task)}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, task.id)}
-                                    className={`group absolute rounded-lg border px-0 py-0 shadow-sm dark:shadow-none cursor-pointer overflow-hidden transition-all hover:shadow-md dark:hover:shadow-none hover:scale-[1.005] ${theme.card} ${task.completed ? 'opacity-60 grayscale filter' : ''} select-none`}
-                                    style={style}
-                                >
-                                    <div className="w-full h-full relative" title={task.notes ? `📝 ${task.notes}` : ''}>
-                                        
-                                        {viewMode === 'MICRO' ? (
-                                            <div className="flex items-center justify-between h-full px-2 gap-2">
-                                                <div className="flex items-center gap-1.5 overflow-hidden flex-1 min-w-0">
-                                                    <span className="text-xs shrink-0 opacity-80">{theme.icon}</span>
-                                                    <span className={`font-bold text-xs truncate leading-none ${theme.text} ${task.completed ? 'line-through' : ''}`}>
-                                                        {task.title}
-                                                    </span>
-                                                    <span className={`text-[10px] font-mono opacity-60 whitespace-nowrap shrink-0 ${theme.subtext}`}>
-                                                        ({formatDisplayTime(task.start_time || task.startTime)} - {formatDisplayTime(task.end_time || task.endTime) || '??'})
-                                                    </span>
-                                                </div>
+            {/* Timeline Body */}
+            <div ref={scrollContainerRef} className="flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar mt-1">
+                <div className="relative w-full" style={{ height: `${VIEW_LIMIT * HOUR_HEIGHT}px` }}>
+                    
+                    {/* Grid Lines & Time Slots */}
+                    {timeSlots.map((time, i) => (
+                        <div key={time} className="absolute w-full flex border-b border-slate-100 dark:border-slate-800" style={{ top: `${i * HOUR_HEIGHT}px`, height: `${HOUR_HEIGHT}px` }}>
+                            <div className="w-[80px] shrink-0 border-r border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 flex justify-center pt-3 transition-colors duration-500">
+                                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono transition-colors duration-500">{time}</span>
+                            </div>
+                            <div 
+                                onClick={() => onOpenTaskModal(time)}
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.dataTransfer.dropEffect = 'copy';
+                                }}
+                                onDrop={(e) => handleDrop(e, time)}
+                                className="flex-1 relative group/slot cursor-pointer hover:bg-indigo-50/15 dark:hover:bg-indigo-500/10 transition-all"
+                            >
+                                <div className="absolute inset-x-2 top-0.5 bottom-0.5 rounded-xl border border-transparent group-hover/slot:border-indigo-200/60 dark:group-hover/slot:border-indigo-500/30 flex items-center justify-center transition-all">
+                                    <span className="opacity-0 group-hover/slot:opacity-100 text-indigo-500 dark:text-indigo-400 text-[10px] font-black tracking-wider bg-white/80 dark:bg-slate-900/80 px-3 py-1 rounded-full shadow-sm">
+                                        + Jadwalkan di {time}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Current Time Indicator */}
+                    <div className="absolute z-30 flex items-center pointer-events-none w-full" style={getCurrentTimeIndicatorStyle()}>
+                        <div className="w-[80px] flex justify-end pr-2">
+                            <span className="text-[9px] font-black text-white bg-rose-500 px-1.5 rounded shadow-sm">{t('timeline_now') || 'Sekarang'}</span>
+                        </div>
+                        <div className="flex-1 h-[2px] bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
+                    </div>
+
+                    {/* Tasks */}
+                    {activeTasks.map((task) => {
+                        const theme = getTaskTheme(task.type);
+                        const style = getTaskStyle(task);
+                        const duration = getDurationMinutes(task);
+                        const viewMode = duration < 45 ? 'MICRO' : 'NORMAL';
+
+                        return (
+                            <div 
+                                key={task.id}
+                                onClick={() => editTask(task)}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, task.id)}
+                                className={`group absolute rounded-2xl border px-0 py-0 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] ${theme.card} ${task.completed ? 'opacity-60 grayscale filter' : ''} select-none`}
+                                style={style}
+                            >
+                                <div className="w-full h-full relative" title={task.notes ? `📝 ${task.notes}` : ''}>
+                                    
+                                    {viewMode === 'MICRO' ? (
+                                        <div className="flex items-center justify-between h-full px-3 gap-2">
+                                            <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
+                                                <span className="text-xs shrink-0 opacity-90">{theme.icon}</span>
+                                                <span className={`font-bold text-xs truncate leading-none ${theme.text} ${task.completed ? 'line-through' : ''}`}>
+                                                    {task.title}
+                                                </span>
+                                                <span className={`text-[10px] font-mono opacity-60 whitespace-nowrap shrink-0 ${theme.subtext}`}>
+                                                    ({formatDisplayTime(task.start_time || task.startTime)} - {formatDisplayTime(task.end_time || task.endTime) || '??'})
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 shrink-0">
+                                                {onFocusTask && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onFocusTask(task.title);
+                                                        }}
+                                                        title="Fokus tugas ini dengan timer"
+                                                        className="w-5 h-5 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 text-xs transition"
+                                                    >
+                                                        🎯
+                                                    </button>
+                                                )}
                                                 <button 
                                                     onClick={(e) => { e.stopPropagation(); toggleTask(task.id); }}
                                                     className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors bg-white dark:bg-slate-800 hover:scale-110 ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : theme.check}`}
                                                 >
-                                                    {task.completed && <svg className="w-2.5 h-2.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 13l4 4L19 7" /></svg>}
+                                                    {task.completed && <Check size={10} strokeWidth={4} />}
                                                 </button>
                                             </div>
-                                        ) : (
-                                            <div className="flex flex-col h-full px-3 py-2 gap-1">
-                                                <div className="flex justify-between items-center shrink-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border flex items-center gap-1 shadow-sm dark:shadow-none opacity-90 ${theme.badge}`}>
-                                                            {theme.icon} {theme.label}
-                                                        </span>
-                                                        <span className={`text-[10px] font-mono font-bold opacity-60 ${theme.text}`}>
-                                                            {formatDisplayTime(task.start_time || task.startTime)} - {formatDisplayTime(task.end_time || task.endTime) || '??'}
-                                                        </span>
-                                                    </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col h-full px-3.5 py-2.5 gap-1">
+                                            <div className="flex justify-between items-center shrink-0">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg border flex items-center gap-1 shadow-sm opacity-90 ${theme.badge}`}>
+                                                        {theme.icon} {theme.label}
+                                                    </span>
+                                                    <span className={`text-[10px] font-mono font-bold opacity-60 ${theme.text}`}>
+                                                        {formatDisplayTime(task.start_time || task.startTime)} - {formatDisplayTime(task.end_time || task.endTime) || '??'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                    {onFocusTask && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onFocusTask(task.title);
+                                                            }}
+                                                            title="Fokus dengan timer"
+                                                            className="px-2 py-0.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[10px] font-black text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition shadow-sm flex items-center gap-1"
+                                                        >
+                                                            <span>🎯 Fokus</span>
+                                                        </button>
+                                                    )}
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); toggleTask(task.id); }}
-                                                        className={`w-5 h-5 rounded border bg-white dark:bg-slate-800 flex items-center justify-center hover:scale-110 transition-transform shrink-0 shadow-sm dark:shadow-none ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : theme.check}`}
+                                                        className={`w-5 h-5 rounded-lg border bg-white dark:bg-slate-800 flex items-center justify-center hover:scale-110 transition-transform shrink-0 shadow-sm ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : theme.check}`}
                                                     >
-                                                        {task.completed && <svg className="w-3 h-3 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 13l4 4L19 7" /></svg>}
+                                                        {task.completed && <Check size={12} strokeWidth={4} />}
                                                     </button>
                                                 </div>
-                                                <div className="flex items-center gap-2 mt-0.5 min-h-0">
-                                                    <h4 className={`font-black text-sm leading-tight truncate shrink-0 max-w-[50%] ${theme.text} ${task.completed ? 'line-through opacity-50' : ''}`}>
-                                                        {task.title}
-                                                    </h4>
-                                                </div>
-                                                {task.notes && (
-                                                    <div className="min-h-0 flex-1 overflow-hidden mt-0.5">
-                                                        <p className={`text-[10px] leading-relaxed italic opacity-70 ${theme.text}`}>
-                                                            "{task.notes}"
-                                                        </p>
-                                                    </div>
-                                                )}
                                             </div>
-                                        )}
+                                            <div className="flex items-center gap-2 mt-0.5 min-h-0">
+                                                <h4 className={`font-black text-sm leading-tight truncate shrink-0 max-w-[65%] ${theme.text} ${task.completed ? 'line-through opacity-50' : ''}`}>
+                                                    {task.title}
+                                                </h4>
+                                            </div>
+                                            {task.notes && (
+                                                <div className="min-h-0 flex-1 overflow-hidden mt-0.5">
+                                                    <p className={`text-[11px] leading-relaxed italic opacity-75 line-clamp-1 ${theme.text}`}>
+                                                        "{task.notes}"
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
-                                    </div>
                                 </div>
-                            );
-                        })}
-                    </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
+        </div>
     );
 }

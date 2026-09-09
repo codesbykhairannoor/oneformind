@@ -120,7 +120,7 @@ export default function PlannerHeader({
                         <button onClick={onOpenTaskModal} className="flex-1 md:flex-none px-6 py-3.5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 text-xs active:scale-95">
                             <Plus size={16} strokeWidth={3} /> {t('btn_add_timeline') || 'Tambah'}
                         </button>
-                        <button onClick={onResetBoard} className="w-12 h-[46px] md:h-auto flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-2xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-sm dark:shadow-none">
+                        <button onClick={onResetBoard} title="Kosongkan jadwal hari ini" className="w-12 h-[46px] md:h-auto flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-2xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-sm dark:shadow-none">
                             <RotateCcw size={18} strokeWidth={2.5} />
                         </button>
                     </div>

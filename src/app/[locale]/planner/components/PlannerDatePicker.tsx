@@ -94,11 +94,8 @@ export default function PlannerDatePicker({ selectedDate, onDateChange, tasks, o
         return todayDateStr === `${currentYear}-${m}-${d}`;
     };
 
-    const isDisabled = (day: number) => {
-        const targetDate = new Date(currentYear, currentMonth, day);
-        const maxDate = new Date();
-        maxDate.setDate(maxDate.getDate() + 10);
-        return targetDate.getTime() > maxDate.getTime();
+    const isDisabled = (_day: number) => {
+        return false;
     };
 
     // Activity Map
