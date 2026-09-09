@@ -493,8 +493,9 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 	}
 
 	if status == "empty" {
-		_, err = db.Exec(`DELETE FROM habit_logs WHERE habit_id = $1 AND date = $2`, habitID, dateStr)
+		_, err = db.Exec(`DELETE FROM habit_logs WHERE habit_id = $1 AND (date = $2::date OR DATE(date) = $2::date)`, habitID, dateStr)
 		if err != nil {
+			fmt.Printf("Error deleting habit log: %v\n", err)
 			http.Error(w, `{"error": "Failed to delete log"}`, http.StatusInternalServerError)
 			return
 		}
@@ -504,7 +505,7 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 
 	query := `
 		INSERT INTO habit_logs (habit_id, date, status, notes) 
-		VALUES ($1, $2, $3, $4)
+		VALUES ($1, $2::date, $3, $4)
 		ON CONFLICT (habit_id, date) 
 		DO UPDATE SET status = EXCLUDED.status, notes = EXCLUDED.notes, updated_at = NOW()
 		RETURNING id, date, status, notes, created_at, updated_at
@@ -519,7 +520,22 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 		Scan(&l.ID, &logDate, &l.Status, &logNotes, &createdAt, &updatedAt)
 
 	if err != nil {
-		fmt.Printf("Error upserting habit log: %v\n", err)
+		fmt.Printf("Error upserting habit log (trying fallback): %v\n", err)
+		// Fallback: Try UPDATE then INSERT if ON CONFLICT encountered schema mismatch
+		res, updateErr := db.Exec(`UPDATE habit_logs SET status = $1, notes = $2, updated_at = NOW() WHERE habit_id = $3 AND (date = $4::date OR DATE(date) = $4::date)`, status, notes, habitID, dateStr)
+		if updateErr == nil {
+			rowsAffected, _ := res.RowsAffected()
+			if rowsAffected == 0 {
+				_, insertErr := db.Exec(`INSERT INTO habit_logs (habit_id, date, status, notes) VALUES ($1, $2::date, $3, $4)`, habitID, dateStr, status, notes)
+				if insertErr != nil {
+					fmt.Printf("Fallback insert error: %v\n", insertErr)
+					http.Error(w, `{"error": "Failed to update log"}`, http.StatusInternalServerError)
+					return
+				}
+			}
+			w.Write([]byte(`{"success": true}`))
+			return
+		}
 		http.Error(w, `{"error": "Failed to update log"}`, http.StatusInternalServerError)
 		return
 	}

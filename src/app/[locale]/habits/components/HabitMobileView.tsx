@@ -10,6 +10,7 @@ interface HabitMobileViewProps {
     selectedMobileDate: string;
     setSelectedMobileDate: (d: string) => void;
     filteredHabits: ProcessedHabitItem[];
+    numericViewMode: 'value' | 'percent';
     onSelectHabitDetail: (habit: HabitItem) => void;
     onSelectHabitTimer: (habit: HabitItem) => void;
     onOpenNumericPopover: (data: { 
@@ -31,6 +32,7 @@ export default function HabitMobileView({
     selectedMobileDate,
     setSelectedMobileDate,
     filteredHabits,
+    numericViewMode,
     onSelectHabitDetail,
     onSelectHabitTimer,
     onOpenNumericPopover,
@@ -121,30 +123,45 @@ export default function HabitMobileView({
                                 )}
 
                                 {/* Toggle / Counter Button */}
-                                {habit.measurementType === 'numeric' ? (
-                                    <button
-                                        type="button"
-                                        onClick={() => onOpenNumericPopover({
-                                            habitId: habit.id,
-                                            habitName: habit.name,
-                                            habitIcon: habit.icon,
-                                            habitColor: habit.color,
-                                            dateStr: selectedMobileDate,
-                                            currentVal: dayInfo.value || 0,
-                                            targetVal: habit.targetValue || 10,
-                                            unit: habit.unit || '',
-                                            currentNotes: dayInfo.notes || ''
-                                        })}
-                                        className={`px-3 h-11 rounded-2xl font-black text-xs flex items-center gap-1 ${
-                                            isDone
-                                                ? 'bg-emerald-500 text-white shadow-md'
-                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                        }`}
-                                    >
-                                        <span>{dayInfo.value || 0}</span>
-                                        <span className="text-[9px] opacity-70">/{habit.targetValue}</span>
-                                    </button>
-                                ) : (
+                                {habit.measurementType === 'numeric' ? (() => {
+                                    const val = dayInfo.value !== undefined ? dayInfo.value : (isDone ? (habit.targetValue || 10) : 0);
+                                    const target = Math.max(1, habit.targetValue || 10);
+                                    const percentVal = Math.round((val / target) * 100);
+                                    const hasProgress = val > 0 || isDone;
+
+                                    return (
+                                        <button
+                                            type="button"
+                                            onClick={() => onOpenNumericPopover({
+                                                habitId: habit.id,
+                                                habitName: habit.name,
+                                                habitIcon: habit.icon,
+                                                habitColor: habit.color,
+                                                dateStr: selectedMobileDate,
+                                                currentVal: val,
+                                                targetVal: target,
+                                                unit: habit.unit || '',
+                                                currentNotes: dayInfo.notes || ''
+                                            })}
+                                            className={`px-3.5 h-11 rounded-2xl font-black text-xs flex items-center gap-1 transition-all ${
+                                                isDone
+                                                    ? 'bg-emerald-500 text-white shadow-md'
+                                                    : hasProgress
+                                                    ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                            }`}
+                                        >
+                                            {numericViewMode === 'percent' ? (
+                                                <span>{hasProgress ? `${percentVal}%` : '0%'}</span>
+                                            ) : (
+                                                <>
+                                                    <span>{val}</span>
+                                                    <span className="text-[9px] opacity-70">/{habit.targetValue}</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    );
+                                })() : (
                                     <button
                                         type="button"
                                         onClick={() => onToggleStatus(habit.id, selectedMobileDate)}

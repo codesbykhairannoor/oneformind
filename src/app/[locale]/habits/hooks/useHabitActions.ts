@@ -119,6 +119,9 @@ export function useHabitActions({
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ date: dateString, status: nextStatus, notes: notePayload })
             });
+            if (mutateHabits) {
+                mutateHabits();
+            }
         } catch (e) {
             console.error('Failed to toggle habit log', e);
         }
@@ -134,29 +137,35 @@ export function useHabitActions({
 
         setHabits(prev => prev.map(h => {
             if (h.id === habitId) {
-                const updatedLogs = {
-                    ...h.logs,
-                    [dateStr]: {
-                        status: currentStatus,
-                        value: currentLog?.value,
-                        notes: noteText
+                return {
+                    ...h,
+                    logs: {
+                        ...h.logs,
+                        [dateStr]: {
+                            status: currentStatus,
+                            value: currentLog?.value,
+                            notes: noteText
+                        }
                     }
                 };
-                return { ...h, logs: updatedLogs };
             }
             return h;
         }));
 
         try {
+            const notePayload = currentLog?.value !== undefined ? JSON.stringify({ val: currentLog.value, note: noteText }) : noteText;
             await fetch(`/api/habits/${habitId}/logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     date: dateStr,
                     status: currentStatus,
-                    notes: noteText
+                    notes: notePayload
                 })
             });
+            if (mutateHabits) {
+                mutateHabits();
+            }
         } catch (e) {
             console.error('Failed to save habit note', e);
         }
@@ -214,6 +223,9 @@ export function useHabitActions({
                     notes: nextStatus === 'empty' ? '' : JSON.stringify(noteObj)
                 })
             });
+            if (mutateHabits) {
+                mutateHabits();
+            }
         } catch (e) {
             console.error('Failed to update numeric habit log', e);
         }

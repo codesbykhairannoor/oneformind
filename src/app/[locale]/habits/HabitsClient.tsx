@@ -58,6 +58,25 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     const [habits, setHabits] = useState<HabitItem[]>(parsedHabits ?? []);
     const [isLoaded, setIsLoaded] = useState(parsedHabits !== null);
 
+    // Persistent display mode for quantitative habits (Angka vs Persentase)
+    const [numericViewMode, setNumericViewMode] = useState<'value' | 'percent'>('value');
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('tranvas_habit_numeric_mode');
+            if (saved === 'percent' || saved === 'value') {
+                setNumericViewMode(saved);
+            }
+        }
+    }, []);
+
+    const handleToggleNumericViewMode = (mode: 'value' | 'percent') => {
+        setNumericViewMode(mode);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('tranvas_habit_numeric_mode', mode);
+        }
+    };
+
     useEffect(() => {
         if (parsedHabits !== null) {
             setHabits(parsedHabits);
@@ -123,6 +142,8 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setActiveFilter={period.setActiveFilter}
                     soundActive={period.soundActive}
                     toggleSound={period.toggleSound}
+                    numericViewMode={numericViewMode}
+                    onToggleNumericViewMode={handleToggleNumericViewMode}
                     isPeriodDropdownOpen={period.isPeriodDropdownOpen}
                     setIsPeriodDropdownOpen={period.setIsPeriodDropdownOpen}
                     selectedYear={period.selectedYear}
@@ -145,6 +166,8 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                 monthDates={monthDates}
                                 isIndo={isIndo}
                                 t={t}
+                                numericViewMode={numericViewMode}
+                                onToggleNumericViewMode={handleToggleNumericViewMode}
                                 onSelectHabitDetail={form.setDetailModalHabit}
                                 onSelectHabitTimer={form.setTimerModalHabit}
                                 onEditHabit={form.editHabit}
@@ -160,6 +183,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                 selectedMobileDate={period.selectedMobileDate}
                                 setSelectedMobileDate={period.setSelectedMobileDate}
                                 filteredHabits={calc.filteredHabits}
+                                numericViewMode={numericViewMode}
                                 onSelectHabitDetail={form.setDetailModalHabit}
                                 onSelectHabitTimer={form.setTimerModalHabit}
                                 onOpenNumericPopover={form.setNumericPopover}

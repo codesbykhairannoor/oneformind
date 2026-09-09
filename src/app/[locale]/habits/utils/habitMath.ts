@@ -9,12 +9,41 @@ export function getHabitDayInfo(habit: HabitItem, day: MonthDateItem): DayInfo {
 
     let status: DayInfo['status'] = rawStatus;
 
-    // Only unscheduled empty days become 'rest'
-    if (rawStatus === 'empty' && !isScheduled) {
+    if (habit.measurementType === 'numeric') {
+        const target = habit.targetValue || 10;
+        if (typeof value === 'number') {
+            if (value >= target) {
+                status = 'completed';
+            } else if (value > 0) {
+                status = 'in_progress';
+            } else if (rawStatus === 'empty' && !isScheduled) {
+                status = 'rest';
+            } else {
+                status = 'empty';
+            }
+        } else if (rawStatus === 'completed') {
+            status = 'completed';
+        } else if (rawStatus === 'in_progress') {
+            status = 'in_progress';
+        } else if (rawStatus === 'empty' && !isScheduled) {
+            status = 'rest';
+        }
+    } else if (rawStatus === 'empty' && !isScheduled) {
+        // Only unscheduled empty days become 'rest'
         status = 'rest';
     }
 
-    return { status, isScheduled, value, notes, hasNote: Boolean(notes && notes.length > 0) };
+    const effectiveVal = habit.measurementType === 'numeric'
+        ? (typeof value === 'number' ? value : (status === 'completed' ? (habit.targetValue || 10) : 0))
+        : value;
+
+    return { 
+        status, 
+        isScheduled, 
+        value: effectiveVal, 
+        notes, 
+        hasNote: Boolean(notes && notes.length > 0) 
+    };
 }
 
 export function calculateMonthDates(currentMonthKey: string, todayStr: string, isIndo: boolean): MonthDateItem[] {

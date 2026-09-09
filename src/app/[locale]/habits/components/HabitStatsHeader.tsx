@@ -20,6 +20,8 @@ interface HabitStatsHeaderProps {
     setActiveFilter: (filter: 'all' | 'morning' | 'afternoon' | 'evening' | 'quit') => void;
     soundActive: boolean;
     toggleSound: () => void;
+    numericViewMode: 'value' | 'percent';
+    onToggleNumericViewMode: (mode: 'value' | 'percent') => void;
     isPeriodDropdownOpen: boolean;
     setIsPeriodDropdownOpen: (open: boolean) => void;
     selectedYear: number;
@@ -41,6 +43,8 @@ export default function HabitStatsHeader({
     setActiveFilter,
     soundActive,
     toggleSound,
+    numericViewMode,
+    onToggleNumericViewMode,
     isPeriodDropdownOpen,
     setIsPeriodDropdownOpen,
     selectedYear,
@@ -129,9 +133,39 @@ export default function HabitStatsHeader({
                         </div>
                     </div>
 
-                    {/* Right Controls: Period, Sound, Today Meter, Add Button */}
-                    <div className="flex flex-wrap items-center gap-3">
+                    {/* Right Controls: Mode Switcher, Period, Sound, Today Meter, Add Button */}
+                    <div className="flex flex-wrap items-center gap-2.5">
                         
+                        {/* Numeric Mode Switcher (Angka vs Persentase) */}
+                        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-xs font-black shadow-xs">
+                            <button
+                                type="button"
+                                onClick={() => onToggleNumericViewMode('value')}
+                                title={isIndo ? 'Tampilkan Nilai / Angka' : 'Show Numeric Values'}
+                                className={`px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all ${
+                                    numericViewMode === 'value'
+                                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                }`}
+                            >
+                                <span>🔢</span>
+                                <span>{isIndo ? 'Angka' : 'Values'}</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onToggleNumericViewMode('percent')}
+                                title={isIndo ? 'Tampilkan Persentase (%)' : 'Show Percentages (%)'}
+                                className={`px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all ${
+                                    numericViewMode === 'percent'
+                                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                }`}
+                            >
+                                <span>📊</span>
+                                <span>%</span>
+                            </button>
+                        </div>
+
                         {/* Sound Toggle */}
                         <button
                             type="button"

@@ -18,6 +18,8 @@ interface HabitMatrixTableProps {
     monthDates: MonthDateItem[];
     isIndo: boolean;
     t: any;
+    numericViewMode: 'value' | 'percent';
+    onToggleNumericViewMode: (mode: 'value' | 'percent') => void;
     onSelectHabitDetail: (habit: HabitItem) => void;
     onSelectHabitTimer: (habit: HabitItem) => void;
     onEditHabit: (habit: HabitItem) => void;
@@ -42,6 +44,8 @@ export default function HabitMatrixTable({
     monthDates,
     isIndo,
     t,
+    numericViewMode,
+    onToggleNumericViewMode,
     onSelectHabitDetail,
     onSelectHabitTimer,
     onEditHabit,
@@ -50,8 +54,6 @@ export default function HabitMatrixTable({
     onOpenNoteModal,
     onToggleStatus
 }: HabitMatrixTableProps) {
-    const [tableNumericMode, setTableNumericMode] = React.useState<'value' | 'percent'>('value');
-
     return (
         <div className="hidden md:block bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
             <div className="overflow-x-auto custom-scrollbar select-none relative">
@@ -67,10 +69,10 @@ export default function HabitMatrixTable({
                             <div className="flex items-center bg-slate-200/70 dark:bg-slate-800 p-0.5 rounded-lg text-[9px] font-black">
                                 <button
                                     type="button"
-                                    onClick={() => setTableNumericMode('value')}
+                                    onClick={() => onToggleNumericViewMode('value')}
                                     title={isIndo ? 'Tampilkan Angka/Nilai' : 'Show Values'}
                                     className={`px-1.5 py-0.5 rounded-md transition ${
-                                        tableNumericMode === 'value'
+                                        numericViewMode === 'value'
                                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                                     }`}
@@ -79,10 +81,10 @@ export default function HabitMatrixTable({
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setTableNumericMode('percent')}
+                                    onClick={() => onToggleNumericViewMode('percent')}
                                     title={isIndo ? 'Tampilkan Persentase (%)' : 'Show Percentage (%)'}
                                     className={`px-1.5 py-0.5 rounded-md transition ${
-                                        tableNumericMode === 'percent'
+                                        numericViewMode === 'percent'
                                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                                     }`}
@@ -215,57 +217,68 @@ export default function HabitMatrixTable({
                                         <div key={day.dateString} className="w-8 shrink-0 flex justify-center relative">
                                             
                                             {/* Quantitative Cell */}
-                                            {habit.measurementType === 'numeric' ? (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onOpenNumericPopover({
-                                                        habitId: habit.id,
-                                                        habitName: habit.name,
-                                                        habitIcon: habit.icon,
-                                                        habitColor: habit.color,
-                                                        dateStr: day.dateString,
-                                                        currentVal: info.value || 0,
-                                                        targetVal: habit.targetValue || 10,
-                                                        unit: habit.unit || '',
-                                                        currentNotes: info.notes || ''
-                                                    })}
-                                                    onContextMenu={(e) => {
-                                                        e.preventDefault();
-                                                        if (day.isFuture) return;
-                                                        onOpenNoteModal({
-                                                            habit,
+                                            {habit.measurementType === 'numeric' ? (() => {
+                                                const habitVal = info.value !== undefined ? info.value : (isDone ? (habit.targetValue || 10) : 0);
+                                                const target = Math.max(1, habit.targetValue || 10);
+                                                const percentVal = Math.round((habitVal / target) * 100);
+                                                const hasProgress = habitVal > 0 || isDone;
+
+                                                return (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onOpenNumericPopover({
+                                                            habitId: habit.id,
+                                                            habitName: habit.name,
+                                                            habitIcon: habit.icon,
+                                                            habitColor: habit.color,
                                                             dateStr: day.dateString,
-                                                            notes: info.notes || ''
-                                                        });
-                                                    }}
-                                                    disabled={day.isFuture}
-                                                    title={`${info.value || 0} / ${habit.targetValue || 10} ${habit.unit || ''} (${Math.round(((info.value || 0) / (habit.targetValue || 1)) * 100)}%)`}
-                                                    className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${
-                                                        isDone
-                                                            ? 'shadow-xs text-white'
-                                                            : (info.value || 0) > 0
-                                                            ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
-                                                            : isRest
-                                                            ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
-                                                            : day.isFuture
-                                                            ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
-                                                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-indigo-400'
-                                                    }`}
-                                                    style={isDone ? { backgroundColor: habit.color } : {}}
-                                                >
-                                                    {isRest && (info.value === undefined || info.value === 0) && !isDone ? (
-                                                        <Coffee size={12} className="opacity-60" />
-                                                    ) : tableNumericMode === 'percent' ? (
-                                                        <span>{Math.round(((info.value || 0) / (habit.targetValue || 1)) * 100)}%</span>
-                                                    ) : (
-                                                        <span>
-                                                            {(info.value || 0) >= 1000
-                                                                ? `${((info.value || 0) / 1000).toFixed((info.value || 0) % 1000 === 0 ? 0 : 1)}k`
-                                                                : info.value || 0}
-                                                        </span>
-                                                    )}
-                                                </button>
-                                            ) : (
+                                                            currentVal: habitVal,
+                                                            targetVal: target,
+                                                            unit: habit.unit || '',
+                                                            currentNotes: info.notes || ''
+                                                        })}
+                                                        onContextMenu={(e) => {
+                                                            e.preventDefault();
+                                                            if (day.isFuture) return;
+                                                            onOpenNoteModal({
+                                                                habit,
+                                                                dateStr: day.dateString,
+                                                                notes: info.notes || ''
+                                                            });
+                                                        }}
+                                                        disabled={day.isFuture}
+                                                        title={`${habitVal} / ${target} ${habit.unit || ''} (${percentVal}%)`}
+                                                        className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${
+                                                            isDone
+                                                                ? 'shadow-xs text-white'
+                                                                : hasProgress
+                                                                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                                                                : isRest
+                                                                ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
+                                                                : day.isFuture
+                                                                ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
+                                                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-indigo-400'
+                                                        }`}
+                                                        style={isDone ? { backgroundColor: habit.color } : {}}
+                                                    >
+                                                        {isRest && !hasProgress ? (
+                                                            <Coffee size={12} className="opacity-60" />
+                                                        ) : numericViewMode === 'percent' ? (
+                                                            hasProgress ? <span>{percentVal}%</span> : <span className="opacity-30 text-[9px] font-bold">-</span>
+                                                        ) : (
+                                                            hasProgress ? (
+                                                                <span>
+                                                                    {habitVal >= 1000
+                                                                        ? `${(habitVal / 1000).toFixed(habitVal % 1000 === 0 ? 0 : 1)}k`
+                                                                        : habitVal}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="opacity-30 text-[9px] font-bold">-</span>
+                                                            )
+                                                        )}
+                                                    </button>
+                                                );
+                                            })() : (
                                                 /* Standard Boolean / Quit / Rest Cell */
                                                 <button
                                                     type="button"

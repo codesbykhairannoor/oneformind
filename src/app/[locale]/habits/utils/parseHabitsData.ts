@@ -37,16 +37,29 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
                 let logNotes = log.notes || '';
                 let logVal: number | undefined = undefined;
 
-                if (logNotes && typeof logNotes === 'string' && logNotes.startsWith('{')) {
-                    try {
-                        const parsedNote = JSON.parse(logNotes);
-                        logVal = parsedNote.val;
-                        logNotes = parsedNote.note || '';
-                    } catch {}
+                if (logNotes && typeof logNotes === 'string') {
+                    if (logNotes.startsWith('{')) {
+                        try {
+                            const parsedNote = JSON.parse(logNotes);
+                            if (typeof parsedNote.val === 'number') {
+                                logVal = parsedNote.val;
+                            }
+                            logNotes = parsedNote.note || '';
+                        } catch {}
+                    }
+                }
+
+                const rawStatus = (log.status as any) || 'completed';
+
+                // Fallback for numeric habit if value wasn't in note
+                if (measurementType === 'numeric' && logVal === undefined) {
+                    if (rawStatus === 'completed') {
+                        logVal = targetValue;
+                    }
                 }
 
                 logsMap[dateStr] = {
-                    status: (log.status as any) || 'completed',
+                    status: rawStatus,
                     value: logVal,
                     notes: logNotes
                 };
