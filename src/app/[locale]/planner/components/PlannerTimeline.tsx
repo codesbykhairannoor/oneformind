@@ -518,7 +518,7 @@ export default function PlannerTimeline({
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2 mt-0.5 min-h-0">
-                                                <h4 className={`font-black text-sm leading-tight truncate shrink-0 max-w-[65%] ${theme.text} ${task.completed ? 'line-through opacity-50' : ''}`}>
+                                                <h4 className={`font-black text-sm leading-tight truncate flex-1 min-w-0 ${theme.text} ${task.completed ? 'line-through opacity-50' : ''}`}>
                                                     {task.title}
                                                 </h4>
                                             </div>
