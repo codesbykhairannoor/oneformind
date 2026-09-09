@@ -20,6 +20,13 @@ export interface HabitItem {
         value?: number;
         notes?: string;
     }>;
+    // Optional computed metrics
+    progress_count?: number;
+    progress_percent?: number;
+    streak?: number;
+    best_streak?: number;
+    habit_strength?: number;
+    is_stagnant?: boolean;
 }
 
 export interface ProcessedHabitItem extends HabitItem {

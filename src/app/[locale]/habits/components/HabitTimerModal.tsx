@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import ModalPortal from '@/components/ModalPortal';
 import { X, Play, Pause, RotateCcw, Check, Sparkles, Plus } from 'lucide-react';
 import { playTriumphSound, triggerConfetti } from '@/lib/habitAudio';
-import { HabitItem } from './HabitDetailModal';
+import { HabitItem } from '../types';
 
 interface HabitTimerModalProps {
     habit: HabitItem | null;

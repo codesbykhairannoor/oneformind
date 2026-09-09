@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import ModalPortal from '@/components/ModalPortal';
 import { X, MessageSquare, Trash2, Check, Calendar } from 'lucide-react';
-import { HabitItem } from './HabitDetailModal';
+import { HabitItem } from '../types';
 
 interface HabitNoteModalProps {
     habit: HabitItem | null;

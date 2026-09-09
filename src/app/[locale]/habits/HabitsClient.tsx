@@ -184,6 +184,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                         currentStreak={calc.currentStreak}
                         perfectDaysCount={calc.perfectDaysCount}
                         totalCompletions={calc.totalCompletions}
+                        processedHabits={calc.processedHabits}
                     />
                 </main>
 
