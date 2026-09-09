@@ -64,7 +64,7 @@ export default function PlannerPage() {
 
     return (
         <AuthenticatedLayout>
-            <div className="flex flex-col lg:h-[calc(100vh-72px)] lg:overflow-hidden min-h-screen lg:min-h-0">
+            <div className="flex flex-col min-h-screen">
                 <PlannerHeader 
                     selectedDate={planner.selectedDate}
                     onDateChange={planner.handleDateChange}
@@ -78,10 +78,10 @@ export default function PlannerPage() {
                     onResetBoard={planner.requestResetBoard}
                 />
 
-                <div className="flex-1 w-full bg-slate-50/50 dark:bg-slate-950 px-3 sm:px-5 lg:px-6 py-3 lg:py-4 transition-colors duration-500 min-h-0 flex flex-col">
+                <div className="flex-1 w-full bg-slate-50/50 dark:bg-slate-950 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 transition-colors duration-500">
                     
                     {/* Mobile Segmented Switcher (< lg) */}
-                    <div className="flex lg:hidden items-center justify-center p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl mb-3 max-w-sm mx-auto w-full shrink-0">
+                    <div className="flex lg:hidden items-center justify-center p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl mb-4 max-w-sm mx-auto w-full shrink-0">
                         <button 
                             onClick={() => setMobileTab('timeline')}
                             className={`flex-1 py-1.5 text-xs font-black rounded-xl transition flex items-center justify-center gap-1.5 ${
@@ -112,11 +112,11 @@ export default function PlannerPage() {
                         </button>
                     </div>
 
-                    {/* Main Workspace Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-5 flex-1 min-h-0 max-w-full mx-auto w-full">
+                    {/* Main Workspace Layout: Desktop Flex (Sidebar ~320-340px sticky, Timeline flex-1 full width) */}
+                    <div className="flex flex-col lg:flex-row gap-6 w-full items-start">
                         
-                        {/* Sidebar Column: Timer + Inbox + 3-Tab Daily Hub */}
-                        <div className={`lg:col-span-2 w-full lg:h-full lg:overflow-y-auto custom-scrollbar pr-0 lg:pr-1 ${
+                        {/* Sidebar Column: Timer + Inbox + 3-Tab Daily Hub (Zero internal scrollbar, natural display) */}
+                        <div className={`w-full lg:w-[320px] xl:w-[340px] shrink-0 space-y-4 lg:sticky lg:top-4 ${
                             mobileTab === 'sidebar' ? 'block pb-24' : 'hidden lg:block'
                         }`}>
                             <PlannerSidebar 
@@ -144,10 +144,10 @@ export default function PlannerPage() {
                             />
                         </div>
 
-                        {/* Timeline Column */}
-                        <div className={`lg:col-span-3 w-full lg:h-full lg:overflow-hidden min-h-0 ${
-                            mobileTab === 'timeline' ? 'block h-[calc(100vh-210px)] min-h-[500px] lg:h-full pb-20 lg:pb-0' : 'hidden lg:block'
-                        }`}>
+                        {/* Timeline Column: Expands to fill all remaining desktop width */}
+                        <div className={`flex-1 min-w-0 w-full ${
+                            mobileTab === 'timeline' ? 'block h-[calc(100vh-210px)] min-h-[520px] pb-20 lg:pb-0' : 'hidden lg:block'
+                        } lg:h-[calc(100vh-140px)] lg:min-h-[640px]`}>
                              <PlannerTimeline 
                                  tasks={planner.tasks}
                                  selectedDate={planner.selectedDate}

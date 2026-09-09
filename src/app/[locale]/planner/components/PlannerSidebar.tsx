@@ -214,7 +214,7 @@ export default function PlannerSidebar({
                         <p className="text-[11px] text-slate-400 font-bold">Kotak masuk kosong</p>
                     </div>
                 ) : (
-                    <div className="space-y-1.5 max-h-[190px] overflow-y-auto pr-1 custom-scrollbar">
+                    <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1 custom-scrollbar">
                         {taskInbox.map((task) => {
                             const theme = getInboxTaskTheme(task.type);
                             return (
