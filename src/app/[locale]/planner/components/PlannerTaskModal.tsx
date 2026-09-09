@@ -48,6 +48,7 @@ export default function PlannerTaskModal({
 }: PlannerTaskModalProps) {
     const t = useTranslations();
     const locale = useLocale();
+    const isIndo = locale === 'id';
     const [conflictError, setConflictError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -58,14 +59,14 @@ export default function PlannerTaskModal({
                 tasks,
                 selectedDate,
                 editingTaskId,
-                t('error_duration_min') || 'Minimal 5 menit!',
-                t('error_conflict') || 'Jadwal bentrok!'
+                isIndo ? 'Minimal 5 menit!' : 'Minimum 5 minutes!',
+                isIndo ? 'Jadwal bentrok!' : 'Time conflict with another task!'
             );
             setConflictError(err);
         } else {
             setConflictError(null);
         }
-    }, [taskStartTime, taskEndTime, editingTaskId, tasks, show, selectedDate, t]);
+    }, [taskStartTime, taskEndTime, editingTaskId, tasks, show, selectedDate, isIndo]);
 
     if (!show) return null;
 
@@ -78,9 +79,9 @@ export default function PlannerTaskModal({
         if (diff < 0) diff += 1440;
         const hours = Math.floor(diff / 60);
         const mins = diff % 60;
-        if (hours === 0) return `${mins} menit`;
-        if (mins === 0) return `${hours} jam`;
-        return `${hours}j ${mins}m`;
+        if (hours === 0) return isIndo ? `${mins} menit` : `${mins} mins`;
+        if (mins === 0) return isIndo ? `${hours} jam` : `${hours} hrs`;
+        return isIndo ? `${hours}j ${mins}m` : `${hours}h ${mins}m`;
     };
 
     // Quick duration applier
@@ -96,14 +97,14 @@ export default function PlannerTaskModal({
     return (
         <ModalPortal>
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 animate-in fade-in duration-200 backdrop-blur-sm">
-                <div className="absolute inset-0" onClick={onClose}></div>
+                <div className="absolute inset-0" onClick={onClose} />
                 <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                     
                     {/* Modal Header */}
                     <div className="px-6 md:px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30 shrink-0">
                         <div>
                             <h3 className="font-black text-slate-800 dark:text-white text-lg tracking-tight">
-                                {editingTaskId ? (t('modal_edit_title') || 'Edit Jadwal') : (t('modal_new_title') || 'Tambah Jadwal Baru')}
+                                {editingTaskId ? (isIndo ? 'Edit Jadwal' : 'Edit Task') : (isIndo ? 'Tambah Jadwal Baru' : 'New Task')}
                             </h3>
                             <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-0.5">
                                 {new Date(selectedDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -123,7 +124,7 @@ export default function PlannerTaskModal({
                         {/* Title */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
-                                {t('modal_label_task_name') || 'Nama Kegiatan / Tugas'}
+                                {isIndo ? 'Nama Kegiatan / Tugas' : 'Task / Activity Name'}
                             </label>
                             <input 
                                 type="text" 
@@ -131,7 +132,7 @@ export default function PlannerTaskModal({
                                 autoFocus
                                 value={taskTitle}
                                 onChange={(e) => setTaskTitle(e.target.value)}
-                                placeholder={t('modal_placeholder_task_name') || 'Misal: Review sprint, Deep work, Baca buku'}
+                                placeholder={isIndo ? 'Misal: Review sprint, Deep work, Baca buku' : 'e.g. Sprint review, Deep work session, Read book'}
                                 className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                             />
                         </div>
@@ -140,7 +141,7 @@ export default function PlannerTaskModal({
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
-                                    {t('label_start_time') || 'Mulai'}
+                                    {isIndo ? 'Mulai' : 'Start Time'}
                                 </label>
                                 <input 
                                     type="time" 
@@ -152,7 +153,7 @@ export default function PlannerTaskModal({
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
-                                    {t('label_end_time') || 'Selesai'}
+                                    {isIndo ? 'Selesai' : 'End Time'}
                                 </label>
                                 <input 
                                     type="time" 
@@ -168,7 +169,7 @@ export default function PlannerTaskModal({
                         <div className="space-y-1.5 -mt-1 p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center justify-between mb-1">
                                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                                    <Clock size={11} className="text-indigo-500" /> Pilih Durasi
+                                    <Clock size={11} className="text-indigo-500" /> {isIndo ? 'Pilih Durasi' : 'Select Duration'}
                                 </span>
                                 <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
                                     {getDurationText()}
@@ -179,9 +180,9 @@ export default function PlannerTaskModal({
                                     { mins: 15, label: '15m' },
                                     { mins: 30, label: '30m' },
                                     { mins: 45, label: '45m' },
-                                    { mins: 60, label: '1 Jam' },
-                                    { mins: 90, label: '1.5 Jam' },
-                                    { mins: 120, label: '2 Jam' }
+                                    { mins: 60, label: isIndo ? '1 Jam' : '1 Hr' },
+                                    { mins: 90, label: isIndo ? '1.5 Jam' : '1.5 Hr' },
+                                    { mins: 120, label: isIndo ? '2 Jam' : '2 Hr' }
                                 ].map(chip => (
                                     <button
                                         key={chip.mins}
@@ -198,14 +199,14 @@ export default function PlannerTaskModal({
                         {/* Priority / Category */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
-                                {t('label_priority') || 'Prioritas & Kategori'}
+                                {isIndo ? 'Prioritas & Kategori' : 'Priority & Category'}
                             </label>
                             <div className="grid grid-cols-4 gap-2">
                                 {[
-                                    { id: 1, label: t('label_urgent') || 'Urgent', icon: '🔥', color: 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20' },
-                                    { id: 2, label: t('label_work') || 'Work', icon: '💼', color: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20' },
-                                    { id: 3, label: t('prio_normal') || 'Normal', icon: '🌱', color: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' },
-                                    { id: 4, label: t('label_todo') || 'Task', icon: '📝', color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' }
+                                    { id: 1, label: 'Urgent', icon: '🔥', color: 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20' },
+                                    { id: 2, label: 'Work', icon: '💼', color: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20' },
+                                    { id: 3, label: 'Normal', icon: '🌱', color: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' },
+                                    { id: 4, label: isIndo ? 'Tugas' : 'Task', icon: '📝', color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' }
                                 ].map(type => (
                                     <button 
                                         key={type.id}
@@ -223,12 +224,12 @@ export default function PlannerTaskModal({
                         {/* Notes */}
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
-                                {t('label_notes') || 'Catatan Tambahan (Opsional)'}
+                                {isIndo ? 'Catatan Tambahan (Opsional)' : 'Additional Notes (Optional)'}
                             </label>
                             <textarea 
                                 value={taskNotes}
                                 onChange={(e) => setTaskNotes(e.target.value)}
-                                placeholder={t('placeholder_notes') || 'Link, konteks, atau instruksi singkat...'}
+                                placeholder={isIndo ? 'Link, konteks, atau instruksi singkat...' : 'Links, context, or instructions...'}
                                 className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-200 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder-slate-400 dark:placeholder-slate-500 min-h-[80px] resize-none"
                             />
                         </div>
@@ -248,14 +249,14 @@ export default function PlannerTaskModal({
                                     onClick={onDelete} 
                                     className="px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors"
                                 >
-                                    {t('yes_delete') || 'Hapus'}
+                                    {isIndo ? 'Hapus' : 'Delete'}
                                 </button>
                             )}
                             <button 
                                 type="submit" 
                                 className="flex-1 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 active:scale-95 transition-all"
                             >
-                                {editingTaskId ? (t('btn_save_all') || 'Simpan Perubahan') : (t('modal_new_title') || 'Tambahkan ke Jadwal')}
+                                {editingTaskId ? (isIndo ? 'Simpan Perubahan' : 'Save Changes') : (isIndo ? 'Tambahkan ke Jadwal' : 'Add to Schedule')}
                             </button>
                         </div>
                     </form>

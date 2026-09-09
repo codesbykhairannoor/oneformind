@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X } from 'lucide-react';
 import { TaskItem } from '../types';
 
@@ -44,6 +44,9 @@ export default function PlannerTimeline({
     onFocusTask
 }: PlannerTimelineProps) {
     const t = useTranslations();
+    const locale = useLocale();
+    const isIndo = locale === 'id';
+
     const [isStartHourOpen, setIsStartHourOpen] = useState(false);
     const [density, setDensity] = useState<'compact' | 'normal'>('compact');
     const [isMobile, setIsMobile] = useState(false);
@@ -190,7 +193,7 @@ export default function PlannerTimeline({
             default:
                 return {
                     icon: '📝',
-                    label: 'Task',
+                    label: isIndo ? 'Tugas' : 'Task',
                     card: 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm',
                     text: 'text-slate-800 dark:text-white',
                     subtext: 'text-slate-500 dark:text-slate-400',
@@ -289,7 +292,7 @@ export default function PlannerTimeline({
                             {t('timeline_title') || 'Timeline'}
                         </h3>
                         <p className="text-[10px] text-slate-400 font-bold mt-0.5 truncate">
-                            {activeTasks.length} kegiatan
+                            {activeTasks.length} {isIndo ? 'kegiatan' : 'tasks'}
                         </p>
                     </div>
                 </div>
@@ -299,11 +302,11 @@ export default function PlannerTimeline({
                     {isToday && (
                         <button
                             onClick={() => scrollToCurrentTime(true)}
-                            title="Gulir ke jam saat ini"
+                            title={isIndo ? "Gulir ke jam saat ini" : "Scroll to current time"}
                             className="px-2 py-1 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-500/20 text-[10px] font-black hover:bg-rose-100 transition active:scale-95 flex items-center gap-1"
                         >
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
-                            <span className="hidden xs:inline">Sekarang</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                            <span className="hidden xs:inline">{isIndo ? 'Sekarang' : 'Now'}</span>
                         </button>
                     )}
 
@@ -311,24 +314,26 @@ export default function PlannerTimeline({
                     <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
                         <button
                             onClick={() => toggleDensity('compact')}
-                            title="Tampilan Kompak (52px / jam) - Lebih hemat ruang"
+                            title={isIndo ? "Tampilan Kompak (52px / jam) - Lebih hemat ruang" : "Compact View (52px / hr)"}
                             className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-[10px] font-black transition ${density === 'compact' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
                         >
-                            Kompak
+                            {isIndo ? 'Kompak' : 'Compact'}
                         </button>
                         <button
                             onClick={() => toggleDensity('normal')}
-                            title="Tampilan Standar (72px / jam) - Ruang kartu lebih lega"
+                            title={isIndo ? "Tampilan Standar (72px / jam) - Ruang kartu lebih lega" : "Normal View (72px / hr)"}
                             className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-[10px] font-black transition ${density === 'normal' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
                         >
-                            Standar
+                            {isIndo ? 'Standar' : 'Normal'}
                         </button>
                     </div>
 
                     {/* Start Hour Selector */}
                     <div className="relative shrink-0">
                         <button onClick={() => setIsStartHourOpen(!isStartHourOpen)} className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group">
-                            <span className="hidden sm:inline text-[10px] font-black text-slate-400 dark:text-slate-500 px-1.5 uppercase tracking-tighter transition-colors duration-500">{t('label_start') || 'Mulai'}</span>
+                            <span className="hidden sm:inline text-[10px] font-black text-slate-400 dark:text-slate-500 px-1.5 uppercase tracking-tighter transition-colors duration-500">
+                                {isIndo ? 'Mulai' : 'Start'}
+                            </span>
                             <div className="bg-white dark:bg-slate-900 px-1.5 sm:px-2 py-0.5 rounded-lg shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors duration-500">
                                 <span className="text-[10px] sm:text-[11px] font-black text-indigo-600 dark:text-indigo-400 font-mono">{String(startHour).padStart(2, '0')}:00</span>
                                 <ChevronDown size={10} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
@@ -338,7 +343,9 @@ export default function PlannerTimeline({
                         {isStartHourOpen && (
                             <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-3 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
                                 <div className="flex justify-between items-center mb-2.5 px-1">
-                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-500">{t('select_hour') || 'Mulai dari Jam'}</span>
+                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-500">
+                                        {isIndo ? 'Mulai dari Jam' : 'Start at Hour'}
+                                    </span>
                                     <button onClick={() => setIsStartHourOpen(false)} className="text-slate-300 dark:text-slate-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
                                         <X size={14} strokeWidth={3} />
                                     </button>
@@ -356,7 +363,7 @@ export default function PlannerTimeline({
                                 </div>
                             </div>
                         )}
-                        {isStartHourOpen && <div className="fixed inset-0 z-50" onClick={() => setIsStartHourOpen(false)}></div>}
+                        {isStartHourOpen && <div className="fixed inset-0 z-50" onClick={() => setIsStartHourOpen(false)} />}
                     </div>
                 </div>
             </div>
@@ -370,7 +377,7 @@ export default function PlannerTimeline({
                         </div>
                         <div>
                             <p className="text-xs font-black text-amber-900 dark:text-amber-200">
-                                Ada {unfinishedYesterdayTasks.length} tugas kemarin yang belum selesai
+                                {isIndo ? `Ada ${unfinishedYesterdayTasks.length} tugas kemarin yang belum selesai` : `You have ${unfinishedYesterdayTasks.length} unfinished tasks from yesterday`}
                             </p>
                             <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium truncate max-w-xs sm:max-w-md">
                                 {unfinishedYesterdayTasks.map(t => t.title).join(', ')}
@@ -382,13 +389,13 @@ export default function PlannerTimeline({
                             onClick={onDismissRollover}
                             className="px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 transition"
                         >
-                            Abaikan
+                            {isIndo ? 'Abaikan' : 'Dismiss'}
                         </button>
                         <button
                             onClick={onAcceptRollover}
                             className="px-3.5 py-1.5 rounded-xl text-[11px] font-black bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20 transition active:scale-95 flex items-center gap-1.5"
                         >
-                            <span>Pindahkan</span>
+                            <span>{isIndo ? 'Pindahkan' : 'Rollover'}</span>
                             <ArrowRight size={13} strokeWidth={2.5} />
                         </button>
                     </div>
@@ -429,9 +436,11 @@ export default function PlannerTimeline({
                     {/* Current Time Indicator */}
                     <div className="absolute z-30 flex items-center pointer-events-none w-full" style={getCurrentTimeIndicatorStyle()}>
                         <div style={{ width: `${timeColWidth}px` }} className="flex justify-end pr-1 sm:pr-2">
-                            <span className="text-[8px] sm:text-[9px] font-black text-white bg-rose-500 px-1 sm:px-1.5 rounded shadow-sm">{t('timeline_now') || 'Sekarang'}</span>
+                            <span className="text-[8px] sm:text-[9px] font-black text-white bg-rose-500 px-1 sm:px-1.5 rounded shadow-sm">
+                                {isIndo ? 'Sekarang' : 'Now'}
+                            </span>
                         </div>
-                        <div className="flex-1 h-[2px] bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
+                        <div className="flex-1 h-[2px] bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
                     </div>
 
                     {/* Tasks */}
@@ -468,10 +477,10 @@ export default function PlannerTimeline({
                                                 {onFocusTask && (
                                                     <button
                                                         onClick={(e) => {
-                                                            e.stopPropagation();
+                                                             e.stopPropagation();
                                                             onFocusTask(task.title);
                                                         }}
-                                                        title="Fokus tugas ini dengan timer"
+                                                        title={isIndo ? "Fokus tugas ini dengan timer" : "Focus on task with timer"}
                                                         className="w-5 h-5 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 text-xs transition"
                                                     >
                                                         🎯
@@ -506,10 +515,10 @@ export default function PlannerTimeline({
                                                                 e.stopPropagation();
                                                                 onFocusTask(task.title);
                                                             }}
-                                                            title="Fokus dengan timer"
+                                                            title={isIndo ? "Fokus dengan timer" : "Focus with timer"}
                                                             className="px-2 py-0.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[10px] font-black text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition shadow-sm flex items-center gap-1"
                                                         >
-                                                            <span>🎯 Fokus</span>
+                                                            <span>{isIndo ? '🎯 Fokus' : '🎯 Focus'}</span>
                                                         </button>
                                                     )}
                                                     <button 

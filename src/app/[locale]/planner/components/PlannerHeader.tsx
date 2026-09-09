@@ -25,6 +25,7 @@ export default function PlannerHeader({
 }: PlannerHeaderProps) {
     const t = useTranslations();
     const locale = useLocale();
+    const isIndo = locale === 'id';
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
     const navigateDate = (offset: number) => {
@@ -40,7 +41,7 @@ export default function PlannerHeader({
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         
-        if (dateStr === todayStr) return t('label_today') || 'Hari ini';
+        if (dateStr === todayStr) return isIndo ? 'Hari ini' : 'Today';
         
         const [y, m, d] = dateStr.split('-').map(Number);
         const localDate = new Date(y, m - 1, d);
@@ -49,8 +50,8 @@ export default function PlannerHeader({
         const diffTime = localDate.getTime() - todayMidnight.getTime();
         const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
         
-        if (diffDays === 1) return t('label_tomorrow') || 'Besok';
-        if (diffDays === -1) return t('label_yesterday') || 'Kemarin';
+        if (diffDays === 1) return isIndo ? 'Besok' : 'Tomorrow';
+        if (diffDays === -1) return isIndo ? 'Kemarin' : 'Yesterday';
         
         return localDate.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' });
     };
@@ -104,9 +105,9 @@ export default function PlannerHeader({
                         {/* Mobile Actions: Add + Reset */}
                         <div className="flex md:hidden items-center gap-1.5 shrink-0">
                             <button onClick={onOpenTaskModal} className="px-3 py-1.5 bg-indigo-600 text-white rounded-xl font-black hover:bg-indigo-700 transition shadow-sm flex items-center justify-center gap-1 text-xs active:scale-95">
-                                <Plus size={14} strokeWidth={3} /> <span>{t('btn_add_timeline') || 'Tambah'}</span>
+                                <Plus size={14} strokeWidth={3} /> <span>{isIndo ? 'Tambah' : 'Add'}</span>
                             </button>
-                            <button onClick={onResetBoard} title="Kosongkan jadwal hari ini" className="w-8 h-8 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95">
+                            <button onClick={onResetBoard} title={isIndo ? "Kosongkan jadwal hari ini" : "Clear today's schedule"} className="w-8 h-8 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95">
                                 <RotateCcw size={14} strokeWidth={2.5} />
                             </button>
                         </div>
@@ -116,12 +117,18 @@ export default function PlannerHeader({
                     <div className="flex-1 w-full min-w-0 md:px-6 lg:px-10 max-w-3xl">
                         <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-black text-slate-400 dark:text-slate-500 mb-1">
                             <span className="flex items-center gap-1">
-                                <span>{t('header_progress') || 'Progress'}</span>
+                                <span>{isIndo ? 'Progres' : 'Progress'}</span>
                                 <span className="text-indigo-600 dark:text-indigo-400 font-bold">({stats.percent}%)</span>
                             </span>
                             <div className="flex items-center gap-2.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>{stats.completed} {t('header_completed') || 'Selesai'}</span>
-                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>{stats.pending} {t('header_pending') || 'Tertunda'}</span>
+                                <span className="flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                    {stats.completed} {isIndo ? 'Selesai' : 'Completed'}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                    {stats.pending} {isIndo ? 'Tertunda' : 'Pending'}
+                                </span>
                             </div>
                         </div>
                         <div className="h-1.5 sm:h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-50 dark:border-slate-700">
@@ -132,9 +139,9 @@ export default function PlannerHeader({
                     {/* Desktop Actions */}
                     <div className="hidden md:flex gap-2.5 items-center shrink-0">
                         <button onClick={onOpenTaskModal} className="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 text-xs active:scale-95">
-                            <Plus size={16} strokeWidth={3} /> {t('btn_add_timeline') || 'Tambah'}
+                            <Plus size={16} strokeWidth={3} /> {isIndo ? 'Tambah' : 'Add Task'}
                         </button>
-                        <button onClick={onResetBoard} title="Kosongkan jadwal hari ini" className="w-10 h-10 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-2xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-sm dark:shadow-none">
+                        <button onClick={onResetBoard} title={isIndo ? "Kosongkan jadwal hari ini" : "Clear today's schedule"} className="w-10 h-10 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-2xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-sm dark:shadow-none">
                             <RotateCcw size={16} strokeWidth={2.5} />
                         </button>
                     </div>
