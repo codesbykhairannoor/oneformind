@@ -51,10 +51,17 @@ export function useHabitsCalculation({
     const topHabit = [...processedHabits].sort((a, b) => (b.progress_count || 0) - (a.progress_count || 0))[0];
     const totalCompletions = processedHabits.reduce((acc, h) => acc + (h.progress_count || 0), 0);
 
-    // Active Streak calculation
+    // Active Streak calculation across all habits
     let currentStreak = 0;
-    const todayDayNumForStreak = mkYear === todayYear && mkMonth === parseInt(todayMonth) ? parseInt(todayDay) : daysInCurrentMonth;
-    for (let d = todayDayNumForStreak; d >= 1; d--) {
+    const isCurrentMonth = mkYear === todayYear && mkMonth === parseInt(todayMonth);
+    const todayDayNumForStreak = isCurrentMonth ? parseInt(todayDay) : daysInCurrentMonth;
+    
+    // If today has completed habits, start from today; if not, check from yesterday so ongoing streak doesn't reset in the morning
+    const todayDayObj = monthDates[todayDayNumForStreak - 1];
+    const todayHasDone = todayDayObj ? processedHabits.some(h => getHabitDayInfo(h, todayDayObj).status === 'completed') : false;
+    const startStreakDay = isCurrentMonth && !todayHasDone ? todayDayNumForStreak - 1 : todayDayNumForStreak;
+
+    for (let d = startStreakDay; d >= 1; d--) {
         const dayObj = monthDates[d - 1];
         if (!dayObj) continue;
         const anyDone = processedHabits.some(h => getHabitDayInfo(h, dayObj).status === 'completed');
@@ -62,16 +69,17 @@ export function useHabitsCalculation({
         else break;
     }
 
-    // Perfect Days Count
+    // Perfect Days Count (Day where all scheduled habits were completed, and at least 1 habit was completed)
     let perfectDaysCount = 0;
     for (let d = 1; d <= todayDayNumForStreak; d++) {
         const dayObj = monthDates[d - 1];
         if (!dayObj) continue;
-        const allDone = processedHabits.length > 0 && processedHabits.every(h => {
+        const hasAtLeastOneDone = processedHabits.some(h => getHabitDayInfo(h, dayObj).status === 'completed');
+        const allScheduledDone = processedHabits.length > 0 && processedHabits.every(h => {
             const info = getHabitDayInfo(h, dayObj);
-            return info.status === 'completed' || info.status === 'rest';
+            return !info.isScheduled || info.status === 'completed' || info.status === 'rest';
         });
-        if (allDone) perfectDaysCount++;
+        if (hasAtLeastOneDone && allScheduledDone) perfectDaysCount++;
     }
 
     // Today Progress

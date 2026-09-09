@@ -174,7 +174,7 @@ export default function HabitMatrixTable({
                                         <div key={day.dateString} className="w-8 shrink-0 flex justify-center relative">
                                             
                                             {/* Quantitative Cell */}
-                                            {habit.measurementType === 'numeric' && !isRest ? (
+                                            {habit.measurementType === 'numeric' ? (
                                                 <button
                                                     type="button"
                                                     onClick={() => onOpenNumericPopover({
@@ -184,31 +184,45 @@ export default function HabitMatrixTable({
                                                         targetVal: habit.targetValue || 10,
                                                         unit: habit.unit || ''
                                                     })}
+                                                    onContextMenu={(e) => {
+                                                        e.preventDefault();
+                                                        if (day.isFuture) return;
+                                                        onOpenNoteModal({
+                                                            habit,
+                                                            dateStr: day.dateString,
+                                                            notes: info.notes || ''
+                                                        });
+                                                    }}
                                                     disabled={day.isFuture}
                                                     className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${
                                                         isDone
                                                             ? 'shadow-xs text-white'
                                                             : (info.value || 0) > 0
                                                             ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                                                            : isRest
+                                                            ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
                                                             : day.isFuture
                                                             ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
                                                             : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-indigo-400'
                                                     }`}
                                                     style={isDone ? { backgroundColor: habit.color } : {}}
                                                 >
-                                                    <span>{info.value || 0}</span>
+                                                    {isRest && (info.value === undefined || info.value === 0) && !isDone ? (
+                                                        <Coffee size={12} className="opacity-60" />
+                                                    ) : (
+                                                        <span>{info.value || 0}</span>
+                                                    )}
                                                 </button>
                                             ) : (
                                                 /* Standard Boolean / Quit / Rest Cell */
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        if (isRest) return;
                                                         onToggleStatus(habit.id, day.dateString);
                                                     }}
                                                     onContextMenu={(e) => {
                                                         e.preventDefault();
-                                                        if (isRest || day.isFuture) return;
+                                                        if (day.isFuture) return;
                                                         onOpenNoteModal({
                                                             habit,
                                                             dateStr: day.dateString,
@@ -222,7 +236,7 @@ export default function HabitMatrixTable({
                                                             : isRelapse
                                                             ? 'bg-rose-500 text-white shadow-xs'
                                                             : isRest
-                                                            ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-600 cursor-default'
+                                                            ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
                                                             : isSkipped
                                                             ? 'bg-slate-200 dark:bg-slate-800 text-slate-400'
                                                             : day.isFuture

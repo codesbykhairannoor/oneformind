@@ -71,24 +71,28 @@ export function useHabitActions({
         const currentStatus = currentLog?.status || 'empty';
         let nextStatus: 'completed' | 'skipped' | 'empty' | 'relapse' = 'completed';
 
-        if (targetHabit.habitType === 'negative') {
-            nextStatus = currentStatus === 'relapse' ? 'empty' : 'relapse';
-            if (nextStatus === 'relapse') {
+        if (forceStatus) {
+            nextStatus = currentStatus === forceStatus ? 'empty' : forceStatus;
+            if (nextStatus === 'completed') playCheckSound();
+            else playUncheckSound();
+        } else if (targetHabit.habitType === 'negative') {
+            if (currentStatus === 'empty' || currentStatus === 'skipped' || currentStatus === 'rest') {
+                nextStatus = 'completed';
+                playCheckSound();
+            } else if (currentStatus === 'completed') {
+                nextStatus = 'relapse';
                 playUncheckSound();
             } else {
-                playCheckSound();
+                nextStatus = 'empty';
+                playUncheckSound();
             }
         } else {
-            if (forceStatus) {
-                nextStatus = currentStatus === forceStatus ? 'empty' : forceStatus;
+            if (currentStatus === 'empty' || currentStatus === 'skipped' || currentStatus === 'rest') {
+                nextStatus = 'completed';
+                playCheckSound();
             } else {
-                if (currentStatus === 'empty' || currentStatus === 'skipped') {
-                    nextStatus = 'completed';
-                    playCheckSound();
-                } else {
-                    nextStatus = 'empty';
-                    playUncheckSound();
-                }
+                nextStatus = 'empty';
+                playUncheckSound();
             }
         }
 
@@ -126,7 +130,7 @@ export function useHabitActions({
         if (!targetHabit) return;
 
         const currentLog = targetHabit.logs[dateStr];
-        const currentStatus = currentLog?.status || (targetHabit.habitType === 'negative' ? 'completed' : 'empty');
+        const currentStatus = currentLog?.status || 'empty';
 
         setHabits(prev => prev.map(h => {
             if (h.id === habitId) {

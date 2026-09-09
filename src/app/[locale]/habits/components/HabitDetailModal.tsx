@@ -64,7 +64,7 @@ export default function HabitDetailModal({ habit, isOpen, onClose, locale }: Hab
             if (!isNaN(date.getTime())) {
                 const dayIndex = date.getDay();
                 totals[dayIndex]++;
-                if (log.status === 'completed' || (isNegative && log.status !== 'relapse' && log.status !== 'empty')) {
+                if (log.status === 'completed') {
                     counts[dayIndex]++;
                 }
             }
@@ -247,7 +247,7 @@ export default function HabitDetailModal({ habit, isOpen, onClose, locale }: Hab
                                     {heatmapWeeks.map((week, wIdx) => (
                                         <div key={wIdx} className="flex flex-col gap-1">
                                             {week.map((day, dIdx) => {
-                                                const isCompleted = day.status === 'completed' || (isNegative && day.status !== 'relapse' && !day.isFuture && day.status !== 'empty');
+                                                const isCompleted = day.status === 'completed';
                                                 const isRelapse = day.status === 'relapse';
                                                 const isSkipped = day.status === 'skipped';
                                                 const isRest = day.status === 'rest';

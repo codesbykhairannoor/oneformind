@@ -9,17 +9,9 @@ export function getHabitDayInfo(habit: HabitItem, day: MonthDateItem): DayInfo {
 
     let status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest' = rawStatus;
 
-    if (habit.habitType === 'negative') {
-        // For quit habit, if not relapse, past and today are clean by default
-        if (rawStatus === 'relapse') {
-            status = 'relapse';
-        } else if (!day.isFuture) {
-            status = 'completed'; // Clean
-        }
-    } else {
-        if (!isScheduled && rawStatus === 'empty') {
-            status = 'rest';
-        }
+    // Only unscheduled empty days become 'rest'
+    if (rawStatus === 'empty' && !isScheduled) {
+        status = 'rest';
     }
 
     return { status, isScheduled, value, notes, hasNote: Boolean(notes && notes.length > 0) };
@@ -76,7 +68,12 @@ export function processHabitsMetrics(
     const todayMonth = todayObj.getMonth() + 1;
     const todayDay = todayObj.getDate();
     const daysInCurrentMonth = monthDates.length;
-    const todayDayNum = mkYear === todayYear && mkMonth === todayMonth ? todayDay : daysInCurrentMonth;
+
+    const isCurrentMonth = mkYear === todayYear && mkMonth === todayMonth;
+    const isPastMonth = mkYear < todayYear || (mkYear === todayYear && mkMonth < todayMonth);
+    const isFutureMonth = mkYear > todayYear || (mkYear === todayYear && mkMonth > todayMonth);
+
+    const activeDayIndex = isCurrentMonth ? todayDay : (isPastMonth ? daysInCurrentMonth : 0);
 
     return habits.map(h => {
         let completedCount = 0;
@@ -86,61 +83,56 @@ export function processHabitsMetrics(
             const info = getHabitDayInfo(h, day);
             if (info.isScheduled) {
                 scheduledDaysCount++;
-                if (info.status === 'completed') {
-                    completedCount++;
-                }
+            }
+            if (info.status === 'completed') {
+                completedCount++;
             }
         });
 
         const effectiveTarget = h.frequencyType === 'weekly_days'
             ? scheduledDaysCount
-            : h.monthlyTarget;
+            : (h.monthlyTarget || daysInCurrentMonth);
         const progressPercent = Math.min(100, Math.round((completedCount / (effectiveTarget || 1)) * 100));
 
-        // 1. Calculate Active Streak (Rest Day Resilient)
-        let streak = 0;
+        // 1. Calculate Best Streak & Running Streak
         let bestStreak = 0;
-        let tempStreak = 0;
+        let runningStreak = 0;
 
-        for (let d = 1; d <= todayDayNum; d++) {
+        for (let d = 1; d <= activeDayIndex; d++) {
             const dayObj = monthDates[d - 1];
             if (!dayObj) continue;
             const info = getHabitDayInfo(h, dayObj);
 
-            if (h.habitType === 'negative') {
-                if (info.status !== 'relapse') {
-                    tempStreak++;
-                    if (tempStreak > bestStreak) bestStreak = tempStreak;
-                } else {
-                    tempStreak = 0;
-                }
+            if (info.status === 'completed') {
+                runningStreak++;
+                if (runningStreak > bestStreak) bestStreak = runningStreak;
+            } else if (info.status === 'rest') {
+                // Rest day carries over streak without breaking or incrementing
+                continue;
             } else {
-                if (info.status === 'completed') {
-                    tempStreak++;
-                    if (tempStreak > bestStreak) bestStreak = tempStreak;
-                } else if (info.status === 'rest') {
-                    // Rest day does NOT break streak!
-                    continue;
-                } else {
-                    tempStreak = 0;
-                }
+                runningStreak = 0;
             }
         }
 
-        // Streak counting backwards from today
-        for (let d = todayDayNum; d >= 1; d--) {
-            const dayObj = monthDates[d - 1];
-            if (!dayObj) continue;
-            const info = getHabitDayInfo(h, dayObj);
+        // Current Active Streak (walk backwards from today or yesterday if today is unlogged)
+        let currentStreak = 0;
+        if (activeDayIndex > 0) {
+            const todayDayObj = monthDates[activeDayIndex - 1];
+            const todayInfo = todayDayObj ? getHabitDayInfo(h, todayDayObj) : null;
+            
+            let startD = activeDayIndex;
+            if (isCurrentMonth && todayInfo && (todayInfo.status === 'empty' || todayInfo.status === 'rest')) {
+                startD = activeDayIndex - 1;
+            }
 
-            if (h.habitType === 'negative') {
-                if (info.status !== 'relapse') streak++;
-                else break;
-            } else {
+            for (let d = startD; d >= 1; d--) {
+                const dayObj = monthDates[d - 1];
+                if (!dayObj) continue;
+                const info = getHabitDayInfo(h, dayObj);
+
                 if (info.status === 'completed') {
-                    streak++;
+                    currentStreak++;
                 } else if (info.status === 'rest') {
-                    // Keep walking past rest days
                     continue;
                 } else {
                     break;
@@ -148,32 +140,35 @@ export function processHabitsMetrics(
             }
         }
 
-        // 2. Calculate Loop Habit Strength Index (Exponential Smoothing)
-        let strength = 0.5; // Starts at 50%
-        for (let d = 1; d <= todayDayNum; d++) {
-            const dayObj = monthDates[d - 1];
-            if (!dayObj) continue;
-            const info = getHabitDayInfo(h, dayObj);
+        // 2. Calculate Loop Habit Strength Index (0 to 100%)
+        let habitStrength = 0;
+        if (completedCount > 0 && activeDayIndex > 0) {
+            let strengthScore = 0;
+            let totalWeight = 0;
+            for (let d = 1; d <= activeDayIndex; d++) {
+                const dayObj = monthDates[d - 1];
+                if (!dayObj) continue;
+                const info = getHabitDayInfo(h, dayObj);
+                const weight = Math.pow(1.05, d);
+                totalWeight += weight;
 
-            if (info.status === 'rest') {
-                // Carry over previous strength without penalty
-                continue;
-            } else if (info.status === 'completed') {
-                strength = strength * 0.95 + 1.0 * 0.05;
-            } else if (info.status === 'relapse' || info.status === 'empty' || info.status === 'skipped') {
-                strength = strength * 0.95 + 0.0 * 0.05;
+                if (info.status === 'completed') {
+                    strengthScore += weight;
+                } else if (info.status === 'rest') {
+                    strengthScore += weight * 0.7;
+                }
             }
+            habitStrength = Math.min(100, Math.round((strengthScore / (totalWeight || 1)) * 100));
         }
-        const habitStrength = Math.round(strength * 100);
 
         return {
             ...h,
             progress_count: completedCount,
             progress_percent: progressPercent,
-            streak,
-            best_streak: Math.max(bestStreak, streak),
+            streak: currentStreak,
+            best_streak: Math.max(bestStreak, currentStreak),
             habit_strength: habitStrength,
-            is_stagnant: completedCount === 0 && todayDayNum > 7
+            is_stagnant: completedCount === 0 && activeDayIndex > 7
         };
     });
 }

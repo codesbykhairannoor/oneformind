@@ -5,30 +5,39 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
     
     return fetchedHabits.map((h: any): HabitItem => {
         let extraMeta: any = {};
-        if (h.status && h.status.startsWith('{')) {
+        if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
             try {
                 extraMeta = JSON.parse(h.status);
             } catch {}
         }
 
-        const habitType = extraMeta.habitType || (h.name.toLowerCase().includes('berhenti') || h.name.toLowerCase().includes('quit') || h.name.toLowerCase().includes('stop') ? 'negative' : 'positive');
-        const measurementType = extraMeta.measurementType || (extraMeta.targetValue ? 'numeric' : 'boolean');
-        const unit = extraMeta.unit || 'x';
+        const habitType = extraMeta.habitType === 'negative'
+            ? 'negative'
+            : extraMeta.habitType === 'positive'
+            ? 'positive'
+            : (h.name && (h.name.toLowerCase().startsWith('berhenti ') || h.name.toLowerCase().startsWith('stop ') || h.name.toLowerCase().startsWith('quit ')) ? 'negative' : 'positive');
+
+        const measurementType = extraMeta.measurementType === 'numeric' || extraMeta.targetValue ? 'numeric' : 'boolean';
+        const unit = extraMeta.unit || (measurementType === 'numeric' ? 'ml' : 'x');
         const targetValue = extraMeta.targetValue || (measurementType === 'numeric' ? 10 : 1);
         const frequencyType = extraMeta.frequencyType || 'daily';
-        const frequencyDays = extraMeta.frequencyDays || [0, 1, 2, 3, 4, 5, 6];
-        const frequencyCount = extraMeta.frequencyCount || 7;
+        const frequencyDays = Array.isArray(extraMeta.frequencyDays) ? extraMeta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
+        const frequencyCount = extraMeta.frequencyCount || frequencyDays.length;
         const timeOfDay = extraMeta.timeOfDay || 'anytime';
 
         const logsMap: Record<string, { status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest'; value?: number; notes?: string }> = {};
 
-        if (h.logs) {
+        if (h.logs && Array.isArray(h.logs)) {
             h.logs.forEach((log: any) => {
-                const dateStr = new Date(log.date).toISOString().split('T')[0];
+                if (!log || !log.date) return;
+                const dateStr = typeof log.date === 'string'
+                    ? log.date.split('T')[0]
+                    : new Date(log.date).toISOString().split('T')[0];
+
                 let logNotes = log.notes || '';
                 let logVal: number | undefined = undefined;
 
-                if (logNotes && logNotes.startsWith('{')) {
+                if (logNotes && typeof logNotes === 'string' && logNotes.startsWith('{')) {
                     try {
                         const parsedNote = JSON.parse(logNotes);
                         logVal = parsedNote.val;
@@ -37,7 +46,7 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
                 }
 
                 logsMap[dateStr] = {
-                    status: log.status as any,
+                    status: (log.status as any) || 'completed',
                     value: logVal,
                     notes: logNotes
                 };

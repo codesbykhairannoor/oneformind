@@ -27,6 +27,8 @@ export default function HabitNumericPopover({
 }: HabitNumericPopoverProps) {
     if (!data) return null;
 
+    const step = data.targetVal <= 10 ? 1 : data.targetVal <= 50 ? 5 : data.targetVal <= 250 ? 10 : 100;
+
     return (
         <ModalPortal>
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -39,26 +41,47 @@ export default function HabitNumericPopover({
                         {data.dateStr} • Target: {data.targetVal} {data.unit}
                     </p>
 
-                    <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="flex items-center justify-center gap-3 mb-3">
                         <button
                             type="button"
-                            onClick={() => onChangeVal(Math.max(0, data.currentVal - 100))}
-                            className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                            onClick={() => onChangeVal(Math.max(0, data.currentVal - step))}
+                            className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95"
                         >
                             <Minus size={16} />
                         </button>
-                        <input
-                            type="number"
-                            value={data.currentVal}
-                            onChange={(e) => onChangeVal(Number(e.target.value))}
-                            className="w-24 text-center font-black text-xl py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-indigo-500"
-                        />
+                        <div className="relative">
+                            <input
+                                type="number"
+                                min="0"
+                                value={data.currentVal}
+                                onChange={(e) => onChangeVal(Math.max(0, Number(e.target.value)))}
+                                className="w-24 text-center font-black text-xl py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-indigo-500"
+                            />
+                        </div>
                         <button
                             type="button"
-                            onClick={() => onChangeVal(data.currentVal + 100)}
-                            className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                            onClick={() => onChangeVal(data.currentVal + step)}
+                            className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95"
                         >
                             <Plus size={16} />
+                        </button>
+                    </div>
+
+                    {/* Quick preset buttons */}
+                    <div className="flex items-center justify-center gap-1.5 mb-4">
+                        <button
+                            type="button"
+                            onClick={() => onChangeVal(Math.round(data.targetVal / 2))}
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                        >
+                            50% ({Math.round(data.targetVal / 2)})
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onChangeVal(data.targetVal)}
+                            className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition"
+                        >
+                            100% ({data.targetVal})
                         </button>
                     </div>
 
@@ -73,7 +96,7 @@ export default function HabitNumericPopover({
                         <button
                             type="button"
                             onClick={() => onUpdate(data.habitId, data.dateStr, data.currentVal)}
-                            className="flex-1 py-2.5 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none transition"
+                            className="flex-1 py-2.5 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none transition active:scale-95"
                         >
                             {isIndo ? 'Simpan' : 'Save'}
                         </button>
