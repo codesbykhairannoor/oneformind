@@ -16,7 +16,7 @@ export interface HabitItem {
     frequencyCount?: number;
     timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
     logs: Record<string, {
-        status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest';
+        status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest' | 'in_progress';
         value?: number;
         notes?: string;
     }>;
@@ -49,7 +49,7 @@ export interface MonthDateItem {
 }
 
 export interface DayInfo {
-    status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest';
+    status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest' | 'in_progress';
     isScheduled: boolean;
     value?: number;
     notes?: string;

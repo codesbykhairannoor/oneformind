@@ -22,7 +22,17 @@ interface HabitMatrixTableProps {
     onSelectHabitTimer: (habit: HabitItem) => void;
     onEditHabit: (habit: HabitItem) => void;
     onConfirmDelete: (habit: HabitItem) => void;
-    onOpenNumericPopover: (data: { habitId: number; dateStr: string; currentVal: number; targetVal: number; unit: string }) => void;
+    onOpenNumericPopover: (data: { 
+        habitId: number; 
+        habitName?: string;
+        habitIcon?: string;
+        habitColor?: string;
+        dateStr: string; 
+        currentVal: number; 
+        targetVal: number; 
+        unit: string;
+        currentNotes?: string;
+    }) => void;
     onOpenNoteModal: (data: { habit: HabitItem; dateStr: string; notes: string }) => void;
     onToggleStatus: (habitId: number, dateStr: string) => void;
 }
@@ -40,6 +50,8 @@ export default function HabitMatrixTable({
     onOpenNoteModal,
     onToggleStatus
 }: HabitMatrixTableProps) {
+    const [tableNumericMode, setTableNumericMode] = React.useState<'value' | 'percent'>('value');
+
     return (
         <div className="hidden md:block bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
             <div className="overflow-x-auto custom-scrollbar select-none relative">
@@ -50,9 +62,38 @@ export default function HabitMatrixTable({
                     {/* Left Sticky Header */}
                     <div className="sticky left-0 z-40 bg-slate-50 dark:bg-slate-950 w-72 shrink-0 border-r border-slate-100 dark:border-slate-800 p-4 flex items-center justify-between font-bold text-slate-400 text-xs shadow-md">
                         <span>{isIndo ? 'Nama Habit' : 'Habit Name'}</span>
-                        <span className="text-[10px] font-black uppercase text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-md">
-                            {filteredHabits.length} {isIndo ? 'Habit' : 'Habits'}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                            {/* Table-wide numeric display mode switcher */}
+                            <div className="flex items-center bg-slate-200/70 dark:bg-slate-800 p-0.5 rounded-lg text-[9px] font-black">
+                                <button
+                                    type="button"
+                                    onClick={() => setTableNumericMode('value')}
+                                    title={isIndo ? 'Tampilkan Angka/Nilai' : 'Show Values'}
+                                    className={`px-1.5 py-0.5 rounded-md transition ${
+                                        tableNumericMode === 'value'
+                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                    }`}
+                                >
+                                    123
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setTableNumericMode('percent')}
+                                    title={isIndo ? 'Tampilkan Persentase (%)' : 'Show Percentage (%)'}
+                                    className={`px-1.5 py-0.5 rounded-md transition ${
+                                        tableNumericMode === 'percent'
+                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                    }`}
+                                >
+                                    %
+                                </button>
+                            </div>
+                            <span className="text-[10px] font-black uppercase text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-md">
+                                {filteredHabits.length} {isIndo ? 'Habit' : 'Habits'}
+                            </span>
+                        </div>
                     </div>
 
                     {/* Dates Columns */}
@@ -179,10 +220,14 @@ export default function HabitMatrixTable({
                                                     type="button"
                                                     onClick={() => onOpenNumericPopover({
                                                         habitId: habit.id,
+                                                        habitName: habit.name,
+                                                        habitIcon: habit.icon,
+                                                        habitColor: habit.color,
                                                         dateStr: day.dateString,
                                                         currentVal: info.value || 0,
                                                         targetVal: habit.targetValue || 10,
-                                                        unit: habit.unit || ''
+                                                        unit: habit.unit || '',
+                                                        currentNotes: info.notes || ''
                                                     })}
                                                     onContextMenu={(e) => {
                                                         e.preventDefault();
@@ -194,6 +239,7 @@ export default function HabitMatrixTable({
                                                         });
                                                     }}
                                                     disabled={day.isFuture}
+                                                    title={`${info.value || 0} / ${habit.targetValue || 10} ${habit.unit || ''} (${Math.round(((info.value || 0) / (habit.targetValue || 1)) * 100)}%)`}
                                                     className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${
                                                         isDone
                                                             ? 'shadow-xs text-white'
@@ -209,8 +255,14 @@ export default function HabitMatrixTable({
                                                 >
                                                     {isRest && (info.value === undefined || info.value === 0) && !isDone ? (
                                                         <Coffee size={12} className="opacity-60" />
+                                                    ) : tableNumericMode === 'percent' ? (
+                                                        <span>{Math.round(((info.value || 0) / (habit.targetValue || 1)) * 100)}%</span>
                                                     ) : (
-                                                        <span>{info.value || 0}</span>
+                                                        <span>
+                                                            {(info.value || 0) >= 1000
+                                                                ? `${((info.value || 0) / 1000).toFixed((info.value || 0) % 1000 === 0 ? 0 : 1)}k`
+                                                                : info.value || 0}
+                                                        </span>
                                                     )}
                                                 </button>
                                             ) : (

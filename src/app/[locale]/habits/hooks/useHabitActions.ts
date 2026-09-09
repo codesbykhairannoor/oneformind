@@ -163,14 +163,24 @@ export function useHabitActions({
     };
 
     // Adjust Numeric Value
-    const handleUpdateNumericValue = async (habitId: number, dateStr: string, newValue: number) => {
+    const handleUpdateNumericValue = async (habitId: number, dateStr: string, newValue: number, updatedNote?: string) => {
         const targetHabit = habits.find(h => h.id === habitId);
         if (!targetHabit) return;
 
         const targetVal = targetHabit.targetValue || 10;
         const currentLog = targetHabit.logs[dateStr];
+        const finalNote = updatedNote !== undefined ? updatedNote : (currentLog?.notes || '');
         const isDone = newValue >= targetVal;
-        const nextStatus: 'completed' | 'empty' = isDone ? 'completed' : 'empty';
+
+        // Determine correct status: 0 = delete from DB, >= target = completed, > 0 = in_progress
+        let nextStatus: 'completed' | 'in_progress' | 'empty' = 'empty';
+        if (newValue === 0 && !finalNote.trim()) {
+            nextStatus = 'empty';
+        } else if (isDone) {
+            nextStatus = 'completed';
+        } else {
+            nextStatus = 'in_progress';
+        }
 
         if (isDone && currentLog?.status !== 'completed') {
             playCheckSound();
@@ -178,28 +188,30 @@ export function useHabitActions({
 
         setHabits(prev => prev.map(h => {
             if (h.id === habitId) {
-                const updatedLogs = {
-                    ...h.logs,
-                    [dateStr]: {
+                const updatedLogs = { ...h.logs };
+                if (nextStatus === 'empty') {
+                    delete updatedLogs[dateStr];
+                } else {
+                    updatedLogs[dateStr] = {
                         status: nextStatus,
                         value: newValue,
-                        notes: currentLog?.notes
-                    }
-                };
+                        notes: finalNote
+                    };
+                }
                 return { ...h, logs: updatedLogs };
             }
             return h;
         }));
 
         try {
-            const noteObj = { val: newValue, note: currentLog?.notes || '' };
+            const noteObj = { val: newValue, note: finalNote };
             await fetch(`/api/habits/${habitId}/logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     date: dateStr,
                     status: nextStatus,
-                    notes: JSON.stringify(noteObj)
+                    notes: nextStatus === 'empty' ? '' : JSON.stringify(noteObj)
                 })
             });
         } catch (e) {

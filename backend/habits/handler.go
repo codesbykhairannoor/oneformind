@@ -493,7 +493,7 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 	}
 
 	if status == "empty" {
-		_, err = db.Exec(`DELETE FROM habit_logs WHERE habit_id = $1 AND DATE(date) = $2`, habitID, dateStr)
+		_, err = db.Exec(`DELETE FROM habit_logs WHERE habit_id = $1 AND date = $2`, habitID, dateStr)
 		if err != nil {
 			http.Error(w, `{"error": "Failed to delete log"}`, http.StatusInternalServerError)
 			return

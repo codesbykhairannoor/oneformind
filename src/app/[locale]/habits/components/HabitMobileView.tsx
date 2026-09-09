@@ -12,7 +12,17 @@ interface HabitMobileViewProps {
     filteredHabits: ProcessedHabitItem[];
     onSelectHabitDetail: (habit: HabitItem) => void;
     onSelectHabitTimer: (habit: HabitItem) => void;
-    onOpenNumericPopover: (data: { habitId: number; dateStr: string; currentVal: number; targetVal: number; unit: string }) => void;
+    onOpenNumericPopover: (data: { 
+        habitId: number; 
+        habitName?: string;
+        habitIcon?: string;
+        habitColor?: string;
+        dateStr: string; 
+        currentVal: number; 
+        targetVal: number; 
+        unit: string;
+        currentNotes?: string;
+    }) => void;
     onToggleStatus: (habitId: number, dateStr: string) => void;
 }
 
@@ -116,10 +126,14 @@ export default function HabitMobileView({
                                         type="button"
                                         onClick={() => onOpenNumericPopover({
                                             habitId: habit.id,
+                                            habitName: habit.name,
+                                            habitIcon: habit.icon,
+                                            habitColor: habit.color,
                                             dateStr: selectedMobileDate,
                                             currentVal: dayInfo.value || 0,
                                             targetVal: habit.targetValue || 10,
-                                            unit: habit.unit || ''
+                                            unit: habit.unit || '',
+                                            currentNotes: dayInfo.notes || ''
                                         })}
                                         className={`px-3 h-11 rounded-2xl font-black text-xs flex items-center gap-1 ${
                                             isDone

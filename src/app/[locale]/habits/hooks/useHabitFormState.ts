@@ -38,10 +38,14 @@ export function useHabitFormState(daysInCurrentMonth: number) {
     // Numeric Popover State
     const [numericPopover, setNumericPopover] = useState<{
         habitId: number;
+        habitName?: string;
+        habitIcon?: string;
+        habitColor?: string;
         dateStr: string;
         currentVal: number;
         targetVal: number;
         unit: string;
+        currentNotes?: string;
     } | null>(null);
 
     const openCreateModal = () => {

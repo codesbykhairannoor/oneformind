@@ -25,7 +25,7 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
         const frequencyCount = extraMeta.frequencyCount || frequencyDays.length;
         const timeOfDay = extraMeta.timeOfDay || 'anytime';
 
-        const logsMap: Record<string, { status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest'; value?: number; notes?: string }> = {};
+        const logsMap: HabitItem['logs'] = {};
 
         if (h.logs && Array.isArray(h.logs)) {
             h.logs.forEach((log: any) => {

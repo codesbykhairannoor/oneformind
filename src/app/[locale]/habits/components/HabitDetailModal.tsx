@@ -58,7 +58,7 @@ export default function HabitDetailModal({ habit, isOpen, onClose, locale }: Hab
 
     // Aggregate logs across all months/periods for this habit
     const aggregatedLogs = useMemo(() => {
-        const logsMap: Record<string, { status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest'; value?: number; notes?: string }> = { ...habit.logs };
+        const logsMap: HabitItem['logs'] = { ...habit.logs };
 
         if (allHabitsRaw && Array.isArray(allHabitsRaw)) {
             const matchingHabits = allHabitsRaw.filter((h: any) =>

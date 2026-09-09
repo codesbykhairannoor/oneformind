@@ -7,7 +7,7 @@ export function getHabitDayInfo(habit: HabitItem, day: MonthDateItem): DayInfo {
     const value = log?.value;
     const notes = log?.notes;
 
-    let status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest' = rawStatus;
+    let status: DayInfo['status'] = rawStatus;
 
     // Only unscheduled empty days become 'rest'
     if (rawStatus === 'empty' && !isScheduled) {
