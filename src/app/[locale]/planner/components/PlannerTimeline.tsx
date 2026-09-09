@@ -486,13 +486,16 @@ export default function PlannerTimeline({
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col h-full px-3.5 py-2.5 gap-1">
-                                            <div className="flex justify-between items-center shrink-0">
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg border flex items-center gap-1 shadow-sm opacity-90 ${theme.badge}`}>
+                                        <div className="flex flex-col justify-between h-full px-3.5 py-2.5 gap-1">
+                                            <div className="flex justify-between items-center shrink-0 gap-2">
+                                                <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg border flex items-center gap-1 shadow-sm opacity-90 shrink-0 ${theme.badge}`}>
                                                         {theme.icon} {theme.label}
                                                     </span>
-                                                    <span className={`text-[10px] font-mono font-bold opacity-60 ${theme.text}`}>
+                                                    <h4 className={`font-black text-sm leading-tight truncate flex-1 min-w-0 ${theme.text} ${task.completed ? 'line-through opacity-50' : ''}`}>
+                                                        {task.title}
+                                                    </h4>
+                                                    <span className={`text-[10px] font-mono font-bold opacity-60 shrink-0 ${theme.text}`}>
                                                         {formatDisplayTime(task.start_time || task.startTime)} - {formatDisplayTime(task.end_time || task.endTime) || '??'}
                                                     </span>
                                                 </div>
@@ -516,11 +519,6 @@ export default function PlannerTimeline({
                                                         {task.completed && <Check size={12} strokeWidth={4} />}
                                                     </button>
                                                 </div>
-                                            </div>
-                                            <div className="flex items-center gap-2 mt-0.5 min-h-0">
-                                                <h4 className={`font-black text-sm leading-tight truncate flex-1 min-w-0 ${theme.text} ${task.completed ? 'line-through opacity-50' : ''}`}>
-                                                    {task.title}
-                                                </h4>
                                             </div>
                                             {task.notes && (
                                                 <div className="min-h-0 flex-1 overflow-hidden mt-0.5">
