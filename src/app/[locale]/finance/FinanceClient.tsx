@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
@@ -18,6 +18,13 @@ import FinanceModalsContainer from './components/FinanceModalsContainer';
 import { SavingVault } from './components/SavingModal';
 import { CategoryOption } from './types';
 import { useFinanceActions } from './hooks/useFinanceActions';
+
+// New Feature Components (Pilihan A & B)
+import WalletsSection, { WalletItem } from './components/WalletsSection';
+import WalletModal from './components/WalletModal';
+import TransferModal from './components/TransferModal';
+import RecurringBillsSection, { RecurringBillItem } from './components/RecurringBillsSection';
+import RecurringBillModal from './components/RecurringBillModal';
 
 const DailyTrendChart = dynamic(() => import('./components/DailyTrendChart'), { ssr: false });
 
@@ -138,7 +145,128 @@ export default function FinanceClient({
         saveUserConfig({ [`finance_income_target_${selectedMonthKey}`]: val });
     };
 
-    // ===== 5. MODAL STATES =====
+    // ===== 5. MULTI-WALLET (PILIHAN B) =====
+    const defaultWallets: WalletItem[] = useMemo(() => [
+        { id: 'w_bca', name: 'BCA Utama', type: 'bank', balance: 10500000, icon: '🏛️', color: '#005baa', accountNumber: '882-019-332' },
+        { id: 'w_gopay', name: 'GoPay / E-Wallet', type: 'ewallet', balance: 450000, icon: '📱', color: '#00aed6' },
+        { id: 'w_cash', name: 'Uang Tunai (Cash)', type: 'cash', balance: 350000, icon: '💵', color: '#10b981' },
+    ], []);
+
+    const wallets: WalletItem[] = useMemo(() => {
+        return userSettings.finance_wallets || defaultWallets;
+    }, [userSettings.finance_wallets, defaultWallets]);
+
+    const [showWalletModal, setShowWalletModal] = useState(false);
+    const [editingWallet, setEditingWallet] = useState<WalletItem | null>(null);
+    const [showTransferModal, setShowTransferModal] = useState(false);
+
+    const handleSaveWallet = (walletData: WalletItem) => {
+        const exists = wallets.some(w => w.id === walletData.id);
+        const updated = exists 
+            ? wallets.map(w => w.id === walletData.id ? walletData : w)
+            : [...wallets, walletData];
+        saveUserConfig({ finance_wallets: updated });
+    };
+
+    const handleDeleteWallet = (id: string) => {
+        const updated = wallets.filter(w => w.id !== id);
+        saveUserConfig({ finance_wallets: updated });
+    };
+
+    const handleTransfer = ({
+        fromWalletId,
+        toWalletId,
+        amount,
+        adminFee,
+        date,
+        notes
+    }: {
+        fromWalletId: string;
+        toWalletId: string;
+        amount: number;
+        adminFee: number;
+        date: string;
+        notes?: string;
+    }) => {
+        const fromW = wallets.find(w => w.id === fromWalletId);
+        const toW = wallets.find(w => w.id === toWalletId);
+        if (!fromW || !toW) return;
+
+        const updatedWallets = wallets.map(w => {
+            if (w.id === fromWalletId) {
+                return { ...w, balance: Math.max(0, w.balance - (amount + adminFee)) };
+            }
+            if (w.id === toWalletId) {
+                return { ...w, balance: w.balance + amount };
+            }
+            return w;
+        });
+
+        saveUserConfig({ finance_wallets: updatedWallets });
+
+        // If admin fee exists, log it as an expense transaction
+        if (adminFee > 0) {
+            handleSaveSingleTrx({
+                title: `Biaya Admin Transfer (${fromW.name} → ${toW.name})`,
+                amount: adminFee,
+                type: 'expense',
+                category: 'utilitas',
+                date: date || new Date().toISOString().split('T')[0],
+                notes: notes || 'Biaya admin transfer antar akun'
+            });
+        }
+    };
+
+    // ===== 6. RECURRING BILLS (PILIHAN A) =====
+    const defaultBills: RecurringBillItem[] = useMemo(() => [
+        { id: 'b_netflix', name: 'Netflix Premium', amount: 186000, cycle: 'monthly', billingDay: 5, category: 'langganan', icon: '🍿', color: '#e50914' },
+        { id: 'b_chatgpt', name: 'ChatGPT Plus AI', amount: 330000, cycle: 'monthly', billingDay: 12, category: 'langganan', icon: '🤖', color: '#10a37f' },
+        { id: 'b_spotify', name: 'Spotify Duo', amount: 86000, cycle: 'monthly', billingDay: 20, category: 'langganan', icon: '🎵', color: '#1db954' },
+        { id: 'b_wifi', name: 'WiFi Internet', amount: 375000, cycle: 'monthly', billingDay: 15, category: 'utilitas', icon: '📶', color: '#0284c7' }
+    ], []);
+
+    const recurringBills: RecurringBillItem[] = useMemo(() => {
+        return userSettings.finance_recurring_bills || defaultBills;
+    }, [userSettings.finance_recurring_bills, defaultBills]);
+
+    const [showRecurringModal, setShowRecurringModal] = useState(false);
+    const [editingBill, setEditingBill] = useState<RecurringBillItem | null>(null);
+
+    // Track paid bill IDs this month from user settings
+    const paidBillIdsThisMonth: string[] = useMemo(() => {
+        return userSettings[`paid_bills_${selectedMonthKey}`] || [];
+    }, [userSettings, selectedMonthKey]);
+
+    const handleSaveBill = (billData: RecurringBillItem) => {
+        const exists = recurringBills.some(b => b.id === billData.id);
+        const updated = exists
+            ? recurringBills.map(b => b.id === billData.id ? billData : b)
+            : [...recurringBills, billData];
+        saveUserConfig({ finance_recurring_bills: updated });
+    };
+
+    const handleDeleteBill = (id: string) => {
+        const updated = recurringBills.filter(b => b.id !== id);
+        saveUserConfig({ finance_recurring_bills: updated });
+    };
+
+    const handlePayAndLogBill = async (bill: RecurringBillItem) => {
+        await handleSaveSingleTrx({
+            title: bill.name,
+            amount: bill.amount,
+            type: 'expense',
+            category: bill.category || 'langganan',
+            date: new Date().toISOString().split('T')[0],
+            notes: `Tagihan Rutin (${bill.cycle === 'yearly' ? 'Tahunan' : 'Bulanan'})`
+        });
+
+        const currentPaid = userSettings[`paid_bills_${selectedMonthKey}`] || [];
+        if (!currentPaid.includes(bill.id)) {
+            saveUserConfig({ [`paid_bills_${selectedMonthKey}`]: [...currentPaid, bill.id] });
+        }
+    };
+
+    // ===== 7. MODAL STATES =====
     const [showTrxModal, setShowTrxModal] = useState(false);
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -155,7 +283,7 @@ export default function FinanceClient({
     const [vaultTxType, setVaultTxType] = useState<'deposit' | 'withdraw'>('deposit');
     const [filterDate, setFilterDate] = useState('');
 
-    // ===== 6. COMPUTED METRICS =====
+    // ===== 8. COMPUTED METRICS =====
     const currentMonthTransactions = transactions;
     const totalIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
     const totalExpense = currentMonthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
@@ -168,7 +296,7 @@ export default function FinanceClient({
         if (t.type === 'income') incomeStats[t.category] = (incomeStats[t.category] || 0) + Number(t.amount);
     });
 
-    // ===== 7. ACTIONS HOOK =====
+    // ===== 9. ACTIONS HOOK =====
     const {
         handleSaveSingleTrx,
         handleSaveBatchTrx,
@@ -215,7 +343,7 @@ export default function FinanceClient({
 
     return (
         <AuthenticatedLayout>
-            <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500">
+            <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500 pb-24">
                 <FinanceHeader
                     selectedMonthKey={selectedMonthKey}
                     onMonthChange={changeMonth}
@@ -226,8 +354,10 @@ export default function FinanceClient({
                     transactions={transactions}
                 />
 
-                <div className="w-full min-h-screen px-3 sm:px-6 lg:px-8 py-6 transition-colors duration-500">
-                    <div className="mb-8 overflow-x-auto no-scrollbar -mx-3 px-3 lg:mx-0 lg:px-0">
+                <div className="w-full min-h-screen px-3 sm:px-6 lg:px-8 py-6 transition-colors duration-500 max-w-[1750px] mx-auto space-y-8">
+                    
+                    {/* Top KPI Stats */}
+                    <div className="overflow-x-auto no-scrollbar -mx-3 px-3 lg:mx-0 lg:px-0">
                         <FinanceStats
                             totalIncome={totalIncome}
                             totalExpense={totalExpense}
@@ -239,7 +369,21 @@ export default function FinanceClient({
                         />
                     </div>
 
+                    {/* NEW: Multi-Wallet Section (Pilihan B) */}
+                    <WalletsSection
+                        wallets={wallets}
+                        activeCurrency={activeCurrency}
+                        currencyLocale={currencyLocale}
+                        onOpenAddWallet={() => { setEditingWallet(null); setShowWalletModal(true); }}
+                        onEditWallet={(w) => { setEditingWallet(w); setShowWalletModal(true); }}
+                        onDeleteWallet={handleDeleteWallet}
+                        onOpenTransferModal={() => setShowTransferModal(true)}
+                    />
+
+                    {/* Main 2-Column Finance Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
+                        
+                        {/* Left Column: Budgets + Insights */}
                         <div className="lg:col-span-2 w-full lg:sticky lg:top-24 h-fit space-y-8 lg:space-y-6 order-1 lg:order-2">
                             <BudgetSidebar
                                 budgets={budgets}
@@ -262,7 +406,10 @@ export default function FinanceClient({
                             </div>
                         </div>
 
-                        <div className="lg:col-span-3 space-y-8 w-full order-2 lg:order-1 pb-24 lg:pb-0">
+                        {/* Right Column: Transactions + Recurring Bills + Savings + Chart */}
+                        <div className="lg:col-span-3 space-y-8 w-full order-2 lg:order-1 pb-16 lg:pb-0">
+                            
+                            {/* Transactions List */}
                             <TransactionList
                                 transactions={transactions}
                                 categories={categories}
@@ -273,6 +420,19 @@ export default function FinanceClient({
                                 currencyLocale={currencyLocale}
                             />
 
+                            {/* NEW: Recurring Subscriptions & Bills Hub (Pilihan A) */}
+                            <RecurringBillsSection
+                                bills={recurringBills}
+                                activeCurrency={activeCurrency}
+                                currencyLocale={currencyLocale}
+                                onOpenAddModal={() => { setEditingBill(null); setShowRecurringModal(true); }}
+                                onEditBill={(b) => { setEditingBill(b); setShowRecurringModal(true); }}
+                                onDeleteBill={handleDeleteBill}
+                                onPayAndLog={handlePayAndLogBill}
+                                paidBillIdsThisMonth={paidBillIdsThisMonth}
+                            />
+
+                            {/* Savings Vault Section */}
                             <SavingsVaultSection
                                 savingsVault={savingsVault}
                                 t={t}
@@ -299,6 +459,7 @@ export default function FinanceClient({
                                 />
                             </div>
 
+                            {/* Daily Trend Chart */}
                             {transactions.length > 0 && (
                                 <div className="relative">
                                     <DailyTrendChart
@@ -313,6 +474,7 @@ export default function FinanceClient({
                 </div>
             </div>
 
+            {/* Standard Finance Modals */}
             <FinanceModalsContainer
                 showArchiveModal={showArchiveModal}
                 setShowArchiveModal={setShowArchiveModal}
@@ -350,6 +512,34 @@ export default function FinanceClient({
                 activeVault={activeVault}
                 vaultTxType={vaultTxType}
                 onVaultMutation={handleVaultMutation}
+            />
+
+            {/* NEW: Wallet Modals */}
+            <WalletModal
+                show={showWalletModal}
+                editingWallet={editingWallet}
+                onClose={() => setShowWalletModal(false)}
+                onSave={handleSaveWallet}
+                activeCurrency={activeCurrency}
+            />
+
+            <TransferModal
+                show={showTransferModal}
+                wallets={wallets}
+                onClose={() => setShowTransferModal(false)}
+                onTransfer={handleTransfer}
+                activeCurrency={activeCurrency}
+                currencyLocale={currencyLocale}
+            />
+
+            {/* NEW: Recurring Bill Modal */}
+            <RecurringBillModal
+                show={showRecurringModal}
+                editingBill={editingBill}
+                categories={categories}
+                onClose={() => setShowRecurringModal(false)}
+                onSave={handleSaveBill}
+                activeCurrency={activeCurrency}
             />
         </AuthenticatedLayout>
     );
