@@ -34,14 +34,14 @@ export default async function FinanceDashboardPage({
 
     // Fetch yearly stats, savings, and assets in parallel
     const [yearlyData, savingsData, assetsData] = await Promise.all([
-        goFetchJson<YearlyStat[]>('finance-yearly', `year=${selectedYear}`),
+        goFetchJson<any>('finance-yearly', `year=${selectedYear}`),
         goFetchJson<any[]>('finance-savings', ''),
         goFetchJson<any[]>('finance-assets', ''),
     ]);
 
-    const yearlyStats: YearlyStat[] = yearlyData[0] || [];
-    const savings = savingsData[0] || [];
-    const assets = assetsData[0] || [];
+    const rawYearly = yearlyData[0];
+    const savings = Array.isArray(savingsData[0]) ? savingsData[0] : [];
+    const assets = Array.isArray(assetsData[0]) ? assetsData[0] : [];
 
     const totalSavings = savings.reduce(
         (acc: number, s: any) => acc + Number(s.current_amount || s.currentAmount || s.current || 0),
@@ -50,18 +50,36 @@ export default async function FinanceDashboardPage({
 
     const totalAssetsValue = assets.reduce(
         (acc: number, a: any) => {
-            const capital = Number(a.value || a.capital || 0);
-            const percent = Number(a.color || a.percent || 0);
-            return acc + (capital * (1 + percent / 100));
+            const val = Number(a.value || a.capital || a.amount || 0);
+            return acc + (isNaN(val) ? 0 : val);
         },
         0
     );
 
-    // If Go already returns computed yearly stats, use them directly
-    // Otherwise build fallback empty stats for all 12 months
+    // Map Go API response (which returns monthlyStats map) or direct array into YearlyStat[]
     let stats: YearlyStat[] = [];
-    if (yearlyStats.length > 0) {
-        stats = yearlyStats;
+    if (rawYearly?.monthlyStats) {
+        for (let i = 1; i <= 12; i++) {
+            const monthKey = `${selectedYear}-${String(i).padStart(2, '0')}`;
+            const m = rawYearly.monthlyStats[monthKey] || { income: 0, expense: 0 };
+            const inc = Number(m.income || m.total_income || 0);
+            const exp = Number(m.expense || m.total_expense || 0);
+            stats.push({
+                month: monthKey,
+                total_income: inc,
+                total_expense: exp,
+                income_target: Number(m.income_target || 0),
+                balance: inc - exp,
+            });
+        }
+    } else if (Array.isArray(rawYearly) && rawYearly.length > 0) {
+        stats = rawYearly.map((s: any) => ({
+            month: s.month,
+            total_income: Number(s.total_income || s.income || 0),
+            total_expense: Number(s.total_expense || s.expense || 0),
+            income_target: Number(s.income_target || 0),
+            balance: Number(s.balance ?? (Number(s.total_income || s.income || 0) - Number(s.total_expense || s.expense || 0))),
+        }));
     } else {
         for (let i = 1; i <= 12; i++) {
             stats.push({

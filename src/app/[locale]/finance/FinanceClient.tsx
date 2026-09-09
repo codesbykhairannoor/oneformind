@@ -44,7 +44,7 @@ import RecurringBillModal from './components/RecurringBillModal';
 // Investments & Assets Portfolio
 import InvestmentPortfolioSection, { InvestmentAssetItem } from './components/InvestmentPortfolioSection';
 import InvestmentAssetModal from './components/InvestmentAssetModal';
-import InvestmentActionModal, { InvestmentActionMode } from './components/InvestmentActionModal';
+import InvestmentActionModal, { InvestmentActionMode, InvestmentActionResult } from './components/InvestmentActionModal';
 
 const DailyTrendChart = dynamic(() => import('./components/DailyTrendChart'), { ssr: false });
 
@@ -312,61 +312,69 @@ export default function FinanceClient({
         saveUserConfig({ finance_investments: updated });
     };
 
-    const handleExecuteAssetAction = async ({
-        assetId,
-        mode,
-        amount,
-        logCashflow,
-        date,
-        notes
-    }: {
-        assetId: string | number;
-        mode: InvestmentActionMode;
-        amount: number;
-        logCashflow: boolean;
-        date: string;
-        notes?: string;
-    }) => {
+    const handleExecuteAssetAction = async (result: InvestmentActionResult) => {
+        const {
+            assetId,
+            mode,
+            cashflowAmount,
+            logCashflow,
+            date,
+            notes,
+            newCapital,
+            newCurrentValue,
+            newUnits,
+            newAvgBuyPrice,
+            newCurrentPrice,
+            newTotalDividends
+        } = result;
+
         const target = investments.find(a => a.id === assetId);
         if (!target) return;
 
-        let updatedCapital = target.capital;
-        let updatedCurrentValue = target.currentValue;
-
-        if (mode === 'revalue') {
-            updatedCurrentValue = amount;
-        } else if (mode === 'topup') {
-            updatedCapital += amount;
-            updatedCurrentValue += amount;
-            if (logCashflow) {
+        if (logCashflow && cashflowAmount > 0) {
+            if (mode === 'topup') {
                 await handleSaveSingleTrx({
-                    title: `Investasi: Top-Up ${target.name}`,
-                    amount,
+                    title: isIndo ? `Investasi: Top-Up ${target.name}` : `Investment: Top-Up ${target.name}`,
+                    amount: cashflowAmount,
                     type: 'expense',
                     category: 'investasi',
                     date,
-                    notes: notes || `Top-up modal instrumen ${target.name}`
+                    notes: notes || (isIndo ? `Top-up modal instrumen ${target.name}` : `Top-up asset ${target.name}`)
                 });
-            }
-        } else if (mode === 'withdraw') {
-            const ratio = target.currentValue > 0 ? Math.min(1, amount / target.currentValue) : 0;
-            updatedCapital = Math.max(0, target.capital * (1 - ratio));
-            updatedCurrentValue = Math.max(0, target.currentValue - amount);
-            if (logCashflow) {
+            } else if (mode === 'withdraw') {
                 await handleSaveSingleTrx({
-                    title: `Pencairan Aset: ${target.name}`,
-                    amount,
+                    title: isIndo ? `Pencairan Aset: ${target.name}` : `Asset Liquidation: ${target.name}`,
+                    amount: cashflowAmount,
                     type: 'income',
                     category: 'investasi',
                     date,
-                    notes: notes || `Pencairan portofolio ${target.name}`
+                    notes: notes || (isIndo ? `Pencairan hasil jual ${target.name}` : `Proceeds from ${target.name}`)
+                });
+            } else if (mode === 'dividend') {
+                await handleSaveSingleTrx({
+                    title: isIndo ? `Dividen: ${target.name}` : `Dividend: ${target.name}`,
+                    amount: cashflowAmount,
+                    type: 'income',
+                    category: 'investasi',
+                    date,
+                    notes: notes || (isIndo ? `Dividen pasif instrumen ${target.name}` : `Passive dividend payout from ${target.name}`)
                 });
             }
         }
 
-        const updated = investments.map(a => 
-            a.id === assetId ? { ...a, capital: updatedCapital, currentValue: updatedCurrentValue } : a
-        );
+        const updated = investments.map(a => {
+            if (a.id !== assetId) return a;
+            return {
+                ...a,
+                capital: newCapital,
+                currentValue: newCurrentValue,
+                units: newUnits !== undefined ? newUnits : a.units,
+                avgBuyPrice: newAvgBuyPrice !== undefined ? newAvgBuyPrice : a.avgBuyPrice,
+                currentPrice: newCurrentPrice !== undefined ? newCurrentPrice : a.currentPrice,
+                totalDividends: newTotalDividends !== undefined ? newTotalDividends : (a.totalDividends || 0)
+            };
+        });
+
         saveUserConfig({ finance_investments: updated });
     };
 
@@ -787,6 +795,11 @@ export default function FinanceClient({
                                 onUpdateMarketValue={(asset) => {
                                     setActionAsset(asset);
                                     setActionMode('revalue');
+                                    setShowActionModal(true);
+                                }}
+                                onRecordDividend={(asset) => {
+                                    setActionAsset(asset);
+                                    setActionMode('dividend');
                                     setShowActionModal(true);
                                 }}
                             />
