@@ -54,7 +54,7 @@ export default function WalletModal({
         } else {
             setName('');
             setType('bank');
-            setBalance('0');
+            setBalance('');
             setIcon('🏛️');
             setColor('#005baa');
             setAccountNumber('');

@@ -182,15 +182,9 @@ export default function FinanceClient({
     };
 
     // ===== 6. MULTI-WALLET =====
-    const defaultWallets: WalletItem[] = useMemo(() => [
-        { id: 'w_bca', name: 'BCA Utama', type: 'bank', balance: 10500000, icon: '🏛️', color: '#005baa', accountNumber: '882-019-332' },
-        { id: 'w_gopay', name: 'GoPay / E-Wallet', type: 'ewallet', balance: 450000, icon: '📱', color: '#00aed6' },
-        { id: 'w_cash', name: 'Uang Tunai (Cash)', type: 'cash', balance: 350000, icon: '💵', color: '#10b981' },
-    ], []);
-
     const wallets: WalletItem[] = useMemo(() => {
-        return userSettings.finance_wallets || defaultWallets;
-    }, [userSettings.finance_wallets, defaultWallets]);
+        return userSettings.finance_wallets || [];
+    }, [userSettings.finance_wallets]);
 
     const [showWalletModal, setShowWalletModal] = useState(false);
     const [editingWallet, setEditingWallet] = useState<WalletItem | null>(null);
@@ -253,16 +247,9 @@ export default function FinanceClient({
     };
 
     // ===== 7. RECURRING BILLS =====
-    const defaultBills: RecurringBillItem[] = useMemo(() => [
-        { id: 'b_netflix', name: 'Netflix Premium', amount: 186000, cycle: 'monthly', billingDay: 5, category: 'langganan', icon: '🍿', color: '#e50914' },
-        { id: 'b_chatgpt', name: 'ChatGPT Plus AI', amount: 330000, cycle: 'monthly', billingDay: 12, category: 'langganan', icon: '🤖', color: '#10a37f' },
-        { id: 'b_spotify', name: 'Spotify Duo', amount: 86000, cycle: 'monthly', billingDay: 20, category: 'langganan', icon: '🎵', color: '#1db954' },
-        { id: 'b_wifi', name: 'WiFi Internet', amount: 375000, cycle: 'monthly', billingDay: 15, category: 'utilitas', icon: '📶', color: '#0284c7' }
-    ], []);
-
     const recurringBills: RecurringBillItem[] = useMemo(() => {
-        return userSettings.finance_recurring_bills || defaultBills;
-    }, [userSettings.finance_recurring_bills, defaultBills]);
+        return userSettings.finance_recurring_bills || [];
+    }, [userSettings.finance_recurring_bills]);
 
     const [showRecurringModal, setShowRecurringModal] = useState(false);
     const [editingBill, setEditingBill] = useState<RecurringBillItem | null>(null);
@@ -301,17 +288,9 @@ export default function FinanceClient({
     };
 
     // ===== 8. INVESTMENTS & STOCK PORTFOLIO =====
-    const defaultInvestments: InvestmentAssetItem[] = useMemo(() => [
-        { id: 'inv_bbca', name: 'Bank Central Asia', type: 'stocks', ticker: 'BBCA', capital: 15000000, currentValue: 18250000, icon: '📈', color: '#005baa', notes: 'Dividen berkala' },
-        { id: 'inv_saham_bbri', name: 'Bank Rakyat Indonesia', type: 'stocks', ticker: 'BBRI', capital: 10000000, currentValue: 11400000, icon: '📈', color: '#0284c7', notes: 'Core holding' },
-        { id: 'inv_bibit_rd', name: 'Sucorinvest Sharia Money', type: 'mutual_funds', capital: 8000000, currentValue: 8520000, icon: '🏦', color: '#10b981', notes: 'Aplikasi Bibit' },
-        { id: 'inv_btc', name: 'Bitcoin', type: 'crypto', ticker: 'BTC', capital: 5000000, currentValue: 7200000, icon: '🪙', color: '#f59e0b', notes: 'Cold wallet DCA' },
-        { id: 'inv_gold', name: 'Logam Mulia Antam 10g', type: 'gold', ticker: 'GOLD', capital: 11500000, currentValue: 14100000, icon: '🪙', color: '#eab308', notes: 'Safe haven fisik' }
-    ], []);
-
     const investments: InvestmentAssetItem[] = useMemo(() => {
-        return userSettings.finance_investments || defaultInvestments;
-    }, [userSettings.finance_investments, defaultInvestments]);
+        return userSettings.finance_investments || [];
+    }, [userSettings.finance_investments]);
 
     const [showAssetModal, setShowAssetModal] = useState(false);
     const [editingAsset, setEditingAsset] = useState<InvestmentAssetItem | null>(null);
