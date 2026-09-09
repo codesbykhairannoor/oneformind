@@ -6,8 +6,7 @@ import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, C
 import { TaskItem } from '../types';
 
 const VIEW_LIMIT = 24;
-const HOUR_HEIGHT = 80;
-const TIME_COL_WIDTH = 80;
+const TIME_COL_WIDTH = 76;
 
 interface PlannerTimelineProps {
     tasks: any[];
@@ -46,17 +45,44 @@ export default function PlannerTimeline({
 }: PlannerTimelineProps) {
     const t = useTranslations();
     const [isStartHourOpen, setIsStartHourOpen] = useState(false);
+    const [density, setDensity] = useState<'compact' | 'normal'>('compact');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+    const hourHeight = density === 'compact' ? 52 : 72;
+
     useEffect(() => {
-        if (scrollContainerRef.current) {
-            const currentH = now.getHours();
-            let diff = currentH - startHour;
-            if (diff < 0) diff += 24;
-            const scrollTarget = Math.max(0, (diff - 1) * HOUR_HEIGHT);
-            scrollContainerRef.current.scrollTop = scrollTarget;
-        }
-    }, [startHour]);
+        try {
+            const saved = localStorage.getItem('planner_timeline_density');
+            if (saved === 'normal' || saved === 'compact') {
+                setDensity(saved);
+            }
+        } catch (e) {}
+    }, []);
+
+    const toggleDensity = (newDensity: 'compact' | 'normal') => {
+        setDensity(newDensity);
+        try {
+            localStorage.setItem('planner_timeline_density', newDensity);
+        } catch (e) {}
+    };
+
+    const scrollToCurrentTime = (smooth = true) => {
+        if (!scrollContainerRef.current) return;
+        const currentH = now.getHours();
+        const currentM = now.getMinutes();
+        let diff = currentH - startHour;
+        if (diff < 0) diff += 24;
+        const targetMinutes = Math.max(0, diff * 60 + currentM - 40);
+        const scrollTarget = (targetMinutes / 60) * hourHeight;
+        scrollContainerRef.current.scrollTo({
+            top: scrollTarget,
+            behavior: smooth ? 'smooth' : 'auto'
+        });
+    };
+
+    useEffect(() => {
+        scrollToCurrentTime(false);
+    }, [startHour, density, selectedDate]);
 
     const handleDragStart = (e: React.DragEvent, taskId: number) => {
         e.dataTransfer.dropEffect = 'move';
@@ -199,28 +225,30 @@ export default function PlannerTimeline({
 
         if (renderDuration <= 0) return { display: 'none' };
 
-        const topPx = (renderStart / 60) * HOUR_HEIGHT;
-        const heightPx = (renderDuration / 60) * HOUR_HEIGHT;
-        const finalHeight = Math.max(heightPx - 8, 28);
+        const topPx = (renderStart / 60) * hourHeight;
+        const heightPx = (renderDuration / 60) * hourHeight;
+        const padding = density === 'compact' ? 4 : 8;
+        const minH = density === 'compact' ? 24 : 28;
+        const finalHeight = Math.max(heightPx - padding, minH);
 
         return {
             top: `${topPx}px`,
             height: `${finalHeight}px`,
-            left: `${TIME_COL_WIDTH + 8}px`,  
+            left: `${TIME_COL_WIDTH + 6}px`,  
             right: '8px', 
             zIndex: duration < 30 ? 20 : 10
         };
     };
 
+    const isToday = (() => {
+        const today = new Date();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        return normalizeDate(selectedDate) === `${today.getFullYear()}-${m}-${d}`;
+    })();
+
     const getCurrentTimeIndicatorStyle = () => {
-        const todayStr = (() => {
-            const today = new Date();
-            const m = String(today.getMonth() + 1).padStart(2, '0');
-            const d = String(today.getDate()).padStart(2, '0');
-            return `${today.getFullYear()}-${m}-${d}`;
-        })();
-        
-        if (normalizeDate(selectedDate) !== todayStr) return { display: 'none' };
+        if (!isToday) return { display: 'none' };
 
         const currentH = now.getHours();
         const currentM = now.getMinutes();
@@ -228,7 +256,7 @@ export default function PlannerTimeline({
         if (diff < 0) diff += 24; 
         if (diff >= VIEW_LIMIT) return { display: 'none' };
         const minutesFromStart = (diff * 60) + currentM;
-        return { top: `${(minutesFromStart / 60) * HOUR_HEIGHT}px`, left: `0px`, right: '0px' };
+        return { top: `${(minutesFromStart / 60) * hourHeight}px`, left: `0px`, right: '0px' };
     };
 
     const timeSlots = Array.from({ length: VIEW_LIMIT }, (_, i) => {
@@ -242,52 +270,85 @@ export default function PlannerTimeline({
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden select-none flex flex-col h-full transition-colors duration-500">
             
             {/* Timeline Header */}
-            <div className="px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none flex min-w-0 justify-between items-center gap-3 shrink-0 transition-colors duration-500">
-                <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-base sm:text-lg shadow-indigo-200 dark:shadow-none shadow-lg">
+            <div className="px-3 sm:px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none flex flex-wrap sm:flex-nowrap min-w-0 justify-between items-center gap-2 shrink-0 transition-colors duration-500">
+                <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-2.5">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm sm:text-base shadow-indigo-200 dark:shadow-none shadow-md">
                         📅
                     </div>
-                    <div>
-                        <h3 className="min-w-0 truncate font-black text-slate-800 dark:text-white text-sm sm:text-base leading-none transition-colors duration-500">
+                    <div className="min-w-0">
+                        <h3 className="min-w-0 truncate font-black text-slate-800 dark:text-white text-xs sm:text-sm leading-none transition-colors duration-500">
                             {t('timeline_title') || 'Timeline Jadwal'}
                         </h3>
-                        <p className="text-[10px] text-slate-400 font-bold mt-1">
+                        <p className="text-[10px] text-slate-400 font-bold mt-0.5 truncate">
                             {activeTasks.length} kegiatan direncanakan
                         </p>
                     </div>
                 </div>
                 
-                <div className="relative shrink-0">
-                    <button onClick={() => setIsStartHourOpen(!isStartHourOpen)} className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group">
-                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 px-2 uppercase tracking-tighter transition-colors duration-500">{t('label_start') || 'Mulai'}</span>
-                        <div className="bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors duration-500">
-                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">{String(startHour).padStart(2, '0')}:00</span>
-                            <ChevronDown size={12} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
-                        </div>
-                    </button>
-                    
-                    {isStartHourOpen && (
-                        <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-slate-900 rounded-[1.5rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-4 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
-                            <div className="flex justify-between items-center mb-3 px-1">
-                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-500">{t('select_hour') || 'Mulai dari Jam'}</span>
-                                <button onClick={() => setIsStartHourOpen(false)} className="text-slate-300 dark:text-slate-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
-                                    <X size={14} strokeWidth={3} />
-                                </button>
-                            </div>
-                            <div className="grid grid-cols-4 gap-1.5">
-                                {Array.from({length: 24}).map((_, h) => (
-                                    <button 
-                                        key={h}
-                                        onClick={() => { setStartHour(h); setIsStartHourOpen(false); }}
-                                        className={`py-2 flex items-center justify-center rounded-xl text-[10px] font-black font-mono transition-all border ${startHour === h ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600'}`}
-                                    >
-                                        {String(h).padStart(2, '0')}:00
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                {/* Header Controls: Now Jump + Density Switcher + Start Hour */}
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    {isToday && (
+                        <button
+                            onClick={() => scrollToCurrentTime(true)}
+                            title="Gulir ke jam saat ini"
+                            className="px-2 py-1 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-500/20 text-[10px] font-black hover:bg-rose-100 transition active:scale-95 flex items-center gap-1"
+                        >
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                            <span className="hidden xs:inline">Sekarang</span>
+                        </button>
                     )}
-                    {isStartHourOpen && <div className="fixed inset-0 z-50" onClick={() => setIsStartHourOpen(false)}></div>}
+
+                    {/* Density Switcher */}
+                    <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                        <button
+                            onClick={() => toggleDensity('compact')}
+                            title="Tampilan Kompak (52px / jam) - Lebih hemat ruang & sedikit scroll"
+                            className={`px-2 py-1 rounded-lg text-[10px] font-black transition ${density === 'compact' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+                        >
+                            Kompak
+                        </button>
+                        <button
+                            onClick={() => toggleDensity('normal')}
+                            title="Tampilan Standar (72px / jam) - Ruang kartu lebih lega"
+                            className={`px-2 py-1 rounded-lg text-[10px] font-black transition ${density === 'normal' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+                        >
+                            Standar
+                        </button>
+                    </div>
+
+                    {/* Start Hour Selector */}
+                    <div className="relative shrink-0">
+                        <button onClick={() => setIsStartHourOpen(!isStartHourOpen)} className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group">
+                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 px-1.5 uppercase tracking-tighter transition-colors duration-500">{t('label_start') || 'Mulai'}</span>
+                            <div className="bg-white dark:bg-slate-900 px-2 py-0.5 rounded-lg shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors duration-500">
+                                <span className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 font-mono">{String(startHour).padStart(2, '0')}:00</span>
+                                <ChevronDown size={11} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
+                            </div>
+                        </button>
+                        
+                        {isStartHourOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-3 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
+                                <div className="flex justify-between items-center mb-2.5 px-1">
+                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-500">{t('select_hour') || 'Mulai dari Jam'}</span>
+                                    <button onClick={() => setIsStartHourOpen(false)} className="text-slate-300 dark:text-slate-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
+                                        <X size={14} strokeWidth={3} />
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-4 gap-1">
+                                    {Array.from({length: 24}).map((_, h) => (
+                                        <button 
+                                            key={h}
+                                            onClick={() => { setStartHour(h); setIsStartHourOpen(false); }}
+                                            className={`py-1.5 flex items-center justify-center rounded-xl text-[10px] font-black font-mono transition-all border ${startHour === h ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600'}`}
+                                        >
+                                            {String(h).padStart(2, '0')}:00
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {isStartHourOpen && <div className="fixed inset-0 z-50" onClick={() => setIsStartHourOpen(false)}></div>}
+                    </div>
                 </div>
             </div>
 
@@ -326,13 +387,13 @@ export default function PlannerTimeline({
             )}
 
             {/* Timeline Body */}
-            <div ref={scrollContainerRef} className="flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar mt-1">
-                <div className="relative w-full" style={{ height: `${VIEW_LIMIT * HOUR_HEIGHT}px` }}>
+            <div ref={scrollContainerRef} className="flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar">
+                <div className="relative w-full" style={{ height: `${VIEW_LIMIT * hourHeight}px` }}>
                     
                     {/* Grid Lines & Time Slots */}
                     {timeSlots.map((time, i) => (
-                        <div key={time} className="absolute w-full flex border-b border-slate-100 dark:border-slate-800" style={{ top: `${i * HOUR_HEIGHT}px`, height: `${HOUR_HEIGHT}px` }}>
-                            <div className="w-[80px] shrink-0 border-r border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 flex justify-center pt-3 transition-colors duration-500">
+                        <div key={time} className="absolute w-full flex border-b border-slate-100 dark:border-slate-800" style={{ top: `${i * hourHeight}px`, height: `${hourHeight}px` }}>
+                            <div className="w-[76px] shrink-0 border-r border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 flex justify-center pt-2 transition-colors duration-500">
                                 <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono transition-colors duration-500">{time}</span>
                             </div>
                             <div 
@@ -345,8 +406,8 @@ export default function PlannerTimeline({
                                 className="flex-1 relative group/slot cursor-pointer hover:bg-indigo-50/15 dark:hover:bg-indigo-500/10 transition-all"
                             >
                                 <div className="absolute inset-x-2 top-0.5 bottom-0.5 rounded-xl border border-transparent group-hover/slot:border-indigo-200/60 dark:group-hover/slot:border-indigo-500/30 flex items-center justify-center transition-all">
-                                    <span className="opacity-0 group-hover/slot:opacity-100 text-indigo-500 dark:text-indigo-400 text-[10px] font-black tracking-wider bg-white/80 dark:bg-slate-900/80 px-3 py-1 rounded-full shadow-sm">
-                                        + Jadwalkan di {time}
+                                    <span className="opacity-0 group-hover/slot:opacity-100 text-indigo-500 dark:text-indigo-400 text-[10px] font-black tracking-wider bg-white/80 dark:bg-slate-900/80 px-2.5 py-0.5 rounded-full shadow-sm">
+                                        + {time}
                                     </span>
                                 </div>
                             </div>
@@ -366,7 +427,8 @@ export default function PlannerTimeline({
                         const theme = getTaskTheme(task.type);
                         const style = getTaskStyle(task);
                         const duration = getDurationMinutes(task);
-                        const viewMode = duration < 45 ? 'MICRO' : 'NORMAL';
+                        const cardHeight = typeof style.height === 'string' ? parseFloat(style.height) : 60;
+                        const viewMode = (cardHeight < 46 || duration < 40) ? 'MICRO' : 'NORMAL';
 
                         return (
                             <div 
