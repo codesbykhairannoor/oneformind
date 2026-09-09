@@ -225,12 +225,14 @@ export function useHabitActions({
 
         try {
             const noteObj = { val: newValue, note: finalNote };
+            // Send 'completed' to database for any positive quantitative entry so PostgreSQL table CHECK constraints (e.g. status IN ('completed','skipped','relapse')) never reject partial progress.
+            const dbStatus = nextStatus === 'empty' ? 'empty' : 'completed';
             await fetch(`/api/habits/${habitId}/logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     date: dateStr,
-                    status: nextStatus,
+                    status: dbStatus,
                     notes: nextStatus === 'empty' ? '' : JSON.stringify(noteObj)
                 })
             });

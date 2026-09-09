@@ -530,13 +530,26 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 		Scan(&l.ID, &logDate, &l.Status, &logNotes, &createdAt, &updatedAt)
 
 	if err != nil {
-		fmt.Printf("Error upserting habit log (trying fallback): %v\n", err)
-		// Fallback: Try UPDATE then INSERT if ON CONFLICT encountered schema mismatch
-		res, updateErr := db.Exec(`UPDATE habit_logs SET status = $1, notes = $2, updated_at = NOW() WHERE habit_id = $3 AND (date = $4::date OR DATE(date) = $4::date)`, status, notes, habitID, dateStr)
+		fmt.Printf("Error upserting habit log (retrying with safe status if constraint violated): %v\n", err)
+		safeStatus := "completed"
+		if status == "skipped" || status == "relapse" {
+			safeStatus = status
+		}
+		err = db.QueryRow(query, habitID, dateStr, safeStatus, notes).
+			Scan(&l.ID, &logDate, &l.Status, &logNotes, &createdAt, &updatedAt)
+	}
+
+	if err != nil {
+		fmt.Printf("Error upserting habit log (trying fallback UPDATE/INSERT): %v\n", err)
+		safeStatus := "completed"
+		if status == "skipped" || status == "relapse" {
+			safeStatus = status
+		}
+		res, updateErr := db.Exec(`UPDATE habit_logs SET status = $1, notes = $2, updated_at = NOW() WHERE habit_id = $3 AND (date = $4::date OR DATE(date) = $4::date)`, safeStatus, notes, habitID, dateStr)
 		if updateErr == nil {
 			rowsAffected, _ := res.RowsAffected()
 			if rowsAffected == 0 {
-				_, insertErr := db.Exec(`INSERT INTO habit_logs (habit_id, date, status, notes) VALUES ($1, $2::date, $3, $4)`, habitID, dateStr, status, notes)
+				_, insertErr := db.Exec(`INSERT INTO habit_logs (habit_id, date, status, notes) VALUES ($1, $2::date, $3, $4)`, habitID, dateStr, safeStatus, notes)
 				if insertErr != nil {
 					fmt.Printf("Fallback insert error: %v\n", insertErr)
 					http.Error(w, `{"error": "Failed to update log"}`, http.StatusInternalServerError)
