@@ -40,7 +40,6 @@ interface HabitFormModalProps {
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
     setFormTimeOfDay: (v: 'morning' | 'afternoon' | 'evening' | 'anytime') => void;
     onClose: () => void;
-    onOpenBatch: () => void;
     onDelete: () => void;
     onSubmit: (e: React.FormEvent) => void;
 }
@@ -79,7 +78,6 @@ export default function HabitFormModal({
     formTimeOfDay,
     setFormTimeOfDay,
     onClose,
-    onOpenBatch,
     onDelete,
     onSubmit
 }: HabitFormModalProps) {
@@ -112,18 +110,6 @@ export default function HabitFormModal({
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {!editingHabitId && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        onClose();
-                                        onOpenBatch();
-                                    }}
-                                    className="hidden sm:flex text-[10px] font-black px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition items-center gap-1 border border-indigo-100 dark:border-indigo-500/30"
-                                >
-                                    <span>⚡</span> Batch Mode
-                                </button>
-                            )}
                             <button 
                                 type="button"
                                 onClick={onClose} 

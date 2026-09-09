@@ -116,9 +116,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         habitToDelete: form.habitToDelete,
         setShowDeleteModal: form.setShowDeleteModal,
         setHabitToDelete: form.setHabitToDelete,
-        batchRows: form.batchRows,
-        setBatchRows: form.setBatchRows,
-        setShowBatchModal: form.setShowBatchModal,
         setNumericPopover: form.setNumericPopover
     });
 
@@ -177,7 +174,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                 numericViewMode={numericViewMode}
                                 onToggleNumericViewMode={handleToggleNumericViewMode}
                                 onSelectHabitDetail={form.setDetailModalHabit}
-                                onSelectHabitTimer={form.setTimerModalHabit}
                                 onEditHabit={form.editHabit}
                                 onConfirmDelete={form.confirmDelete}
                                 onOpenNumericPopover={form.setNumericPopover}
@@ -193,7 +189,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                 filteredHabits={calc.filteredHabits}
                                 numericViewMode={numericViewMode}
                                 onSelectHabitDetail={form.setDetailModalHabit}
-                                onSelectHabitTimer={form.setTimerModalHabit}
                                 onOpenNumericPopover={form.setNumericPopover}
                                 onToggleStatus={actions.toggleStatus}
                             />
@@ -235,17 +230,11 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                 <HabitsModalsContainer
                     detailModalHabit={form.detailModalHabit}
                     setDetailModalHabit={form.setDetailModalHabit}
-                    timerModalHabit={form.timerModalHabit}
-                    setTimerModalHabit={form.setTimerModalHabit}
                     noteModalData={form.noteModalData}
                     setNoteModalData={form.setNoteModalData}
                     showCreateModal={form.showCreateModal}
                     setShowCreateModal={form.setShowCreateModal}
                     editingHabitId={form.editingHabitId}
-                    showBatchModal={form.showBatchModal}
-                    setShowBatchModal={form.setShowBatchModal}
-                    batchRows={form.batchRows}
-                    setBatchRows={form.setBatchRows}
                     showDeleteModal={form.showDeleteModal}
                     setShowDeleteModal={form.setShowDeleteModal}
                     habitToDelete={form.habitToDelete}
@@ -284,7 +273,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     onToggleStatus={actions.toggleStatus}
                     onSaveNote={actions.handleSaveNote}
                     onSubmitSingleHabit={actions.submitSingleHabit}
-                    onSubmitBatchHabits={actions.submitBatchHabits}
                     onExecuteDelete={actions.executeDelete}
                 />
             </div>

@@ -12,7 +12,6 @@ interface HabitMobileViewProps {
     filteredHabits: ProcessedHabitItem[];
     numericViewMode: 'value' | 'percent';
     onSelectHabitDetail: (habit: HabitItem) => void;
-    onSelectHabitTimer: (habit: HabitItem) => void;
     onOpenNumericPopover: (data: { 
         habitId: number; 
         habitName?: string;
@@ -34,7 +33,6 @@ export default function HabitMobileView({
     filteredHabits,
     numericViewMode,
     onSelectHabitDetail,
-    onSelectHabitTimer,
     onOpenNumericPopover,
     onToggleStatus
 }: HabitMobileViewProps) {
@@ -111,17 +109,6 @@ export default function HabitMobileView({
 
                             {/* Action Button */}
                             <div className="flex items-center gap-1 shrink-0">
-                                {/* Timer Trigger */}
-                                {(habit.unit === 'min' || habit.unit === 'menit' || habit.name.toLowerCase().includes('meditasi') || habit.name.toLowerCase().includes('baca')) && (
-                                    <button
-                                        type="button"
-                                        onClick={() => onSelectHabitTimer(habit)}
-                                        className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center"
-                                    >
-                                        <Play size={14} fill="currentColor" />
-                                    </button>
-                                )}
-
                                 {/* Toggle / Counter Button */}
                                 {habit.measurementType === 'numeric' ? (() => {
                                     const val = dayInfo.value !== undefined ? dayInfo.value : (isDone ? (habit.targetValue || 10) : 0);

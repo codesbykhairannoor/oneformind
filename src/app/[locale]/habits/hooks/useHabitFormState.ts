@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HabitItem, BatchRow } from '../types';
+import { HabitItem } from '../types';
 
 export function useHabitFormState(daysInCurrentMonth: number) {
     // Single Habit Form Modal State
@@ -19,20 +19,12 @@ export function useHabitFormState(daysInCurrentMonth: number) {
     const [formFreqDays, setFormFreqDays] = useState<number[]>([1, 2, 3, 4, 5]);
     const [formTimeOfDay, setFormTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'anytime'>('morning');
 
-    // Batch Habit Modal State
-    const [showBatchModal, setShowBatchModal] = useState(false);
-    const [batchRows, setBatchRows] = useState<BatchRow[]>([
-        { name: '', icon: '⚡', color: '#6366f1', target: 25, timeOfDay: 'morning' },
-        { name: '', icon: '💧', color: '#10b981', target: 25, timeOfDay: 'morning' }
-    ]);
-
     // Delete Modal State
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [habitToDelete, setHabitToDelete] = useState<HabitItem | null>(null);
 
     // Other Modals State
     const [detailModalHabit, setDetailModalHabit] = useState<HabitItem | null>(null);
-    const [timerModalHabit, setTimerModalHabit] = useState<HabitItem | null>(null);
     const [noteModalData, setNoteModalData] = useState<{ habit: HabitItem; dateStr: string; notes: string } | null>(null);
 
     // Numeric Popover State
@@ -112,18 +104,12 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormFreqDays,
         formTimeOfDay,
         setFormTimeOfDay,
-        showBatchModal,
-        setShowBatchModal,
-        batchRows,
-        setBatchRows,
         showDeleteModal,
         setShowDeleteModal,
         habitToDelete,
         setHabitToDelete,
         detailModalHabit,
         setDetailModalHabit,
-        timerModalHabit,
-        setTimerModalHabit,
         noteModalData,
         setNoteModalData,
         numericPopover,

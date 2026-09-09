@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { HabitItem, BatchRow } from '../types';
+import { HabitItem } from '../types';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 
 interface UseHabitActionsParams {
@@ -27,9 +27,6 @@ interface UseHabitActionsParams {
     habitToDelete: HabitItem | null;
     setShowDeleteModal: (v: boolean) => void;
     setHabitToDelete: (h: HabitItem | null) => void;
-    batchRows: BatchRow[];
-    setBatchRows: React.Dispatch<React.SetStateAction<BatchRow[]>>;
-    setShowBatchModal: (v: boolean) => void;
     setNumericPopover: (v: any) => void;
 }
 
@@ -56,9 +53,6 @@ export function useHabitActions({
     habitToDelete,
     setShowDeleteModal,
     setHabitToDelete,
-    batchRows,
-    setBatchRows,
-    setShowBatchModal,
     setNumericPopover
 }: UseHabitActionsParams) {
 
@@ -354,60 +348,6 @@ export function useHabitActions({
         setHabitToDelete(null);
     };
 
-    // Batch Habits Submission
-    const submitBatchHabits = async () => {
-        const validRows = batchRows.filter(r => r.name.trim() !== '');
-        if (validRows.length === 0) return;
-
-        const tempHabits: HabitItem[] = validRows.map((r, i) => {
-            const meta = { habitType: 'positive', measurementType: 'boolean', timeOfDay: r.timeOfDay, frequencyType: 'daily' };
-            return {
-                id: Date.now() + i,
-                name: r.name,
-                icon: r.icon,
-                color: r.color,
-                period: currentMonthKey,
-                monthlyTarget: r.target,
-                position: (habits.length > 0 ? Math.max(...habits.map(h => h.position)) : 0) + i + 1,
-                timeOfDay: r.timeOfDay,
-                status: JSON.stringify(meta),
-                logs: {}
-            };
-        });
-
-        setHabits(prev => [...prev, ...tempHabits]);
-
-        validRows.forEach(async (r, i) => {
-            try {
-                const meta = { habitType: 'positive', measurementType: 'boolean', timeOfDay: r.timeOfDay, frequencyType: 'daily' };
-                const res = await fetch('/api/habits', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: r.name,
-                        icon: r.icon,
-                        color: r.color,
-                        period: currentMonthKey,
-                        monthlyTarget: r.target,
-                        status: JSON.stringify(meta)
-                    })
-                });
-                if (res.ok) {
-                    const realHabit = await res.json();
-                    setHabits(prev => prev.map(h => h.id === tempHabits[i].id ? { ...tempHabits[i], id: realHabit.id } : h));
-                }
-            } catch (e) {
-                console.error('Failed to submit batch habit', e);
-            }
-        });
-
-        setShowBatchModal(false);
-        setBatchRows([
-            { name: '', icon: '⚡', color: '#6366f1', target: daysInCurrentMonth, timeOfDay: 'morning' },
-            { name: '', icon: '💧', color: '#10b981', target: daysInCurrentMonth, timeOfDay: 'morning' }
-        ]);
-    };
-
     // Copy Habits from Last Month
     const handleCopyPreviousHabits = async () => {
         try {
@@ -434,7 +374,6 @@ export function useHabitActions({
         handleUpdateNumericValue,
         submitSingleHabit,
         executeDelete,
-        submitBatchHabits,
         handleCopyPreviousHabits
     };
 }

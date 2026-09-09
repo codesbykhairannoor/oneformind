@@ -21,7 +21,6 @@ interface HabitMatrixTableProps {
     numericViewMode: 'value' | 'percent';
     onToggleNumericViewMode: (mode: 'value' | 'percent') => void;
     onSelectHabitDetail: (habit: HabitItem) => void;
-    onSelectHabitTimer: (habit: HabitItem) => void;
     onEditHabit: (habit: HabitItem) => void;
     onConfirmDelete: (habit: HabitItem) => void;
     onOpenNumericPopover: (data: { 
@@ -47,7 +46,6 @@ export default function HabitMatrixTable({
     numericViewMode,
     onToggleNumericViewMode,
     onSelectHabitDetail,
-    onSelectHabitTimer,
     onEditHabit,
     onConfirmDelete,
     onOpenNumericPopover,
@@ -167,16 +165,6 @@ export default function HabitMatrixTable({
 
                                 {/* Quick Action Floating Hover Bubble */}
                                 <div className="flex items-center gap-1 bg-white dark:bg-slate-800 px-2 py-1 rounded-full absolute right-2 shadow-lg border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 z-50">
-                                    {(habit.unit === 'min' || habit.unit === 'menit' || habit.name.toLowerCase().includes('meditasi') || habit.name.toLowerCase().includes('baca')) && (
-                                        <button 
-                                            type="button"
-                                            onClick={() => onSelectHabitTimer(habit)} 
-                                            className="p-1 text-slate-400 hover:text-indigo-600" 
-                                            title={t('habits_timer_tooltip') || 'Timer'}
-                                        >
-                                            <Play size={12} fill="currentColor" />
-                                        </button>
-                                    )}
                                     <button 
                                         type="button"
                                         onClick={() => onSelectHabitDetail(habit)} 

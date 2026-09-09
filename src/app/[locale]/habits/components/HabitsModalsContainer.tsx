@@ -2,29 +2,21 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { HabitItem, BatchRow } from '../types';
+import { HabitItem } from '../types';
 import HabitFormModal from './HabitFormModal';
-import HabitBatchModal from './HabitBatchModal';
 import HabitDeleteModal from './HabitDeleteModal';
 
 const HabitDetailModal = dynamic(() => import('./HabitDetailModal'), { ssr: false });
-const HabitTimerModal = dynamic(() => import('./HabitTimerModal'), { ssr: false });
 const HabitNoteModal = dynamic(() => import('./HabitNoteModal'), { ssr: false });
 
 interface HabitsModalsContainerProps {
     detailModalHabit: HabitItem | null;
     setDetailModalHabit: (h: HabitItem | null) => void;
-    timerModalHabit: HabitItem | null;
-    setTimerModalHabit: (h: HabitItem | null) => void;
     noteModalData: { habit: HabitItem; dateStr: string; notes: string } | null;
     setNoteModalData: (d: { habit: HabitItem; dateStr: string; notes: string } | null) => void;
     showCreateModal: boolean;
     setShowCreateModal: (v: boolean) => void;
     editingHabitId: number | null;
-    showBatchModal: boolean;
-    setShowBatchModal: (v: boolean) => void;
-    batchRows: BatchRow[];
-    setBatchRows: React.Dispatch<React.SetStateAction<BatchRow[]>>;
     showDeleteModal: boolean;
     setShowDeleteModal: (v: boolean) => void;
     habitToDelete: HabitItem | null;
@@ -63,24 +55,17 @@ interface HabitsModalsContainerProps {
     onToggleStatus: (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => void;
     onSaveNote: (habitId: number, dateStr: string, noteText: string) => void;
     onSubmitSingleHabit: (e: React.FormEvent) => void;
-    onSubmitBatchHabits: () => void;
     onExecuteDelete: () => void;
 }
 
 export default function HabitsModalsContainer({
     detailModalHabit,
     setDetailModalHabit,
-    timerModalHabit,
-    setTimerModalHabit,
     noteModalData,
     setNoteModalData,
     showCreateModal,
     setShowCreateModal,
     editingHabitId,
-    showBatchModal,
-    setShowBatchModal,
-    batchRows,
-    setBatchRows,
     showDeleteModal,
     setShowDeleteModal,
     habitToDelete,
@@ -119,7 +104,6 @@ export default function HabitsModalsContainer({
     onToggleStatus,
     onSaveNote,
     onSubmitSingleHabit,
-    onSubmitBatchHabits,
     onExecuteDelete
 }: HabitsModalsContainerProps) {
     return (
@@ -129,17 +113,6 @@ export default function HabitsModalsContainer({
                 habit={detailModalHabit}
                 isOpen={Boolean(detailModalHabit)}
                 onClose={() => setDetailModalHabit(null)}
-                locale={locale}
-            />
-
-            {/* MODAL: TIMER */}
-            <HabitTimerModal
-                habit={timerModalHabit}
-                isOpen={Boolean(timerModalHabit)}
-                onClose={() => setTimerModalHabit(null)}
-                onComplete={(habitId) => {
-                    onToggleStatus(habitId, todayStr, 'completed');
-                }}
                 locale={locale}
             />
 
@@ -189,22 +162,8 @@ export default function HabitsModalsContainer({
                 formTimeOfDay={formTimeOfDay}
                 setFormTimeOfDay={setFormTimeOfDay}
                 onClose={() => setShowCreateModal(false)}
-                onOpenBatch={() => setShowBatchModal(true)}
                 onDelete={onExecuteDelete}
                 onSubmit={onSubmitSingleHabit}
-            />
-
-            {/* MODAL: BATCH HABIT CREATION */}
-            <HabitBatchModal
-                isOpen={showBatchModal}
-                isIndo={isIndo}
-                daysInCurrentMonth={daysInCurrentMonth}
-                iconList={iconList}
-                colorPalette={colorPalette}
-                batchRows={batchRows}
-                setBatchRows={setBatchRows}
-                onClose={() => setShowBatchModal(false)}
-                onSubmit={onSubmitBatchHabits}
             />
 
             {/* MODAL: DELETE CONFIRMATION */}
