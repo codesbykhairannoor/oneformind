@@ -16,6 +16,10 @@ export function getHabitDayInfo(habit: HabitItem, day: MonthDateItem): DayInfo {
                 status = 'completed';
             } else if (value > 0) {
                 status = 'in_progress';
+            } else if (rawStatus === 'completed') {
+                status = 'completed';
+            } else if (rawStatus === 'in_progress') {
+                status = 'in_progress';
             } else if (rawStatus === 'empty' && !isScheduled) {
                 status = 'rest';
             } else {
@@ -34,7 +38,11 @@ export function getHabitDayInfo(habit: HabitItem, day: MonthDateItem): DayInfo {
     }
 
     const effectiveVal = habit.measurementType === 'numeric'
-        ? (typeof value === 'number' ? value : (status === 'completed' ? (habit.targetValue || 10) : 0))
+        ? (typeof value === 'number' 
+            ? value 
+            : (status === 'completed' 
+                ? (habit.targetValue || 10) 
+                : (status === 'in_progress' ? 1 : 0)))
         : value;
 
     return { 

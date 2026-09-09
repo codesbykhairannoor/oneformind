@@ -96,28 +96,39 @@ export function useHabitActions({
             }
         }
 
+        // For numeric habits, calculate proper next value: completed -> targetValue, empty -> 0
+        const targetVal = targetHabit.targetValue || 10;
+        const nextVal = targetHabit.measurementType === 'numeric'
+            ? (nextStatus === 'completed' ? (currentLog?.value && currentLog.value >= targetVal ? currentLog.value : targetVal) : (nextStatus === 'empty' ? 0 : currentLog?.value))
+            : currentLog?.value;
+
         // Optimistic UI update
         setHabits(prev => prev.map(h => {
             if (h.id === habitId) {
-                const updatedLogs = {
-                    ...h.logs,
-                    [dateString]: {
+                const updatedLogs = { ...h.logs };
+                if (nextStatus === 'empty') {
+                    delete updatedLogs[dateString];
+                } else {
+                    updatedLogs[dateString] = {
                         status: nextStatus,
-                        value: currentLog?.value,
+                        value: nextVal,
                         notes: currentLog?.notes
-                    }
-                };
+                    };
+                }
                 return { ...h, logs: updatedLogs };
             }
             return h;
         }));
 
         try {
-            const notePayload = currentLog?.notes ? currentLog.notes : undefined;
+            const notePayload = targetHabit.measurementType === 'numeric' && nextVal !== undefined
+                ? JSON.stringify({ val: nextVal, note: currentLog?.notes || '' })
+                : (currentLog?.notes ? currentLog.notes : undefined);
+
             await fetch(`/api/habits/${habitId}/logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date: dateString, status: nextStatus, notes: notePayload })
+                body: JSON.stringify({ date: dateString, status: nextStatus, notes: nextStatus === 'empty' ? '' : notePayload })
             });
             if (mutateHabits) {
                 mutateHabits();

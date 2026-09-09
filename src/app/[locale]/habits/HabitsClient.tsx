@@ -50,13 +50,21 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         keepPreviousData: true,
     });
 
+    // Pre-parse initial SSR habits if available
+    const initialParsedHabits = useMemo(() => {
+        if (initialHabits && Array.isArray(initialHabits) && initialHabits.length > 0) {
+            return parseRawHabitsData(initialHabits);
+        }
+        return [];
+    }, [initialHabits]);
+
     const parsedHabits = useMemo(() => {
         if (!fetchedHabits || !Array.isArray(fetchedHabits)) return null;
         return parseRawHabitsData(fetchedHabits);
     }, [fetchedHabits]);
 
-    const [habits, setHabits] = useState<HabitItem[]>(parsedHabits ?? []);
-    const [isLoaded, setIsLoaded] = useState(parsedHabits !== null);
+    const [habits, setHabits] = useState<HabitItem[]>(initialParsedHabits);
+    const [isLoaded, setIsLoaded] = useState(initialParsedHabits.length > 0 || parsedHabits !== null);
 
     // Persistent display mode for quantitative habits (Angka vs Persentase)
     const [numericViewMode, setNumericViewMode] = useState<'value' | 'percent'>('value');

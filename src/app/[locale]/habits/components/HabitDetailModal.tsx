@@ -73,19 +73,56 @@ export default function HabitDetailModal({ habit, isOpen, onClose, locale }: Hab
                             ? log.date.split('T')[0]
                             : new Date(log.date).toISOString().split('T')[0];
 
-                        let logNotes = log.notes || '';
+                        let logNotesRaw = log.notes;
+                        let logNotes = '';
                         let logVal: number | undefined = undefined;
 
-                        if (logNotes && typeof logNotes === 'string' && logNotes.startsWith('{')) {
-                            try {
-                                const parsed = JSON.parse(logNotes);
-                                logVal = parsed.val;
-                                logNotes = parsed.note || '';
-                            } catch {}
+                        if (logNotesRaw !== null && logNotesRaw !== undefined) {
+                            if (typeof logNotesRaw === 'number') {
+                                logVal = logNotesRaw;
+                            } else if (typeof logNotesRaw === 'object') {
+                                if (typeof logNotesRaw.val === 'number') logVal = logNotesRaw.val;
+                                else if (typeof logNotesRaw.val === 'string' && !isNaN(Number(logNotesRaw.val))) logVal = Number(logNotesRaw.val);
+                                logNotes = typeof logNotesRaw.note === 'string' ? logNotesRaw.note : '';
+                            } else if (typeof logNotesRaw === 'string') {
+                                let trimmed = logNotesRaw.trim();
+                                if (trimmed.startsWith('{') || (trimmed.startsWith('"') && trimmed.includes('{'))) {
+                                    try {
+                                        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+                                            trimmed = JSON.parse(trimmed);
+                                        }
+                                        const parsed = typeof trimmed === 'string' ? JSON.parse(trimmed) : trimmed;
+                                        if (parsed && typeof parsed === 'object') {
+                                            if (typeof parsed.val === 'number') logVal = parsed.val;
+                                            else if (typeof parsed.val === 'string' && !isNaN(Number(parsed.val))) logVal = Number(parsed.val);
+                                            logNotes = typeof parsed.note === 'string' ? parsed.note : '';
+                                        }
+                                    } catch {
+                                        logNotes = trimmed;
+                                    }
+                                } else if (!isNaN(Number(trimmed)) && trimmed !== '') {
+                                    logVal = Number(trimmed);
+                                } else {
+                                    logNotes = trimmed;
+                                }
+                            }
+                        }
+
+                        const rawStatus = (log.status as any) || 'completed';
+
+                        if (habit.measurementType === 'numeric' && logVal === undefined) {
+                            if (rawStatus === 'completed') {
+                                logVal = habit.targetValue;
+                            } else if (rawStatus === 'in_progress' && typeof logNotesRaw === 'string') {
+                                const match = logNotesRaw.match(/"val"\s*:\s*(\d+(\.\d+)?)/);
+                                if (match && match[1]) {
+                                    logVal = parseFloat(match[1]);
+                                }
+                            }
                         }
 
                         logsMap[dateStr] = {
-                            status: log.status || 'completed',
+                            status: rawStatus,
                             value: logVal,
                             notes: logNotes
                         };

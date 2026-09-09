@@ -31,7 +31,7 @@ export default async function HabitsPage({ searchParams }: { searchParams: { mon
     const initialDateStr = `${year}-${String(month).padStart(2, '0')}`;
 
     // Fetch habits from Go API (no Prisma!)
-    const [habits] = await goFetchJson<any[]>('habits', `month=${initialDateStr}`);
+    const [habits] = await goFetchJson<any[]>('habits', `period=${initialDateStr}`);
 
     const serializedHabits = (habits || []).map((h: any) => ({
         ...h,

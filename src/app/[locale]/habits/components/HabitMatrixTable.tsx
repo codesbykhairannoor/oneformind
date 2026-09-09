@@ -221,7 +221,7 @@ export default function HabitMatrixTable({
                                                 const habitVal = info.value !== undefined ? info.value : (isDone ? (habit.targetValue || 10) : 0);
                                                 const target = Math.max(1, habit.targetValue || 10);
                                                 const percentVal = Math.round((habitVal / target) * 100);
-                                                const hasProgress = habitVal > 0 || isDone;
+                                                const hasProgress = habitVal > 0 || isDone || info.status === 'in_progress';
 
                                                 return (
                                                     <button

@@ -127,7 +127,7 @@ export default function HabitMobileView({
                                     const val = dayInfo.value !== undefined ? dayInfo.value : (isDone ? (habit.targetValue || 10) : 0);
                                     const target = Math.max(1, habit.targetValue || 10);
                                     const percentVal = Math.round((val / target) * 100);
-                                    const hasProgress = val > 0 || isDone;
+                                    const hasProgress = val > 0 || isDone || dayInfo.status === 'in_progress';
 
                                     return (
                                         <button

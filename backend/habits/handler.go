@@ -111,6 +111,9 @@ func HabitsHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleGetHabits(w http.ResponseWriter, r *http.Request, userID int) {
 	period := r.URL.Query().Get("period")
+	if period == "" {
+		period = r.URL.Query().Get("month")
+	}
 
 	query := `SELECT id, user_id, period, name, icon, color, monthly_target, is_archived, created_at, updated_at, status, position 
 			  FROM habits 
@@ -276,6 +279,7 @@ func handleCreateHabit(w http.ResponseWriter, r *http.Request, userID int) {
 
 	json.NewEncoder(w).Encode(h)
 }
+
 func handleUpdateHabit(w http.ResponseWriter, r *http.Request, userID int, habitIdStr string) {
 	habitID, err := strconv.Atoi(habitIdStr)
 	if err != nil {
@@ -481,6 +485,12 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 	var notes *string
 	if n, ok := req["notes"].(string); ok {
 		notes = &n
+	} else if req["notes"] != nil {
+		// If notes is a JSON map/object, serialize to string
+		if bytes, err := json.Marshal(req["notes"]); err == nil {
+			nStr := string(bytes)
+			notes = &nStr
+		}
 	}
 
 	if dateStr == "" || status == "" {
