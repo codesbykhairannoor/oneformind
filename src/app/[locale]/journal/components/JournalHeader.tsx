@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Flame, Sparkles, BookOpen, CheckCircle2, DollarSign, Calendar } from 'lucide-react';
 
 interface JournalHeaderProps {
     todayDate?: string;
+    totalJournals?: number;
+    totalWords?: number;
+    streakDays?: number;
     synergy?: {
         tasks_completed?: number;
         tasks_total?: number;
@@ -15,8 +18,14 @@ interface JournalHeaderProps {
     };
 }
 
-export default function JournalHeader({ synergy }: JournalHeaderProps) {
-    const t = useTranslations();
+export default function JournalHeader({ 
+    totalJournals = 0,
+    totalWords = 0,
+    streakDays = 1,
+    synergy 
+}: JournalHeaderProps) {
+    const locale = useLocale();
+    const isIndo = locale === 'id';
     
     const tasksCompleted = synergy?.tasks_completed ?? 0;
     const tasksTotal = synergy?.tasks_total ?? 0;
@@ -24,59 +33,106 @@ export default function JournalHeader({ synergy }: JournalHeaderProps) {
     const expenseTotal = synergy?.expense_total ?? 0;
 
     const formatMoney = (val: number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
+        if (isIndo) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
+        }
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
     };
 
     return (
-        // 1:1 from JournalHeader.vue line 25-58
-        <div className="relative z-[60] transition-all bg-white dark:bg-slate-900 border-b shadow-sm border-slate-100 dark:border-slate-800 duration-500">
-            <div className="flex w-full min-w-0 flex-col items-stretch justify-between gap-4 px-4 sm:px-6 lg:px-8 py-4 md:flex-row md:items-center">
-                
-                <div className="flex items-center gap-2 w-full min-w-0 md:w-auto md:max-w-[min(100%,28rem)]">
-                    <p className="shrink-0 text-[13px] font-black capitalize tracking-wide text-slate-700 dark:text-slate-300 mr-2 pr-4">
-                        {t('journal_title') || 'My Journal'}
-                    </p>
-                </div>
-
-                <div className="flex min-w-0 flex-wrap items-center w-full gap-3 md:w-auto md:flex-nowrap md:justify-end">
+        <div className="relative z-30 transition-all bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     
-                    <div className="hidden lg:flex items-center gap-5 px-5 border-x border-slate-200 dark:border-slate-800 h-10 transition-colors duration-500">
-                        <div className="flex flex-col justify-center">
-                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 leading-none mb-1 transition-colors duration-500">
-                                {t('journal_tasks') || 'Tugas'}
-                            </span>
-                            <span className="text-sm font-black text-slate-700 dark:text-slate-300 leading-none transition-colors duration-500">
-                                {tasksCompleted}/{tasksTotal}
-                            </span>
+                    {/* Left: Title & Writing Streak */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                                    {isIndo ? 'Jurnal Refleksi & Pikiran' : 'Cognitive Reflection Journal'}
+                                </h1>
+                                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                                    <Sparkles className="w-3 h-3 text-indigo-500" />
+                                    AI Neural CBT
+                                </span>
+                            </div>
+                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                {isIndo 
+                                    ? 'Ruang aman untuk menjernihkan pikiran, merekam jejak emosi & mendeteksi pola kognitif' 
+                                    : 'A safe sanctuary to declutter thoughts, track emotional trajectory & reframe cognitive distortions'}
+                            </p>
                         </div>
-                        <div className="flex flex-col justify-center">
-                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 leading-none mb-1 transition-colors duration-500">
-                                {t('journal_habit') || 'Habit'}
-                            </span>
-                            <span className="text-sm font-black text-slate-700 dark:text-slate-300 leading-none transition-colors duration-500">
-                                {habitsCompleted}
-                            </span>
-                        </div>
-                        <div className="flex flex-col justify-center">
-                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 leading-none mb-1 transition-colors duration-500">
-                                {t('journal_expense') || 'Keluar'}
-                            </span>
-                            <span className="text-sm font-black text-slate-700 dark:text-slate-300 leading-none font-mono transition-colors duration-500">
-                                {formatMoney(expenseTotal)}
-                            </span>
+
+                        {/* Streak Badge */}
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-black text-xs shadow-sm">
+                            <Flame className="w-4 h-4 fill-amber-500 text-amber-500 animate-pulse" />
+                            <span>{streakDays} {isIndo ? 'Hari Beruntun' : 'Day Streak'}</span>
                         </div>
                     </div>
 
-                    <Link 
-                        href="/journal/write" 
-                        className="flex min-w-0 items-center justify-center flex-1 h-12 px-6 text-sm font-black text-white transition shadow-lg md:flex-none md:shrink-0 bg-indigo-600 rounded-2xl hover:bg-indigo-700 shadow-indigo-100 dark:shadow-none gap-2 active:scale-95 whitespace-nowrap"
-                    >
-                        <Plus className="h-4 w-4 stroke-[3]" />
-                        <span className="tracking-tight md:inline">{t('journal_add') || 'Tambah jurnal'}</span>
-                    </Link>
+                    {/* Right: Daily Life OS Synergy & Action CTA */}
+                    <div className="flex flex-wrap items-center gap-3 md:justify-end">
+                        
+                        {/* Synergy Micro-pills */}
+                        <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60">
+                            {/* Stories count */}
+                            <div className="flex items-center gap-2">
+                                <BookOpen className="w-4 h-4 text-indigo-500" />
+                                <div>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
+                                        {isIndo ? 'Cerita' : 'Stories'}
+                                    </p>
+                                    <p className="text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
+                                        {totalJournals}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
+
+                            {/* Planner tasks */}
+                            <div className="flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                <div>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
+                                        {isIndo ? 'Tugas' : 'Tasks'}
+                                    </p>
+                                    <p className="text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
+                                        {tasksCompleted}/{tasksTotal}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
+
+                            {/* Habit count */}
+                            <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-purple-500" />
+                                <div>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
+                                        {isIndo ? 'Kebiasaan' : 'Habits'}
+                                    </p>
+                                    <p className="text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
+                                        {habitsCompleted}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CTA: Write New Journal Button */}
+                        <Link 
+                            href="/journal/write" 
+                            className="group relative flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 text-white font-black text-xs sm:text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 active:scale-95 transition-all duration-200"
+                        >
+                            <Plus className="w-4 h-4 stroke-[3] group-hover:rotate-90 transition-transform duration-300" />
+                            <span>{isIndo ? 'Tulis Cerita Hari Ini' : 'Write Today\'s Story'}</span>
+                        </Link>
+
+                    </div>
 
                 </div>
             </div>
         </div>
     );
 }
+

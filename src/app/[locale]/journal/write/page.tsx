@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import JournalEditorHeader from './components/JournalEditorHeader';
 import JournalEditorBody from './components/JournalEditorBody';
+import { analyzeJournalCognitive } from '../lib/journalAi';
 
 interface JournalWritePageProps {
     params?: Promise<{
@@ -14,8 +15,10 @@ interface JournalWritePageProps {
 }
 
 export default function JournalWritePage({ params }: JournalWritePageProps) {
-    const t = useTranslations();
+    const locale = useLocale();
+    const isIndo = locale === 'id';
     const router = useRouter();
+
     const resolvedParams = params ? React.use(params) : null;
     const journalId = resolvedParams?.id;
 
@@ -24,74 +27,132 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     const [mood, setMood] = useState<string>('awesome');
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [isInsertingBrief, setIsInsertingBrief] = useState(false);
+    const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
+
+    // Styling & Tools State
     const [isBold, setIsBold] = useState(false);
     const [isItalic, setIsItalic] = useState(false);
-    const [isBullet, setIsBullet] = useState(false);
     const [selectedFont, setSelectedFont] = useState('Inter, sans-serif');
     const [selectedFontSize, setSelectedFontSize] = useState('1.125rem');
     const [showFontMenu, setShowFontMenu] = useState(false);
     const [showSizeMenu, setShowSizeMenu] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [isZenMode, setIsZenMode] = useState(false);
+    const [isPrivacyBlur, setIsPrivacyBlur] = useState(false);
     
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const recognitionRef = useRef<any>(null);
 
+    // 1. Fetch Existing Journal (Edit Mode) or Load Local Draft (New Mode)
     useEffect(() => {
-        if (!journalId) return;
-
-        const fetchJournal = async () => {
-            try {
-                const res = await fetch('/api/journals');
-                if (res.ok) {
-                    const data = await res.json();
-                    const item = data.find((j: any) => String(j.id) === String(journalId));
-                    if (item) {
-                        setTitle(item.title || '');
-                        
-                        let rawContent = item.content || '';
-                        const txt = document.createElement("textarea");
-                        txt.innerHTML = rawContent;
-                        rawContent = txt.value;
-
-                        if (rawContent.includes('<')) {
-                            rawContent = rawContent.replace(/<br\s*[\/]?>/gi, '\n')
-                                .replace(/<\/p>/gi, '\n\n')
-                                .replace(/<\/div>/gi, '\n\n')
-                                .replace(/<\/h[1-6]>/gi, '\n\n')
-                                .replace(/<\/li>/gi, '\n')
-                                .replace(/<li[^>]*>/gi, '- ')
-                                .replace(/<[^>]+>/g, '')
-                                .replace(/\n{3,}/g, '\n\n')
-                                .trim(); 
+        if (journalId) {
+            const fetchJournal = async () => {
+                try {
+                    const res = await fetch('/api/journals');
+                    if (res.ok) {
+                        const data = await res.json();
+                        const item = data.find((j: any) => String(j.id) === String(journalId));
+                        if (item) {
+                            setTitle(item.title || '');
+                            
+                            let rawContent = item.content || '';
+                            if (rawContent.includes('<')) {
+                                rawContent = rawContent
+                                    .replace(/<br\s*[\/]?>/gi, '\n')
+                                    .replace(/<\/p>/gi, '\n\n')
+                                    .replace(/<\/div>/gi, '\n\n')
+                                    .replace(/<\/h[1-6]>/gi, '\n\n')
+                                    .replace(/<\/li>/gi, '\n')
+                                    .replace(/<li[^>]*>/gi, '- ')
+                                    .replace(/<[^>]+>/g, '')
+                                    .replace(/\n{3,}/g, '\n\n')
+                                    .trim();
+                            }
+                            
+                            setContent(rawContent);
+                            setMood(item.mood || 'awesome');
+                            setImageUrl(item.imagePath || item.image_url || null);
                         }
-                        
-                        setContent(rawContent);
-                        setMood(item.mood || 'awesome');
-                        setImageUrl(item.imagePath || null);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch journal for edit:', error);
+                }
+            };
+            fetchJournal();
+        } else {
+            // Restore draft from localStorage if available
+            try {
+                const savedDraft = localStorage.getItem('tranvas_journal_draft');
+                if (savedDraft) {
+                    const parsed = JSON.parse(savedDraft);
+                    if (parsed.content || parsed.title) {
+                        setTitle(parsed.title || '');
+                        setContent(parsed.content || '');
+                        if (parsed.mood) setMood(parsed.mood);
                     }
                 }
-            } catch (error) {
-                console.error('Failed to fetch journal:', error);
+            } catch (e) {
+                console.error('Draft restore error', e);
             }
-        };
-        fetchJournal();
+        }
     }, [journalId]);
 
-    const dateStr = new Date().toLocaleDateString('id-ID', {
-        weekday: 'long',
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-    });
+    // 2. Auto-save Draft to LocalStorage every 5s if creating new
+    useEffect(() => {
+        if (journalId) return;
+        if (!title && !content) return;
+
+        const timeout = setTimeout(() => {
+            try {
+                localStorage.setItem('tranvas_journal_draft', JSON.stringify({
+                    title,
+                    content,
+                    mood,
+                    updatedAt: new Date().toISOString()
+                }));
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                setLastSavedTime(timeStr);
+            } catch (e) {
+                console.error('Draft auto-save error', e);
+            }
+        }, 1500);
+
+        return () => clearTimeout(timeout);
+    }, [title, content, mood, journalId]);
+
+    // Date formatting for header
+    const dateStr = useMemo(() => {
+        try {
+            return new Date().toLocaleDateString(isIndo ? 'id-ID' : 'en-US', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        } catch {
+            return '';
+        }
+    }, [isIndo]);
+
+    // Calculate Word Count & Reading Time
+    const wordCount = useMemo(() => {
+        const clean = content.replace(/<[^>]*>?/gm, ' ').replace(/#\w+/g, ' ');
+        return clean.split(/\s+/).filter(Boolean).length;
+    }, [content]);
+
+    const readTimeMinutes = useMemo(() => {
+        return Math.max(1, Math.ceil(wordCount / 180));
+    }, [wordCount]);
 
     const moods = [
-        { slug: 'awesome', emoji: '🤩', label: 'Luar Biasa' },
-        { slug: 'good', emoji: '😊', label: 'Senang' },
-        { slug: 'okay', emoji: '😐', label: 'Biasa Saja' },
-        { slug: 'sad', emoji: '😢', label: 'Sedih' },
-        { slug: 'angry', emoji: '😡', label: 'Marah' },
+        { slug: 'awesome', emoji: '🤩', label: isIndo ? 'Luar Biasa' : 'Awesome' },
+        { slug: 'good', emoji: '😊', label: isIndo ? 'Senang' : 'Good' },
+        { slug: 'okay', emoji: '😐', label: isIndo ? 'Biasa Saja' : 'Okay' },
+        { slug: 'sad', emoji: '😢', label: isIndo ? 'Sedih' : 'Sad' },
+        { slug: 'angry', emoji: '😡', label: isIndo ? 'Marah / Stres' : 'Angry / Stressed' },
     ];
 
     const fontFamilies = [
@@ -104,24 +165,88 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     ];
 
     const fontSizes = [
-        { label: "Normal", value: "1.125rem" },
-        { label: "Medium", value: "1.25rem" },
-        { label: "Large", value: "1.5rem" },
-        { label: "Extra", value: "1.875rem" },
+        { label: isIndo ? "Normal" : "Normal", value: "1.125rem" },
+        { label: isIndo ? "Sedang" : "Medium", value: "1.25rem" },
+        { label: isIndo ? "Besar" : "Large", value: "1.5rem" },
+        { label: isIndo ? "Ekstra" : "Extra", value: "1.875rem" },
     ];
 
+    // Markdown insertion helper
+    const handleInsertMarkdown = (prefix: string, suffix: string = '', defaultText: string = '') => {
+        const textarea = textareaRef.current;
+        if (!textarea) {
+            setContent(prev => `${prev}${prefix}${defaultText}${suffix}`);
+            return;
+        }
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selected = content.substring(start, end) || defaultText;
+        const replacement = `${prefix}${selected}${suffix}`;
+        
+        const newContent = content.substring(0, start) + replacement + content.substring(end);
+        setContent(newContent);
+
+        setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+        }, 10);
+    };
+
+    // 1-Click Life OS Brief Auto-Injection
+    const handleInsertLifeOSBrief = async () => {
+        setIsInsertingBrief(true);
+        try {
+            const dashRes = await fetch('/api/dashboard');
+            let tasksCompleted = 0;
+            let tasksTotal = 0;
+            let habitsCompleted = 0;
+            let expenseTotal = 0;
+
+            if (dashRes.ok) {
+                const dashData = await dashRes.json();
+                tasksCompleted = dashData.planner?.completed || 0;
+                tasksTotal = dashData.planner?.total || 0;
+                habitsCompleted = dashData.habits?.completed || 0;
+                expenseTotal = dashData.finance?.expense || 0;
+            }
+
+            const formattedExpense = isIndo 
+                ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(expenseTotal)
+                : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(expenseTotal);
+
+            const briefSection = isIndo ? `
+---
+### 📊 Rekap Hari Ini (Daily Life OS Brief)
+- ✅ **Penyelesaian Tugas:** ${tasksCompleted}/${tasksTotal} tugas terlaksana
+- 🔄 **Kebiasaan Harian:** ${habitsCompleted} habit konsisten
+- 💰 **Pengeluaran Hari Ini:** ${formattedExpense}
+---
+` : `
+---
+### 📊 Today's Recap (Daily Life OS Brief)
+- ✅ **Task Execution:** ${tasksCompleted}/${tasksTotal} tasks completed
+- 🔄 **Daily Habits:** ${habitsCompleted} habits checked in
+- 💰 **Today's Spend:** ${formattedExpense}
+---
+`;
+
+            setContent(prev => prev ? `${prev.trim()}\n\n${briefSection.trim()}\n` : briefSection.trim());
+        } catch (error) {
+            console.error('Failed to inject Life OS Brief:', error);
+        } finally {
+            setIsInsertingBrief(false);
+        }
+    };
+
+    // Save Action with Real Dynamic Cognitive AI Analysis
     const handleSave = async () => {
         if (!title && !content) return;
         setIsSaving(true);
 
-        const sentimentMap: Record<string, string> = {
-            awesome: 'Sentimen sangat positif dan berorientasi pada pencapaian tinggi (High Productivity & Optimism).',
-            good: 'Fokus kerja mendalam dengan kestabilan emosi yang baik.',
-            okay: 'Suasana hati netral, direkomendasikan untuk melakukan aktivitas penyegaran.',
-            sad: 'Kecenderungan sentimen melow, disarankan untuk istirahat sejenak.',
-            angry: 'Tingkat stres tinggi, prioritaskan teknik pernapasan dalam.',
-        };
-        const aiSentiment = sentimentMap[mood] || 'Sentimen netral.';
+        // Dynamically analyze journal content using the real cognitive engine
+        const cognitiveResult = analyzeJournalCognitive(content, mood, locale);
+        const aiSentiment = `[Mindset: ${cognitiveResult.mindsetTheme}] ${cognitiveResult.summarySentence}`;
 
         try {
             if (journalId) {
@@ -129,7 +254,7 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title,
+                        title: title || (isIndo ? 'Catatan Refleksi' : 'Daily Reflection'),
                         content,
                         mood,
                         imagePath: imageUrl,
@@ -141,7 +266,7 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title: title || 'Untitled Entry',
+                        title: title || (isIndo ? 'Catatan Refleksi' : 'Daily Reflection'),
                         content,
                         date: new Date().toISOString(),
                         mood,
@@ -149,6 +274,10 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                         aiSentiment
                     })
                 });
+                // Clear local draft upon successful save
+                try {
+                    localStorage.removeItem('tranvas_journal_draft');
+                } catch (e) {}
             }
         } catch (error) {
             console.error('Failed to save journal:', error);
@@ -157,7 +286,7 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
         setTimeout(() => {
             setIsSaving(false);
             router.push('/journal');
-        }, 600);
+        }, 500);
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,7 +301,7 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
         if (typeof window === 'undefined') return;
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         if (!SpeechRecognition) {
-            alert('Browser Anda tidak mendukung Voice to Text.');
+            alert(isIndo ? 'Browser Anda belum mendukung Dikte Suara (Voice to Text).' : 'Your browser does not support Voice to Text.');
             return;
         }
 
@@ -184,7 +313,7 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
 
         try {
             const rec = new SpeechRecognition();
-            rec.lang = 'id-ID';
+            rec.lang = isIndo ? 'id-ID' : 'en-US';
             rec.continuous = true;
             rec.interimResults = false;
 
@@ -203,17 +332,23 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     };
 
     return (
-        <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 relative selection:bg-indigo-100 dark:selection:bg-indigo-900/40 pb-32 transition-colors duration-500 ${isZenMode ? 'bg-slate-950 text-white' : ''}`}>
+        <div className={`min-h-screen relative selection:bg-indigo-100 dark:selection:bg-indigo-900/40 pb-32 transition-colors duration-300 ${
+            isZenMode 
+                ? 'bg-slate-950 text-white' 
+                : 'bg-slate-50/60 dark:bg-slate-950 text-slate-900 dark:text-white'
+        }`}>
             
             <JournalEditorHeader
-                t={t}
                 isZenMode={isZenMode}
+                setIsZenMode={setIsZenMode}
+                isPrivacyBlur={isPrivacyBlur}
+                setIsPrivacyBlur={setIsPrivacyBlur}
+                wordCount={wordCount}
+                readTimeMinutes={readTimeMinutes}
                 isBold={isBold}
                 setIsBold={setIsBold}
                 isItalic={isItalic}
                 setIsItalic={setIsItalic}
-                isBullet={isBullet}
-                setIsBullet={setIsBullet}
                 selectedFont={selectedFont}
                 setSelectedFont={setSelectedFont}
                 selectedFontSize={selectedFontSize}
@@ -224,16 +359,17 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                 setShowSizeMenu={setShowSizeMenu}
                 isListening={isListening}
                 toggleVoiceRecognition={toggleVoiceRecognition}
-                setIsZenMode={setIsZenMode}
+                onInsertMarkdown={handleInsertMarkdown}
                 handleSave={handleSave}
                 isSaving={isSaving}
+                lastSavedTime={lastSavedTime}
                 fontFamilies={fontFamilies}
                 fontSizes={fontSizes}
             />
 
             <JournalEditorBody
-                t={t}
                 isZenMode={isZenMode}
+                isPrivacyBlur={isPrivacyBlur}
                 dateStr={dateStr}
                 title={title}
                 setTitle={setTitle}
@@ -251,7 +387,10 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                 selectedFontSize={selectedFontSize}
                 isBold={isBold}
                 isItalic={isItalic}
+                onInsertLifeOSBrief={handleInsertLifeOSBrief}
+                isInsertingBrief={isInsertingBrief}
             />
         </div>
     );
 }
+
