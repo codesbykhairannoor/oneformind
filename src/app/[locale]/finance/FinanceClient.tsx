@@ -30,7 +30,7 @@ import SavingsVaultSection from './components/SavingsVaultSection';
 import FinanceModalsContainer from './components/FinanceModalsContainer';
 import { SavingVault } from './components/SavingModal';
 import { CategoryOption } from './types';
-import { useFinanceActions } from './hooks/useFinanceActions';
+import { useFinanceActions, FinanceDeleteTarget } from './hooks/useFinanceActions';
 
 // Wallets & Transfers
 import WalletsSection, { WalletItem } from './components/WalletsSection';
@@ -198,10 +198,6 @@ export default function FinanceClient({
         saveUserConfig({ finance_wallets: updated });
     };
 
-    const handleDeleteWallet = (id: string) => {
-        const updated = wallets.filter(w => w.id !== id);
-        saveUserConfig({ finance_wallets: updated });
-    };
 
     const handleTransfer = ({
         fromWalletId,
@@ -266,11 +262,6 @@ export default function FinanceClient({
         saveUserConfig({ finance_recurring_bills: updated });
     };
 
-    const handleDeleteBill = (id: string) => {
-        const updated = recurringBills.filter(b => b.id !== id);
-        saveUserConfig({ finance_recurring_bills: updated });
-    };
-
     const handlePayAndLogBill = async (bill: RecurringBillItem) => {
         await handleSaveSingleTrx({
             title: bill.name,
@@ -304,11 +295,6 @@ export default function FinanceClient({
         const updated = exists
             ? investments.map(a => a.id === assetData.id ? assetData : a)
             : [...investments, assetData];
-        saveUserConfig({ finance_investments: updated });
-    };
-
-    const handleDeleteAsset = (id: string | number) => {
-        const updated = investments.filter(a => a.id !== id);
         saveUserConfig({ finance_investments: updated });
     };
 
@@ -383,7 +369,7 @@ export default function FinanceClient({
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState<any>(null);
-    const [deleteTarget, setDeleteTarget] = useState<{type: 'transaction'|'category', data: any} | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<FinanceDeleteTarget | null>(null);
     const [showSavingModal, setShowSavingModal] = useState(false);
     const [showVaultTxModal, setShowVaultTxModal] = useState(false);
     const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -464,7 +450,11 @@ export default function FinanceClient({
         setEditingCategory,
         setShowVaultTxModal,
         activeVault,
-        vaultTxType
+        vaultTxType,
+        wallets,
+        investments,
+        recurringBills,
+        saveUserConfig
     });
 
     const changeMonth = (val: number | string) => {
@@ -743,7 +733,10 @@ export default function FinanceClient({
                                 currencyLocale={currencyLocale}
                                 onOpenAddWallet={() => { setEditingWallet(null); setShowWalletModal(true); }}
                                 onEditWallet={(w) => { setEditingWallet(w); setShowWalletModal(true); }}
-                                onDeleteWallet={handleDeleteWallet}
+                                onDeleteWallet={(id) => {
+                                    const w = wallets.find(item => item.id === id);
+                                    setDeleteTarget({ type: 'wallet', data: { id, name: w?.name || 'Dompet' } });
+                                }}
                                 onOpenTransferModal={() => setShowTransferModal(true)}
                             />
 
@@ -754,7 +747,9 @@ export default function FinanceClient({
                                 t={t}
                                 onOpenCreateVault={() => { setEditingSaving(null); setShowSavingModal(true); }}
                                 onEditVault={(vault) => { setEditingSaving(vault); setShowSavingModal(true); }}
-                                onDeleteVault={(vault) => setDeleteTarget({ type: 'transaction', data: { id: vault.id } })}
+                                onDeleteVault={(vault) => {
+                                    setDeleteTarget({ type: 'vault', data: { id: vault.id, name: vault.title || (vault as any).name || 'Target Tabungan' } });
+                                }}
                                 onDeposit={(vault) => {
                                     setActiveVault(vault);
                                     setVaultTxType('deposit');
@@ -781,7 +776,10 @@ export default function FinanceClient({
                                 currencyLocale={currencyLocale}
                                 onOpenAddModal={() => { setEditingAsset(null); setShowAssetModal(true); }}
                                 onEditAsset={(asset) => { setEditingAsset(asset); setShowAssetModal(true); }}
-                                onDeleteAsset={handleDeleteAsset}
+                                onDeleteAsset={(id) => {
+                                    const a = investments.find(item => item.id === id);
+                                    setDeleteTarget({ type: 'investment', data: { id, name: a?.name || 'Aset Investasi', ticker: a?.ticker } });
+                                }}
                                 onTopupAsset={(asset) => {
                                     setActionAsset(asset);
                                     setActionMode('topup');
@@ -815,7 +813,10 @@ export default function FinanceClient({
                                 currencyLocale={currencyLocale}
                                 onOpenAddModal={() => { setEditingBill(null); setShowRecurringModal(true); }}
                                 onEditBill={(b) => { setEditingBill(b); setShowRecurringModal(true); }}
-                                onDeleteBill={handleDeleteBill}
+                                onDeleteBill={(id) => {
+                                    const b = recurringBills.find(item => item.id === id);
+                                    setDeleteTarget({ type: 'recurring_bill', data: { id, name: b?.name || 'Tagihan Rutin' } });
+                                }}
                                 onPayAndLog={handlePayAndLogBill}
                                 paidBillIdsThisMonth={paidBillIdsThisMonth}
                             />

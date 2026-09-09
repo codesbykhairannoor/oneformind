@@ -4,6 +4,14 @@ import { TransactionItem } from '../components/TransactionList';
 import { CategoryOption } from '../types';
 import { SavingVault } from '../components/SavingModal';
 
+export type FinanceDeleteTarget = 
+    | { type: 'transaction'; data: { id: number | string; title?: string } }
+    | { type: 'category'; data: { slug: string; name: string } }
+    | { type: 'vault'; data: { id?: number | string; name: string } }
+    | { type: 'wallet'; data: { id: string; name: string } }
+    | { type: 'investment'; data: { id: number | string; name: string; ticker?: string } }
+    | { type: 'recurring_bill'; data: { id: string; name: string } };
+
 interface UseFinanceActionsParams {
     transactions: TransactionItem[];
     mutateTx: (data?: any, shouldRevalidate?: boolean) => Promise<any>;
@@ -11,10 +19,10 @@ interface UseFinanceActionsParams {
     mutateCat: (data?: any, shouldRevalidate?: boolean) => Promise<any>;
     budgets: any[];
     mutateBud: (data?: any, shouldRevalidate?: boolean) => Promise<any>;
-    mutateSav: () => Promise<any>;
+    mutateSav: (data?: any, shouldRevalidate?: boolean) => Promise<any>;
     selectedMonthKey: string;
-    deleteTarget: { type: 'transaction' | 'category'; data: any } | null;
-    setDeleteTarget: (v: { type: 'transaction' | 'category'; data: any } | null) => void;
+    deleteTarget: FinanceDeleteTarget | null;
+    setDeleteTarget: (v: FinanceDeleteTarget | null) => void;
     setShowBatchModal: (v: boolean) => void;
     setShowSavingModal: (v: boolean) => void;
     setShowCategoryModal: (v: boolean) => void;
@@ -22,6 +30,10 @@ interface UseFinanceActionsParams {
     setShowVaultTxModal: (v: boolean) => void;
     activeVault: SavingVault | null;
     vaultTxType: 'deposit' | 'withdraw';
+    wallets?: any[];
+    investments?: any[];
+    recurringBills?: any[];
+    saveUserConfig?: (updates: any) => Promise<void> | void;
 }
 
 export function useFinanceActions({
@@ -41,7 +53,11 @@ export function useFinanceActions({
     setEditingCategory,
     setShowVaultTxModal,
     activeVault,
-    vaultTxType
+    vaultTxType,
+    wallets,
+    investments,
+    recurringBills,
+    saveUserConfig
 }: UseFinanceActionsParams) {
 
     const handleSaveSingleTrx = async (data: any) => {
@@ -90,32 +106,61 @@ export function useFinanceActions({
     };
 
     const handleDeleteTrx = async (id: number) => {
-        setDeleteTarget({ type: 'transaction', data: { id } });
+        const trx = transactions.find(t => t.id === id);
+        setDeleteTarget({ type: 'transaction', data: { id, title: trx?.title } });
     };
 
     const confirmDelete = async () => {
         if (!deleteTarget) return;
 
-        if (deleteTarget.type === 'transaction') {
-            const { id } = deleteTarget.data;
-            mutateTx(transactions.filter(t => t.id !== id), false);
-            await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
-            mutateTx();
-        } else if (deleteTarget.type === 'category') {
-            const cat = deleteTarget.data;
-            const budgetToDelete = budgets.find(b => b.category === cat.slug);
-            
-            mutateCat(categories.filter(c => c.slug !== cat.slug), false);
-            mutateBud(budgets.filter(b => b.category !== cat.slug), false);
-            
-            await fetch(`/api/finance/categories?slug=${cat.slug}`, { method: 'DELETE' });
-            
-            if (budgetToDelete) {
-                await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
+        try {
+            if (deleteTarget.type === 'transaction') {
+                const { id } = deleteTarget.data;
+                mutateTx(transactions.filter(t => t.id !== id), false);
+                await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
+                mutateTx();
+            } else if (deleteTarget.type === 'category') {
+                const cat = deleteTarget.data;
+                const budgetToDelete = budgets.find(b => b.category === cat.slug);
+                
+                mutateCat(categories.filter(c => c.slug !== cat.slug), false);
+                mutateBud(budgets.filter(b => b.category !== cat.slug), false);
+                
+                await fetch(`/api/finance/categories?slug=${cat.slug}`, { method: 'DELETE' });
+                
+                if (budgetToDelete) {
+                    await fetch(`/api/finance/budgets?id=${budgetToDelete.id}`, { method: 'DELETE' });
+                }
+                
+                mutateCat();
+                mutateBud();
+            } else if (deleteTarget.type === 'vault') {
+                const { id } = deleteTarget.data;
+                if (id && mutateSav) {
+                    await fetch(`/api/finance/savings?id=${id}`, { method: 'DELETE' });
+                    mutateSav();
+                }
+            } else if (deleteTarget.type === 'wallet') {
+                const { id } = deleteTarget.data;
+                if (wallets && saveUserConfig) {
+                    const updated = wallets.filter(w => w.id !== id);
+                    saveUserConfig({ finance_wallets: updated });
+                }
+            } else if (deleteTarget.type === 'investment') {
+                const { id } = deleteTarget.data;
+                if (investments && saveUserConfig) {
+                    const updated = investments.filter(a => a.id !== id);
+                    saveUserConfig({ finance_investments: updated });
+                }
+            } else if (deleteTarget.type === 'recurring_bill') {
+                const { id } = deleteTarget.data;
+                if (recurringBills && saveUserConfig) {
+                    const updated = recurringBills.filter(b => b.id !== id);
+                    saveUserConfig({ finance_recurring_bills: updated });
+                }
             }
-            
-            mutateCat();
-            mutateBud();
+        } catch (err) {
+            console.error('Failed executing deletion:', err);
         }
 
         setDeleteTarget(null);

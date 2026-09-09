@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLocale } from 'next-intl';
 import { TransactionItem, DayStat } from './TransactionList';
 import { CategoryOption } from '../types';
 import { SavingVault } from './SavingModal';
@@ -11,6 +12,7 @@ import CategoryModal from './CategoryModal';
 import SavingModal from './SavingModal';
 import VaultTransactionModal from './VaultTransactionModal';
 import { DeleteConfirmModal } from './FinanceModals';
+import { FinanceDeleteTarget } from '../hooks/useFinanceActions';
 
 interface FinanceModalsContainerProps {
     showArchiveModal: boolean;
@@ -41,8 +43,8 @@ interface FinanceModalsContainerProps {
     setEditingCategory: (cat: any) => void;
     onSaveCategory: (cat: any) => void;
 
-    deleteTarget: { type: 'transaction' | 'category'; data: any } | null;
-    setDeleteTarget: (target: { type: 'transaction' | 'category'; data: any } | null) => void;
+    deleteTarget: FinanceDeleteTarget | null;
+    setDeleteTarget: (target: FinanceDeleteTarget | null) => void;
     confirmDelete: () => void;
 
     showSavingModal: boolean;
@@ -101,6 +103,22 @@ export default function FinanceModalsContainer({
     vaultTxType,
     onVaultMutation
 }: FinanceModalsContainerProps) {
+    const locale = useLocale();
+    const isIndo = locale === 'id';
+
+    const getItemName = () => {
+        if (!deleteTarget) return '';
+        switch (deleteTarget.type) {
+            case 'transaction': return deleteTarget.data.title || (isIndo ? 'Transaksi Ini' : 'This Transaction');
+            case 'category': return deleteTarget.data.name;
+            case 'vault': return deleteTarget.data.name || (isIndo ? 'Target Tabungan Ini' : 'This Goal Vault');
+            case 'wallet': return deleteTarget.data.name || (isIndo ? 'Dompet Ini' : 'This Wallet');
+            case 'investment': return `${deleteTarget.data.name} ${deleteTarget.data.ticker ? `(${deleteTarget.data.ticker})` : ''}`.trim();
+            case 'recurring_bill': return deleteTarget.data.name || (isIndo ? 'Tagihan Rutin Ini' : 'This Recurring Bill');
+            default: return isIndo ? 'Item Ini' : 'This Item';
+        }
+    };
+
     return (
         <>
             <ArchiveModal
@@ -152,7 +170,7 @@ export default function FinanceModalsContainer({
                 isOpen={!!deleteTarget}
                 onClose={() => setDeleteTarget(null)}
                 onConfirm={confirmDelete}
-                itemName={deleteTarget?.type === 'category' ? deleteTarget.data.name : 'Transaksi'}
+                itemName={getItemName()}
             />
 
             <SavingModal
