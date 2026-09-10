@@ -1,16 +1,29 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { ChevronDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { 
+    ChevronDown, ChevronLeft, ChevronRight, 
+    Plus, Zap, Calendar as CalendarIcon, Sparkles 
+} from 'lucide-react';
 
 interface CalendarHeaderProps {
     currentMonth: string; // YYYY-MM
     onChangeMonth: (newMonth: string) => void;
     onAddEvent: () => void;
+    onOpenTaskDrawer?: () => void;
+    onGoToToday?: () => void;
 }
 
-export default function CalendarHeader({ currentMonth, onChangeMonth, onAddEvent }: CalendarHeaderProps) {
+export default function CalendarHeader({ 
+    currentMonth, 
+    onChangeMonth, 
+    onAddEvent,
+    onOpenTaskDrawer,
+    onGoToToday
+}: CalendarHeaderProps) {
+    const locale = useLocale();
+    const isIndo = locale === 'id';
     const t = useTranslations();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -18,12 +31,15 @@ export default function CalendarHeader({ currentMonth, onChangeMonth, onAddEvent
     const activeYear = date.getFullYear();
     const activeMonthNum = date.getMonth();
 
-    const monthsList = [
+    const monthsList = isIndo ? [
         'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ] : [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
-    const displayMonthStr = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+    const displayMonthStr = date.toLocaleDateString(isIndo ? 'id-ID' : 'en-US', { month: 'long', year: 'numeric' });
 
     const selectMonth = (monthIndex: number) => {
         const m = String(monthIndex + 1).padStart(2, '0');
@@ -38,76 +54,102 @@ export default function CalendarHeader({ currentMonth, onChangeMonth, onAddEvent
         onChangeMonth(payload);
     };
 
+    const stepMonth = (offset: number) => {
+        const d = new Date(activeYear, activeMonthNum + offset, 1);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        onChangeMonth(`${y}-${m}`);
+    };
+
     return (
-        // 1:1 from CalendarHeader.vue line 48-121
-        <div className="relative z-50 transition-all bg-white dark:bg-slate-900 border-b shadow-sm dark:shadow-none border-slate-100 dark:border-slate-800 duration-500">
-            <div className="w-full min-w-0 px-4 py-2 sm:px-6 lg:px-8">
+        <div className="relative z-40 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
+            <div className="w-full px-4 py-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                 
-                <div className="flex flex-col items-stretch justify-between w-full min-w-0 gap-3 md:flex-row md:items-center">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                     
-                    <div className="flex items-center gap-2 w-full min-w-0 md:w-auto md:max-w-[min(100%,28rem)]">
-                        <p className="shrink-0 text-[13px] font-black capitalize tracking-wide text-slate-700 dark:text-slate-300 mr-2 pr-4">
-                            {t('calendar_page_title') || 'Kalender'}
-                        </p>
+                    {/* Title & Today Shortcut */}
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-sm">
+                            <CalendarIcon size={20} />
+                        </div>
+                        <div>
+                            <h1 className="text-base sm:text-lg font-black text-slate-800 dark:text-white leading-tight">
+                                {isIndo ? 'Kalender 360° Life OS' : '360° Life OS Calendar'}
+                            </h1>
+                            <p className="text-[11px] font-bold text-slate-400">
+                                {isIndo ? 'Sinkronisasi agenda, meeting, target & tugas' : 'Unified schedule, meetings, targets & habits'}
+                            </p>
+                        </div>
+
+                        {onGoToToday && (
+                            <button
+                                type="button"
+                                onClick={onGoToToday}
+                                className="ml-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black transition active:scale-95 shadow-xs"
+                            >
+                                {isIndo ? 'Hari Ini' : 'Today'}
+                            </button>
+                        )}
                     </div>
 
-                    <div className="flex min-w-0 flex-wrap items-center w-full gap-3 md:w-auto md:flex-nowrap md:justify-end">
+                    {/* Month Picker & Quick Action Buttons */}
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         
-                        {/* Month Selector Dropdown */}
-                        <div className="relative min-w-0 flex-1 md:flex-none md:max-w-xs">
-                            <button 
+                        {/* Month Nav Buttons + Dropdown */}
+                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 p-1 rounded-2xl">
+                            <button
                                 type="button"
-                                onClick={() => setIsOpen(!isOpen)} 
-                                className="w-full min-w-0 flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 pl-4 pr-3 py-2 rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all active:scale-95 duration-500"
+                                onClick={() => stepMonth(-1)}
+                                className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition"
+                                title={isIndo ? 'Bulan Sebelumnya' : 'Previous Month'}
                             >
-                                <div className="flex min-w-0 flex-1 flex-col items-start leading-none text-left">
-                                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold tracking-widest leading-none">
-                                        {t('label_period') || 'Period'}
-                                    </span>
-                                    <span className="w-full truncate text-[11px] font-black leading-none mt-1 capitalize">
-                                        {displayMonthStr}
-                                    </span>
-                                </div>
-                                <div className="p-1 bg-white dark:bg-slate-800 border shadow-sm dark:shadow-none rounded-lg border-slate-100 dark:border-slate-700 flex items-center justify-center transition-colors duration-500">
-                                    <ChevronDown className={`w-3 h-3 text-indigo-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-                                </div>
+                                <ChevronLeft size={16} />
                             </button>
 
-                            {isOpen && (
-                                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-6 z-[60] origin-top-right transition-colors duration-500">
-                                    <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)}></div>
-                                    
-                                    <div className="relative z-10">
-                                        <div className="flex items-center justify-between px-3 mb-6 bg-slate-50 dark:bg-slate-950/50 border border-slate-100/50 dark:border-slate-800 rounded-[1.5rem] py-2 transition-colors duration-500">
+                            <div className="relative">
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsOpen(!isOpen)} 
+                                    className="px-3 py-1 rounded-xl text-xs font-black text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-700 transition flex items-center gap-1.5 capitalize"
+                                >
+                                    <span>{displayMonthStr}</span>
+                                    <ChevronDown size={13} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {isOpen && (
+                                    <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-5 z-[70] origin-top-right">
+                                        <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)}></div>
+                                        
+                                        <div className="flex items-center justify-between mb-4 bg-slate-50 dark:bg-slate-800 p-2 rounded-2xl">
                                             <button 
                                                 type="button" 
                                                 onClick={(e) => { e.stopPropagation(); changeYear(-1); }} 
-                                                className="p-2.5 transition rounded-xl hover:bg-white dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm dark:shadow-none bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800"
+                                                className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition shadow-xs"
                                             >
-                                                <ChevronLeft className="w-4 h-4 stroke-[3]" />
+                                                <ChevronLeft size={14} />
                                             </button>
-                                            <span className="text-xl font-black tracking-tight text-slate-800 dark:text-slate-100 transition-colors duration-500">
+                                            <span className="text-sm font-black text-slate-800 dark:text-white font-mono">
                                                 {activeYear}
                                             </span>
                                             <button 
                                                 type="button" 
                                                 onClick={(e) => { e.stopPropagation(); changeYear(1); }} 
-                                                className="p-2.5 transition rounded-xl hover:bg-white dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm dark:shadow-none bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800"
+                                                className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition shadow-xs"
                                             >
-                                                <ChevronRight className="w-4 h-4 stroke-[3]" />
+                                                <ChevronRight size={14} />
                                             </button>
                                         </div>
                                         
-                                        <div className="grid grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-3 gap-2">
                                             {monthsList.map((monthName, idx) => (
                                                 <button 
                                                     key={monthName}
                                                     type="button"
                                                     onClick={() => selectMonth(idx)}
-                                                    className={`py-4 rounded-2xl text-[11px] font-black transition-all duration-500 ${
+                                                    className={`py-2 rounded-xl text-xs font-black transition-all ${
                                                         activeMonthNum === idx 
-                                                            ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200 dark:shadow-none scale-105' 
-                                                            : 'hover:bg-indigo-50 dark:hover:bg-indigo-500/10 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900'
+                                                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' 
+                                                            : 'hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-600 dark:text-slate-400'
                                                     }`}
                                                 >
                                                     {monthName.slice(0, 3)}
@@ -115,23 +157,46 @@ export default function CalendarHeader({ currentMonth, onChangeMonth, onAddEvent
                                             ))}
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => stepMonth(1)}
+                                className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition"
+                                title={isIndo ? 'Bulan Selanjutnya' : 'Next Month'}
+                            >
+                                <ChevronRight size={16} />
+                            </button>
                         </div>
 
+                        {/* Task Time-Blocking Drawer Trigger */}
+                        {onOpenTaskDrawer && (
+                            <button
+                                type="button"
+                                onClick={onOpenTaskDrawer}
+                                className="px-3.5 py-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-900/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-xs"
+                                title={isIndo ? 'Buka laci time-blocking tugas planner' : 'Open task time-blocking drawer'}
+                            >
+                                <Zap size={14} />
+                                <span className="hidden sm:inline">{isIndo ? 'Time-Block Tugas' : 'Time-Block Tasks'}</span>
+                            </button>
+                        )}
+
+                        {/* Add Event Button */}
                         <button 
                             type="button"
                             onClick={onAddEvent} 
-                            className="h-11 px-6 flex items-center gap-3 bg-indigo-600 text-white rounded-xl font-black hover:bg-indigo-700 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-indigo-100 dark:shadow-indigo-900/40 transition-all duration-500 shrink-0"
+                            className="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 transition-all active:scale-95 shrink-0"
                         >
-                            <Plus className="w-4 h-4 stroke-[4] text-white" />
-                            <span className="hidden md:inline text-[11px] tracking-wide font-black">
-                                {t('btn_add_event') || 'Add event'}
-                            </span>
+                            <Plus size={15} strokeWidth={3} />
+                            <span>{isIndo ? 'Buat Agenda' : 'Add Event'}</span>
                         </button>
 
                     </div>
+
                 </div>
+
             </div>
         </div>
     );

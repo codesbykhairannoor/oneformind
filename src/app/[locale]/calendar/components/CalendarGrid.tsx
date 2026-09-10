@@ -57,6 +57,7 @@ export default function CalendarGrid({
 
     const [filters, setFilters] = useState<CalendarFilters>({
         events: true,
+        jobs: true,
         journal: true,
         habits: true,
         planner: true,
@@ -65,7 +66,7 @@ export default function CalendarGrid({
     });
 
     const toggleFilter = (key: keyof CalendarFilters) => {
-        setFilters(prev => ({ ...prev, [key]: !prev[key] }));
+        setFilters((prev: CalendarFilters) => ({ ...prev, [key]: !prev[key] }));
     };
 
     const selectedDay = calendarDays.find(d => d.date === selectedDate);
