@@ -162,8 +162,8 @@ export function useFinanceActions({
         }
     };
 
-    const handleDeleteTrx = async (id: number) => {
-        const trx = transactions.find(t => t.id === id);
+    const handleDeleteTrx = async (id: number | string) => {
+        const trx = transactions.find(t => String(t.id) === String(id));
         setDeleteTarget({ type: 'transaction', data: { id, title: trx?.title } });
     };
 
@@ -173,23 +173,23 @@ export function useFinanceActions({
         try {
             if (deleteTarget.type === 'transaction') {
                 const { id } = deleteTarget.data;
-                const trxToDelete = transactions.find(t => t.id === id);
+                const trxToDelete = transactions.find(t => String(t.id) === String(id));
                 if (trxToDelete && wallets && saveUserConfig) {
                     const targetWalletId = (trxToDelete as any).walletId || wallets[0]?.id;
                     const amt = Number(trxToDelete.amount) || 0;
                     if (targetWalletId && amt > 0) {
                         const revertDelta = trxToDelete.type === 'income' ? -amt : amt;
                         const updatedWallets = wallets.map(w => {
-                            if (w.id === targetWalletId) {
+                            if (String(w.id) === String(targetWalletId)) {
                                 return { ...w, balance: Math.max(0, (Number(w.balance) || 0) + revertDelta) };
                             }
                             return w;
                         });
-                        saveUserConfig({ finance_wallets: updatedWallets });
+                        await saveUserConfig({ finance_wallets: updatedWallets });
                     }
                 }
 
-                mutateTx(transactions.filter(t => t.id !== id), false);
+                mutateTx(transactions.filter(t => String(t.id) !== String(id)), false);
                 await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
                 mutateTx();
             } else if (deleteTarget.type === 'category') {
@@ -216,20 +216,25 @@ export function useFinanceActions({
             } else if (deleteTarget.type === 'wallet') {
                 const { id } = deleteTarget.data;
                 if (wallets && saveUserConfig) {
-                    const updated = wallets.filter(w => w.id !== id);
-                    saveUserConfig({ finance_wallets: updated });
+                    const updated = wallets.filter(w => String(w.id) !== String(id));
+                    await saveUserConfig({ finance_wallets: updated });
                 }
             } else if (deleteTarget.type === 'investment') {
                 const { id } = deleteTarget.data;
                 if (investments && saveUserConfig) {
-                    const updated = investments.filter(a => a.id !== id);
-                    saveUserConfig({ finance_investments: updated });
+                    const updated = investments.filter(a => String(a.id) !== String(id));
+                    await saveUserConfig({ finance_investments: updated });
+                }
+                try {
+                    await fetch(`/api/finance/assets?id=${id}`, { method: 'DELETE' });
+                } catch (e) {
+                    // ignore if only in userConfig
                 }
             } else if (deleteTarget.type === 'recurring_bill') {
                 const { id } = deleteTarget.data;
                 if (recurringBills && saveUserConfig) {
-                    const updated = recurringBills.filter(b => b.id !== id);
-                    saveUserConfig({ finance_recurring_bills: updated });
+                    const updated = recurringBills.filter(b => String(b.id) !== String(id));
+                    await saveUserConfig({ finance_recurring_bills: updated });
                 }
             }
         } catch (err) {

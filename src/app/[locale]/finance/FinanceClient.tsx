@@ -191,9 +191,9 @@ export default function FinanceClient({
     const [showTransferModal, setShowTransferModal] = useState(false);
 
     const handleSaveWallet = (walletData: WalletItem) => {
-        const exists = wallets.some(w => w.id === walletData.id);
+        const exists = wallets.some(w => String(w.id) === String(walletData.id));
         const updated = exists 
-            ? wallets.map(w => w.id === walletData.id ? walletData : w)
+            ? wallets.map(w => String(w.id) === String(walletData.id) ? walletData : w)
             : [...wallets, walletData];
         saveUserConfig({ finance_wallets: updated });
     };
@@ -214,15 +214,15 @@ export default function FinanceClient({
         date: string;
         notes?: string;
     }) => {
-        const fromW = wallets.find(w => w.id === fromWalletId);
-        const toW = wallets.find(w => w.id === toWalletId);
+        const fromW = wallets.find(w => String(w.id) === String(fromWalletId));
+        const toW = wallets.find(w => String(w.id) === String(toWalletId));
         if (!fromW || !toW) return;
 
         const updatedWallets = wallets.map(w => {
-            if (w.id === fromWalletId) {
+            if (String(w.id) === String(fromWalletId)) {
                 return { ...w, balance: Math.max(0, w.balance - (amount + adminFee)) };
             }
-            if (w.id === toWalletId) {
+            if (String(w.id) === String(toWalletId)) {
                 return { ...w, balance: w.balance + amount };
             }
             return w;
@@ -256,9 +256,9 @@ export default function FinanceClient({
     }, [userSettings, selectedMonthKey]);
 
     const handleSaveBill = (billData: RecurringBillItem) => {
-        const exists = recurringBills.some(b => b.id === billData.id);
+        const exists = recurringBills.some(b => String(b.id) === String(billData.id));
         const updated = exists
-            ? recurringBills.map(b => b.id === billData.id ? billData : b)
+            ? recurringBills.map(b => String(b.id) === String(billData.id) ? billData : b)
             : [...recurringBills, billData];
         saveUserConfig({ finance_recurring_bills: updated });
     };
@@ -293,9 +293,9 @@ export default function FinanceClient({
     const [actionMode, setActionMode] = useState<InvestmentActionMode>('revalue');
 
     const handleSaveAsset = (assetData: InvestmentAssetItem) => {
-        const exists = investments.some(a => a.id === assetData.id);
+        const exists = investments.some(a => String(a.id) === String(assetData.id));
         const updated = exists
-            ? investments.map(a => a.id === assetData.id ? assetData : a)
+            ? investments.map(a => String(a.id) === String(assetData.id) ? assetData : a)
             : [...investments, assetData];
         saveUserConfig({ finance_investments: updated });
     };
@@ -317,7 +317,7 @@ export default function FinanceClient({
             newTotalDividends
         } = result;
 
-        const target = investments.find(a => a.id === assetId);
+        const target = investments.find(a => String(a.id) === String(assetId));
         if (!target) return;
 
         if (logCashflow && cashflowAmount > 0) {
@@ -355,7 +355,7 @@ export default function FinanceClient({
         }
 
         const updated = investments.map(a => {
-            if (a.id !== assetId) return a;
+            if (String(a.id) !== String(assetId)) return a;
             return {
                 ...a,
                 capital: newCapital,
@@ -745,8 +745,8 @@ export default function FinanceClient({
                                 onOpenAddWallet={() => { setEditingWallet(null); setShowWalletModal(true); }}
                                 onEditWallet={(w) => { setEditingWallet(w); setShowWalletModal(true); }}
                                 onDeleteWallet={(id) => {
-                                    const w = wallets.find(item => item.id === id);
-                                    setDeleteTarget({ type: 'wallet', data: { id, name: w?.name || 'Dompet' } });
+                                    const w = wallets.find(item => String(item.id) === String(id));
+                                    setDeleteTarget({ type: 'wallet', data: { id: String(id), name: w?.name || 'Dompet' } });
                                 }}
                                 onOpenTransferModal={() => setShowTransferModal(true)}
                             />
@@ -788,8 +788,8 @@ export default function FinanceClient({
                                 onOpenAddModal={() => { setEditingAsset(null); setShowAssetModal(true); }}
                                 onEditAsset={(asset) => { setEditingAsset(asset); setShowAssetModal(true); }}
                                 onDeleteAsset={(id) => {
-                                    const a = investments.find(item => item.id === id);
-                                    setDeleteTarget({ type: 'investment', data: { id, name: a?.name || 'Aset Investasi', ticker: a?.ticker } });
+                                    const a = investments.find(item => String(item.id) === String(id));
+                                    setDeleteTarget({ type: 'investment', data: { id: String(id), name: a?.name || 'Aset Investasi', ticker: a?.ticker } });
                                 }}
                                 onTopupAsset={(asset) => {
                                     setActionAsset(asset);
@@ -825,8 +825,8 @@ export default function FinanceClient({
                                 onOpenAddModal={() => { setEditingBill(null); setShowRecurringModal(true); }}
                                 onEditBill={(b) => { setEditingBill(b); setShowRecurringModal(true); }}
                                 onDeleteBill={(id) => {
-                                    const b = recurringBills.find(item => item.id === id);
-                                    setDeleteTarget({ type: 'recurring_bill', data: { id, name: b?.name || 'Tagihan Rutin' } });
+                                    const b = recurringBills.find(item => String(item.id) === String(id));
+                                    setDeleteTarget({ type: 'recurring_bill', data: { id: String(id), name: b?.name || 'Tagihan Rutin' } });
                                 }}
                                 onPayAndLog={handlePayAndLogBill}
                                 paidBillIdsThisMonth={paidBillIdsThisMonth}

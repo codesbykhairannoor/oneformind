@@ -371,14 +371,22 @@ export default function InvestmentPortfolioSection({
 
                                         <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition shrink-0">
                                             <button
-                                                onClick={() => onEditAsset(asset)}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onEditAsset(asset);
+                                                }}
                                                 className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-700 transition"
                                                 title={isIndo ? 'Edit Aset' : 'Edit Asset'}
                                             >
                                                 <Edit3 size={14} />
                                             </button>
                                             <button
-                                                onClick={() => onDeleteAsset(asset.id)}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onDeleteAsset(asset.id);
+                                                }}
                                                 className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition"
                                                 title={isIndo ? 'Hapus' : 'Delete'}
                                             >
