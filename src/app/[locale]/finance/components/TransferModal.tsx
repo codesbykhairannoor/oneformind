@@ -56,6 +56,27 @@ export default function TransferModal({
     const fromWallet = wallets.find(w => w.id === fromWalletId);
     const toWallet = wallets.find(w => w.id === toWalletId);
 
+    const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
+
+    const formatDisplay = (val: string | number) => {
+        if (val === undefined || val === null || val === '') return '';
+        const str = val.toString().replace(/[^0-9]/g, '');
+        if (!str) return '';
+        return isDotSeparator 
+            ? str.replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+            : str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value.replace(/[^0-9]/g, '');
+        setAmount(raw);
+    };
+
+    const handleAdminFeeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value.replace(/[^0-9]/g, '');
+        setAdminFee(raw);
+    };
+
     const formatMoney = (val: number) => {
         return new Intl.NumberFormat(currencyLocale, {
             style: 'currency',
@@ -170,10 +191,11 @@ export default function TransferModal({
                                 </label>
                                 <input
                                     type="text"
+                                    inputMode="numeric"
                                     required
-                                    value={amount}
-                                    onChange={e => setAmount(e.target.value)}
-                                    placeholder="Contoh: 500000"
+                                    value={formatDisplay(amount)}
+                                    onChange={handleAmountChange}
+                                    placeholder="Contoh: 500.000"
                                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                 />
                             </div>
@@ -184,9 +206,10 @@ export default function TransferModal({
                                 </label>
                                 <input
                                     type="text"
-                                    value={adminFee}
-                                    onChange={e => setAdminFee(e.target.value)}
-                                    placeholder="Contoh: 2500"
+                                    inputMode="numeric"
+                                    value={formatDisplay(adminFee)}
+                                    onChange={handleAdminFeeChange}
+                                    placeholder="Contoh: 2.500"
                                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                 />
                             </div>

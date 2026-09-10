@@ -44,6 +44,13 @@ export const TransactionModal = ({
     const t = useTranslations();
     const [showDatePicker, setShowDatePicker] = useState(false);
 
+    const formatDisplay = (val: string | number) => {
+        if (val === undefined || val === null || val === '') return '';
+        const str = val.toString().replace(/[^0-9]/g, '');
+        if (!str) return '';
+        return str.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -58,25 +65,23 @@ export const TransactionModal = ({
                             ✨
                         </div>
                         <div>
-                            <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight leading-none mb-2">
-                                {editingId ? (t('edit_transaction') || 'Edit Transaksi') : (t('record_transaction') || 'Transaksi Baru')}
+                            <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight leading-none mb-1 transition-colors duration-500">
+                                {editingId ? (t('edit_transaction') || 'Edit Transaksi') : (t('record_transaction') || 'Catat Transaksi')}
                             </h3>
-                            {!editingId && (
-                                <button type="button" className="text-[10px] font-bold tracking-tight px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition duration-300 flex items-center gap-1.5 active:scale-95 w-fit border border-indigo-100 dark:border-indigo-500/20">
-                                    <span>⚡</span> {t('batch_mode_title') || 'Batch Mode'}
-                                </button>
-                            )}
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 tracking-wider">
+                                {t('auto_balance') || 'Saldo akan otomatis diperbarui'}
+                            </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-100 dark:hover:bg-rose-500/20 hover:text-rose-500 dark:hover:text-rose-400 transition-all active:scale-90 flex items-center justify-center font-bold">
-                        <X size={20} strokeWidth={2.5} />
+                    <button onClick={onClose} type="button" className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-100 dark:hover:bg-rose-500/20 hover:text-rose-500 dark:hover:text-rose-400 transition-all active:scale-90 flex items-center justify-center font-bold">
+                        ✕
                     </button>
                 </div>
 
-                {/* Body */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-5">
+                {/* Form */}
+                <form onSubmit={onSubmit} className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-5">
                     
-                    {/* Type Switcher */}
+                    {/* Type switcher */}
                     <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl transition-colors duration-500">
                         <button type="button" onClick={() => setType('expense')} className={`flex-1 py-3 rounded-xl text-[10px] font-bold tracking-tight transition-all flex items-center justify-center gap-2 duration-300 ${type === 'expense' ? 'bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm dark:shadow-none' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}>
                             {type === 'expense' && <span>🔴</span>} {t('out') || 'Pengeluaran'}
@@ -93,8 +98,14 @@ export const TransactionModal = ({
                         </label>
                         <div className="relative group">
                             <span className={`absolute left-4 top-1/2 -translate-y-1/2 font-black text-lg transition-colors duration-500 ${type === 'expense' ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'}`}>Rp</span>
-                            <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" 
-                                className={`w-full pl-12 pr-4 h-14 rounded-xl border-2 bg-white dark:bg-slate-900 focus:ring-0 font-black text-2xl transition-all dark:text-white border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 ${type === 'expense' ? 'focus:border-rose-500' : 'focus:border-emerald-500'}`} />
+                            <input 
+                                type="text" 
+                                inputMode="numeric" 
+                                value={formatDisplay(amount)} 
+                                onChange={e => setAmount(e.target.value.replace(/[^0-9]/g, ''))} 
+                                placeholder="0" 
+                                className={`w-full pl-12 pr-4 h-14 rounded-xl border-2 bg-white dark:bg-slate-900 focus:ring-0 font-black text-2xl transition-all dark:text-white border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 ${type === 'expense' ? 'focus:border-rose-500' : 'focus:border-emerald-500'}`} 
+                            />
                         </div>
                     </div>
 
@@ -140,7 +151,7 @@ export const TransactionModal = ({
                             )}
                         </div>
                     </div>
-                </div>
+                </form>
 
                 {/* Footer */}
                 <div className="px-6 md:px-8 py-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex gap-3 z-20 shrink-0 rounded-b-[2.5rem]">

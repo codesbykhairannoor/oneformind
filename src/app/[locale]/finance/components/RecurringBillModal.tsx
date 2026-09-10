@@ -69,6 +69,22 @@ export default function RecurringBillModal({
 
     if (!show) return null;
 
+    const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
+
+    const formatDisplay = (val: string | number) => {
+        if (val === undefined || val === null || val === '') return '';
+        const str = val.toString().replace(/[^0-9]/g, '');
+        if (!str) return '';
+        return isDotSeparator 
+            ? str.replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+            : str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value.replace(/[^0-9]/g, '');
+        setAmount(raw);
+    };
+
     const handleSelectPreset = (preset: typeof PRESET_ICONS[0]) => {
         setIcon(preset.icon);
         setColor(preset.color);
@@ -180,10 +196,11 @@ export default function RecurringBillModal({
                                 </label>
                                 <input
                                     type="text"
+                                    inputMode="numeric"
                                     required
-                                    value={amount}
-                                    onChange={e => setAmount(e.target.value)}
-                                    placeholder="Contoh: 186000"
+                                    value={formatDisplay(amount)}
+                                    onChange={handleAmountChange}
+                                    placeholder="Contoh: 186.000"
                                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm font-mono focus:ring-2 focus:ring-purple-500 focus:outline-none"
                                 />
                             </div>

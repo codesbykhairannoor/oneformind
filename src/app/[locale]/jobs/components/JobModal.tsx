@@ -92,6 +92,13 @@ export default function JobModal({
         setActiveTab('overview');
     }, [job, show]);
 
+    const formatDisplay = (val: string | number | null | undefined) => {
+        if (val === undefined || val === null || val === '') return '';
+        const str = val.toString().replace(/[^0-9]/g, '');
+        if (!str) return '';
+        return str.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
     if (!show) return null;
 
     const handleSave = () => {
@@ -358,10 +365,14 @@ export default function JobModal({
                                                 {isIndo ? 'Gaji Min' : 'Min Salary'}
                                             </label>
                                             <input
-                                                type="number"
-                                                value={form.salary_min || ''}
-                                                onChange={(e) => setForm(prev => ({ ...prev, salary_min: e.target.value ? Number(e.target.value) : null }))}
-                                                placeholder="15000000"
+                                                type="text"
+                                                inputMode="numeric"
+                                                value={formatDisplay(form.salary_min)}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                                                    setForm(prev => ({ ...prev, salary_min: raw ? Number(raw) : null }));
+                                                }}
+                                                placeholder="15.000.000"
                                                 className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
                                             />
                                         </div>
@@ -371,10 +382,14 @@ export default function JobModal({
                                                 {isIndo ? 'Gaji Max' : 'Max Salary'}
                                             </label>
                                             <input
-                                                type="number"
-                                                value={form.salary_max || ''}
-                                                onChange={(e) => setForm(prev => ({ ...prev, salary_max: e.target.value ? Number(e.target.value) : null }))}
-                                                placeholder="25000000"
+                                                type="text"
+                                                inputMode="numeric"
+                                                value={formatDisplay(form.salary_max)}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                                                    setForm(prev => ({ ...prev, salary_max: raw ? Number(raw) : null }));
+                                                }}
+                                                placeholder="25.000.000"
                                                 className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono"
                                             />
                                         </div>

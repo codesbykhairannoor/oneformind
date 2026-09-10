@@ -36,29 +36,41 @@ export default function FinanceStats({
         }).format(val);
     };
 
+    const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
+
+    const formatDisplay = (val: string | number) => {
+        if (val === undefined || val === null || val === '') return '';
+        const str = val.toString().replace(/[^0-9]/g, '');
+        if (!str) return '';
+        return isDotSeparator 
+            ? str.replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+            : str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
     // --- INLINE SALARY EDIT (1:1 from FinanceStats.vue) ---
     const [isEditingSalary, setIsEditingSalary] = useState(false);
-    const [rawSalary, setRawSalary] = useState(incomeTarget);
+    const [rawSalary, setRawSalary] = useState(String(incomeTarget || ''));
     const inputSalaryRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!isEditingSalary) setRawSalary(incomeTarget);
+        if (!isEditingSalary) setRawSalary(String(incomeTarget || ''));
     }, [incomeTarget, isEditingSalary]);
 
     const startEditing = () => {
-        setRawSalary(incomeTarget);
+        setRawSalary(String(incomeTarget || ''));
         setIsEditingSalary(true);
         setTimeout(() => inputSalaryRef.current?.focus(), 50);
     };
 
     const cancelEdit = () => {
         setIsEditingSalary(false);
-        setRawSalary(incomeTarget);
+        setRawSalary(String(incomeTarget || ''));
     };
 
     const saveSalary = () => {
-        if (rawSalary !== incomeTarget && onUpdateTarget) {
-            onUpdateTarget(rawSalary);
+        const num = Number(rawSalary.replace(/[^0-9]/g, '')) || 0;
+        if (num !== incomeTarget && onUpdateTarget) {
+            onUpdateTarget(num);
         }
         setIsEditingSalary(false);
     };
@@ -131,15 +143,19 @@ export default function FinanceStats({
                             <div className="flex items-center gap-2 w-full mt-1">
                                 <input 
                                     ref={inputSalaryRef}
-                                    type="number"
-                                    value={rawSalary}
-                                    onChange={(e) => setRawSalary(Number(e.target.value))}
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={formatDisplay(rawSalary)}
+                                    onChange={(e) => {
+                                        const raw = e.target.value.replace(/[^0-9]/g, '');
+                                        setRawSalary(raw);
+                                    }}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') saveSalary();
                                         if (e.key === 'Escape') cancelEdit();
                                     }}
                                     onBlur={saveSalary}
-                                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-3 py-1.5 text-xl font-black text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-3 py-1.5 text-xl font-black text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600 font-mono"
                                 />
                             </div>
                         )}

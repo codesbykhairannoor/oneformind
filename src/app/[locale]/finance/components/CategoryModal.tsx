@@ -56,6 +56,13 @@ export default function CategoryModal({
 
     if (!show) return null;
 
+    const formatDisplay = (val: string | number) => {
+        if (val === undefined || val === null || val === '') return '';
+        const str = val.toString().replace(/[^0-9]/g, '');
+        if (!str) return '';
+        return str.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) return;
@@ -170,10 +177,10 @@ export default function CategoryModal({
                                 <input 
                                     type="text"
                                     inputMode="numeric"
-                                    value={limit}
+                                    value={formatDisplay(limit)}
                                     onChange={(e) => {
                                         let raw = e.target.value.replace(/[^0-9]/g, '');
-                                        setLimit(raw ? new Intl.NumberFormat('id-ID').format(Number(raw)) : '');
+                                        setLimit(raw);
                                     }}
                                     placeholder="0"
                                     className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-rose-500 font-black text-lg text-slate-700 dark:text-white transition-all duration-500"

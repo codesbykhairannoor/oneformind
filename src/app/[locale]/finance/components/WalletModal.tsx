@@ -63,6 +63,22 @@ export default function WalletModal({
 
     if (!show) return null;
 
+    const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
+
+    const formatDisplay = (val: string | number) => {
+        if (val === undefined || val === null || val === '') return '';
+        const str = val.toString().replace(/[^0-9]/g, '');
+        if (!str) return '';
+        return isDotSeparator 
+            ? str.replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
+            : str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value.replace(/[^0-9]/g, '');
+        setBalance(raw);
+    };
+
     const handleSelectPreset = (p: typeof WALLET_PRESETS[0]) => {
         setName(p.name);
         setType(p.type);
@@ -72,7 +88,7 @@ export default function WalletModal({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const numBal = Number(balance.replace(/[^0-9]/g, ''));
+        const numBal = Number(balance.replace(/[^0-9]/g, '')) || 0;
         if (!name.trim() || isNaN(numBal)) return;
 
         onSave({
@@ -188,9 +204,10 @@ export default function WalletModal({
                                 </label>
                                 <input
                                     type="text"
+                                    inputMode="numeric"
                                     required
-                                    value={balance}
-                                    onChange={e => setBalance(e.target.value)}
+                                    value={formatDisplay(balance)}
+                                    onChange={handleAmountChange}
                                     placeholder="0"
                                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                 />
