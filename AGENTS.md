@@ -12,5 +12,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Coolify Deployment Monitoring
 When deploying code to Coolify or debugging a failed deployment:
 1. **Never assume success:** Do not blindly assume a fix worked just because a local build succeeded.
-2. **Autonomous Verification:** If the user provides a Coolify deployment or log URL, or asks you to check the deployment, you MUST use the rowser_subagent to open the URL, read the runtime/deployment logs, and debug the issue yourself.
+2. **Autonomous Verification:** If the user provides a Coolify deployment or log URL, or asks you to check the deployment, you MUST use the  rowser_subagent to open the URL, read the runtime/deployment logs, and debug the issue yourself.
 3. **Continuous Monitoring:** Continue fixing, pushing, and checking the logs autonomously until the deployment turns green, without forcing the user to copy-paste error messages.
+
+## Git Workflow
+- **Always Commit & Push to GitHub:** Setiap kali selesai melakukan perbaikan, penambahan fitur, atau modifikasi file pada kode, WAJIB langsung lakukan commit dengan pesan yang deskriptif dan push ke remote repository (`git push origin main`).
