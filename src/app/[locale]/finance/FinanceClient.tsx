@@ -178,44 +178,13 @@ export default function FinanceClient({
 
     const handleUpdateTarget = (val: number) => {
         setIncomeTarget(val);
-        const currentWallets = userSettings.finance_wallets || [];
-        let updatedWallets = currentWallets;
-        if (currentWallets.length === 0) {
-            updatedWallets = [{
-                id: 'wallet_main',
-                name: isIndo ? 'Dompet Utama' : 'Main Wallet',
-                type: 'cash',
-                balance: val,
-                icon: '💵',
-                color: '#10b981'
-            }];
-        } else if (currentWallets.length === 1 && (currentWallets[0].id === 'wallet_main' || currentWallets[0].name === 'Dompet Utama' || currentWallets[0].name === 'Main Wallet')) {
-            updatedWallets = [{ ...currentWallets[0], balance: val }];
-        }
-        saveUserConfig({ 
-            [`finance_income_target_${selectedMonthKey}`]: val,
-            finance_wallets: updatedWallets
-        });
+        saveUserConfig({ [`finance_income_target_${selectedMonthKey}`]: val });
     };
 
     // ===== 6. MULTI-WALLET =====
     const wallets: WalletItem[] = useMemo(() => {
-        const stored = userSettings.finance_wallets;
-        if (stored && Array.isArray(stored) && stored.length > 0) {
-            return stored;
-        }
-        if (incomeTarget > 0) {
-            return [{
-                id: 'wallet_main',
-                name: isIndo ? 'Dompet Utama' : 'Main Wallet',
-                type: 'cash',
-                balance: incomeTarget,
-                icon: '💵',
-                color: '#10b981'
-            }];
-        }
-        return [];
-    }, [userSettings.finance_wallets, incomeTarget, isIndo]);
+        return userSettings.finance_wallets || [];
+    }, [userSettings.finance_wallets]);
 
     const [showWalletModal, setShowWalletModal] = useState(false);
     const [editingWallet, setEditingWallet] = useState<WalletItem | null>(null);
@@ -439,6 +408,8 @@ export default function FinanceClient({
         ? totalWalletsBalance
         : (incomeTarget + totalIncome - totalExpense);
 
+    const liquidCash = wallets.length > 0 ? totalWalletsBalance : balance;
+
     const { totalInvestedCapital, totalInvestedCurrentValue, totalInvestedReturn, totalInvestedROI } = useMemo(() => {
         let cap = 0;
         let cur = 0;
@@ -461,7 +432,7 @@ export default function FinanceClient({
         }, 0);
     }, [recurringBills]);
 
-    const totalNetWorth = totalWalletsBalance + totalInvestedCurrentValue + totalVaultsBalance;
+    const totalNetWorth = liquidCash + totalInvestedCurrentValue + totalVaultsBalance;
 
     // ===== 11. ACTIONS HOOK =====
     const {
@@ -563,10 +534,10 @@ export default function FinanceClient({
                                         <Wallet size={13} className="group-hover:text-blue-400 transition" />
                                     </div>
                                     <p className="text-lg font-black font-mono text-white">
-                                        {formatMoney(totalWalletsBalance)}
+                                        {formatMoney(liquidCash)}
                                     </p>
                                     <span className="text-[10px] text-blue-400 font-bold">
-                                        {wallets.length} {isIndo ? 'Akun' : 'Wallets'}
+                                        {wallets.length > 0 ? `${wallets.length} ${isIndo ? 'Akun' : 'Wallets'}` : (isIndo ? 'Kas Utama' : 'Main Cash')}
                                     </span>
                                 </div>
 
