@@ -264,15 +264,25 @@ export default function RecurringBillsSection({
                                         </button>
 
                                         <button
-                                            onClick={() => onEditBill(bill)}
-                                            className="p-1.5 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition"
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                onEditBill(bill);
+                                            }}
+                                            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition cursor-pointer"
                                             title="Edit"
                                         >
                                             <Edit2 size={13} />
                                         </button>
                                         <button
-                                            onClick={() => onDeleteBill(bill.id)}
-                                            className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition"
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                onDeleteBill(bill.id);
+                                            }}
+                                            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition cursor-pointer"
                                             title="Hapus"
                                         >
                                             <Trash2 size={13} />

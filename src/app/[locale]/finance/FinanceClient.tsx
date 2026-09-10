@@ -800,9 +800,17 @@ export default function FinanceClient({
                                 currencyLocale={currencyLocale}
                                 onOpenAddModal={() => { setEditingAsset(null); setShowAssetModal(true); }}
                                 onEditAsset={(asset) => { setEditingAsset(asset); setShowAssetModal(true); }}
-                                onDeleteAsset={(id) => {
-                                    const a = investments.find(item => String(item.id) === String(id));
-                                    setDeleteTarget({ type: 'investment', data: { id: String(id), name: a?.name || 'Aset Investasi', ticker: a?.ticker } });
+                                onDeleteAsset={(asset) => {
+                                    const targetId = asset.id || `${asset.name}_${asset.ticker || 'asset'}`;
+                                    setDeleteTarget({ 
+                                        type: 'investment', 
+                                        data: { 
+                                            id: String(targetId), 
+                                            name: asset.name || 'Aset Investasi', 
+                                            ticker: asset.ticker,
+                                            asset
+                                        } 
+                                    });
                                 }}
                                 onTopupAsset={(asset) => {
                                     setActionAsset(asset);

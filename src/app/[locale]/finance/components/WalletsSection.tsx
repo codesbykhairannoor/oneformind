@@ -175,17 +175,27 @@ export default function WalletsSection({
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                                <div className="flex items-center gap-1.5 shrink-0 relative z-10">
                                     <button
-                                        onClick={() => onEditWallet(wallet)}
-                                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 transition"
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            onEditWallet(wallet);
+                                        }}
+                                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 transition cursor-pointer"
                                         title="Edit"
                                     >
                                         <Edit2 size={13} />
                                     </button>
                                     <button
-                                        onClick={() => onDeleteWallet(wallet.id)}
-                                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition"
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            onDeleteWallet(wallet.id);
+                                        }}
+                                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition cursor-pointer"
                                         title="Hapus"
                                     >
                                         <Trash2 size={13} />

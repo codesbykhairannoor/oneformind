@@ -9,7 +9,7 @@ export type FinanceDeleteTarget =
     | { type: 'category'; data: { slug: string; name: string } }
     | { type: 'vault'; data: { id?: number | string; name: string } }
     | { type: 'wallet'; data: { id: string; name: string } }
-    | { type: 'investment'; data: { id: number | string; name: string; ticker?: string } }
+    | { type: 'investment'; data: { id: number | string; name: string; ticker?: string; asset?: any } }
     | { type: 'recurring_bill'; data: { id: string; name: string } };
 
 interface UseFinanceActionsParams {
@@ -220,13 +220,20 @@ export function useFinanceActions({
                     await saveUserConfig({ finance_wallets: updated });
                 }
             } else if (deleteTarget.type === 'investment') {
-                const { id } = deleteTarget.data;
+                const { id, name, ticker, asset } = deleteTarget.data as any;
                 if (investments && saveUserConfig) {
-                    const updated = investments.filter(a => String(a.id) !== String(id));
+                    const updated = investments.filter(a => {
+                        if (a.id && id && String(a.id) === String(id)) return false;
+                        if (asset && a.name === asset.name && a.ticker === asset.ticker) return false;
+                        if (name && a.name === name && (ticker ? a.ticker === ticker : true)) return false;
+                        return true;
+                    });
                     await saveUserConfig({ finance_investments: updated });
                 }
                 try {
-                    await fetch(`/api/finance/assets?id=${id}`, { method: 'DELETE' });
+                    if (id) {
+                        await fetch(`/api/finance/assets?id=${id}`, { method: 'DELETE' });
+                    }
                 } catch (e) {
                     // ignore if only in userConfig
                 }

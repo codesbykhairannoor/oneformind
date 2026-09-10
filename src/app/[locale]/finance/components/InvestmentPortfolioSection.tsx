@@ -55,7 +55,7 @@ interface InvestmentPortfolioSectionProps {
     currencyLocale?: string;
     onOpenAddModal: () => void;
     onEditAsset: (asset: InvestmentAssetItem) => void;
-    onDeleteAsset: (id: string | number) => void;
+    onDeleteAsset: (asset: InvestmentAssetItem) => void;
     onTopupAsset: (asset: InvestmentAssetItem) => void;
     onWithdrawAsset: (asset: InvestmentAssetItem) => void;
     onUpdateMarketValue: (asset: InvestmentAssetItem) => void;
@@ -321,16 +321,16 @@ export default function InvestmentPortfolioSection({
 
                         return (
                             <div
-                                key={asset.id}
+                                key={asset.id || asset.name}
                                 className="group p-5 sm:p-6 rounded-[2rem] bg-white dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-2xl hover:shadow-emerald-500/5 transition-all flex flex-col justify-between gap-4 relative overflow-hidden"
                             >
-                                {/* Top Glow Accent */}
+                                {/* Top Glow Accent - must not intercept pointer events */}
                                 <div 
-                                    className="absolute -top-16 -right-16 w-32 h-32 rounded-full blur-[60px] opacity-10 group-hover:opacity-25 transition-opacity"
+                                    className="absolute -top-16 -right-16 w-32 h-32 rounded-full blur-[60px] opacity-10 group-hover:opacity-25 transition-opacity pointer-events-none"
                                     style={{ backgroundColor: asset.color || '#10b981' }}
                                 />
 
-                                <div>
+                                <div className="relative z-10">
                                     {/* Header: Icon, Name, Ticker, Badges & Actions */}
                                     <div className="flex items-start justify-between gap-2 mb-3">
                                         <div className="flex items-center gap-3 min-w-0">
@@ -369,28 +369,30 @@ export default function InvestmentPortfolioSection({
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition shrink-0">
+                                        <div className="flex items-center gap-1.5 shrink-0 relative z-20">
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
+                                                    e.preventDefault();
                                                     e.stopPropagation();
                                                     onEditAsset(asset);
                                                 }}
-                                                className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-700 transition"
+                                                className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-700 transition cursor-pointer"
                                                 title={isIndo ? 'Edit Aset' : 'Edit Asset'}
                                             >
-                                                <Edit3 size={14} />
+                                                <Edit3 size={15} />
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
+                                                    e.preventDefault();
                                                     e.stopPropagation();
-                                                    onDeleteAsset(asset.id);
+                                                    onDeleteAsset(asset);
                                                 }}
-                                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition"
+                                                className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition cursor-pointer"
                                                 title={isIndo ? 'Hapus' : 'Delete'}
                                             >
-                                                <Trash2 size={14} />
+                                                <Trash2 size={15} />
                                             </button>
                                         </div>
                                     </div>
