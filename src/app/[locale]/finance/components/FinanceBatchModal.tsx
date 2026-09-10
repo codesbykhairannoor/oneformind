@@ -6,16 +6,20 @@ import FinanceDatePicker from './FinanceDatePicker';
 import ModalPortal from '@/components/ModalPortal';
 import { Trash2, Plus, X, Calendar, Sparkles } from 'lucide-react';
 
+import { WalletOption } from '../types';
+
 interface BatchRow {
     type: 'income' | 'expense';
     title: string;
     amount: string;
     category: string;
+    walletId?: string;
 }
 
 interface FinanceBatchModalProps {
     show: boolean;
     categories: { slug: string; name: string; icon: string; type: string }[];
+    wallets?: WalletOption[];
     budgets?: any[];
     transactions?: any[];
     onClose: () => void;
@@ -28,6 +32,7 @@ interface FinanceBatchModalProps {
 export default function FinanceBatchModal({
     show,
     categories,
+    wallets = [],
     budgets = [],
     transactions = [],
     onClose,
@@ -42,8 +47,8 @@ export default function FinanceBatchModal({
 
     const [date, setDate] = useState<string>(todayStr);
     const [rows, setRows] = useState<BatchRow[]>([
-        { type: 'expense', title: '', amount: '', category: '' },
-        { type: 'expense', title: '', amount: '', category: '' }
+        { type: 'expense', title: '', amount: '', category: '', walletId: wallets[0]?.id || '' },
+        { type: 'expense', title: '', amount: '', category: '', walletId: wallets[0]?.id || '' }
     ]);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -276,6 +281,25 @@ export default function FinanceBatchModal({
                                                     className="w-full text-xs font-bold h-11 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white text-slate-700 dark:text-slate-200 placeholder:text-slate-300"
                                                 />
                                             </div>
+
+                                            {wallets.length > 0 && (
+                                                <div>
+                                                    <label className="text-[9px] font-bold text-slate-400 dark:text-slate-600 tracking-wider mb-1.5 ml-1 block">
+                                                        {trx.type === 'expense' ? (locale === 'id' ? 'Potong Dompet' : 'Pay From') : (locale === 'id' ? 'Masuk Dompet' : 'Deposit To')}
+                                                    </label>
+                                                    <select 
+                                                        value={trx.walletId || wallets[0]?.id || ''} 
+                                                        onChange={(e) => setRows(prev => prev.map((r, i) => i === index ? { ...r, walletId: e.target.value } : r))}
+                                                        className="w-full pl-3 pr-8 h-11 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 text-xs appearance-none cursor-pointer focus:border-indigo-400"
+                                                    >
+                                                        {wallets.map(w => (
+                                                            <option key={w.id} value={w.id}>
+                                                                {w.icon || '💳'} {w.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

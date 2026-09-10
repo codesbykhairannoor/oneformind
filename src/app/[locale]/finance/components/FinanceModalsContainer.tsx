@@ -19,6 +19,7 @@ interface FinanceModalsContainerProps {
     setShowArchiveModal: (v: boolean) => void;
     selectedDayData: DayStat | null;
     categories: CategoryOption[];
+    wallets?: any[];
     activeCurrency: string;
     currencyLocale: string;
     onEditTransactionFromArchive: (trx: TransactionItem) => void;
@@ -56,7 +57,7 @@ interface FinanceModalsContainerProps {
     setShowVaultTxModal: (v: boolean) => void;
     activeVault: SavingVault | null;
     vaultTxType: 'deposit' | 'withdraw';
-    onVaultMutation: (amount: number, note: string) => void;
+    onVaultMutation: (amount: number, type: 'deposit' | 'withdraw', date?: string, walletId?: string) => void;
 }
 
 export default function FinanceModalsContainer({
@@ -64,6 +65,7 @@ export default function FinanceModalsContainer({
     setShowArchiveModal,
     selectedDayData,
     categories,
+    wallets = [],
     activeCurrency,
     currencyLocale,
     onEditTransactionFromArchive,
@@ -136,6 +138,7 @@ export default function FinanceModalsContainer({
                 show={showTrxModal}
                 editingTransaction={editingTransaction}
                 categories={categories}
+                wallets={wallets}
                 transactions={transactions}
                 budgets={budgets}
                 onClose={() => setShowTrxModal(false)}
@@ -148,6 +151,7 @@ export default function FinanceModalsContainer({
             <FinanceBatchModal
                 show={showBatchModal}
                 categories={categories}
+                wallets={wallets}
                 budgets={budgets}
                 transactions={transactions}
                 onClose={() => setShowBatchModal(false)}
@@ -184,8 +188,11 @@ export default function FinanceModalsContainer({
                 show={showVaultTxModal}
                 saving={activeVault}
                 type={vaultTxType}
+                wallets={wallets}
                 onClose={() => setShowVaultTxModal(false)}
                 onSave={onVaultMutation}
+                activeCurrency={activeCurrency}
+                currencyLocale={currencyLocale}
             />
         </>
     );

@@ -5,12 +5,15 @@ import { useTranslations, useLocale } from 'next-intl';
 import FinanceDatePicker from './FinanceDatePicker';
 import ModalPortal from '@/components/ModalPortal';
 
+import { WalletOption } from '../types';
+
 export interface TransactionModalItem {
     id?: number | string;
     title: string;
     amount: number | string;
     type: 'income' | 'expense';
     category: string;
+    walletId?: string;
     date: string;
     notes?: string;
 }
@@ -19,6 +22,7 @@ interface TransactionModalProps {
     show: boolean;
     editingTransaction: TransactionModalItem | null;
     categories: { slug: string; name: string; icon: string; type: string }[];
+    wallets?: WalletOption[];
     transactions?: any[];
     budgets?: any[];
     onClose: () => void;
@@ -32,6 +36,7 @@ export default function TransactionModal({
     show,
     editingTransaction,
     categories,
+    wallets = [],
     transactions = [],
     budgets = [],
     onClose,
@@ -49,6 +54,7 @@ export default function TransactionModal({
     const [amount, setAmount] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [category, setCategory] = useState<string>('');
+    const [walletId, setWalletId] = useState<string>('');
     const [date, setDate] = useState<string>(todayStr);
     const [notes, setNotes] = useState<string>('');
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -59,6 +65,7 @@ export default function TransactionModal({
             setAmount(String(editingTransaction.amount || ''));
             setTitle(editingTransaction.title || '');
             setCategory(editingTransaction.category || '');
+            setWalletId(editingTransaction.walletId || (wallets[0]?.id || ''));
             setDate(editingTransaction.date || todayStr);
             setNotes(editingTransaction.notes || '');
         } else {
@@ -66,10 +73,11 @@ export default function TransactionModal({
             setAmount('');
             setTitle('');
             setCategory('');
+            setWalletId(wallets[0]?.id || '');
             setDate(todayStr);
             setNotes('');
         }
-    }, [editingTransaction, show, todayStr]);
+    }, [editingTransaction, show, todayStr, wallets]);
 
     // 1:1 from TransactionModal.vue line 34 — watch type, reset category
     useEffect(() => {
@@ -111,6 +119,14 @@ export default function TransactionModal({
         }
     };
 
+    const formatMoney = (val: number) => {
+        return new Intl.NumberFormat(currencyLocale, {
+            style: 'currency',
+            currency: activeCurrency,
+            maximumFractionDigits: 0
+        }).format(val);
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const numAmount = Number(amount);
@@ -122,6 +138,7 @@ export default function TransactionModal({
             amount: numAmount,
             type,
             category: category || (displayCategories[0]?.slug || 'other'),
+            walletId: walletId || undefined,
             date,
             notes
         });
@@ -220,6 +237,32 @@ export default function TransactionModal({
                                 className="w-full px-4 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-0 font-bold text-sm text-slate-700 dark:text-slate-200 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700"
                             />
                         </div>
+
+                        {/* Wallet / Account Selector */}
+                        {wallets.length > 0 && (
+                            <div>
+                                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-600 mb-2 ml-1 tracking-tight">
+                                    {type === 'expense' ? (locale === 'id' ? 'Sumber Dompet / Rekening' : 'Pay From Wallet') : (locale === 'id' ? 'Masuk ke Dompet / Rekening' : 'Deposit to Wallet')}
+                                </label>
+                                <div className="relative">
+                                    <select 
+                                        value={walletId}
+                                        onChange={(e) => setWalletId(e.target.value)}
+                                        className="w-full pl-4 pr-8 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-0 font-bold text-slate-700 dark:text-slate-200 text-sm appearance-none cursor-pointer transition-all"
+                                    >
+                                        <option value="">{locale === 'id' ? 'Pilih Dompet / Rekening...' : 'Select Wallet...'}</option>
+                                        {wallets.map(w => (
+                                            <option key={w.id} value={w.id}>
+                                                {w.icon || '💳'} {w.name} ({formatMoney(w.balance)})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-600">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path d="M19 9l-7 7-7-7"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Category & Date Grid */}
                         <div className="grid grid-cols-2 gap-4">

@@ -7,12 +7,15 @@ import { SavingVault } from './SavingModal';
 import FinanceDatePicker from './FinanceDatePicker';
 import ModalPortal from '@/components/ModalPortal';
 
+import { WalletOption } from '../types';
+
 interface VaultTransactionModalProps {
     show: boolean;
     saving: SavingVault | null;
     type: 'deposit' | 'withdraw';
+    wallets?: WalletOption[];
     onClose: () => void;
-    onSave: (amount: number, type: 'deposit' | 'withdraw', date?: string) => void;
+    onSave: (amount: number, type: 'deposit' | 'withdraw', date?: string, walletId?: string) => void;
     activeCurrency?: string;
     currencyLocale?: string;
 }
@@ -21,6 +24,7 @@ export default function VaultTransactionModal({
     show,
     saving,
     type,
+    wallets = [],
     onClose,
     onSave,
     activeCurrency = 'IDR',
@@ -30,6 +34,7 @@ export default function VaultTransactionModal({
     const todayStr = new Date().toISOString().split('T')[0];
 
     const [amount, setAmount] = useState<string>('');
+    const [walletId, setWalletId] = useState<string>('');
     const [date, setDate] = useState<string>(todayStr);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -38,9 +43,10 @@ export default function VaultTransactionModal({
     useEffect(() => {
         if (show) {
             setAmount('');
+            setWalletId(wallets[0]?.id || '');
             setDate(todayStr);
         }
-    }, [show, todayStr]);
+    }, [show, todayStr, wallets]);
 
     if (!show || !saving) return null;
 
@@ -82,7 +88,7 @@ export default function VaultTransactionModal({
             return;
         }
 
-        onSave(numAmount, type, date);
+        onSave(numAmount, type, date, walletId || undefined);
         setAmount('');
         onClose();
     };
@@ -133,6 +139,32 @@ export default function VaultTransactionModal({
                                 </p>
                             </div>
                         </div>
+
+                        {/* Wallet Selection */}
+                        {wallets.length > 0 && (
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 tracking-wider ml-1 mb-1.5 block">
+                                    {type === 'deposit' ? 'Potong dari Dompet / Rekening' : 'Setor ke Dompet / Rekening'}
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        value={walletId}
+                                        onChange={(e) => setWalletId(e.target.value)}
+                                        className="w-full pl-4 pr-8 h-12 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 text-xs appearance-none cursor-pointer focus:ring-0 focus:border-indigo-500"
+                                    >
+                                        <option value="">Pilih Dompet / Rekening...</option>
+                                        {wallets.map(w => (
+                                            <option key={w.id} value={w.id}>
+                                                {w.icon || '💳'} {w.name} ({formatMoney(w.balance)})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path d="M19 9l-7 7-7-7"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Input Box — 1:1 from VaultTransactionModal.vue line 120-141 */}
                         <div className="space-y-4">

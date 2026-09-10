@@ -62,8 +62,42 @@ export function useFinanceActions({
 
     const handleSaveSingleTrx = async (data: any) => {
         try {
+            const targetWalletId = data.walletId || (wallets && wallets[0]?.id);
+            const numAmount = Number(data.amount) || 0;
+            
+            if (wallets && saveUserConfig && targetWalletId && numAmount > 0) {
+                let updatedWallets = [...wallets];
+                if (data.id) {
+                    const oldTrx = transactions.find(t => t.id === data.id);
+                    if (oldTrx) {
+                        const oldAmount = Number(oldTrx.amount) || 0;
+                        const oldWalletId = (oldTrx as any).walletId || targetWalletId;
+                        
+                        // Revert old transaction from wallet
+                        updatedWallets = updatedWallets.map(w => {
+                            if (w.id === oldWalletId) {
+                                const revertDelta = oldTrx.type === 'income' ? -oldAmount : oldAmount;
+                                return { ...w, balance: Math.max(0, (Number(w.balance) || 0) + revertDelta) };
+                            }
+                            return w;
+                        });
+                    }
+                }
+                
+                // Apply new transaction to wallet
+                updatedWallets = updatedWallets.map(w => {
+                    if (w.id === targetWalletId) {
+                        const applyDelta = data.type === 'income' ? numAmount : -numAmount;
+                        return { ...w, balance: Math.max(0, (Number(w.balance) || 0) + applyDelta) };
+                    }
+                    return w;
+                });
+                
+                saveUserConfig({ finance_wallets: updatedWallets });
+            }
+
             if (data.id) {
-                mutateTx(transactions.map(t => t.id === data.id ? { ...data, amount: Number(data.amount), date: data.date.split('T')[0] } : t), false);
+                mutateTx(transactions.map(t => t.id === data.id ? { ...data, amount: numAmount, date: data.date.split('T')[0] } : t), false);
                 
                 await fetch(`/api/finance/transactions/${data.id}`, {
                     method: 'PUT',
@@ -73,7 +107,7 @@ export function useFinanceActions({
                 mutateTx();
             } else {
                 const tempId = Date.now();
-                mutateTx([{ ...data, id: tempId, amount: Number(data.amount), date: data.date.split('T')[0] }, ...transactions], false);
+                mutateTx([{ ...data, id: tempId, amount: numAmount, date: data.date.split('T')[0] }, ...transactions], false);
                 
                 await fetch('/api/finance/transactions', {
                     method: 'POST',
@@ -89,12 +123,35 @@ export function useFinanceActions({
 
     const handleSaveBatchTrx = async (date: string, rows: any[]) => {
         try {
+            if (wallets && saveUserConfig && rows.length > 0) {
+                let updatedWallets = [...wallets];
+                for (const r of rows) {
+                    const targetWalletId = r.walletId || wallets[0]?.id;
+                    const amt = Number(r.amount) || 0;
+                    if (targetWalletId && amt > 0) {
+                        updatedWallets = updatedWallets.map(w => {
+                            if (w.id === targetWalletId) {
+                                const delta = r.type === 'income' ? amt : -amt;
+                                return { ...w, balance: Math.max(0, (Number(w.balance) || 0) + delta) };
+                            }
+                            return w;
+                        });
+                    }
+                }
+                saveUserConfig({ finance_wallets: updatedWallets });
+            }
+
             for (const r of rows) {
                 await fetch('/api/finance/transactions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        date, type: r.type, amount: Number(r.amount), title: r.title, category: r.category || 'other'
+                        date,
+                        type: r.type,
+                        amount: Number(r.amount),
+                        title: r.title,
+                        category: r.category || 'other',
+                        walletId: r.walletId
                     })
                 });
             }
@@ -116,6 +173,22 @@ export function useFinanceActions({
         try {
             if (deleteTarget.type === 'transaction') {
                 const { id } = deleteTarget.data;
+                const trxToDelete = transactions.find(t => t.id === id);
+                if (trxToDelete && wallets && saveUserConfig) {
+                    const targetWalletId = (trxToDelete as any).walletId || wallets[0]?.id;
+                    const amt = Number(trxToDelete.amount) || 0;
+                    if (targetWalletId && amt > 0) {
+                        const revertDelta = trxToDelete.type === 'income' ? -amt : amt;
+                        const updatedWallets = wallets.map(w => {
+                            if (w.id === targetWalletId) {
+                                return { ...w, balance: Math.max(0, (Number(w.balance) || 0) + revertDelta) };
+                            }
+                            return w;
+                        });
+                        saveUserConfig({ finance_wallets: updatedWallets });
+                    }
+                }
+
                 mutateTx(transactions.filter(t => t.id !== id), false);
                 await fetch(`/api/finance/transactions/${id}`, { method: 'DELETE' });
                 mutateTx();
@@ -194,19 +267,54 @@ export function useFinanceActions({
         }
     };
 
-    const handleVaultMutation = async (amount: number, note: string) => {
+    const handleVaultMutation = async (amount: number, type: 'deposit' | 'withdraw', date?: string, walletId?: string) => {
         if (!activeVault) return;
         try {
-            const res = await fetch(`/api/finance/savings/${activeVault.id}/logs`, {
-                method: 'POST',
+            const currentAmount = Number(activeVault.current_amount || (activeVault as any).current || 0);
+            const newCurrentAmount = type === 'deposit' ? currentAmount + amount : Math.max(0, currentAmount - amount);
+            const targetWalletId = walletId || (wallets && wallets[0]?.id);
+            const txDate = date || new Date().toISOString().split('T')[0];
+
+            // 1. Update Vault in DB
+            await fetch('/api/finance/savings', {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount, type: vaultTxType, note })
+                body: JSON.stringify({
+                    id: activeVault.id,
+                    title: activeVault.title || (activeVault as any).name,
+                    targetAmount: Number(activeVault.target_amount || (activeVault as any).target || 0),
+                    currentAmount: newCurrentAmount,
+                    icon: activeVault.icon,
+                    color: activeVault.color
+                })
             });
-            if (res.ok) {
-                mutateSav();
-                mutateTx();
-                setShowVaultTxModal(false);
+
+            // 2. Log transaction & mutate wallet
+            const vaultName = activeVault.title || (activeVault as any).name || 'Target Tabungan';
+            if (type === 'deposit') {
+                await handleSaveSingleTrx({
+                    title: `Nabung: ${vaultName}`,
+                    amount,
+                    type: 'expense',
+                    category: 'tabungan',
+                    walletId: targetWalletId,
+                    date: txDate,
+                    notes: `Setoran ke pos tabungan ${vaultName}`
+                });
+            } else {
+                await handleSaveSingleTrx({
+                    title: `Tarik Tabungan: ${vaultName}`,
+                    amount,
+                    type: 'income',
+                    category: 'tabungan',
+                    walletId: targetWalletId,
+                    date: txDate,
+                    notes: `Pencairan dari pos tabungan ${vaultName}`
+                });
             }
+
+            mutateSav();
+            setShowVaultTxModal(false);
         } catch (error) {
             console.error('Failed vault mutation:', error);
         }
@@ -250,6 +358,7 @@ export function useFinanceActions({
             amount: tx.amount,
             type: tx.type,
             category: tx.category,
+            walletId: tx.walletId,
             date: tx.date
         });
     };

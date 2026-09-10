@@ -178,13 +178,44 @@ export default function FinanceClient({
 
     const handleUpdateTarget = (val: number) => {
         setIncomeTarget(val);
-        saveUserConfig({ [`finance_income_target_${selectedMonthKey}`]: val });
+        const currentWallets = userSettings.finance_wallets || [];
+        let updatedWallets = currentWallets;
+        if (currentWallets.length === 0) {
+            updatedWallets = [{
+                id: 'wallet_main',
+                name: isIndo ? 'Dompet Utama' : 'Main Wallet',
+                type: 'cash',
+                balance: val,
+                icon: '💵',
+                color: '#10b981'
+            }];
+        } else if (currentWallets.length === 1 && (currentWallets[0].id === 'wallet_main' || currentWallets[0].name === 'Dompet Utama' || currentWallets[0].name === 'Main Wallet')) {
+            updatedWallets = [{ ...currentWallets[0], balance: val }];
+        }
+        saveUserConfig({ 
+            [`finance_income_target_${selectedMonthKey}`]: val,
+            finance_wallets: updatedWallets
+        });
     };
 
     // ===== 6. MULTI-WALLET =====
     const wallets: WalletItem[] = useMemo(() => {
-        return userSettings.finance_wallets || [];
-    }, [userSettings.finance_wallets]);
+        const stored = userSettings.finance_wallets;
+        if (stored && Array.isArray(stored) && stored.length > 0) {
+            return stored;
+        }
+        if (incomeTarget > 0) {
+            return [{
+                id: 'wallet_main',
+                name: isIndo ? 'Dompet Utama' : 'Main Wallet',
+                type: 'cash',
+                balance: incomeTarget,
+                icon: '💵',
+                color: '#10b981'
+            }];
+        }
+        return [];
+    }, [userSettings.finance_wallets, incomeTarget, isIndo]);
 
     const [showWalletModal, setShowWalletModal] = useState(false);
     const [editingWallet, setEditingWallet] = useState<WalletItem | null>(null);
@@ -236,6 +267,7 @@ export default function FinanceClient({
                 amount: adminFee,
                 type: 'expense',
                 category: 'utilitas',
+                walletId: fromWalletId,
                 date: date || new Date().toISOString().split('T')[0],
                 notes: notes || 'Biaya admin transfer antar akun'
             });
@@ -268,6 +300,7 @@ export default function FinanceClient({
             amount: bill.amount,
             type: 'expense',
             category: bill.category || 'langganan',
+            walletId: (bill as any).walletId || wallets[0]?.id,
             date: new Date().toISOString().split('T')[0],
             notes: `Tagihan Rutin (${bill.cycle === 'yearly' ? 'Tahunan' : 'Bulanan'})`
         });
@@ -304,6 +337,7 @@ export default function FinanceClient({
             mode,
             cashflowAmount,
             logCashflow,
+            walletId,
             date,
             notes,
             newCapital,
@@ -324,6 +358,7 @@ export default function FinanceClient({
                     amount: cashflowAmount,
                     type: 'expense',
                     category: 'investasi',
+                    walletId: walletId || wallets[0]?.id,
                     date,
                     notes: notes || (isIndo ? `Top-up modal instrumen ${target.name}` : `Top-up asset ${target.name}`)
                 });
@@ -333,6 +368,7 @@ export default function FinanceClient({
                     amount: cashflowAmount,
                     type: 'income',
                     category: 'investasi',
+                    walletId: walletId || wallets[0]?.id,
                     date,
                     notes: notes || (isIndo ? `Pencairan hasil jual ${target.name}` : `Proceeds from ${target.name}`)
                 });
@@ -342,6 +378,7 @@ export default function FinanceClient({
                     amount: cashflowAmount,
                     type: 'income',
                     category: 'investasi',
+                    walletId: walletId || wallets[0]?.id,
                     date,
                     notes: notes || (isIndo ? `Dividen pasif instrumen ${target.name}` : `Passive dividend payout from ${target.name}`)
                 });
@@ -385,7 +422,6 @@ export default function FinanceClient({
     const currentMonthTransactions = transactions;
     const totalIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
     const totalExpense = currentMonthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
-    const balance = incomeTarget + totalIncome - totalExpense;
 
     const expenseStats: Record<string, number> = {};
     const incomeStats: Record<string, number> = {};
@@ -398,6 +434,10 @@ export default function FinanceClient({
     const totalWalletsBalance = useMemo(() => {
         return wallets.reduce((sum, w) => sum + (Number(w.balance) || 0), 0);
     }, [wallets]);
+
+    const balance = wallets.length > 0
+        ? totalWalletsBalance
+        : (incomeTarget + totalIncome - totalExpense);
 
     const { totalInvestedCapital, totalInvestedCurrentValue, totalInvestedReturn, totalInvestedROI } = useMemo(() => {
         let cap = 0;
@@ -832,6 +872,7 @@ export default function FinanceClient({
                 setShowArchiveModal={setShowArchiveModal}
                 selectedDayData={selectedDayData}
                 categories={categories}
+                wallets={wallets}
                 activeCurrency={activeCurrency}
                 currencyLocale={currencyLocale}
                 onEditTransactionFromArchive={(trx) => { setEditingTransaction(trx); setShowTrxModal(true); }}
@@ -908,6 +949,7 @@ export default function FinanceClient({
                 show={showActionModal}
                 asset={actionAsset}
                 mode={actionMode}
+                wallets={wallets}
                 onClose={() => setShowActionModal(false)}
                 onExecute={handleExecuteAssetAction}
                 activeCurrency={activeCurrency}

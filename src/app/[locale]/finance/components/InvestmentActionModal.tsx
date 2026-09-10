@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import { InvestmentAssetItem } from './InvestmentPortfolioSection';
+import { WalletOption } from '../types';
 
 export type InvestmentActionMode = 'revalue' | 'topup' | 'withdraw' | 'dividend';
 
@@ -44,6 +45,7 @@ export interface InvestmentActionResult {
     // Cashflow integration
     cashflowAmount: number;
     logCashflow: boolean;
+    walletId?: string;
     date: string;
     notes?: string;
 }
@@ -52,6 +54,7 @@ interface InvestmentActionModalProps {
     show: boolean;
     asset: InvestmentAssetItem | null;
     mode: InvestmentActionMode;
+    wallets?: WalletOption[];
     onClose: () => void;
     onExecute: (result: InvestmentActionResult) => void;
     activeCurrency?: string;
@@ -62,6 +65,7 @@ export default function InvestmentActionModal({
     show,
     asset,
     mode,
+    wallets = [],
     onClose,
     onExecute,
     activeCurrency = 'IDR',
@@ -78,6 +82,7 @@ export default function InvestmentActionModal({
     const [actionUnits, setActionUnits] = useState('');
     const [actionPrice, setActionPrice] = useState('');
     const [rawAmount, setRawAmount] = useState('');
+    const [walletId, setWalletId] = useState('');
     const [logCashflow, setLogCashflow] = useState(true);
     const [notes, setNotes] = useState('');
     const [date, setDate] = useState(todayStr);
@@ -120,6 +125,7 @@ export default function InvestmentActionModal({
             setDate(todayStr);
             setNotes('');
             setActionUnits('');
+            setWalletId(wallets[0]?.id || '');
 
             if (mode === 'revalue') {
                 if (isUnitBased) {
@@ -318,6 +324,7 @@ export default function InvestmentActionModal({
             newTotalDividends: calculations.newTotalDividends,
             cashflowAmount: calculations.cashflowAmount,
             logCashflow: mode === 'revalue' ? false : logCashflow,
+            walletId: mode === 'revalue' ? undefined : (walletId || wallets[0]?.id),
             date,
             notes: notes.trim() || undefined
         });
@@ -644,21 +651,49 @@ export default function InvestmentActionModal({
                             </div>
                         )}
 
-                        {/* Log to Cashflow Checkbox */}
+                        {/* Log to Cashflow Checkbox & Wallet Selection */}
                         {mode !== 'revalue' && (
-                            <label className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 cursor-pointer hover:bg-slate-100/70 transition">
-                                <input
-                                    type="checkbox"
-                                    checked={logCashflow}
-                                    onChange={(e) => setLogCashflow(e.target.checked)}
-                                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
-                                />
-                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    {mode === 'topup' && (isIndo ? 'Otomatis catat sebagai Pengeluaran (Investasi) di Arus Kas' : 'Log as Expense (Investment) in Cashflow')}
-                                    {mode === 'withdraw' && (isIndo ? 'Otomatis catat sebagai Pemasukan (Pencairan) di Arus Kas' : 'Log as Income (Liquidation) in Cashflow')}
-                                    {mode === 'dividend' && (isIndo ? 'Otomatis catat sebagai Pemasukan (Dividen) di Arus Kas' : 'Log as Income (Dividend) in Cashflow')}
-                                </span>
-                            </label>
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 cursor-pointer hover:bg-slate-100/70 transition">
+                                    <input
+                                        type="checkbox"
+                                        checked={logCashflow}
+                                        onChange={(e) => setLogCashflow(e.target.checked)}
+                                        className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                                    />
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                        {mode === 'topup' && (isIndo ? 'Otomatis catat sebagai Pengeluaran (Investasi) di Arus Kas' : 'Log as Expense (Investment) in Cashflow')}
+                                        {mode === 'withdraw' && (isIndo ? 'Otomatis catat sebagai Pemasukan (Pencairan) di Arus Kas' : 'Log as Income (Liquidation) in Cashflow')}
+                                        {mode === 'dividend' && (isIndo ? 'Otomatis catat sebagai Pemasukan (Dividen) di Arus Kas' : 'Log as Income (Dividend) in Cashflow')}
+                                    </span>
+                                </label>
+
+                                {logCashflow && wallets.length > 0 && (
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                                            {mode === 'topup' 
+                                                ? (isIndo ? 'Sumber Dana (Potong Dompet)' : 'Source Wallet') 
+                                                : (isIndo ? 'Tujuan Dana (Masuk Dompet)' : 'Destination Wallet')}
+                                        </label>
+                                        <div className="relative">
+                                            <select
+                                                value={walletId}
+                                                onChange={(e) => setWalletId(e.target.value)}
+                                                className="w-full bg-slate-50 dark:bg-slate-800/70 border-2 border-transparent focus:border-emerald-500/30 focus:bg-white dark:focus:bg-slate-800 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-800 dark:text-white transition-all appearance-none cursor-pointer"
+                                            >
+                                                {wallets.map((w) => (
+                                                    <option key={w.id} value={w.id}>
+                                                        {w.icon || '💳'} {w.name} ({formatMoney(w.balance)})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">
+                                                ▼
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {/* Note & Date */}
