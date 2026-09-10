@@ -1,44 +1,62 @@
 'use client';
 
 import React, { useState, useRef, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
-import { Search, X } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { 
+    Search, X, Kanban, Table, Calendar, 
+    BarChart3, SlidersHorizontal, ArrowUpDown, 
+    Building2, MapPin, DollarSign, Filter
+} from 'lucide-react';
+import { JobRowItem } from '../lib/jobAnalytics';
+
+export type JobViewMode = 'kanban' | 'table' | 'interviews' | 'compare';
 
 export interface JobFilterParams {
     search?: string;
     status?: string;
+    workModel?: string;
     days?: number | null;
+    sortBy?: 'applied_date' | 'salary' | 'company' | 'status';
 }
 
 interface JobFilterBarProps {
     filters: JobFilterParams;
-    uniqueTitles: string[];
-    localJobs: any[];
-    totalCount: number;
     onFilterChange: (newFilters: JobFilterParams) => void;
+    viewMode: JobViewMode;
+    setViewMode: (v: JobViewMode) => void;
+    uniqueTitles: string[];
+    jobs: JobRowItem[];
+    totalCount: number;
+    filteredCount: number;
 }
 
 export default function JobFilterBar({
     filters,
+    onFilterChange,
+    viewMode,
+    setViewMode,
     uniqueTitles = [],
-    localJobs = [],
+    jobs = [],
     totalCount = 0,
-    onFilterChange
+    filteredCount = 0
 }: JobFilterBarProps) {
-    const t = useTranslations();
+    const locale = useLocale();
+    const isIndo = locale === 'id';
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [search, setSearch] = useState(filters.search || '');
     const [activeStatus, setActiveStatus] = useState(filters.status || 'all');
+    const [activeWorkModel, setActiveWorkModel] = useState(filters.workModel || 'all');
     const [activeDays, setActiveDays] = useState<number | null>(filters.days || null);
+    const [sortBy, setSortBy] = useState<'applied_date' | 'salary' | 'company' | 'status'>(filters.sortBy || 'applied_date');
     const [showDropdown, setShowDropdown] = useState(false);
 
     // Merge server titles + local job titles
     const allUniqueTitles = useMemo(() => {
-        const localTitles = localJobs.map(j => j.title).filter(Boolean);
+        const localTitles = jobs.map(j => j.title).filter(Boolean);
         const combined = Array.from(new Set([...uniqueTitles, ...localTitles]));
         return combined.sort();
-    }, [uniqueTitles, localJobs]);
+    }, [uniqueTitles, jobs]);
 
     // Suggestions based on search
     const suggestions = useMemo(() => {
@@ -47,181 +65,291 @@ export default function JobFilterBar({
         return allUniqueTitles.filter(t => t.toLowerCase().includes(q)).slice(0, 8);
     }, [search, allUniqueTitles]);
 
+    // Status items with counts
+    const statusCounts = useMemo(() => {
+        const counts: Record<string, number> = { all: jobs.length };
+        jobs.forEach(j => {
+            const s = j.status || 'wishlist';
+            counts[s] = (counts[s] || 0) + 1;
+        });
+        return counts;
+    }, [jobs]);
+
     const statusPills = [
-        { key: 'all', labelKey: 'job_status_all', icon: '📋', color: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700' },
-        { key: 'wishlist', labelKey: 'job_status_wishlist', icon: '💭', color: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/20 hover:bg-blue-100 dark:hover:bg-blue-500/20' },
-        { key: 'applied', labelKey: 'job_status_applied', icon: '📤', color: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/20 hover:bg-yellow-100 dark:hover:bg-yellow-500/20' },
-        { key: 'interview', labelKey: 'job_status_interview', icon: '🎤', color: 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20' },
-        { key: 'offer', labelKey: 'job_status_offer', icon: '🎉', color: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20 hover:bg-green-100 dark:hover:bg-green-500/20' },
-        { key: 'rejected', labelKey: 'job_status_rejected', icon: '❌', color: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/20' },
-        { key: 'accepted', labelKey: 'job_status_accepted', icon: '✅', color: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/20' },
+        { key: 'all', label: isIndo ? 'Semua' : 'All', icon: '📋' },
+        { key: 'wishlist', label: isIndo ? 'Incaran' : 'Wishlist', icon: '💭' },
+        { key: 'applied', label: isIndo ? 'Dilamar' : 'Applied', icon: '📤' },
+        { key: 'interview', label: isIndo ? 'Interview' : 'Interview', icon: '🎯' },
+        { key: 'offer', label: isIndo ? 'Offering' : 'Offer', icon: '🎉' },
+        { key: 'accepted', label: isIndo ? 'Diterima' : 'Accepted', icon: '🏆' },
+        { key: 'rejected', label: isIndo ? 'Ditolak' : 'Rejected', icon: '❌' },
     ];
 
     const datePills = [
-        { key: null, labelKey: 'job_filter_all_time', fallback: 'Semua Waktu' },
-        { key: 3, labelKey: 'job_filter_3_days', fallback: '3 Hari Terakhir' },
-        { key: 7, labelKey: 'job_filter_7_days', fallback: '7 Hari Terakhir' },
-        { key: 30, labelKey: 'job_filter_30_days', fallback: '30 Hari Terakhir' },
-        { key: 90, labelKey: 'job_filter_90_days', fallback: '90 Hari Terakhir' },
+        { key: null, label: isIndo ? 'Semua Waktu' : 'All Time' },
+        { key: 7, label: isIndo ? '7 Hari Terakhir' : 'Last 7 Days' },
+        { key: 30, label: isIndo ? '30 Hari Terakhir' : 'Last 30 Days' },
+        { key: 90, label: isIndo ? '90 Hari Terakhir' : 'Last 90 Days' },
     ];
 
-    const activeFiltersCount = useMemo(() => {
-        let count = 0;
-        if (search) count++;
-        if (activeStatus !== 'all') count++;
-        if (activeDays) count++;
-        return count;
-    }, [search, activeStatus, activeDays]);
+    const workModels = [
+        { key: 'all', label: isIndo ? 'Semua Model' : 'All Models' },
+        { key: 'remote', label: 'Remote 🌐' },
+        { key: 'hybrid', label: 'Hybrid 🏢' },
+        { key: 'onsite', label: 'On-site 📍' },
+    ];
 
-    const applyFilters = (newSearch = search, newStatus = activeStatus, newDays = activeDays) => {
+    const applyFilters = (
+        newSearch = search, 
+        newStatus = activeStatus, 
+        newWorkModel = activeWorkModel, 
+        newDays = activeDays,
+        newSort = sortBy
+    ) => {
         setShowDropdown(false);
-        if (inputRef.current) inputRef.current.blur();
         onFilterChange({
             search: newSearch || undefined,
             status: newStatus !== 'all' ? newStatus : undefined,
-            days: newDays || undefined
+            workModel: newWorkModel !== 'all' ? newWorkModel : undefined,
+            days: newDays || undefined,
+            sortBy: newSort
         });
     };
 
     const selectSuggestion = (titleStr: string) => {
         setSearch(titleStr);
         setShowDropdown(false);
-        applyFilters(titleStr, activeStatus, activeDays);
+        applyFilters(titleStr, activeStatus, activeWorkModel, activeDays, sortBy);
     };
 
     const handleSetStatus = (key: string) => {
         setActiveStatus(key);
-        applyFilters(search, key, activeDays);
+        applyFilters(search, key, activeWorkModel, activeDays, sortBy);
+    };
+
+    const handleSetWorkModel = (key: string) => {
+        setActiveWorkModel(key);
+        applyFilters(search, activeStatus, key, activeDays, sortBy);
     };
 
     const handleSetDays = (key: number | null) => {
         setActiveDays(key);
-        applyFilters(search, activeStatus, key);
+        applyFilters(search, activeStatus, activeWorkModel, key, sortBy);
+    };
+
+    const handleSetSort = (s: 'applied_date' | 'salary' | 'company' | 'status') => {
+        setSortBy(s);
+        applyFilters(search, activeStatus, activeWorkModel, activeDays, s);
     };
 
     const clearAll = () => {
         setSearch('');
         setActiveStatus('all');
+        setActiveWorkModel('all');
         setActiveDays(null);
-        applyFilters('', 'all', null);
+        setSortBy('applied_date');
+        applyFilters('', 'all', 'all', null, 'applied_date');
     };
 
+    const activeFilterCount = (search ? 1 : 0) + (activeStatus !== 'all' ? 1 : 0) + (activeWorkModel !== 'all' ? 1 : 0) + (activeDays ? 1 : 0);
+
     return (
-        // 1:1 from JobFilterBar.vue line 102-209
-        <div className="mb-5 bg-white/80 dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-500">
+        <div className="space-y-4 mb-6">
             
-            {/* Top Bar: Search + Date filter */}
-            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-visible transition-colors duration-500">
+            {/* ROW 1: Search & View Mode Switcher */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                {/* Smart Search */}
-                <div className="relative flex-1 min-w-0 w-full">
-                    <div className="relative">
-                        <Search size={16} className="absolute left-3.5 top-3 text-slate-400" />
-                        <input
-                            ref={inputRef}
-                            value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
-                                setShowDropdown(e.target.value.length > 0 && suggestions.length > 0);
-                            }}
-                            onKeyUp={(e) => {
-                                if (e.key === 'Enter') {
-                                    setShowDropdown(false);
-                                    applyFilters();
-                                }
-                            }}
-                            onFocus={() => setShowDropdown(suggestions.length > 0)}
-                            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                            type="text"
-                            placeholder={t('job_filter_search_placeholder') || 'Cari posisi, perusahaan, lokasi...'}
-                            className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-400 font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all"
-                        />
-                        {search && (
-                            <button 
-                                onClick={() => { setSearch(''); applyFilters('', activeStatus, activeDays); }}
-                                className="absolute right-3 top-2.5 text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 transition-colors"
-                            >
-                                <X size={16} />
-                            </button>
-                        )}
-                    </div>
+                {/* Search Bar */}
+                <div className="relative flex-1 max-w-lg">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setShowDropdown(e.target.value.length > 0 && suggestions.length > 0);
+                        }}
+                        onKeyUp={(e) => {
+                            if (e.key === 'Enter') {
+                                setShowDropdown(false);
+                                applyFilters();
+                            }
+                        }}
+                        onFocus={() => setShowDropdown(suggestions.length > 0)}
+                        onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                        placeholder={isIndo ? "Cari posisi, perusahaan, lokasi, recruiter..." : "Search job title, company, location, recruiter..."}
+                        className="w-full pl-11 pr-10 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-sm"
+                    />
+                    {search && (
+                        <button 
+                            type="button"
+                            onClick={() => { setSearch(''); applyFilters('', activeStatus, activeWorkModel, activeDays, sortBy); }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
 
                     {/* Autocomplete Dropdown */}
                     {showDropdown && suggestions.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-                            <div className="px-3 py-2 text-[11px] font-black capitalize tracking-wide text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
-                                ✨ {t('job_filter_autocomplete_label') || 'Posisi yang kamu lamar'}
+                        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 overflow-hidden">
+                            <div className="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                ✨ {isIndo ? 'Saran Posisi' : 'Suggested Titles'}
                             </div>
                             {suggestions.map((titleStr) => (
                                 <button
                                     key={titleStr}
                                     type="button"
                                     onMouseDown={(e) => { e.preventDefault(); selectSuggestion(titleStr); }}
-                                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors flex items-center gap-2.5"
+                                    className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 transition flex items-center gap-2"
                                 >
-                                    <span className="text-indigo-400">💼</span>
-                                    {titleStr}
+                                    <span>💼</span>
+                                    <span>{titleStr}</span>
                                 </button>
                             ))}
                         </div>
                     )}
                 </div>
 
-                {/* Date Range Pills */}
-                <div className="flex items-center gap-1.5 flex-wrap shrink-0">
-                    <span className="text-xs font-bold text-slate-400 mr-1">{t('job_filter_applied_label') || 'Dilamar:'}</span>
-                    {datePills.map((d) => (
-                        <button
-                            key={String(d.key)}
-                            type="button"
-                            onClick={() => handleSetDays(d.key)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                                activeDays === d.key
-                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100 dark:shadow-none'
-                                    : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400'
-                            }`}
-                        >
-                            {t(d.labelKey) || d.fallback}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Status filter pills row */}
-            <div className="px-4 py-3 flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold text-slate-400 mr-1">{t('job_filter_status_label') || 'Status:'}</span>
-                {statusPills.map((pill) => (
+                {/* 4-View Switcher Tabs */}
+                <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 shrink-0 self-start lg:self-auto overflow-x-auto no-scrollbar">
                     <button
-                        key={pill.key}
                         type="button"
-                        onClick={() => handleSetStatus(pill.key)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 ${
-                            activeStatus === pill.key
-                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100 dark:shadow-none scale-105'
-                                : `${pill.color} border`
+                        onClick={() => setViewMode('kanban')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            viewMode === 'kanban'
+                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
                         }`}
                     >
-                        <span>{pill.icon}</span>
-                        {t(pill.labelKey) || pill.key}
+                        <Kanban size={14} />
+                        <span>Kanban Pipeline</span>
                     </button>
-                ))}
 
-                {/* Active filter count + Clear button */}
-                {activeFiltersCount > 0 && (
-                    <div className="ml-auto flex items-center gap-2">
-                        <span className="text-xs text-slate-500 font-medium">
-                            {totalCount} {t('job_filter_results') || 'hasil'}
-                        </span>
+                    <button
+                        type="button"
+                        onClick={() => setViewMode('table')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            viewMode === 'table'
+                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                        }`}
+                    >
+                        <Table size={14} />
+                        <span>{isIndo ? 'Tabel Detail' : 'Table View'}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setViewMode('interviews')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            viewMode === 'interviews'
+                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                        }`}
+                    >
+                        <Calendar size={14} />
+                        <span>{isIndo ? 'Jadwal Interview' : 'Interviews'}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setViewMode('compare')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            viewMode === 'compare'
+                                ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                        }`}
+                    >
+                        <BarChart3 size={14} />
+                        <span>{isIndo ? 'Komparasi Offer' : 'Offer Matrix'}</span>
+                    </button>
+                </div>
+
+            </div>
+
+            {/* ROW 2: Status Pills, Work Models & Time Horizon */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                
+                {/* Status Pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                    {statusPills.map((pill) => {
+                        const count = statusCounts[pill.key] || 0;
+                        const isSelected = activeStatus === pill.key;
+                        return (
+                            <button
+                                key={pill.key}
+                                type="button"
+                                onClick={() => handleSetStatus(pill.key)}
+                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 border ${
+                                    isSelected
+                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                        : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                                }`}
+                            >
+                                <span>{pill.icon}</span>
+                                <span>{pill.label}</span>
+                                <span className="text-[10px] font-mono opacity-70">({count})</span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Work Model & Sort Selector */}
+                <div className="flex items-center gap-2">
+                    
+                    {/* Work Model Selector */}
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                        {workModels.map((wm) => {
+                            const isSelected = activeWorkModel === wm.key;
+                            return (
+                                <button
+                                    key={wm.key}
+                                    type="button"
+                                    onClick={() => handleSetWorkModel(wm.key)}
+                                    className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase transition ${
+                                        isSelected
+                                            ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                                            : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                                    }`}
+                                >
+                                    {wm.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Date Range Selector */}
+                    <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
+                        <select
+                            value={activeDays === null ? 'all' : String(activeDays)}
+                            onChange={(e) => handleSetDays(e.target.value === 'all' ? null : Number(e.target.value))}
+                            aria-label={isIndo ? "Pilih rentang tanggal lamaran" : "Select applied date range"}
+                            className="bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-700 dark:text-slate-200 p-0 outline-none cursor-pointer"
+                        >
+                            {datePills.map(d => (
+                                <option key={String(d.key)} value={d.key === null ? 'all' : String(d.key)} className="dark:bg-slate-900">
+                                    {d.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Clear Button if active */}
+                    {activeFilterCount > 0 && (
                         <button
                             type="button"
                             onClick={clearAll}
-                            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-all flex items-center gap-1"
+                            className="px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 transition flex items-center gap-1 shrink-0"
                         >
                             <X size={12} />
-                            {t('job_filter_clear') || 'Hapus Filter'} ({activeFiltersCount})
+                            <span>{isIndo ? 'Reset' : 'Reset'} ({activeFilterCount})</span>
                         </button>
-                    </div>
-                )}
+                    )}
+
+                </div>
+
             </div>
 
         </div>

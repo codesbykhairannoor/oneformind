@@ -1,41 +1,45 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import useSWR from 'swr';
+import { 
+    Briefcase, Plus, Sparkles, Kanban, Table, 
+    Calendar, BarChart3, SlidersHorizontal, ArrowUpDown,
+    CheckCircle2, AlertCircle, Award
+} from 'lucide-react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
-import JobStats, { JobStatsData } from './components/JobStats';
-import JobFilterBar, { JobFilterParams } from './components/JobFilterBar';
-import JobTable, { JobRowItem } from './components/JobTable';
+import GatedPage from '@/components/GatedPage';
+import JobStats from './components/JobStats';
+import JobFilterBar, { JobFilterParams, JobViewMode } from './components/JobFilterBar';
+import JobKanbanView from './components/JobKanbanView';
+import JobTable from './components/JobTable';
+import JobInterviewsCalendarView from './components/JobInterviewsCalendarView';
+import JobOfferComparisonModal from './components/JobOfferComparisonModal';
+import JobModal from './components/JobModal';
 import MasterCvModal from './components/MasterCvModal';
 import ResumeAiModal from './components/ResumeAiModal';
+import { 
+    JobRowItem, 
+    calculateJobFunnelStats, 
+    serializeJobPayload, 
+    deserializeJobPayload 
+} from './lib/jobAnalytics';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
-import GatedPage from '@/components/GatedPage';
-import { Briefcase, Plus, Sparkles } from 'lucide-react';
 
 export default function JobsPage() {
-    const t = useTranslations();
+    const locale = useLocale();
+    const isIndo = locale === 'id';
 
     const { data: fetchedJobs, mutate: mutateJobs } = useSWR('/api/jobs', fetcher);
 
     const parsedJobs = useMemo(() => {
         if (!fetchedJobs || !Array.isArray(fetchedJobs)) return null;
-        return fetchedJobs.map((j: any) => ({
-            id: j.id,
-            _key: `db_${j.id}`,
-            company: j.company,
-            title: j.title,
-            location: j.location || '',
-            applied_date: j.appliedDate ? j.appliedDate.split('T')[0] : '',
-            status: j.status,
-            notes: j.notes || '',
-            is_new: false,
-            is_saving: false
-        }));
+        return fetchedJobs.map((j: any) => deserializeJobPayload(j));
     }, [fetchedJobs]);
 
-    const [jobs, setJobs] = useState<JobRowItem[]>(parsedJobs || []);
+    const [jobs, setJobs] = useState<JobRowItem[]>([]);
 
     useEffect(() => {
         if (parsedJobs) {
@@ -43,11 +47,25 @@ export default function JobsPage() {
         }
     }, [parsedJobs]);
 
-    const [filters, setFilters] = useState<JobFilterParams>({ search: '', status: 'all', days: null });
+    // View state
+    const [viewMode, setViewMode] = useState<JobViewMode>('kanban');
+    const [filters, setFilters] = useState<JobFilterParams>({ 
+        search: '', 
+        status: 'all', 
+        workModel: 'all', 
+        days: null,
+        sortBy: 'applied_date'
+    });
+
+    // Modals state
+    const [isJobModalOpen, setIsJobModalOpen] = useState(false);
+    const [selectedJobForEdit, setSelectedJobForEdit] = useState<JobRowItem | null>(null);
+    
     const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
     const [isAiModalOpen, setIsAiModalOpen] = useState(false);
     const [activeJobForScan, setActiveJobForScan] = useState<JobRowItem | null>(null);
 
+    // User Master CV
     const [masterCvFilename, setMasterCvFilename] = useState<string>('');
     const [masterCvText, setMasterCvText] = useState<string>('');
 
@@ -69,130 +87,195 @@ export default function JobsPage() {
 
     const hasMasterCv = Boolean(masterCvText || masterCvFilename);
 
-    // Compute Stats dynamically
-    const stats: JobStatsData = useMemo(() => {
-        const res: JobStatsData = { total: jobs.length, wishlist: 0, applied: 0, interview: 0, offer: 0, rejected: 0, accepted: 0 };
-        jobs.forEach(j => {
-            if (j.status && typeof (res as any)[j.status] === 'number') {
-                (res as any)[j.status]++;
-            }
-        });
-        return res;
+    // Funnel & Velocity Analytics
+    const funnelStats = useMemo(() => {
+        return calculateJobFunnelStats(jobs);
     }, [jobs]);
 
-    // Unique Job Titles for Autocomplete
+    // Unique Job Titles
     const uniqueTitles = useMemo(() => {
         const set = new Set<string>();
         jobs.forEach(j => { if (j.title) set.add(j.title); });
         return Array.from(set).sort();
     }, [jobs]);
 
-    // Filtered Jobs
+    // Filter & Sort Logic
     const filteredJobs = useMemo(() => {
-        return jobs.filter(j => {
+        const result = jobs.filter(j => {
+            // Search
             if (filters.search) {
                 const q = filters.search.toLowerCase();
                 const matchComp = j.company?.toLowerCase().includes(q);
                 const matchTitle = j.title?.toLowerCase().includes(q);
                 const matchLoc = j.location?.toLowerCase().includes(q);
-                if (!matchComp && !matchTitle && !matchLoc) return false;
+                const matchRec = j.recruiter_name?.toLowerCase().includes(q);
+                if (!matchComp && !matchTitle && !matchLoc && !matchRec) return false;
             }
+
+            // Status
             if (filters.status && filters.status !== 'all' && j.status !== filters.status) {
                 return false;
             }
+
+            // Work Model
+            if (filters.workModel && filters.workModel !== 'all' && j.work_model !== filters.workModel) {
+                return false;
+            }
+
+            // Days Horizon
             if (filters.days && j.applied_date) {
                 const jobDate = new Date(j.applied_date).getTime();
                 const now = new Date().getTime();
                 const diffDays = (now - jobDate) / (1000 * 3600 * 24);
                 if (diffDays > filters.days) return false;
             }
+
             return true;
         });
+
+        // Sorting
+        result.sort((a, b) => {
+            if (filters.sortBy === 'salary') {
+                const salA = a.salary_max || a.salary_min || 0;
+                const salB = b.salary_max || b.salary_min || 0;
+                return salB - salA;
+            }
+            if (filters.sortBy === 'company') {
+                return (a.company || '').localeCompare(b.company || '');
+            }
+            if (filters.sortBy === 'status') {
+                return (a.status || '').localeCompare(b.status || '');
+            }
+            // default: applied_date desc
+            const dateA = a.applied_date ? new Date(a.applied_date).getTime() : 0;
+            const dateB = b.applied_date ? new Date(b.applied_date).getTime() : 0;
+            return dateB - dateA;
+        });
+
+        return result;
     }, [jobs, filters]);
 
-    // Add empty row
-    const addEmptyRow = () => {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const newRow: JobRowItem = {
-            id: 'temp_' + Date.now(),
-            _key: 'temp_key_' + Date.now(),
-            is_new: true,
+    // Handlers
+    const handleOpenCreateModal = (defaultStatus = 'applied') => {
+        setSelectedJobForEdit({
+            id: '',
             company: '',
             title: '',
-            location: '',
-            applied_date: todayStr,
-            status: 'wishlist',
-            is_saving: false
-        };
-        setJobs(prev => [newRow, ...prev]);
+            location: 'Remote',
+            applied_date: new Date().toISOString().split('T')[0],
+            status: defaultStatus,
+            work_model: 'remote',
+            job_type: 'fulltime',
+            salary_min: null,
+            salary_max: null,
+            salary_currency: 'IDR',
+            salary_period: 'monthly',
+            benefits: '',
+            recruiter_name: '',
+            recruiter_email: '',
+            recruiter_linkedin: '',
+            follow_up_date: null,
+            follow_up_status: 'pending',
+            interview_rounds: [],
+            star_situation: '',
+            star_task: '',
+            star_action: '',
+            star_result: '',
+            notes: ''
+        });
+        setIsJobModalOpen(true);
     };
 
-    // Auto save row
-    const handleAutoSaveRow = async (updatedJob: JobRowItem) => {
-        setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, is_saving: true } : j));
+    const handleOpenEditModal = (job: JobRowItem) => {
+        setSelectedJobForEdit(job);
+        setIsJobModalOpen(true);
+    };
 
-        try {
-            if (updatedJob.is_new) {
+    const handleSaveJob = async (jobForm: JobRowItem) => {
+        setIsJobModalOpen(false);
+        const isNew = !jobForm.id || String(jobForm.id).startsWith('temp_');
+        const payload = serializeJobPayload(jobForm);
+
+        if (isNew) {
+            // Optimistic create
+            const tempId = 'temp_' + Date.now();
+            const optimisticJob: JobRowItem = { ...jobForm, id: tempId };
+            setJobs(prev => [optimisticJob, ...prev]);
+
+            try {
                 const res = await fetch('/api/jobs', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: updatedJob.title || 'Untitled',
-                        company: updatedJob.company || 'Unknown',
-                        status: updatedJob.status || 'wishlist',
-                        location: updatedJob.location,
-                        appliedDate: updatedJob.applied_date,
-                        notes: updatedJob.notes
-                    })
+                    body: JSON.stringify(payload)
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, id: data.id, is_new: false, is_saving: false } : j));
+                    setJobs(prev => prev.map(j => j.id === tempId ? { ...j, id: data.id } : j));
+                    mutateJobs();
                 }
-            } else {
-                const res = await fetch(`/api/jobs/${updatedJob.id}`, {
+            } catch (err) {
+                console.error('Failed to create job:', err);
+            }
+        } else {
+            // Optimistic update
+            setJobs(prev => prev.map(j => j.id === jobForm.id ? jobForm : j));
+
+            try {
+                const res = await fetch(`/api/jobs/${jobForm.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: updatedJob.title,
-                        company: updatedJob.company,
-                        status: updatedJob.status,
-                        location: updatedJob.location,
-                        appliedDate: updatedJob.applied_date,
-                        notes: updatedJob.notes
-                    })
+                    body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    setJobs(prev => prev.map(j => j.id === updatedJob.id ? { ...j, is_saving: false } : j));
+                    mutateJobs();
                 }
+            } catch (err) {
+                console.error('Failed to update job:', err);
             }
-        } catch (error) {
-            console.error('Failed to save job:', error);
-            setJobs(prev => prev.map(j => (j.id === updatedJob.id || j._key === updatedJob._key) ? { ...j, is_saving: false } : j));
         }
     };
 
-    // Delete job
+    const handleStatusChange = async (job: JobRowItem, newStatus: string) => {
+        const updated = { ...job, status: newStatus };
+        setJobs(prev => prev.map(j => j.id === job.id ? updated : j));
+
+        try {
+            const payload = serializeJobPayload(updated);
+            await fetch(`/api/jobs/${job.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            mutateJobs();
+        } catch (err) {
+            console.error('Failed to update status:', err);
+        }
+    };
+
     const handleDeleteJob = async (id: number | string) => {
+        const confirmed = window.confirm(
+            isIndo ? 'Apakah Anda yakin ingin menghapus lamaran ini?' : 'Are you sure you want to delete this application?'
+        );
+        if (!confirmed) return;
+
         setJobs(prev => prev.filter(j => j.id !== id));
         if (typeof id === 'number' || !String(id).startsWith('temp_')) {
             try {
                 await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
+                mutateJobs();
             } catch (error) {
                 console.error('Failed to delete job:', error);
             }
         }
     };
 
-    // Open AI scan modal
     const handleOpenScan = (job: JobRowItem) => {
         setActiveJobForScan(job);
         setIsAiModalOpen(true);
     };
 
-    // Save master CV
-    const handleSaveMasterCv = async (fileData: string, filename: string) => {
-        const extractedText = `Master CV (${filename}) extracted data & intelligence preview.`;
+    const handleSaveMasterCv = async (fileData: string, filename: string, textData?: string) => {
+        const extractedText = textData || `Master CV (${filename}) extracted intelligence baseline.`;
         setMasterCvFilename(filename);
         setMasterCvText(extractedText);
         try {
@@ -209,113 +292,138 @@ export default function JobsPage() {
     return (
         <AuthenticatedLayout>
             <GatedPage feature="job">
-                {/* 1:1 from Index.vue line 65-148 */}
                 <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 transition-colors duration-500">
-                
-                {/* SUB HEADER: Title + Total Badge + Actions — 1:1 from Index.vue line 67-103 */}
-                <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 relative z-50 transition-colors duration-500">
-                    <div className="w-full min-w-0 px-4 sm:px-6 lg:px-8 py-3">
-                        <div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3 md:flex-nowrap">
-                            
-                            {/* Title & Total Badge */}
-                            <div className="flex min-w-0 flex-1 items-center gap-2 md:flex-initial md:max-w-[min(100%,28rem)]">
-                                <p className="shrink-0 text-[13px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mr-2 pr-4">
-                                    {t('job_page_title') || 'Job Tracker'}
-                                </p>
-                                {jobs.length > 0 && (
-                                    <div className="flex min-w-0 flex-1 items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700/50 overflow-hidden">
-                                        <span className="shrink-0 ml-1 text-[9px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded-full transition-colors duration-500">
-                                            {jobs.length}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Right Actions */}
-                            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                                {/* Master CV Button */}
-                                <button 
-                                    onClick={() => setIsMasterModalOpen(true)}
-                                    className="px-4 h-11 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2 group relative"
-                                >
-                                    <Briefcase size={16} className={hasMasterCv ? 'text-emerald-500' : 'text-slate-400'} />
-                                    <span className="text-[10px] font-bold hidden lg:inline">
-                                        {hasMasterCv ? (t('job_master_cv_ready') || 'CV Ready') : (t('job_master_cv_needs_setup') || 'Setup Master CV')}
-                                    </span>
-                                    {!hasMasterCv && (
-                                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse"></div>
-                                    )}
-                                </button>
-
-                                {/* Add Row Button */}
-                                <button 
-                                    onClick={addEmptyRow}
-                                    className="bg-indigo-600 h-11 text-white font-black px-4 sm:px-6 rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 shrink-0 relative overflow-hidden group"
-                                >
-                                    <Plus size={16} strokeWidth={4} />
-                                    <span className="hidden sm:inline text-[11px] font-bold">
-                                        {t('job_add_row') || 'Tambah Baris'}
-                                    </span>
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                {/* Main Content Body — 1:1 from Index.vue line 105-146 */}
-                <div className="w-full max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 min-w-0 overflow-x-hidden transition-all duration-500">
                     
-                    {/* Neural Bridge Banner */}
-                    <div className="group relative overflow-hidden bg-white/40 dark:bg-slate-900/40 rounded-[2rem] border border-slate-200/50 dark:border-slate-800/50 p-6 transition-all duration-500 hover:shadow-xl hover:shadow-indigo-500/5">
-                        <div className="flex items-start gap-4 relative z-10">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
-                                <Sparkles size={20} className="text-white" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wide">
-                                        Neural Bridge (Job Tracker)
-                                    </span>
+                    {/* TOP NAVBAR / SUB HEADER */}
+                    <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 relative z-40 transition-colors duration-500">
+                        <div className="w-full min-w-0 px-4 sm:px-6 lg:px-8 py-3.5">
+                            <div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3 md:flex-nowrap">
+                                
+                                {/* Title & Pipeline Count Badge */}
+                                <div className="flex min-w-0 flex-1 items-center gap-3 md:flex-initial">
+                                    <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+                                        <Briefcase size={18} />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h1 className="text-sm sm:text-base font-black uppercase tracking-tight text-slate-800 dark:text-white truncate">
+                                            {isIndo ? 'Pusat Manajemen Lamaran & Karier' : 'Job Tracker & Career Command'}
+                                        </h1>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:block">
+                                            {isIndo ? 'Pipeline Lamaran • Multi-Round Interview • ATS Optimization' : 'Application Pipeline • Interview Hub • ATS Engine'}
+                                        </p>
+                                    </div>
                                 </div>
-                                <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed italic">
-                                    "Menghubungkan target karier dan histori lamaran kerja secara otomatis untuk mengkalkulasi skor kecocokan CV."
-                                </p>
+
+                                {/* Actions: Master CV & New Job Button */}
+                                <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                                    {/* Master CV Setup Trigger */}
+                                    <button 
+                                        type="button"
+                                        onClick={() => setIsMasterModalOpen(true)}
+                                        className="px-3.5 sm:px-4 h-11 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all flex items-center gap-2 group relative shadow-sm"
+                                    >
+                                        <Briefcase size={16} className={hasMasterCv ? 'text-emerald-500' : 'text-slate-400'} />
+                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-200 hidden md:inline">
+                                            {hasMasterCv ? (isIndo ? 'Master CV Terhubung' : 'Master CV Connected') : (isIndo ? 'Setup Master CV' : 'Setup Master CV')}
+                                        </span>
+                                        {!hasMasterCv && (
+                                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                        )}
+                                    </button>
+
+                                    {/* New Job Modal Button */}
+                                    <button 
+                                        type="button"
+                                        onClick={() => handleOpenCreateModal('applied')}
+                                        className="bg-indigo-600 hover:bg-indigo-700 h-11 text-white font-black px-4 sm:px-6 rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2 shrink-0"
+                                    >
+                                        <Plus size={16} strokeWidth={3} />
+                                        <span className="text-xs font-black tracking-wide">
+                                            {isIndo ? 'Tambah Lamaran' : 'New Application'}
+                                        </span>
+                                    </button>
+                                </div>
+
                             </div>
                         </div>
                     </div>
 
-                    {/* Job Stats Cards */}
-                    <JobStats stats={stats} />
+                    {/* MAIN CONTAINER */}
+                    <div className="w-full max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 min-w-0 transition-all duration-500">
+                        
+                        {/* Recruitment Funnel Stats & Velocity Cards */}
+                        <JobStats 
+                            stats={funnelStats} 
+                            onOpenOfferComparison={() => setViewMode('compare')}
+                        />
 
-                    {/* Smart Filter Bar */}
-                    <JobFilterBar
-                        filters={filters}
-                        uniqueTitles={uniqueTitles}
-                        localJobs={jobs}
-                        totalCount={filteredJobs.length}
-                        onFilterChange={setFilters}
+                        {/* Filter Bar & 4-View Switcher */}
+                        <JobFilterBar
+                            filters={filters}
+                            onFilterChange={setFilters}
+                            viewMode={viewMode}
+                            setViewMode={setViewMode}
+                            uniqueTitles={uniqueTitles}
+                            jobs={jobs}
+                            totalCount={jobs.length}
+                            filteredCount={filteredJobs.length}
+                        />
+
+                        {/* ================= VIEW 1: KANBAN PIPELINE ================= */}
+                        {viewMode === 'kanban' && (
+                            <JobKanbanView
+                                jobs={filteredJobs}
+                                onEdit={handleOpenEditModal}
+                                onDelete={handleDeleteJob}
+                                onStatusChange={handleStatusChange}
+                                onScan={handleOpenScan}
+                                onAddInColumn={(st) => handleOpenCreateModal(st)}
+                            />
+                        )}
+
+                        {/* ================= VIEW 2: TABLE VIEW ================= */}
+                        {viewMode === 'table' && (
+                            <JobTable
+                                jobs={filteredJobs}
+                                onEdit={handleOpenEditModal}
+                                onDelete={handleDeleteJob}
+                                onScan={handleOpenScan}
+                                onStatusChange={handleStatusChange}
+                            />
+                        )}
+
+                        {/* ================= VIEW 3: INTERVIEWS HUB ================= */}
+                        {viewMode === 'interviews' && (
+                            <JobInterviewsCalendarView
+                                jobs={jobs}
+                                onEditJob={handleOpenEditModal}
+                                onAddInterview={(j) => handleOpenEditModal(j)}
+                            />
+                        )}
+
+                        {/* ================= VIEW 4: OFFER COMPARISON ================= */}
+                        {viewMode === 'compare' && (
+                            <JobOfferComparisonModal
+                                jobs={jobs}
+                                onAcceptOffer={(j) => handleStatusChange(j, 'accepted')}
+                                onEditJob={handleOpenEditModal}
+                            />
+                        )}
+
+                    </div>
+
+                    {/* MODALS */}
+                    
+                    {/* Create / Edit Job Modal */}
+                    <JobModal
+                        show={isJobModalOpen}
+                        job={selectedJobForEdit}
+                        onClose={() => setIsJobModalOpen(false)}
+                        onSave={handleSaveJob}
+                        onScanATS={handleOpenScan}
                     />
 
-                    {/* Job Table */}
-                    <JobTable
-                        jobs={filteredJobs}
-                        onAutoSave={handleAutoSaveRow}
-                        onDelete={handleDeleteJob}
-                        onScan={handleOpenScan}
-                        onJobChange={(index, field, val) => {
-                            const target = filteredJobs[index];
-                            if (target) {
-                                setJobs(prev => prev.map(j => 
-                                    (j.id === target.id || j._key === target._key) 
-                                        ? { ...j, [field]: val } 
-                                        : j
-                                ));
-                            }
-                        }}
-                    />
-
-                    {/* Modals */}
+                    {/* ATS Resume Scan Modal */}
                     <ResumeAiModal
                         show={isAiModalOpen}
                         initialJobDescription={activeJobForScan?.notes || activeJobForScan?.title}
@@ -323,9 +431,11 @@ export default function JobsPage() {
                         company={activeJobForScan?.company}
                         hasMasterCv={hasMasterCv}
                         masterCvName={masterCvFilename}
+                        masterCvText={masterCvText}
                         onClose={() => setIsAiModalOpen(false)}
                     />
 
+                    {/* Master CV Setup Modal */}
                     <MasterCvModal
                         show={isMasterModalOpen}
                         hasMasterCv={hasMasterCv}
@@ -334,16 +444,6 @@ export default function JobsPage() {
                         onClose={() => setIsMasterModalOpen(false)}
                         onSaveMasterCv={handleSaveMasterCv}
                     />
-
-                    {/* Tips Box — 1:1 from Index.vue line 141-145 */}
-                    <div className="mt-5 flex items-center justify-start">
-                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2 bg-indigo-50/50 dark:bg-indigo-500/10 px-4 py-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/30 shadow-sm transition-all duration-500">
-                            <span className="text-indigo-500 dark:text-indigo-400 text-base">💡</span> 
-                            {t('job_tips') || 'Tips: Klik sel pada tabel untuk mengedit. Data otomatis tersimpan saat berpindah sel.'}
-                        </p>
-                    </div>
-
-                </div>
 
                 </div>
             </GatedPage>
