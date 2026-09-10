@@ -43,7 +43,7 @@ import RecurringBillModal from './components/RecurringBillModal';
 
 // Investments & Assets Portfolio
 import InvestmentPortfolioSection, { InvestmentAssetItem } from './components/InvestmentPortfolioSection';
-import InvestmentAssetModal from './components/InvestmentAssetModal';
+import InvestmentAssetModal, { InvestmentFundingOption } from './components/InvestmentAssetModal';
 import InvestmentActionModal, { InvestmentActionMode, InvestmentActionResult } from './components/InvestmentActionModal';
 
 const DailyTrendChart = dynamic(() => import('./components/DailyTrendChart'), { ssr: false });
@@ -292,12 +292,25 @@ export default function FinanceClient({
     const [actionAsset, setActionAsset] = useState<InvestmentAssetItem | null>(null);
     const [actionMode, setActionMode] = useState<InvestmentActionMode>('revalue');
 
-    const handleSaveAsset = (assetData: InvestmentAssetItem) => {
+    const handleSaveAsset = async (assetData: InvestmentAssetItem, fundingOption?: InvestmentFundingOption) => {
         const exists = investments.some(a => String(a.id) === String(assetData.id));
         const updated = exists
             ? investments.map(a => String(a.id) === String(assetData.id) ? assetData : a)
             : [...investments, assetData];
-        saveUserConfig({ finance_investments: updated });
+        await saveUserConfig({ finance_investments: updated });
+
+        // If creating new asset and funding from wallet was chosen:
+        if (!exists && fundingOption?.deductFromWallet && fundingOption.walletId && assetData.capital > 0) {
+            await handleSaveSingleTrx({
+                title: isIndo ? `Investasi: Beli ${assetData.name}` : `Investment: Buy ${assetData.name}`,
+                amount: assetData.capital,
+                type: 'expense',
+                category: 'investasi',
+                walletId: fundingOption.walletId,
+                date: fundingOption.date || new Date().toISOString().split('T')[0],
+                notes: fundingOption.notes || (isIndo ? `Beli aset ${assetData.name} (${assetData.ticker || assetData.type})` : `Initial purchase of ${assetData.name}`)
+            });
+        }
     };
 
     const handleExecuteAssetAction = async (result: InvestmentActionResult) => {
@@ -910,6 +923,7 @@ export default function FinanceClient({
             <InvestmentAssetModal
                 show={showAssetModal}
                 editingAsset={editingAsset}
+                wallets={wallets}
                 onClose={() => setShowAssetModal(false)}
                 onSave={handleSaveAsset}
                 activeCurrency={activeCurrency}

@@ -4,12 +4,11 @@ import React from 'react';
 import { useLocale } from 'next-intl';
 import { TransactionItem, DayStat } from './TransactionList';
 import { CategoryOption } from '../types';
-import { SavingVault } from './SavingModal';
 import ArchiveModal from './ArchiveModal';
 import TransactionModal from './TransactionModal';
 import FinanceBatchModal from './FinanceBatchModal';
 import CategoryModal from './CategoryModal';
-import SavingModal from './SavingModal';
+import SavingModal, { SavingVault, SavingFundingOption } from './SavingModal';
 import VaultTransactionModal from './VaultTransactionModal';
 import { DeleteConfirmModal } from './FinanceModals';
 import { FinanceDeleteTarget } from '../hooks/useFinanceActions';
@@ -51,7 +50,7 @@ interface FinanceModalsContainerProps {
     showSavingModal: boolean;
     setShowSavingModal: (v: boolean) => void;
     editingSaving: SavingVault | null;
-    onSaveVault: (data: SavingVault) => void;
+    onSaveVault: (data: SavingVault, fundingOption?: SavingFundingOption) => void;
 
     showVaultTxModal: boolean;
     setShowVaultTxModal: (v: boolean) => void;
@@ -180,8 +179,11 @@ export default function FinanceModalsContainer({
             <SavingModal
                 show={showSavingModal}
                 saving={editingSaving}
+                wallets={wallets}
                 onClose={() => setShowSavingModal(false)}
                 onSave={onSaveVault}
+                activeCurrency={activeCurrency}
+                currencyLocale={currencyLocale}
             />
 
             <VaultTransactionModal

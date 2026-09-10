@@ -2,7 +2,7 @@
 
 import { TransactionItem } from '../components/TransactionList';
 import { CategoryOption } from '../types';
-import { SavingVault } from '../components/SavingModal';
+import { SavingVault, SavingFundingOption } from '../components/SavingModal';
 
 export type FinanceDeleteTarget = 
     | { type: 'transaction'; data: { id: number | string; title?: string } }
@@ -244,13 +244,15 @@ export function useFinanceActions({
         setDeleteTarget(null);
     };
 
-    const handleSaveVault = async (data: SavingVault) => {
+    const handleSaveVault = async (data: SavingVault, fundingOption?: SavingFundingOption) => {
         try {
+            const initialAmount = fundingOption?.deductFromWallet && fundingOption.initialAmount ? fundingOption.initialAmount : Number(data.current_amount || 0);
+
             if (data.id) {
                 const res = await fetch('/api/finance/savings', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: data.id, title: data.title, targetAmount: Number(data.target_amount), icon: data.icon })
+                    body: JSON.stringify({ id: data.id, title: data.title, targetAmount: Number(data.target_amount), icon: data.icon, color: data.color })
                 });
                 if (res.ok) {
                     mutateSav();
@@ -260,9 +262,26 @@ export function useFinanceActions({
                 const res = await fetch('/api/finance/savings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: data.title, targetAmount: Number(data.target_amount), icon: data.icon, color: data.color })
+                    body: JSON.stringify({ 
+                        title: data.title, 
+                        targetAmount: Number(data.target_amount), 
+                        currentAmount: initialAmount,
+                        icon: data.icon, 
+                        color: data.color 
+                    })
                 });
                 if (res.ok) {
+                    if (fundingOption?.deductFromWallet && fundingOption.walletId && initialAmount > 0) {
+                        await handleSaveSingleTrx({
+                            title: `Setoran Awal: ${data.title}`,
+                            amount: initialAmount,
+                            type: 'expense',
+                            category: 'tabungan',
+                            walletId: fundingOption.walletId,
+                            date: fundingOption.date || new Date().toISOString().split('T')[0],
+                            notes: fundingOption.notes || `Setoran awal ke pos tabungan ${data.title}`
+                        });
+                    }
                     mutateSav();
                     setShowSavingModal(false);
                 }

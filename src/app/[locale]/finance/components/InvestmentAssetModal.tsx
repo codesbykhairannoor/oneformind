@@ -18,11 +18,19 @@ import {
 import ModalPortal from '@/components/ModalPortal';
 import { InvestmentAssetItem } from './InvestmentPortfolioSection';
 
+export interface InvestmentFundingOption {
+    deductFromWallet: boolean;
+    walletId?: string;
+    date?: string;
+    notes?: string;
+}
+
 interface InvestmentAssetModalProps {
     show: boolean;
     editingAsset: InvestmentAssetItem | null;
+    wallets?: any[];
     onClose: () => void;
-    onSave: (asset: InvestmentAssetItem) => void;
+    onSave: (asset: InvestmentAssetItem, fundingOption?: InvestmentFundingOption) => void;
     activeCurrency?: string;
     currencyLocale?: string;
 }
@@ -30,6 +38,7 @@ interface InvestmentAssetModalProps {
 export default function InvestmentAssetModal({
     show,
     editingAsset,
+    wallets = [],
     onClose,
     onSave,
     activeCurrency = 'IDR',
@@ -56,6 +65,11 @@ export default function InvestmentAssetModal({
     const [icon, setIcon] = useState('📈');
     const [color, setColor] = useState('#3b82f6');
     const [notes, setNotes] = useState('');
+
+    // Funding & Cashflow States (Only for new asset creations)
+    const [deductFromWallet, setDeductFromWallet] = useState(true);
+    const [selectedWalletId, setSelectedWalletId] = useState('');
+    const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
 
     const assetTypes: { id: InvestmentAssetItem['type']; label: string; icon: string; defaultColor: string; defaultMode: 'units' | 'lumpsum'; defaultUnit: 'lot' | 'shares' | 'gram' | 'coin' | 'unit' }[] = [
         { id: 'stocks', label: isIndo ? 'Saham' : 'Stocks', icon: '📈', defaultColor: '#3b82f6', defaultMode: 'units', defaultUnit: 'lot' },
@@ -128,8 +142,13 @@ export default function InvestmentAssetModal({
             setIcon('📈');
             setColor('#3b82f6');
             setNotes('');
+            setDeductFromWallet(true);
+            setPurchaseDate(new Date().toISOString().split('T')[0]);
+            if (wallets && wallets.length > 0) {
+                setSelectedWalletId(wallets[0].id);
+            }
         }
-    }, [editingAsset, show]);
+    }, [editingAsset, show, wallets]);
 
     const handleTypeSelect = (selectedType: InvestmentAssetItem['type']) => {
         setType(selectedType);
@@ -194,6 +213,13 @@ export default function InvestmentAssetModal({
         let finalCapital = calculatedMetrics.capital;
         let finalCurrentValue = calculatedMetrics.currentValue;
 
+        const fundingOption: InvestmentFundingOption | undefined = !editingAsset ? {
+            deductFromWallet,
+            walletId: selectedWalletId || (wallets && wallets[0]?.id),
+            date: purchaseDate,
+            notes: notes.trim() || undefined
+        } : undefined;
+
         if (inputMode === 'units') {
             const numUnits = parseFloat(units) || 0;
             const numAvgBuy = parseFloat(avgBuyPrice) || 0;
@@ -217,7 +243,7 @@ export default function InvestmentAssetModal({
                 color,
                 notes: notes.trim() || undefined,
                 totalDividends: editingAsset?.totalDividends || 0
-            });
+            }, fundingOption);
         } else {
             onSave({
                 id: editingAsset?.id || `inv_${Date.now()}`,
@@ -232,7 +258,7 @@ export default function InvestmentAssetModal({
                 color,
                 notes: notes.trim() || undefined,
                 totalDividends: editingAsset?.totalDividends || 0
-            });
+            }, fundingOption);
         }
 
         onClose();
@@ -524,6 +550,82 @@ export default function InvestmentAssetModal({
                                         </span>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* WALLET DEDUCTION & CASHFLOW INTEGRATION (ONLY ON NEW ASSET) */}
+                        {!editingAsset && wallets && wallets.length > 0 && (
+                            <div className="p-4 rounded-3xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 text-base">
+                                            💳
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-black text-slate-800 dark:text-white truncate">
+                                                {isIndo ? 'Potong Modal Beli dari Saldo Dompet?' : 'Deduct Capital from Wallet?'}
+                                            </p>
+                                            <p className="text-[10px] text-slate-400 truncate">
+                                                {isIndo ? 'Otomatis mengurangi saldo rekening & mencatat di Arus Kas' : 'Auto-deduct bank balance & record cashflow entry'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={deductFromWallet} 
+                                            onChange={e => setDeductFromWallet(e.target.checked)} 
+                                            className="sr-only peer" 
+                                        />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
+                                </div>
+
+                                {deductFromWallet ? (
+                                    <div className="pt-3 border-t border-slate-200/60 dark:border-slate-700/60 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in duration-200">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                                                {isIndo ? 'Pilih Rekening / Dompet Sumber' : 'Funding Wallet / Bank'}
+                                            </label>
+                                            <select
+                                                value={selectedWalletId || (wallets[0]?.id || '')}
+                                                onChange={e => setSelectedWalletId(e.target.value)}
+                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500"
+                                            >
+                                                {wallets.map(w => (
+                                                    <option key={w.id} value={w.id}>
+                                                        {w.name} (Saldo: {formatMoney(Number(w.balance || 0))})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                                                {isIndo ? 'Tanggal Transaksi Pembelian' : 'Purchase Date'}
+                                            </label>
+                                            <input
+                                                type="date"
+                                                value={purchaseDate}
+                                                onChange={e => setPurchaseDate(e.target.value)}
+                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500"
+                                            />
+                                        </div>
+
+                                        <div className="sm:col-span-2 p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/30 text-[10px] text-emerald-700 dark:text-emerald-300 font-medium">
+                                            ✨ {isIndo 
+                                                ? `Saldo ${wallets.find(w => String(w.id) === String(selectedWalletId || wallets[0]?.id))?.name || 'Dompet'} akan otomatis terpotong ${formatMoney(calculatedMetrics.capital)} dan tercatat sebagai Pengeluaran Investasi di Arus Kas.` 
+                                                : `${wallets.find(w => String(w.id) === String(selectedWalletId || wallets[0]?.id))?.name || 'Wallet'} will be deducted by ${formatMoney(calculatedMetrics.capital)} and logged under Investment Cashflow.`}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200/50 dark:border-amber-800/30 text-[10px] text-amber-700 dark:text-amber-300 font-medium animate-in fade-in duration-200">
+                                        ℹ️ {isIndo 
+                                            ? 'Mode Portofolio Lama: Hanya mencatat aset yang sudah Anda miliki tanpa memotong saldo kas dompet saat ini.' 
+                                            : 'Historical Asset Mode: Only records existing holdings without deducting from current wallet cash.'}
+                                    </div>
+                                )}
                             </div>
                         )}
 

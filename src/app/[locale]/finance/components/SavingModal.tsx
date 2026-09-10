@@ -14,20 +14,32 @@ export interface SavingVault {
     color: string;
 }
 
+export interface SavingFundingOption {
+    deductFromWallet: boolean;
+    walletId?: string;
+    initialAmount?: number;
+    date?: string;
+    notes?: string;
+}
+
 interface SavingModalProps {
     show: boolean;
     saving: SavingVault | null;
+    wallets?: any[];
     onClose: () => void;
-    onSave: (data: SavingVault) => void;
+    onSave: (data: SavingVault, fundingOption?: SavingFundingOption) => void;
     activeCurrency?: string;
+    currencyLocale?: string;
 }
 
 export default function SavingModal({
     show,
     saving,
+    wallets = [],
     onClose,
     onSave,
-    activeCurrency = 'IDR'
+    activeCurrency = 'IDR',
+    currencyLocale = 'id-ID'
 }: SavingModalProps) {
     const t = useTranslations();
 
@@ -39,19 +51,31 @@ export default function SavingModal({
     const [icon, setIcon] = useState('🏦');
     const [color, setColor] = useState('#6366f1');
 
+    // Initial Deposit States (Only for new vault creation)
+    const [initialDeposit, setInitialDeposit] = useState<string>('');
+    const [deductFromWallet, setDeductFromWallet] = useState(false);
+    const [selectedWalletId, setSelectedWalletId] = useState('');
+
     useEffect(() => {
         if (saving && saving.id) {
             setTitle(saving.title || '');
             setTargetAmount(String(saving.target_amount || ''));
             setIcon(saving.icon || '🏦');
             setColor(saving.color || '#6366f1');
+            setInitialDeposit('');
+            setDeductFromWallet(false);
         } else {
             setTitle('');
             setTargetAmount('');
             setIcon('🏦');
             setColor('#6366f1');
+            setInitialDeposit('');
+            setDeductFromWallet(false);
+            if (wallets && wallets.length > 0) {
+                setSelectedWalletId(wallets[0].id);
+            }
         }
-    }, [saving, show]);
+    }, [saving, show, wallets]);
 
     if (!show) return null;
 
@@ -71,18 +95,36 @@ export default function SavingModal({
         }
     };
 
+    const handleInitialDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let rawValue = e.target.value;
+        let cleanVal = isDotSeparator ? rawValue.replace(/\./g, '') : rawValue.replace(/,/g, '');
+        if (!isNaN(Number(cleanVal)) || cleanVal === '') {
+            setInitialDeposit(cleanVal);
+        }
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const numTarget = Number(targetAmount);
         if (!title.trim() || isNaN(numTarget) || numTarget <= 0) return;
 
+        const numInitial = Number(initialDeposit) || 0;
+        const fundingOption: SavingFundingOption | undefined = (!saving?.id && deductFromWallet && numInitial > 0) ? {
+            deductFromWallet: true,
+            walletId: selectedWalletId || (wallets && wallets[0]?.id),
+            initialAmount: numInitial,
+            date: new Date().toISOString().split('T')[0],
+            notes: `Setoran awal ke pos tabungan ${title.trim()}`
+        } : undefined;
+
         onSave({
             id: saving?.id,
             title: title.trim(),
             target_amount: numTarget,
+            current_amount: numInitial,
             icon,
             color
-        });
+        }, fundingOption);
         onClose();
     };
 
@@ -133,7 +175,7 @@ export default function SavingModal({
                                 {t('vault_label_target') || 'Target Nominal'} ({activeCurrency})
                             </label>
                             <input 
-                                type="text"
+                                type="text" 
                                 required
                                 value={formatDisplay(targetAmount)}
                                 onChange={handleAmountChange}
@@ -141,6 +183,65 @@ export default function SavingModal({
                                 className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent rounded-2xl px-5 py-4 text-slate-700 dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500/20 focus:ring-4 focus:ring-indigo-500/5 transition-all shadow-sm text-lg"
                             />
                         </div>
+
+                        {/* Optional Initial Deposit (Only on New Vault) */}
+                        {!saving?.id && wallets && wallets.length > 0 && (
+                            <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        <p className="text-xs font-black text-slate-800 dark:text-white">
+                                            Langsung Setor Saldo Awal Tabungan?
+                                        </p>
+                                        <p className="text-[10px] text-slate-400">
+                                            Potong dari dompet & catat pengeluaran pos tabungan otomatis
+                                        </p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={deductFromWallet} 
+                                            onChange={e => setDeductFromWallet(e.target.checked)} 
+                                            className="sr-only peer" 
+                                        />
+                                        <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                    </label>
+                                </div>
+
+                                {deductFromWallet && (
+                                    <div className="pt-3 border-t border-indigo-100 dark:border-indigo-900/40 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in duration-200">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Nominal Setoran Awal ({activeCurrency})
+                                            </label>
+                                            <input 
+                                                type="text"
+                                                value={formatDisplay(initialDeposit)}
+                                                onChange={handleInitialDepositChange}
+                                                placeholder="0"
+                                                className="w-full bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 dark:text-slate-100 outline-none"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Pilih Dompet Sumber
+                                            </label>
+                                            <select
+                                                value={selectedWalletId || (wallets[0]?.id || '')}
+                                                onChange={e => setSelectedWalletId(e.target.value)}
+                                                className="w-full bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none"
+                                            >
+                                                {wallets.map(w => (
+                                                    <option key={w.id} value={w.id}>
+                                                        {w.name} (Saldo: {new Intl.NumberFormat(currencyLocale, { style: 'currency', currency: activeCurrency, maximumFractionDigits: 0 }).format(Number(w.balance || 0))})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Icon Picker */}
                         <div className="space-y-2">
