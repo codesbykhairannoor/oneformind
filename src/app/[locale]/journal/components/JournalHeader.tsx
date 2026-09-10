@@ -71,48 +71,48 @@ export default function JournalHeader({
                     </div>
 
                     {/* Right: Daily Life OS Synergy & Action CTA */}
-                    <div className="flex flex-wrap items-center gap-3 md:justify-end">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:justify-end">
                         
                         {/* Synergy Micro-pills */}
-                        <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60">
+                        <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-4 px-3 sm:px-4 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60">
                             {/* Stories count */}
-                            <div className="flex items-center gap-2">
-                                <BookOpen className="w-4 h-4 text-indigo-500" />
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
+                                    <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
                                         {isIndo ? 'Cerita' : 'Stories'}
                                     </p>
-                                    <p className="text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
+                                    <p className="text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
                                         {totalJournals}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
+                            <div className="w-px h-5 sm:h-6 bg-slate-200 dark:bg-slate-700" />
 
                             {/* Planner tasks */}
-                            <div className="flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
+                                    <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
                                         {isIndo ? 'Tugas' : 'Tasks'}
                                     </p>
-                                    <p className="text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
+                                    <p className="text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
                                         {tasksCompleted}/{tasksTotal}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
+                            <div className="w-px h-5 sm:h-6 bg-slate-200 dark:bg-slate-700" />
 
                             {/* Habit count */}
-                            <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-purple-500" />
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500" />
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
-                                        {isIndo ? 'Kebiasaan' : 'Habits'}
+                                    <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">
+                                        {isIndo ? 'Habits' : 'Habits'}
                                     </p>
-                                    <p className="text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
+                                    <p className="text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-200 leading-tight">
                                         {habitsCompleted}
                                     </p>
                                 </div>

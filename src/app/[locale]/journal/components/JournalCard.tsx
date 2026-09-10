@@ -111,7 +111,7 @@ export default function JournalCard({ journal, isExplorer = false, onDelete, onO
             <button 
                 type="button"
                 onClick={handleDelete}
-                className="absolute top-3.5 right-3.5 z-20 w-8 h-8 sm:w-9 sm:h-9 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-400 hover:text-rose-500 rounded-full flex items-center justify-center shadow-md border border-slate-200/50 dark:border-slate-700/50 transition-all opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 hover:scale-105 active:scale-95"
+                className="absolute top-3.5 right-3.5 z-20 w-8 h-8 sm:w-9 sm:h-9 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-400 hover:text-rose-500 rounded-full flex items-center justify-center shadow-md border border-slate-200/50 dark:border-slate-700/50 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 scale-95 sm:scale-90 sm:group-hover:scale-100 hover:scale-105 active:scale-95"
                 title={isIndo ? 'Hapus Jurnal' : 'Delete Journal'}
             >
                 <Trash2 className="w-4 h-4 stroke-[2.2]" />

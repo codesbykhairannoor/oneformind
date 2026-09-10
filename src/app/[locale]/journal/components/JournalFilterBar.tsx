@@ -120,57 +120,57 @@ export default function JournalFilterBar({
                 </div>
 
                 {/* View Mode Switcher Tabs */}
-                <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 shrink-0 self-start sm:self-auto overflow-x-auto no-scrollbar">
+                <div className="grid grid-cols-4 w-full sm:w-auto sm:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 shrink-0">
                     <button
                         type="button"
                         onClick={() => handleViewMode('grid')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all ${
                             viewMode === 'grid'
                                 ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                     >
-                        <LayoutGrid size={14} />
+                        <LayoutGrid size={13} />
                         <span>{isIndo ? 'Galeri' : 'Grid'}</span>
                     </button>
 
                     <button
                         type="button"
                         onClick={() => handleViewMode('calendar')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all ${
                             viewMode === 'calendar'
                                 ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                     >
-                        <CalendarIcon size={14} />
-                        <span>{isIndo ? 'Kalender Mood' : 'Calendar'}</span>
+                        <CalendarIcon size={13} />
+                        <span>{isIndo ? 'Kalender' : 'Calendar'}</span>
                     </button>
 
                     <button
                         type="button"
                         onClick={() => handleViewMode('timeline')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all ${
                             viewMode === 'timeline'
                                 ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                     >
-                        <ListFilter size={14} />
+                        <ListFilter size={13} />
                         <span>{isIndo ? 'Timeline' : 'Timeline'}</span>
                     </button>
 
                     <button
                         type="button"
                         onClick={() => handleViewMode('memories')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all ${
                             viewMode === 'memories'
                                 ? 'bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                     >
-                        <History size={14} />
-                        <span>{isIndo ? 'Kenangan' : 'Flashbacks'}</span>
+                        <History size={13} />
+                        <span>{isIndo ? 'Memori' : 'Memories'}</span>
                     </button>
                 </div>
 

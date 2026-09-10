@@ -85,10 +85,10 @@ export default function JournalDetailModal({
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
                 <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-                <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-200/70 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+                <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl border border-slate-200/70 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[92vh]">
                     
                     {/* Header Controls */}
-                    <div className="p-5 sm:p-7 pb-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-4 sm:p-7 pb-3 sm:pb-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
                             <Calendar size={14} className="text-indigo-500" />
                             <span>{formatDate(journal.date)}</span>

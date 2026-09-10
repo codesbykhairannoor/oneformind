@@ -11,6 +11,7 @@ import AuthHeader from './layout/AuthHeader';
 import AuthSidebar from './layout/AuthSidebar';
 import AuthLogoutModal from './layout/AuthLogoutModal';
 import AuthCoachFloatingButton from './layout/AuthCoachFloatingButton';
+import AuthMobileBottomNav from './layout/AuthMobileBottomNav';
 
 interface AuthenticatedLayoutProps {
     children: React.ReactNode;
@@ -282,6 +283,9 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                 pathname={pathname}
                 onClick={goToCoachWithContext}
             />
+
+            {/* MOBILE BOTTOM NAVIGATION BAR */}
+            <AuthMobileBottomNav moduleSettings={moduleSettings} />
 
         </div>
     );
