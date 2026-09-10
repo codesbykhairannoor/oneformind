@@ -1,29 +1,33 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { Wallet } from 'lucide-react';
 
 interface FinanceStatsProps {
     totalIncome: number;
     totalExpense: number;
     balance: number;
-    incomeTarget: number;
+    incomeTarget?: number;
     onUpdateTarget?: (val: number) => void;
     activeCurrency?: string;
     currencyLocale?: string;
+    onManageWallets?: () => void;
+    walletsCount?: number;
 }
 
 export default function FinanceStats({ 
     totalIncome, 
     totalExpense, 
     balance, 
-    incomeTarget, 
-    onUpdateTarget,
     activeCurrency = 'IDR',
-    currencyLocale = 'id-ID'
+    currencyLocale = 'id-ID',
+    onManageWallets,
+    walletsCount = 0
 }: FinanceStatsProps) {
     const t = useTranslations();
     const locale = useLocale();
+    const isIndo = locale === 'id';
 
     const needsDecimal = ['USD', 'GBP', 'EUR'].includes(activeCurrency);
 
@@ -36,143 +40,124 @@ export default function FinanceStats({
         }).format(val);
     };
 
-    const isDotSeparator = ['IDR', 'EUR', 'de-DE'].includes(activeCurrency);
+    // Arus Kas Bersih (Net Cashflow) = Pemasukan - Pengeluaran
+    const netCashflow = totalIncome - totalExpense;
 
-    const formatDisplay = (val: string | number) => {
-        if (val === undefined || val === null || val === '') return '';
-        const str = val.toString().replace(/[^0-9]/g, '');
-        if (!str) return '';
-        return isDotSeparator 
-            ? str.replace(/\B(?=(\d{3})+(?!\d))/g, '.') 
-            : str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
-    // --- INLINE SALARY EDIT (1:1 from FinanceStats.vue) ---
-    const [isEditingSalary, setIsEditingSalary] = useState(false);
-    const [rawSalary, setRawSalary] = useState(String(incomeTarget || ''));
-    const inputSalaryRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (!isEditingSalary) setRawSalary(String(incomeTarget || ''));
-    }, [incomeTarget, isEditingSalary]);
-
-    const startEditing = () => {
-        setRawSalary(String(incomeTarget || ''));
-        setIsEditingSalary(true);
-        setTimeout(() => inputSalaryRef.current?.focus(), 50);
-    };
-
-    const cancelEdit = () => {
-        setIsEditingSalary(false);
-        setRawSalary(String(incomeTarget || ''));
-    };
-
-    const saveSalary = () => {
-        const num = Number(rawSalary.replace(/[^0-9]/g, '')) || 0;
-        if (num !== incomeTarget && onUpdateTarget) {
-            onUpdateTarget(num);
-        }
-        setIsEditingSalary(false);
-    };
+    // Saldo Awal Bulan (Opening Balance) = Saldo Kas Saat Ini + Pengeluaran - Pemasukan
+    const openingBalance = Math.max(0, balance - totalIncome + totalExpense);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch">
             
-            {/* Left Big Card: Available Balance — 1:1 from FinanceStats.vue line 51 */}
-            <div className="lg:col-span-7 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-600 dark:from-indigo-700 dark:via-indigo-600 dark:to-violet-700 p-6 md:p-8 text-white shadow-2xl dark:shadow-none shadow-indigo-200/50 dark:shadow-indigo-900/20 flex flex-col justify-center min-h-[200px] transition-all duration-500">
+            {/* Left Big Card: Kas Likuid Dompet Tersedia */}
+            <div className="lg:col-span-7 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-600 dark:from-indigo-700 dark:via-indigo-600 dark:to-violet-700 p-6 md:p-8 text-white shadow-2xl dark:shadow-none shadow-indigo-200/50 dark:shadow-indigo-900/20 flex flex-col justify-between min-h-[200px] transition-all duration-500">
                 <div className="relative z-10 flex flex-col h-full justify-between">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h4 className="text-[10px] font-black text-white/60 tracking-widest text-shadow-sm">
-                                {t('available_balance') || 'Available Balance'}
-                            </h4>
-                            <h3 className="text-4xl md:text-5xl font-black tracking-tight leading-none text-white drop-shadow-sm">
+                            <div className="flex items-center gap-2 mb-1.5">
+                                <h4 className="text-[10px] font-black text-white/70 tracking-widest uppercase">
+                                    {isIndo ? 'Sisa Saldo Kas (Dompet)' : (t('available_balance') || 'Available Liquid Cash')}
+                                </h4>
+                                {walletsCount > 0 && (
+                                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/20">
+                                        {walletsCount} {isIndo ? 'Dompet Aktif' : 'Wallets'}
+                                    </span>
+                                )}
+                            </div>
+                            <h3 className="text-4xl md:text-5xl font-black tracking-tight leading-none text-white drop-shadow-sm font-mono">
                                 {formatMoney(balance)}
                             </h3>
                         </div>
-                        <div className="bg-white/10 dark:bg-black/20 p-2 rounded-xl border border-white/10">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
+                        <div className="bg-white/10 dark:bg-black/20 p-2.5 rounded-2xl border border-white/10 shrink-0">
+                            <Wallet className="w-6 h-6 text-white" />
                         </div>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t border-white/10 flex items-center gap-3">
-                        <div className="flex -space-x-2">
-                            <div className="w-6 h-6 rounded-full bg-indigo-300 border-2 border-indigo-600"></div>
-                            <div className="w-6 h-6 rounded-full bg-violet-300 border-2 border-indigo-600"></div>
+                    <div className="mt-6 pt-5 border-t border-white/15 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs">📅</span>
+                            <span className="text-xs font-bold text-white/90">
+                                {isIndo ? 'Saldo Awal Bulan:' : 'Opening Month Balance:'}{' '}
+                                <span className="font-mono font-black text-white">{formatMoney(openingBalance)}</span>
+                            </span>
                         </div>
-                        <span className="text-[10px] font-medium text-indigo-100">
-                            {t('monthly_finance_desc') || 'Your financial performance this month.'}
-                        </span>
-                    </div>
-                </div>
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-fuchsia-500/20 rounded-full blur-3xl"></div>
-            </div>
-
-            {/* Right Cards — 1:1 from FinanceStats.vue line 77 */}
-            <div className="lg:col-span-5 grid grid-rows-[auto_1fr] gap-4">
-                
-                {/* Base Capital Card with inline edit — 1:1 from FinanceStats.vue line 79 */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] px-6 py-5 shadow-sm dark:shadow-none hover:shadow-md transition-all relative overflow-hidden group flex items-center justify-between h-fit transition-colors duration-500">
-                    <div className="flex-1 min-w-0">
-                        <h4 className="text-[9px] font-black text-slate-400 dark:text-slate-500 tracking-widest mb-1.5 flex items-center gap-1 transition-colors duration-500">
-                            {t('base_capital') || 'Base Capital'}
-                            {!isEditingSalary && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-indigo-500 transition-colors"></span>
-                            )}
-                        </h4>
-                        
-                        {!isEditingSalary ? (
-                            <div className="flex items-center justify-between">
-                                <h4 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white truncate pr-2 transition-colors duration-500">
-                                    {formatMoney(incomeTarget)}
-                                </h4>
-                                <button 
-                                    onClick={startEditing} 
-                                    title="Edit Target / Modal Awal" 
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm dark:shadow-none duration-300"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-2 w-full mt-1">
-                                <input 
-                                    ref={inputSalaryRef}
-                                    type="text"
-                                    inputMode="numeric"
-                                    value={formatDisplay(rawSalary)}
-                                    onChange={(e) => {
-                                        const raw = e.target.value.replace(/[^0-9]/g, '');
-                                        setRawSalary(raw);
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') saveSalary();
-                                        if (e.key === 'Escape') cancelEdit();
-                                    }}
-                                    onBlur={saveSalary}
-                                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-3 py-1.5 text-xl font-black text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600 font-mono"
-                                />
-                            </div>
+                        {onManageWallets && (
+                            <button
+                                onClick={onManageWallets}
+                                type="button"
+                                className="text-[10px] font-bold px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition active:scale-95 flex items-center gap-1.5 backdrop-blur-sm border border-white/20"
+                                title={isIndo ? 'Buka daftar dompet & rekening' : 'Manage wallets and accounts'}
+                            >
+                                <span>💳</span>
+                                <span>{isIndo ? 'Kelola Dompet' : 'Manage Wallets'}</span>
+                            </button>
                         )}
                     </div>
                 </div>
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-fuchsia-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            </div>
 
-                {/* Income and Expense Grid — 1:1 from FinanceStats.vue line 109 */}
-                <div className="grid grid-cols-2 gap-4 h-full min-h-[160px]">
+            {/* Right Cards: Net Cashflow & In/Out Grid */}
+            <div className="lg:col-span-5 grid grid-rows-[auto_1fr] gap-4">
+                
+                {/* Net Cashflow KPI Card (Replaces the confusing static Base Capital) */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] px-6 py-5 shadow-sm dark:shadow-none hover:shadow-md transition-all relative overflow-hidden group flex items-center justify-between h-fit transition-colors duration-500">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1.5">
+                            <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-widest uppercase">
+                                {t('net_cashflow') || (isIndo ? 'Arus Kas Bersih (Net)' : 'Net Cashflow')}
+                            </h4>
+                            <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
+                                netCashflow > 0
+                                    ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
+                                    : netCashflow < 0
+                                    ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
+                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700'
+                            }`}>
+                                {netCashflow > 0 ? (
+                                    <><span>🟢</span> {t('surplus') || 'Surplus'}</>
+                                ) : netCashflow < 0 ? (
+                                    <><span>🔴</span> {t('deficit') || 'Defisit'}</>
+                                ) : (
+                                    <><span>⚪</span> {isIndo ? 'Seimbang' : 'Balanced'}</>
+                                )}
+                            </span>
+                        </div>
+                        
+                        <div className="flex items-baseline justify-between">
+                            <h4 className={`text-2xl md:text-3xl font-black font-mono tracking-tight truncate pr-2 ${
+                                netCashflow > 0 
+                                    ? 'text-emerald-600 dark:text-emerald-400' 
+                                    : netCashflow < 0 
+                                    ? 'text-rose-600 dark:text-rose-400' 
+                                    : 'text-slate-700 dark:text-slate-300'
+                            }`}>
+                                {netCashflow > 0 ? '+' : ''}{formatMoney(netCashflow)}
+                            </h4>
+                        </div>
+
+                        <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-1">
+                            {netCashflow > 0 
+                                ? (isIndo ? 'Pemasukan melampaui pengeluaran bulan ini' : 'Inflows exceed outflows this month')
+                                : netCashflow < 0
+                                ? (isIndo ? 'Pengeluaran lebih besar dari pemasukan bulan ini' : 'Outflows exceed inflows this month')
+                                : (isIndo ? 'Pemasukan dan pengeluaran seimbang' : 'Income and expenses are in balance')}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Income and Expense Grid */}
+                <div className="grid grid-cols-2 gap-4 h-full min-h-[140px]">
                     {/* Income */}
                     <div className="bg-emerald-50/40 dark:bg-emerald-500/5 border border-emerald-100/60 dark:border-emerald-500/20 rounded-[2rem] p-5 flex flex-col justify-center relative overflow-hidden group hover:bg-emerald-50 dark:hover:bg-emerald-500/10 shadow-sm dark:shadow-none transition-colors duration-500">
                         <div className="flex items-center justify-between mb-1">
-                            <p className="text-[9px] font-black text-emerald-600/60 dark:text-emerald-400/60 tracking-widest transition-colors duration-500">
+                            <p className="text-[9px] font-black text-emerald-600/60 dark:text-emerald-400/60 tracking-widest transition-colors duration-500 uppercase">
                                 {t('income') || 'Income'}
                             </p>
-                            <div className="w-5 h-5 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center text-[10px] text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition duration-300">↓</div>
+                            <div className="w-6 h-6 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center text-xs text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition duration-300">↓</div>
                         </div>
-                        <h4 className="text-lg md:text-xl font-black text-emerald-700 dark:text-emerald-400 truncate transition-colors duration-500">
+                        <h4 className="text-lg md:text-xl font-black text-emerald-700 dark:text-emerald-400 truncate font-mono transition-colors duration-500">
                             {formatMoney(totalIncome)}
                         </h4>
                     </div>
@@ -180,12 +165,12 @@ export default function FinanceStats({
                     {/* Expense */}
                     <div className="bg-rose-50/40 dark:bg-rose-500/5 border border-rose-100/60 dark:border-rose-500/20 rounded-[2rem] p-5 flex flex-col justify-center relative overflow-hidden group hover:bg-rose-50 dark:hover:bg-rose-500/10 shadow-sm dark:shadow-none transition-colors duration-500">
                         <div className="flex items-center justify-between mb-1">
-                            <p className="text-[9px] font-black text-rose-600/60 dark:text-rose-400/60 tracking-widest transition-colors duration-500">
+                            <p className="text-[9px] font-black text-rose-600/60 dark:text-rose-400/60 tracking-widest transition-colors duration-500 uppercase">
                                 {t('expense') || 'Expense'}
                             </p>
-                            <div className="w-5 h-5 bg-rose-100 dark:bg-rose-500/20 rounded-full flex items-center justify-center text-[10px] text-rose-600 dark:text-rose-400 group-hover:scale-110 transition duration-300">↑</div>
+                            <div className="w-6 h-6 bg-rose-100 dark:bg-rose-500/20 rounded-full flex items-center justify-center text-xs text-rose-600 dark:text-rose-400 group-hover:scale-110 transition duration-300">↑</div>
                         </div>
-                        <h4 className="text-lg md:text-xl font-black text-rose-700 dark:text-rose-400 truncate transition-colors duration-500">
+                        <h4 className="text-lg md:text-xl font-black text-rose-700 dark:text-rose-400 truncate font-mono transition-colors duration-500">
                             {formatMoney(totalExpense)}
                         </h4>
                     </div>

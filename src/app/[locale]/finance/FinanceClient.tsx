@@ -682,6 +682,8 @@ export default function FinanceClient({
                                     onUpdateTarget={handleUpdateTarget}
                                     activeCurrency={activeCurrency}
                                     currencyLocale={currencyLocale}
+                                    onManageWallets={() => setActiveTab('wallets_savings')}
+                                    walletsCount={wallets.length}
                                 />
                             </div>
 
