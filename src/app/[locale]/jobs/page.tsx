@@ -414,7 +414,7 @@ export default function JobsPage() {
                     </div>
 
                     {/* MAIN CONTAINER */}
-                    <div className="w-full max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 min-w-0 transition-all duration-500">
+                    <div className="w-full max-w-[98%] mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-4 space-y-3 min-w-0 transition-all duration-500">
                         
                         {/* ⚡ INSTANT QUICK ADD BAR (FRICTION-FREE INPUT) */}
                         <JobQuickAddBar

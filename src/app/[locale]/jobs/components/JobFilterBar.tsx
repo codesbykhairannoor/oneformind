@@ -154,10 +154,10 @@ export default function JobFilterBar({
     const activeFilterCount = (search ? 1 : 0) + (activeStatus !== 'all' ? 1 : 0) + (activeWorkModel !== 'all' ? 1 : 0) + (activeDays ? 1 : 0);
 
     return (
-        <div className="space-y-4 mb-6">
+        <div className="space-y-2.5 mb-3">
             
             {/* ROW 1: Search & View Mode Switcher */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
                 
                 {/* Search Bar */}
                 <div className="relative flex-1 max-w-lg">
