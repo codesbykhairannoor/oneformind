@@ -6,7 +6,7 @@ import useSWR from 'swr';
 import { 
     Briefcase, Plus, Sparkles, Kanban, Table, 
     Calendar, BarChart3, SlidersHorizontal, ArrowUpDown,
-    CheckCircle2, AlertCircle, Award
+    CheckCircle2, AlertCircle, Award, Zap
 } from 'lucide-react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import GatedPage from '@/components/GatedPage';
@@ -17,6 +17,8 @@ import JobTable from './components/JobTable';
 import JobInterviewsCalendarView from './components/JobInterviewsCalendarView';
 import JobOfferComparisonModal from './components/JobOfferComparisonModal';
 import JobModal from './components/JobModal';
+import JobDetailDrawer from './components/JobDetailDrawer';
+import JobQuickAddBar from './components/JobQuickAddBar';
 import MasterCvModal from './components/MasterCvModal';
 import ResumeAiModal from './components/ResumeAiModal';
 import { 
@@ -57,7 +59,11 @@ export default function JobsPage() {
         sortBy: 'applied_date'
     });
 
-    // Modals state
+    // Fast Side Drawer state (Default click inspector)
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [selectedJobForDrawer, setSelectedJobForDrawer] = useState<JobRowItem | null>(null);
+
+    // Full Modal state (For comprehensive editing)
     const [isJobModalOpen, setIsJobModalOpen] = useState(false);
     const [selectedJobForEdit, setSelectedJobForEdit] = useState<JobRowItem | null>(null);
     
@@ -156,6 +162,11 @@ export default function JobsPage() {
     }, [jobs, filters]);
 
     // Handlers
+    const handleOpenDrawer = (job: JobRowItem) => {
+        setSelectedJobForDrawer(job);
+        setIsDrawerOpen(true);
+    };
+
     const handleOpenCreateModal = (defaultStatus = 'applied') => {
         setSelectedJobForEdit({
             id: '',
@@ -187,12 +198,66 @@ export default function JobsPage() {
     };
 
     const handleOpenEditModal = (job: JobRowItem) => {
+        setIsDrawerOpen(false);
         setSelectedJobForEdit(job);
         setIsJobModalOpen(true);
     };
 
+    // FAST INSTANT OPTIMISTIC QUICK ADD (NO MODAL!)
+    const handleQuickAddJob = async (company: string, title: string, status: string = 'applied', workModel: string = 'remote', linkUrl?: string) => {
+        const tempId = 'temp_' + Date.now();
+        const newJob: JobRowItem = {
+            id: tempId,
+            company: company || (isIndo ? 'Perusahaan Target' : 'Target Company'),
+            title: title || (isIndo ? 'Posisi Lamaran' : 'Job Title'),
+            location: workModel === 'remote' ? 'Remote' : 'Jakarta',
+            applied_date: new Date().toISOString().split('T')[0],
+            status: status || 'applied',
+            work_model: workModel || 'remote',
+            job_type: 'fulltime',
+            salary_min: null,
+            salary_max: null,
+            salary_currency: 'IDR',
+            salary_period: 'monthly',
+            benefits: '',
+            recruiter_name: '',
+            recruiter_email: '',
+            recruiter_linkedin: '',
+            follow_up_date: null,
+            follow_up_status: 'pending',
+            interview_rounds: [],
+            star_situation: '',
+            star_task: '',
+            star_action: '',
+            star_result: '',
+            notes: linkUrl ? `Job Link: ${linkUrl}` : ''
+        };
+
+        // Instant optimistic update to state
+        setJobs(prev => [newJob, ...prev]);
+
+        // Post payload to backend API
+        try {
+            const payload = serializeJobPayload(newJob);
+            const res = await fetch('/api/jobs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setJobs(prev => prev.map(j => j.id === tempId ? { ...j, id: data.id } : j));
+                mutateJobs();
+            }
+        } catch (err) {
+            console.error('Failed to quick add job:', err);
+        }
+    };
+
     const handleSaveJob = async (jobForm: JobRowItem) => {
         setIsJobModalOpen(false);
+        setIsDrawerOpen(false);
+
         const isNew = !jobForm.id || String(jobForm.id).startsWith('temp_');
         const payload = serializeJobPayload(jobForm);
 
@@ -331,7 +396,7 @@ export default function JobsPage() {
                                         )}
                                     </button>
 
-                                    {/* New Job Modal Button */}
+                                    {/* New Job Full Modal Button */}
                                     <button 
                                         type="button"
                                         onClick={() => handleOpenCreateModal('applied')}
@@ -339,7 +404,7 @@ export default function JobsPage() {
                                     >
                                         <Plus size={16} strokeWidth={3} />
                                         <span className="text-xs font-black tracking-wide">
-                                            {isIndo ? 'Tambah Lamaran' : 'New Application'}
+                                            {isIndo ? 'Form Formil Lengkap' : 'Full Application Form'}
                                         </span>
                                     </button>
                                 </div>
@@ -351,6 +416,11 @@ export default function JobsPage() {
                     {/* MAIN CONTAINER */}
                     <div className="w-full max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 min-w-0 transition-all duration-500">
                         
+                        {/* ⚡ INSTANT QUICK ADD BAR (FRICTION-FREE INPUT) */}
+                        <JobQuickAddBar
+                            onQuickAdd={(comp, tit, st, wm, link) => handleQuickAddJob(comp, tit, st, wm, link)}
+                        />
+
                         {/* Recruitment Funnel Stats & Velocity Cards */}
                         <JobStats 
                             stats={funnelStats} 
@@ -373,11 +443,12 @@ export default function JobsPage() {
                         {viewMode === 'kanban' && (
                             <JobKanbanView
                                 jobs={filteredJobs}
-                                onEdit={handleOpenEditModal}
+                                onEdit={handleOpenDrawer}
                                 onDelete={handleDeleteJob}
                                 onStatusChange={handleStatusChange}
                                 onScan={handleOpenScan}
                                 onAddInColumn={(st) => handleOpenCreateModal(st)}
+                                onQuickAddJob={(comp, tit, st, wm) => handleQuickAddJob(comp, tit, st, wm)}
                             />
                         )}
 
@@ -385,7 +456,7 @@ export default function JobsPage() {
                         {viewMode === 'table' && (
                             <JobTable
                                 jobs={filteredJobs}
-                                onEdit={handleOpenEditModal}
+                                onEdit={handleOpenDrawer}
                                 onDelete={handleDeleteJob}
                                 onScan={handleOpenScan}
                                 onStatusChange={handleStatusChange}
@@ -396,8 +467,8 @@ export default function JobsPage() {
                         {viewMode === 'interviews' && (
                             <JobInterviewsCalendarView
                                 jobs={jobs}
-                                onEditJob={handleOpenEditModal}
-                                onAddInterview={(j) => handleOpenEditModal(j)}
+                                onEditJob={handleOpenDrawer}
+                                onAddInterview={(j) => handleOpenDrawer(j)}
                             />
                         )}
 
@@ -406,15 +477,26 @@ export default function JobsPage() {
                             <JobOfferComparisonModal
                                 jobs={jobs}
                                 onAcceptOffer={(j) => handleStatusChange(j, 'accepted')}
-                                onEditJob={handleOpenEditModal}
+                                onEditJob={handleOpenDrawer}
                             />
                         )}
 
                     </div>
 
-                    {/* MODALS */}
+                    {/* MODALS & DRAWERS */}
                     
-                    {/* Create / Edit Job Modal */}
+                    {/* Fast Slide-Over Drawer Inspector */}
+                    <JobDetailDrawer
+                        show={isDrawerOpen}
+                        job={selectedJobForDrawer}
+                        onClose={() => setIsDrawerOpen(false)}
+                        onSave={handleSaveJob}
+                        onDelete={handleDeleteJob}
+                        onScanATS={handleOpenScan}
+                        onOpenFullModal={handleOpenEditModal}
+                    />
+
+                    {/* Full Create / Edit Job Modal */}
                     <JobModal
                         show={isJobModalOpen}
                         job={selectedJobForEdit}
