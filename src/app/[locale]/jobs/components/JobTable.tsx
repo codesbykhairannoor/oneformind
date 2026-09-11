@@ -14,7 +14,7 @@ import JobStatusDropdown from './JobStatusDropdown';
 interface JobTableProps {
     jobs: JobRowItem[];
     onEdit: (job: JobRowItem) => void;
-    onDelete: (id: number | string) => void;
+    onDelete: (jobOrId: JobRowItem | number | string) => void;
     onScan: (job: JobRowItem) => void;
     onStatusChange: (job: JobRowItem, newStatus: string) => void;
     onQuickAddJob?: (company: string, title: string, status: string, workModel: string) => void;
@@ -150,9 +150,12 @@ export default function JobTable({
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => onDelete(job.id)}
-                                        className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition"
-                                        title="Delete"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDelete(job);
+                                        }}
+                                        className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition shadow-sm"
+                                        title={isIndo ? 'Hapus Lamaran' : 'Delete Application'}
                                     >
                                         <Trash2 size={14} />
                                     </button>
@@ -454,9 +457,12 @@ export default function JobTable({
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => onDelete(job.id)}
-                                                    className="p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 transition"
-                                                    title="Delete"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onDelete(job);
+                                                    }}
+                                                    className="p-1.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/30 text-rose-500 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition"
+                                                    title={isIndo ? 'Hapus Lamaran' : 'Delete Application'}
                                                 >
                                                     <Trash2 size={14} />
                                                 </button>

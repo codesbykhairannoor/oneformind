@@ -6,10 +6,11 @@ import useSWR from 'swr';
 import { 
     Briefcase, Plus, Sparkles, Table, 
     Calendar, BarChart3, SlidersHorizontal, ArrowUpDown,
-    CheckCircle2, AlertCircle, Award, Zap
+    CheckCircle2, AlertCircle, Award, Zap, Trash2, X
 } from 'lucide-react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import GatedPage from '@/components/GatedPage';
+import ModalPortal from '@/components/ModalPortal';
 import JobStats from './components/JobStats';
 import JobFilterBar, { JobFilterParams, JobViewMode } from './components/JobFilterBar';
 import JobTable from './components/JobTable';
@@ -56,6 +57,10 @@ export default function JobsPage() {
         days: null,
         sortBy: 'applied_date'
     });
+
+    // Delete Confirmation Modal State
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [jobToDelete, setJobToDelete] = useState<JobRowItem | null>(null);
 
     // Fast Side Drawer state (Default click inspector)
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -315,13 +320,29 @@ export default function JobsPage() {
         }
     };
 
-    const handleDeleteJob = async (id: number | string) => {
-        const confirmed = window.confirm(
-            isIndo ? 'Apakah Anda yakin ingin menghapus lamaran ini?' : 'Are you sure you want to delete this application?'
-        );
-        if (!confirmed) return;
+    const handleRequestDelete = (jobOrId: JobRowItem | number | string) => {
+        if (typeof jobOrId === 'object' && jobOrId !== null) {
+            setJobToDelete(jobOrId);
+        } else {
+            const found = jobs.find(j => j.id === jobOrId) || null;
+            if (found) {
+                setJobToDelete(found);
+            } else {
+                setJobToDelete({ id: jobOrId, company: '', title: '' } as JobRowItem);
+            }
+        }
+        setDeleteModalOpen(true);
+    };
 
+    const handleConfirmDelete = async () => {
+        if (!jobToDelete) return;
+        const id = jobToDelete.id;
+
+        // Optimistic UI update
         setJobs(prev => prev.filter(j => j.id !== id));
+        setDeleteModalOpen(false);
+        setJobToDelete(null);
+
         if (typeof id === 'number' || !String(id).startsWith('temp_')) {
             try {
                 await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
@@ -437,7 +458,7 @@ export default function JobsPage() {
                             <JobTable
                                 jobs={filteredJobs}
                                 onEdit={handleOpenDrawer}
-                                onDelete={handleDeleteJob}
+                                onDelete={handleRequestDelete}
                                 onScan={handleOpenScan}
                                 onStatusChange={handleStatusChange}
                                 onQuickAddJob={(comp, tit, st, wm) => handleQuickAddJob(comp, tit, st, wm)}
@@ -472,7 +493,7 @@ export default function JobsPage() {
                         job={selectedJobForDrawer}
                         onClose={() => setIsDrawerOpen(false)}
                         onSave={handleSaveJob}
-                        onDelete={handleDeleteJob}
+                        onDelete={handleRequestDelete}
                         onScanATS={handleOpenScan}
                         onOpenFullModal={handleOpenEditModal}
                     />
@@ -483,6 +504,7 @@ export default function JobsPage() {
                         job={selectedJobForEdit}
                         onClose={() => setIsJobModalOpen(false)}
                         onSave={handleSaveJob}
+                        onDelete={handleRequestDelete}
                         onScanATS={handleOpenScan}
                     />
 
@@ -507,6 +529,81 @@ export default function JobsPage() {
                         onClose={() => setIsMasterModalOpen(false)}
                         onSaveMasterCv={handleSaveMasterCv}
                     />
+
+                    {/* DEDICATED IN-APP DELETE CONFIRMATION MODAL */}
+                    {deleteModalOpen && (
+                        <ModalPortal>
+                            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+                                {/* Backdrop */}
+                                <div 
+                                    className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm transition-opacity animate-in fade-in duration-200" 
+                                    onClick={() => setDeleteModalOpen(false)} 
+                                />
+
+                                {/* Modal Card */}
+                                <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 space-y-5 animate-in zoom-in-95 fade-in duration-200">
+                                    
+                                    {/* Icon & Title */}
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-900/40 shadow-sm">
+                                            <Trash2 size={24} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <h3 className="text-base font-black text-slate-800 dark:text-white">
+                                                {isIndo ? 'Hapus Lamaran Kerja?' : 'Delete Job Application?'}
+                                            </h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                {isIndo 
+                                                    ? 'Tindakan ini tidak dapat dibatalkan. Riwayat wawancara, catatan recruiter, dan follow-up akan dihapus.' 
+                                                    : 'This action cannot be undone. All interview history, recruiter CRM notes, and follow-ups will be deleted.'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Target Job Info Card */}
+                                    {jobToDelete && (
+                                        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-black text-xs flex items-center justify-center shrink-0 border border-indigo-100 dark:border-indigo-900/30">
+                                                {jobToDelete.company ? jobToDelete.company.charAt(0).toUpperCase() : '💼'}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h4 className="text-xs font-black text-slate-800 dark:text-white truncate">
+                                                    {jobToDelete.title || (isIndo ? 'Posisi Lamaran' : 'Job Title')}
+                                                </h4>
+                                                <p className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 truncate">
+                                                    {jobToDelete.company || (isIndo ? 'Perusahaan' : 'Company')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center justify-end gap-2.5 pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setDeleteModalOpen(false);
+                                                setJobToDelete(null);
+                                            }}
+                                            className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 text-xs font-bold transition"
+                                        >
+                                            {isIndo ? 'Batal' : 'Cancel'}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={handleConfirmDelete}
+                                            className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-lg shadow-rose-500/25 active:scale-95 transition flex items-center gap-1.5"
+                                        >
+                                            <Trash2 size={14} />
+                                            <span>{isIndo ? 'Ya, Hapus Lamaran' : 'Yes, Delete'}</span>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </ModalPortal>
+                    )}
 
                 </div>
             </GatedPage>

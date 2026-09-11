@@ -16,6 +16,7 @@ interface JobModalProps {
     job?: JobRowItem | null;
     onClose: () => void;
     onSave: (form: JobRowItem) => void;
+    onDelete?: (jobOrId: JobRowItem | number | string) => void;
     onScanATS?: (job: JobRowItem) => void;
 }
 
@@ -24,6 +25,7 @@ export default function JobModal({
     job,
     onClose,
     onSave,
+    onDelete,
     onScanATS
 }: JobModalProps) {
     const locale = useLocale();
@@ -740,13 +742,30 @@ export default function JobModal({
 
                     {/* Footer */}
                     <div className="p-5 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="text-xs font-black text-slate-400 hover:text-rose-500 transition px-4 py-2"
-                        >
-                            {isIndo ? 'Batal' : 'Cancel'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                            {form.id && onDelete && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        onClose();
+                                        onDelete(form);
+                                    }}
+                                    className="px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition text-xs font-bold flex items-center gap-1.5"
+                                    title={isIndo ? 'Hapus Lamaran' : 'Delete Application'}
+                                >
+                                    <Trash2 size={14} />
+                                    <span>{isIndo ? 'Hapus Lamaran' : 'Delete'}</span>
+                                </button>
+                            )}
+
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="text-xs font-black text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition px-3 py-2"
+                            >
+                                {isIndo ? 'Batal' : 'Cancel'}
+                            </button>
+                        </div>
 
                         <div className="flex items-center gap-2">
                             {onScanATS && (

@@ -15,7 +15,7 @@ interface JobDetailDrawerProps {
     job: JobRowItem | null;
     onClose: () => void;
     onSave: (form: JobRowItem) => void;
-    onDelete: (id: number | string) => void;
+    onDelete: (jobOrId: JobRowItem | number | string) => void;
     onScanATS: (job: JobRowItem) => void;
     onOpenFullModal: (job: JobRowItem) => void;
 }
@@ -413,10 +413,10 @@ export default function JobDetailDrawer({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    onDelete(form.id);
+                                    onDelete(form);
                                     onClose();
                                 }}
-                                className="px-3.5 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 hover:bg-rose-100 transition text-xs font-bold flex items-center gap-1.5"
+                                className="px-3.5 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition text-xs font-bold flex items-center gap-1.5"
                             >
                                 <Trash2 size={15} />
                                 <span>{isIndo ? 'Hapus' : 'Delete'}</span>
