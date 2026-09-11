@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { useGating } from '@/hooks/useGating';
 import DashboardHero from '@/app/[locale]/dashboard/components/DashboardHero';
 import DashboardQuickToolbar from '@/app/[locale]/dashboard/components/DashboardQuickToolbar';
 import DashboardTodayTasks from '@/app/[locale]/dashboard/components/DashboardTodayTasks';
+import DashboardStudyRadar from '@/app/[locale]/dashboard/components/DashboardStudyRadar';
 import DashboardAiGatingBanner from '@/app/[locale]/dashboard/components/DashboardAiGatingBanner';
 import DashboardSidebarWidgets from '@/app/[locale]/dashboard/components/DashboardSidebarWidgets';
 
@@ -14,25 +15,26 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
     const t = useTranslations();
     const [loadingInsight] = useState(false);
     const [globalInsight] = useState<any>({
-        summary: 'Performa habit dan planner Anda sangat konsisten minggu ini. Tingkat penyelesaian tugas pagi mencapai 85%.'
+        summary: locale === 'id' 
+            ? 'Performa habit, agenda, dan fokus akademik Anda terhubung harmonis minggu ini. Tetap pertahankan momentum!'
+            : 'Your habits, planner tasks, and academic focus are harmoniously connected this week. Keep up the strong momentum!'
     });
 
     const { isExplorer, isAiEnabled, trial, isTrialActive } = useGating();
 
     const plannerData = synergy.planner;
+    const trend = synergy.trend || [];
+    const trendMax = Math.max(...trend.map((d: any) => d.score), 1);
 
-    const trend = [
-        { day: 'Mon', score: 65 },
-        { day: 'Tue', score: 80 },
-        { day: 'Wed', score: 45 },
-        { day: 'Thu', score: 90 },
-        { day: 'Fri', score: 70 },
-        { day: 'Sat', score: 85 },
-        { day: 'Sun', score: 100 },
-    ];
+    // Calculate integrated Life Synergy score
+    const habitScore = synergy.habits.percent;
+    const plannerScore = synergy.planner.total > 0
+        ? Math.round((synergy.planner.completed / synergy.planner.total) * 100)
+        : 100;
+    const goalScore = synergy.goals.top_goal ? synergy.goals.top_goal.percent : 70;
+    const journalScore = synergy.journal.is_written ? 100 : 50;
 
-    const overallScore = Math.round((synergy.habits.percent + 80 + synergy.goals.top_goal.percent + (synergy.journal.is_written ? 100 : 0)) / 4);
-    const trendMax = Math.max(...trend.map((d) => d.score), 1);
+    const overallScore = Math.round((habitScore + plannerScore + goalScore + journalScore) / 4);
 
     return (
         <AuthenticatedLayout user={user}>
@@ -52,13 +54,22 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
                         
-                        {/* Main Column */}
+                        {/* Main Column (8 Cols) */}
                         <div className="space-y-6 lg:col-span-8">
                             <DashboardTodayTasks
                                 plannerData={plannerData}
                                 synergy={synergy}
                                 t={t}
                             />
+
+                            {/* Academic Radar & Knowledge / Book Tracker */}
+                            {synergy.study && (
+                                <DashboardStudyRadar
+                                    studyData={synergy.study}
+                                    t={t}
+                                    locale={locale}
+                                />
+                            )}
 
                             <DashboardAiGatingBanner
                                 isAiEnabled={isAiEnabled}
@@ -72,7 +83,7 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
                             />
                         </div>
 
-                        {/* Sidebar Column */}
+                        {/* Sidebar Column (4 Cols) */}
                         <DashboardSidebarWidgets
                             trend={trend}
                             trendMax={trendMax}
