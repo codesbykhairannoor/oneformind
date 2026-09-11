@@ -77,10 +77,10 @@ export default function JobTable({
     return (
         <div className="space-y-4">
             
-            {/* Quick Add Row Button on Top of Table */}
+            {/* Clean Table Top Header */}
             <div className="flex items-center justify-between gap-3 px-1">
                 <div className="flex items-center gap-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                         {isIndo ? 'Daftar Semua Lamaran Kerja' : 'Job Application Register'}
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 text-xs font-mono font-black border border-indigo-100 dark:border-indigo-900/40">
@@ -88,14 +88,23 @@ export default function JobTable({
                     </span>
                 </div>
 
-                {!isAddingRow && (
+                {!isAddingRow ? (
                     <button
                         type="button"
                         onClick={() => setIsAddingRow(true)}
-                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-sm transition flex items-center gap-1.5 active:scale-95"
+                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5 active:scale-95"
                     >
                         <Plus size={14} strokeWidth={3} />
-                        <span>{isIndo ? '+ Tambah Baris Baru' : '+ Quick Add Row'}</span>
+                        <span>{isIndo ? '+ Tambah Lamaran' : '+ Add Application'}</span>
+                    </button>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={() => setIsAddingRow(false)}
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1"
+                    >
+                        <X size={13} />
+                        <span>{isIndo ? 'Tutup Form' : 'Close Input'}</span>
                     </button>
                 )}
             </div>

@@ -17,7 +17,6 @@ import JobInterviewsCalendarView from './components/JobInterviewsCalendarView';
 import JobOfferComparisonModal from './components/JobOfferComparisonModal';
 import JobModal from './components/JobModal';
 import JobDetailDrawer from './components/JobDetailDrawer';
-import JobQuickAddBar from './components/JobQuickAddBar';
 import MasterCvModal from './components/MasterCvModal';
 import ResumeAiModal from './components/ResumeAiModal';
 import { 
@@ -403,7 +402,7 @@ export default function JobsPage() {
                                     >
                                         <Plus size={16} strokeWidth={3} />
                                         <span className="text-xs font-black tracking-wide">
-                                            {isIndo ? 'Form Formil Lengkap' : 'Full Application Form'}
+                                            {isIndo ? 'Tambah Lamaran' : 'New Application'}
                                         </span>
                                     </button>
                                 </div>
@@ -415,11 +414,6 @@ export default function JobsPage() {
                     {/* MAIN CONTAINER */}
                     <div className="w-full max-w-[98%] mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-4 space-y-3 min-w-0 transition-all duration-500">
                         
-                        {/* ⚡ INSTANT QUICK ADD BAR (FRICTION-FREE INPUT) */}
-                        <JobQuickAddBar
-                            onQuickAdd={(comp, tit, st, wm, link) => handleQuickAddJob(comp, tit, st, wm, link)}
-                        />
-
                         {/* Recruitment Funnel Stats & Velocity Cards */}
                         <JobStats 
                             stats={funnelStats} 
