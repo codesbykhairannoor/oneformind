@@ -1,73 +1,187 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import ModalPortal from '@/components/ModalPortal';
-import StudyCompetencyRadar from '../components/StudyCompetencyRadar';
-import StudyArchetypeMatches from '../components/StudyArchetypeMatches';
-import StudyMaterialList, { StudyMaterial } from '../components/StudyMaterialList';
-import StudyUploadForm from '../components/StudyUploadForm';
-import { Sparkles, ArrowLeft, Copy, RefreshCw, CheckCircle2, Plus, X, ExternalLink, ShieldCheck, PenLine } from 'lucide-react';
+import { 
+    Sparkles, ArrowLeft, Copy, RefreshCw, CheckCircle2, 
+    Plus, X, ExternalLink, ShieldCheck, PenLine, 
+    GraduationCap, Award, BookOpen, Mail, Globe, 
+    Download, Code2, Terminal, FileText,
+    Star, Trophy, Layers, Check, Share2
+} from 'lucide-react';
+
+const GithubIcon = ({ size = 16, className = '' }: { size?: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+        <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+);
+
+const LinkedinIcon = ({ size = 16, className = '' }: { size?: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+        <rect width="4" height="12" x="2" y="9" />
+        <circle cx="4" cy="4" r="2" />
+    </svg>
+);
+
+export interface FeaturedProject {
+    id: string;
+    title: string;
+    description: string;
+    tags: string[];
+    demo_url?: string;
+    github_url?: string;
+    role: string;
+    stars_or_metric?: string;
+}
+
+export interface AcademicHonor {
+    id: string;
+    title: string;
+    issuer: string;
+    year: string;
+    type: 'competition' | 'publication' | 'certification';
+    badge: string;
+}
+
+export interface CourseworkEvidence {
+    id: string;
+    course_name: string;
+    grade: string;
+    semester: string;
+    highlight: string;
+    artifact_link?: string;
+}
 
 export default function StudyPortfolioPage() {
     const t = useTranslations();
-    const [username, setUsername] = useState('student_tranvas');
+    const locale = useLocale();
+    const isIndo = locale === 'id';
+
+    const [username, setUsername] = useState('khairan_noor');
     const [isEditingUsername, setIsEditingUsername] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false);
+    const [isExportCvModalOpen, setIsExportCvModalOpen] = useState(false);
 
-    // Initial Coursework Materials state
-    const [materials, setMaterials] = useState<StudyMaterial[]>([
+    // Profile state
+    const [profile, setProfile] = useState({
+        name: 'Khairan Noor',
+        headline: isIndo 
+            ? 'Software Engineer & Mahasiswa Teknik Informatika Berprestasi' 
+            : 'Software Engineer & High-Distinction Computer Science Student',
+        major: isIndo ? 'Teknik Informatika (Software Engineering)' : 'Computer Science & Software Engineering',
+        ipk: '3.92',
+        sks: '112',
+        cumlaude: isIndo ? 'Summa Cum Laude Candidate' : 'Summa Cum Laude Candidate',
+        bio: isIndo
+            ? 'Fokus pada arsitektur sistem web skala tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi terindeks SINTA.'
+            : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and SINTA-indexed academic research.',
+        github: 'https://github.com/codesbykhairannoor',
+        linkedin: 'https://linkedin.com',
+        email: 'khairan@tranvas.app',
+        website: 'https://tranvas.app'
+    });
+
+    // Featured Projects state
+    const [projects, setProjects] = useState<FeaturedProject[]>([
         {
-            id: 1,
-            course_name: 'Pemrograman Web & Next.js App Router',
-            week: 'Minggu 08',
-            grade: 96,
-            status: 'completed',
-            metadata: {
-                field_of_study: 'Software Engineering',
-                competencies: {
-                    'System Architecture': 96,
-                    'React & Next.js': 94,
-                    'Web Performance': 90
-                }
-            },
-            context_data: {
-                link: 'https://nextjs.org/docs',
-                link_name: 'Next.js Official Documentation',
-                text: 'Silabus arsitektur aplikasi berbasis Next.js Server Components.'
-            },
-            artifact_data: {
-                link: 'https://github.com/example/nextjs-architecture',
-                link_name: 'GitHub Project Repository',
-                text: 'Implementasi IPoW & App Router Next.js 16.'
-            }
+            id: '1',
+            title: 'Tranvas OS - Next-Gen Productivity Suite',
+            description: isIndo 
+                ? 'Platform produktivitas modular all-in-one dengan arsitektur multi-tenant, Go backend, dan Next.js 16 App Router.' 
+                : 'All-in-one modular productivity platform with multi-tenant architecture, Go backend, and Next.js 16 App Router.',
+            tags: ['Next.js 16', 'TypeScript', 'Go', 'PostgreSQL', 'Tailwind CSS'],
+            demo_url: 'https://tranvas.app',
+            github_url: 'https://github.com/example/tranvas',
+            role: 'Lead Architect',
+            stars_or_metric: '< 45ms P99 Latency'
         },
         {
-            id: 2,
-            course_name: 'Algoritma & Struktur Data',
-            week: 'Minggu 05',
-            grade: 90,
-            status: 'completed',
-            metadata: {
-                field_of_study: 'Computer Science',
-                competencies: {
-                    'Graph Theory': 90,
-                    'Dijkstra Algorithm': 88,
-                    'Dynamic Programming': 85
-                }
-            },
-            context_data: {
-                text: 'Modul praktikum graf & algoritma pencarian jalur terpendek.'
-            },
-            artifact_data: {
-                text: 'Hasil analisis kompleksitas Big-O & kode C++ Dijkstra.'
-            }
+            id: '2',
+            title: 'Neural Matrix Academic Engine',
+            description: isIndo
+                ? 'Sistem analisis kurikulum otomatis dan simulator IPK cerdas dengan integrasi Spaced Repetition Flashcards.'
+                : 'Automated curriculum analysis and GPA simulator engine with Spaced Repetition active recall integration.',
+            tags: ['React', 'Web Audio API', 'Canvas API', 'TypeScript'],
+            demo_url: 'https://tranvas.app/study',
+            github_url: 'https://github.com/example/academic-engine',
+            role: 'Fullstack Creator',
+            stars_or_metric: '100% Client-side Offline'
         }
     ]);
+
+    // Academic Honors & Publications
+    const [honors, setHonors] = useState<AcademicHonor[]>([
+        {
+            id: '1',
+            title: isIndo ? 'Juara 1 Lomba Karya Tulis Ilmiah (LKTI) Nasional' : '1st Place National Scientific Paper Competition',
+            issuer: isIndo ? 'Kementerian Pendidikan & Riset' : 'Ministry of Education & Tech',
+            year: '2025',
+            type: 'competition',
+            badge: '🏆 1st Winner'
+        },
+        {
+            id: '2',
+            title: isIndo ? 'Publikasi Jurnal SINTA 2: Optimalisasi Query Graf' : 'SINTA 2 Journal Publication: Graph Query Optimization',
+            issuer: 'Journal of Computer Science & Systems',
+            year: '2025',
+            type: 'publication',
+            badge: '📄 SINTA 2'
+        },
+        {
+            id: '3',
+            title: isIndo ? 'Dean\'s List of Academic Excellence (4 Semesters)' : 'Dean\'s List of Academic Excellence (4 Semesters)',
+            issuer: 'Fakultas Ilmu Komputer',
+            year: '2024 - 2026',
+            type: 'certification',
+            badge: '✨ Honor Roll'
+        }
+    ]);
+
+    // Coursework Proof Transcripts
+    const [coursework, setCoursework] = useState<CourseworkEvidence[]>([
+        {
+            id: '1',
+            course_name: isIndo ? 'Pemrograman Web & Sistem Terdistribusi' : 'Web Systems & Distributed Architecture',
+            grade: 'A (4.00)',
+            semester: 'Semester 5',
+            highlight: isIndo ? 'Implementasi fullstack Server Components & Optimistic UI' : 'Fullstack Server Components & Optimistic UI architecture',
+            artifact_link: 'https://github.com/example/web-systems'
+        },
+        {
+            id: '2',
+            course_name: isIndo ? 'Algoritma & Struktur Data Lanjut' : 'Advanced Algorithms & Data Structures',
+            grade: 'A (4.00)',
+            semester: 'Semester 4',
+            highlight: isIndo ? 'Analisis kompleksitas Dijkstra, Bellman-Ford, dan Graf Segment Tree' : 'Complexity analysis of Dijkstra, Bellman-Ford & Segment Trees',
+            artifact_link: 'https://github.com/example/algo-lab'
+        },
+        {
+            id: '3',
+            course_name: isIndo ? 'Desain & Manajemen Basis Data' : 'Database Systems & Architecture',
+            grade: 'A (4.00)',
+            semester: 'Semester 4',
+            highlight: isIndo ? 'Desain skema normalisasi 3NF & tuning PostgreSQL query execution plan' : '3NF schema design & PostgreSQL query execution plan tuning',
+            artifact_link: 'https://github.com/example/database-perf'
+        }
+    ]);
+
+    // New project form state
+    const [newProject, setNewProject] = useState({
+        title: '',
+        description: '',
+        tags: '',
+        demo_url: '',
+        github_url: '',
+        role: 'Fullstack Developer',
+        stars_or_metric: ''
+    });
 
     const [publicUrl, setPublicUrl] = useState(`https://tranvas.app/p/${username}`);
 
@@ -87,227 +201,558 @@ export default function StudyPortfolioPage() {
 
     const handleRefresh = () => {
         setIsRefreshing(true);
-        setTimeout(() => setIsRefreshing(false), 800);
+        setTimeout(() => setIsRefreshing(false), 600);
     };
 
-    const handleOptimisticDelete = (id: number | string) => {
-        setMaterials(prev => prev.filter(m => m.id !== id));
-    };
+    const handleAddProjectSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newProject.title.trim()) return;
 
-    const handleOptimisticUpdate = (updated: StudyMaterial) => {
-        setMaterials(prev => prev.map(m => m.id === updated.id ? updated : m));
-    };
+        const p: FeaturedProject = {
+            id: Date.now().toString(),
+            title: newProject.title,
+            description: newProject.description,
+            tags: newProject.tags.split(',').map(s => s.trim()).filter(Boolean),
+            demo_url: newProject.demo_url,
+            github_url: newProject.github_url,
+            role: newProject.role,
+            stars_or_metric: newProject.stars_or_metric
+        };
 
-    const handleAddMaterial = (newMaterial: StudyMaterial) => {
-        setMaterials(prev => [newMaterial, ...prev]);
+        setProjects([p, ...projects]);
+        setIsAddProjectModalOpen(false);
+        setNewProject({
+            title: '',
+            description: '',
+            tags: '',
+            demo_url: '',
+            github_url: '',
+            role: 'Fullstack Developer',
+            stars_or_metric: ''
+        });
     };
 
     return (
         <AuthenticatedLayout>
-            {/* 1:1 from Portfolio/Index.vue line 81-253 */}
-            <div className="min-h-screen bg-white dark:bg-slate-950 pb-32 transition-colors overflow-x-hidden">
-                {/* Ambient Background Gradients */}
-                <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-                    <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[120px] animate-pulse"></div>
-                    <div className="absolute top-[20%] -right-[10%] w-[40%] h-[40%] bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
-                </div>
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-32 transition-colors font-sans overflow-x-hidden">
                 
-                {/* Sub Header */}
-                <header className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 px-4 md:px-6 py-4 md:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-50">
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        <Link
-                            href="/study"
-                            className="group p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all text-slate-500 active:scale-90 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shrink-0"
-                        >
-                            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                        </Link>
-                        <div className="flex-1">
-                            <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-none mb-1 tracking-tight">
-                                {t('study_neural_portfolio_title') || 'Neural Portfolio'}
-                            </h1>
-                            <div className="flex items-center gap-2">
-                                <span className="flex h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <p className="text-[9px] md:text-[10px] font-black text-indigo-500 tracking-[0.2em] md:tracking-[0.25em]">
-                                    {t('study_portfolio_subtitle') || 'AI Competency Showcase'}
+                {/* Header Navbar */}
+                <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-50 px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        
+                        <div className="flex items-center gap-3">
+                            <Link
+                                href="/study"
+                                className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition active:scale-95"
+                            >
+                                <ArrowLeft size={16} />
+                            </Link>
+                            <div>
+                                <h1 className="text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                                    <span>{isIndo ? 'Bento Academic & Developer Portfolio' : 'Bento Academic & Developer Portfolio'}</span>
+                                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black border border-emerald-500/20">
+                                        Live
+                                    </span>
+                                </h1>
+                                <p className="text-xs text-slate-400 font-semibold">
+                                    {isIndo ? 'Portofolio kredensial nyata untuk rekruter, beasiswa & kompetisi.' : 'Real credential showcase for recruiters, scholarships & research.'}
                                 </p>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 custom-scrollbar">
-                        <button
-                            type="button"
-                            onClick={handleRefresh}
-                            disabled={isRefreshing}
-                            className="flex items-center gap-2 px-4 md:px-5 py-2.5 md:py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-2xl font-black text-[10px] md:text-[11px] tracking-wider transition-all active:scale-95 disabled:opacity-50 border border-slate-200/50 dark:border-slate-700/50 shadow-sm group whitespace-nowrap"
-                        >
-                            <RefreshCw className={`h-4 w-4 shrink-0 ${isRefreshing ? 'animate-spin text-indigo-500' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-                            <span>{t('study_refresh_data') || 'Refresh Data'}</span>
-                        </button>
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                            <button
+                                type="button"
+                                onClick={handleRefresh}
+                                className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-xs font-black transition active:scale-95"
+                            >
+                                <RefreshCw size={13} className={isRefreshing ? 'animate-spin text-indigo-500' : ''} />
+                                <span>{isIndo ? 'Segarkan' : 'Sync'}</span>
+                            </button>
 
-                        <button
-                            type="button"
-                            onClick={() => setIsUploadModalOpen(true)}
-                            className="flex items-center gap-2 px-5 md:px-7 py-2.5 md:py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-[10px] md:text-[11px] tracking-wider transition-all active:scale-95 shadow-xl shadow-indigo-600/20 hover:shadow-indigo-600/30 border border-indigo-500/50 whitespace-nowrap"
-                        >
-                            <Plus className="h-4 w-4 shrink-0" />
-                            <span>{t('study_new_analysis') || 'Input Card'}</span>
-                        </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsExportCvModalOpen(true)}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-black transition active:scale-95 shadow-sm"
+                            >
+                                <Download size={14} />
+                                <span>{isIndo ? 'Unduh Resume CV' : 'Export CV'}</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setIsAddProjectModalOpen(true)}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md shadow-indigo-500/20 active:scale-95 transition"
+                            >
+                                <Plus size={14} />
+                                <span>{isIndo ? 'Tambah Proyek' : 'Add Project'}</span>
+                            </button>
+                        </div>
+
                     </div>
                 </header>
 
-                <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10">
+                <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                     
-                    {/* URL Identity Banner */}
-                    <div className="mb-8 md:mb-12 p-1 bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl shadow-indigo-500/5 border border-slate-200/50 dark:border-slate-800/50 overflow-hidden group">
-                        <div className="p-6 md:p-10 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 rounded-[2.25rem] md:rounded-[3.25rem] flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                            <div className="flex items-start md:items-center gap-4 md:gap-8">
-                                <div className="relative shrink-0 mt-2 md:mt-0">
-                                    <div className="h-16 w-16 md:h-20 md:w-20 rounded-2xl md:rounded-[2rem] bg-indigo-600 flex items-center justify-center text-white shadow-2xl shadow-indigo-600/30 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                                        <ShieldCheck className="h-8 w-8 md:h-10 md:w-10" />
-                                    </div>
-                                    <div className="absolute -bottom-2 -right-2 h-6 w-6 md:h-8 md:w-8 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900 flex items-center justify-center text-white">
-                                        <CheckCircle2 className="h-3 w-3 md:h-4 md:w-4" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white mb-1.5 tracking-tight">
-                                        {t('study_public_url') || 'Public Portfolio URL'}
-                                    </h3>
-                                    <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm font-semibold max-w-md leading-relaxed">
-                                        {t('study_portfolio_url_desc') || 'Bagikan link portofolio akademikmu yang dapat diakses publik secara profesional.'}
-                                    </p>
-                                </div>
+                    {/* Public URL Identity Bar */}
+                    <div className="p-5 sm:p-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+                                <ShieldCheck size={24} />
                             </div>
+                            <div>
+                                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                                    {isIndo ? 'Link Portofolio Publik' : 'Public Portfolio URL'}
+                                </h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    {isIndo ? 'Link ini dapat diakses publik oleh HR, dosen pembimbing, atau juri lomba tanpa login.' : 'Publicly accessible to recruiters, advisors, and competition juries.'}
+                                </p>
+                            </div>
+                        </div>
 
-                            <div className="w-full lg:w-auto lg:min-w-[320px]">
-                                {isEditingUsername ? (
-                                    <div className="bg-slate-100 dark:bg-slate-800/50 p-2 rounded-3xl md:rounded-[2rem] border border-slate-200 dark:border-slate-700/50">
-                                        <form onSubmit={(e) => { e.preventDefault(); setIsEditingUsername(false); }} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                            <input
-                                                type="text"
-                                                value={username}
-                                                onChange={(e) => setUsername(e.target.value)}
-                                                placeholder="Username"
-                                                required
-                                                className="bg-white dark:bg-slate-900 sm:bg-transparent sm:dark:bg-transparent border border-slate-200 dark:border-slate-700 sm:border-none rounded-2xl text-sm font-bold text-slate-800 dark:text-white placeholder-slate-400 focus:ring-1 focus:ring-indigo-500 sm:focus:ring-0 w-full px-5 py-3 sm:py-0"
-                                            />
-                                            <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setIsEditingUsername(false)}
-                                                    className="px-5 py-3 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl font-black text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-[11px] tracking-widest transition-all"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    type="submit"
-                                                    className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-[11px] tracking-widest shadow-lg active:scale-95 transition-all"
-                                                >
-                                                    Save
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col sm:flex-row items-center gap-4">
-                                        <div className="flex-1 bg-slate-100 dark:bg-slate-800/50 px-6 py-4 rounded-[2rem] border border-slate-200 dark:border-slate-700/50 flex items-center justify-between gap-4 group/url">
-                                            <span className="text-sm font-black text-slate-900 dark:text-white truncate max-w-[200px] tracking-tight">
-                                                {publicUrl}
-                                            </span>
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setIsEditingUsername(true)}
-                                                    className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900 text-slate-500 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 rounded-xl transition-all shadow-sm active:scale-90 border border-slate-100 dark:border-slate-600 font-bold text-[11px] tracking-wider"
-                                                >
-                                                    <PenLine className="h-3.5 w-3.5" />
-                                                    Edit URL
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={copyLink}
-                                                    className="p-2.5 bg-white dark:bg-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900 text-slate-400 hover:text-indigo-600 rounded-xl transition-all shadow-sm active:scale-90 border border-slate-100 dark:border-slate-600"
-                                                >
-                                                    {!copied ? <Copy className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <a
-                                            href={publicUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full sm:w-auto px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[2rem] font-black text-[11px] tracking-widest hover:scale-105 transition-all active:scale-95 shadow-xl flex items-center justify-center gap-3"
-                                        >
-                                            {t('study_visit_link') || 'Kunjungi Link'}
-                                            <ExternalLink className="h-4 w-4" />
-                                        </a>
-                                    </div>
-                                )}
+                        <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                            <div className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 truncate max-w-[280px]">
+                                {publicUrl}
                             </div>
+                            <button
+                                type="button"
+                                onClick={copyLink}
+                                className="px-4 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 text-xs font-black flex items-center gap-1.5 transition active:scale-95 shrink-0"
+                            >
+                                {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                                <span>{copied ? (isIndo ? 'Tersalin!' : 'Copied!') : (isIndo ? 'Salin Link' : 'Copy Link')}</span>
+                            </button>
+                            <a
+                                href={publicUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-indigo-500/20 transition active:scale-95 shrink-0"
+                            >
+                                <span>{isIndo ? 'Lihat Tampilan Tamu' : 'Visit Guest View'}</span>
+                                <ExternalLink size={13} />
+                            </a>
                         </div>
                     </div>
 
-                    {/* Main Layout Grid */}
-                    <div className="space-y-12">
-                        {/* AI Analysis Grid (50/50) */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                            <StudyCompetencyRadar />
-                            <StudyArchetypeMatches />
+                    {/* BENTO GRID SHOWCASE */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        
+                        {/* Bento Card 1: Main Academic Hero & Identity (Span 2 cols) */}
+                        <div className="md:col-span-2 lg:col-span-3 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white rounded-[3rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden flex flex-col justify-between space-y-8">
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+                            {/* Top row */}
+                            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-indigo-600 border-2 border-white/20 flex items-center justify-center text-3xl font-black shadow-2xl shrink-0">
+                                        {profile.name.charAt(0)}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <h2 className="text-2xl sm:text-3xl font-black tracking-tight">{profile.name}</h2>
+                                            <CheckCircle2 size={20} className="text-emerald-400" />
+                                        </div>
+                                        <p className="text-xs sm:text-sm text-indigo-200 font-semibold">{profile.headline}</p>
+                                        <span className="inline-block text-[11px] font-mono text-indigo-300">@{username}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="px-3.5 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-black">
+                                        {profile.cumlaude}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Bio */}
+                            <p className="relative z-10 text-xs sm:text-sm text-indigo-100/90 leading-relaxed max-w-2xl">
+                                {profile.bio}
+                            </p>
+
+                            {/* Metrics & Socials */}
+                            <div className="relative z-10 flex flex-wrap items-center justify-between gap-6 pt-6 border-t border-white/10">
+                                <div className="flex items-center gap-6">
+                                    <div>
+                                        <span className="text-[10px] font-black uppercase text-indigo-300 block">{isIndo ? 'IPK Kumulatif' : 'Cumulative GPA'}</span>
+                                        <span className="text-2xl sm:text-3xl font-black font-mono text-white">{profile.ipk} <span className="text-xs font-bold text-indigo-300">/ 4.00</span></span>
+                                    </div>
+                                    <div className="h-8 w-px bg-white/10"></div>
+                                    <div>
+                                        <span className="text-[10px] font-black uppercase text-indigo-300 block">{isIndo ? 'Total SKS Lulus' : 'Credits Earned'}</span>
+                                        <span className="text-2xl sm:text-3xl font-black font-mono text-white">{profile.sks} <span className="text-xs font-bold text-indigo-300">SKS</span></span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2.5">
+                                    <a href={profile.github} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 transition text-white">
+                                        <GithubIcon size={16} />
+                                    </a>
+                                    <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 transition text-white">
+                                        <LinkedinIcon size={16} />
+                                    </a>
+                                    <a href={`mailto:${profile.email}`} className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 transition text-white">
+                                        <Mail size={16} />
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Materials List */}
-                        <div>
-                            <StudyMaterialList
-                                materials={materials}
-                                user={{ username }}
-                                onOptimisticDelete={handleOptimisticDelete}
-                                onOptimisticUpdate={handleOptimisticUpdate}
-                            />
+                        {/* Bento Card 2: Academic Status & Verified Badges (Span 1 col) */}
+                        <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-7 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-6">
+                            <div className="space-y-2">
+                                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center font-black">
+                                    <Trophy size={20} />
+                                </div>
+                                <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                                    {isIndo ? 'Kredensial Kampus' : 'Academic Standing'}
+                                </h4>
+                                <p className="text-xs text-slate-400 font-semibold">
+                                    {profile.major}
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 space-y-1">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 block">{isIndo ? 'Status Mahasiswa' : 'Student Status'}</span>
+                                    <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                        <CheckCircle2 size={13} />
+                                        <span>{isIndo ? 'Aktif - Tingkat Akhir' : 'Active - Senior Year'}</span>
+                                    </span>
+                                </div>
+
+                                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 space-y-1">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 block">{isIndo ? 'Target Kelulusan' : 'Target Graduation'}</span>
+                                    <span className="text-xs font-black text-slate-800 dark:text-slate-200">
+                                        {isIndo ? '2026 (Cum Laude On-Track)' : '2026 (Cum Laude Track)'}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+
+                        {/* Bento Card 3: Featured Projects Showcase (Span 2 cols on Desktop) */}
+                        <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2.5">
+                                    <Code2 size={20} className="text-indigo-600" />
+                                    <h3 className="text-base font-black text-slate-900 dark:text-white">
+                                        {isIndo ? 'Proyek Unggulan & Portofolio Teknis' : 'Featured Technical Projects'}
+                                    </h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddProjectModalOpen(true)}
+                                    className="text-xs font-black text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                                >
+                                    <Plus size={13} />
+                                    <span>{isIndo ? 'Tambah' : 'Add'}</span>
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {projects.map((proj) => (
+                                    <div
+                                        key={proj.id}
+                                        className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-3 hover:border-indigo-300 transition group"
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div>
+                                                <h4 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-indigo-600 transition">
+                                                    {proj.title}
+                                                </h4>
+                                                <span className="text-[10px] font-bold text-slate-400">{proj.role}</span>
+                                            </div>
+                                            {proj.stars_or_metric && (
+                                                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-black border border-indigo-200 dark:border-indigo-800">
+                                                    {proj.stars_or_metric}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                            {proj.description}
+                                        </p>
+
+                                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                            {proj.tags.map((tag) => (
+                                                <span key={tag} className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold border border-slate-200 dark:border-slate-600">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex items-center gap-3 pt-2 text-xs font-black">
+                                            {proj.demo_url && (
+                                                <a href={proj.demo_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+                                                    <span>Live Demo</span>
+                                                    <ExternalLink size={12} />
+                                                </a>
+                                            )}
+                                            {proj.github_url && (
+                                                <a href={proj.github_url} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1">
+                                                    <GithubIcon size={12} />
+                                                    <span>GitHub Repo</span>
+                                                </a>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Bento Card 4: Academic Honors, Competitions & Publications (Span 2 cols on Desktop) */}
+                        <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
+                            <div className="flex items-center gap-2.5">
+                                <Award size={20} className="text-amber-500" />
+                                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                                    {isIndo ? 'Prestasi, Lomba & Publikasi Ilmiah' : 'Honors, Competitions & Publications'}
+                                </h3>
+                            </div>
+
+                            <div className="space-y-4">
+                                {honors.map((honor) => (
+                                    <div
+                                        key={honor.id}
+                                        className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2 hover:border-amber-300 transition"
+                                    >
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 text-[10px] font-black border border-amber-200 dark:border-amber-800">
+                                                {honor.badge}
+                                            </span>
+                                            <span className="text-xs font-mono font-bold text-slate-400">{honor.year}</span>
+                                        </div>
+
+                                        <h4 className="text-sm font-black text-slate-900 dark:text-white leading-snug">
+                                            {honor.title}
+                                        </h4>
+                                        <p className="text-xs text-slate-400 font-semibold">{honor.issuer}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Bento Card 5: Verified Coursework & Transcripts (Full Width Span) */}
+                        <div className="md:col-span-3 lg:col-span-4 bg-white dark:bg-slate-900 rounded-[3rem] p-8 sm:p-10 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-2.5">
+                                    <BookOpen size={20} className="text-emerald-500" />
+                                    <div>
+                                        <h3 className="text-base font-black text-slate-900 dark:text-white">
+                                            {isIndo ? 'Transkrip Matakuliah & Bukti Praktikum Terverifikasi' : 'Verified Coursework & Lab Transcripts'}
+                                        </h3>
+                                        <p className="text-xs text-slate-400 font-semibold">
+                                            {isIndo ? 'Rekap capaian akademik mata kuliah inti bersumber dari sistem perkuliahan.' : 'Academic achievements tied to verified curriculum lab assignments.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {coursework.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-3"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400">
+                                                {item.semester}
+                                            </span>
+                                            <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-mono font-black text-xs border border-emerald-200 dark:border-emerald-800">
+                                                {item.grade}
+                                            </span>
+                                        </div>
+
+                                        <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                                            {item.course_name}
+                                        </h4>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                            {item.highlight}
+                                        </p>
+
+                                        {item.artifact_link && (
+                                            <a
+                                                href={item.artifact_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-[11px] font-black text-indigo-600 dark:text-indigo-400 hover:underline pt-1"
+                                            >
+                                                <span>{isIndo ? 'Lihat Bukti Repo/Laporan' : 'View Artifact Repo'}</span>
+                                                <ExternalLink size={11} />
+                                            </a>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                     </div>
 
                 </main>
 
-                {/* Premium Upload Modal */}
-                {isUploadModalOpen && (
-                    <ModalPortal><div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-10">
-                        <div className="absolute inset-0 bg-slate-950/60 " onClick={() => setIsUploadModalOpen(false)}></div>
-                        <div className="relative w-full max-w-6xl max-h-full overflow-hidden bg-white dark:bg-slate-950 rounded-[4rem] shadow-2xl border border-white/10 flex flex-col animate-in zoom-in-95 duration-200">
-                            <div className="sticky top-0 z-10 bg-white/95 dark:bg-slate-950/95 px-10 py-8 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between">
-                                <div className="flex items-center gap-5">
-                                    <div className="h-14 w-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-2xl shadow-indigo-600/40 border border-indigo-500/50">
-                                        <Sparkles className="h-7 w-7" />
-                                    </div>
+                {/* Add Project Modal */}
+                {isAddProjectModalOpen && (
+                    <ModalPortal>
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsAddProjectModalOpen(false)}></div>
+                            <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 animate-in zoom-in-95 duration-150">
+                                
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white mb-1">
+                                    {isIndo ? 'Tambah Proyek Unggulan' : 'Add Featured Project'}
+                                </h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
+                                    {isIndo ? 'Tampilkan karya terbaikmu di portofolio publik.' : 'Showcase your finest build in your public portfolio.'}
+                                </p>
+
+                                <form onSubmit={handleAddProjectSubmit} className="space-y-4">
                                     <div>
-                                        <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
-                                            {t('study_input_material') || 'Analyze New Coursework'}
-                                        </h2>
-                                        <div className="flex items-center gap-2">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
-                                            <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-[0.3em]">
-                                                {t('study_neural_analysis') || 'Neural Skill Mapping Engine'}
-                                            </p>
+                                        <label className="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                                            {isIndo ? 'Judul Proyek' : 'Project Title'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={newProject.title}
+                                            onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+                                            placeholder="e.g. Distributed Task Queue"
+                                            className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                                            {isIndo ? 'Deskripsi Ringkas' : 'Description'}
+                                        </label>
+                                        <textarea
+                                            rows={2}
+                                            required
+                                            value={newProject.description}
+                                            onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                                            placeholder={isIndo ? 'Masalah yang diselesaikan & teknologi utama...' : 'Key architecture & solution solved...'}
+                                            className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white outline-none resize-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                                            {isIndo ? 'Tech Stack (Pisahkan dengan koma)' : 'Tech Stack (comma separated)'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={newProject.tags}
+                                            onChange={(e) => setNewProject({ ...newProject, tags: e.target.value })}
+                                            placeholder="Next.js, TypeScript, Go, PostgreSQL"
+                                            className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                                                Live Demo URL
+                                            </label>
+                                            <input
+                                                type="url"
+                                                value={newProject.demo_url}
+                                                onChange={(e) => setNewProject({ ...newProject, demo_url: e.target.value })}
+                                                placeholder="https://..."
+                                                className="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                                                GitHub URL
+                                            </label>
+                                            <input
+                                                type="url"
+                                                value={newProject.github_url}
+                                                onChange={(e) => setNewProject({ ...newProject, github_url: e.target.value })}
+                                                placeholder="https://github.com/..."
+                                                className="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                            />
                                         </div>
                                     </div>
-                                </div>
-                                <button onClick={() => setIsUploadModalOpen(false)} className="p-4 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-3xl transition-all text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                                    <X className="h-8 w-8" />
-                                </button>
-                            </div>
 
-                            <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
-                                <div className="max-w-5xl mx-auto">
-                                    <StudyUploadForm
-                                        materials={materials}
-                                        onClose={() => setIsUploadModalOpen(false)}
-                                        onAddMaterial={handleAddMaterial}
-                                    />
-                                </div>
+                                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsAddProjectModalOpen(false)}
+                                            className="px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                        >
+                                            {isIndo ? 'Batal' : 'Cancel'}
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-black tracking-wide shadow-lg shadow-indigo-500/20 active:scale-95 transition"
+                                        >
+                                            {isIndo ? 'Simpan Proyek' : 'Save Project'}
+                                        </button>
+                                    </div>
+                                </form>
+
                             </div>
                         </div>
-                    </div></ModalPortal>
+                    </ModalPortal>
                 )}
+
+                {/* Export CV Modal */}
+                {isExportCvModalOpen && (
+                    <ModalPortal>
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsExportCvModalOpen(false)}></div>
+                            <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 animate-in zoom-in-95 duration-150 space-y-5">
+                                
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center">
+                                        <FileText size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                                            {isIndo ? 'Ekspor Resume / Master CV' : 'Export Verified Resume CV'}
+                                        </h3>
+                                        <p className="text-xs text-slate-400">
+                                            {isIndo ? 'Format terstruktur siap cetak atau ATS review.' : 'ATS-ready formatted export.'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                                    <p className="font-bold text-slate-900 dark:text-white">📄 Data yang disertakan:</p>
+                                    <ul className="list-disc list-inside space-y-1 text-[11px]">
+                                        <li>Profil Akademik ({profile.name}, IPK {profile.ipk}, {profile.sks} SKS)</li>
+                                        <li>{projects.length} Proyek Unggulan Terverifikasi</li>
+                                        <li>{honors.length} Prestasi & Publikasi Ilmiah</li>
+                                        <li>Transkrip Mata Kuliah Inti & Tautan Bukti</li>
+                                    </ul>
+                                </div>
+
+                                <div className="flex items-center justify-end gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsExportCvModalOpen(false)}
+                                        className="px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                    >
+                                        {isIndo ? 'Tutup' : 'Close'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (typeof window !== 'undefined') {
+                                                window.print();
+                                            }
+                                            setIsExportCvModalOpen(false);
+                                        }}
+                                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-black shadow-lg shadow-indigo-500/20 active:scale-95 transition flex items-center gap-2"
+                                    >
+                                        <Download size={14} />
+                                        <span>{isIndo ? 'Cetak / Simpan PDF' : 'Print / Save PDF'}</span>
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </ModalPortal>
+                )}
+
             </div>
         </AuthenticatedLayout>
     );
