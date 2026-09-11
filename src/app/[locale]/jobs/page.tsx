@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import useSWR from 'swr';
 import { 
-    Briefcase, Plus, Sparkles, Kanban, Table, 
+    Briefcase, Plus, Sparkles, Table, 
     Calendar, BarChart3, SlidersHorizontal, ArrowUpDown,
     CheckCircle2, AlertCircle, Award, Zap
 } from 'lucide-react';
@@ -12,7 +12,6 @@ import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import GatedPage from '@/components/GatedPage';
 import JobStats from './components/JobStats';
 import JobFilterBar, { JobFilterParams, JobViewMode } from './components/JobFilterBar';
-import JobKanbanView from './components/JobKanbanView';
 import JobTable from './components/JobTable';
 import JobInterviewsCalendarView from './components/JobInterviewsCalendarView';
 import JobOfferComparisonModal from './components/JobOfferComparisonModal';
@@ -49,8 +48,8 @@ export default function JobsPage() {
         }
     }, [parsedJobs]);
 
-    // View state
-    const [viewMode, setViewMode] = useState<JobViewMode>('kanban');
+    // View state (Table view is the clean primary default)
+    const [viewMode, setViewMode] = useState<JobViewMode>('table');
     const [filters, setFilters] = useState<JobFilterParams>({ 
         search: '', 
         status: 'all', 
@@ -439,20 +438,7 @@ export default function JobsPage() {
                             filteredCount={filteredJobs.length}
                         />
 
-                        {/* ================= VIEW 1: KANBAN PIPELINE ================= */}
-                        {viewMode === 'kanban' && (
-                            <JobKanbanView
-                                jobs={filteredJobs}
-                                onEdit={handleOpenDrawer}
-                                onDelete={handleDeleteJob}
-                                onStatusChange={handleStatusChange}
-                                onScan={handleOpenScan}
-                                onAddInColumn={(st) => handleOpenCreateModal(st)}
-                                onQuickAddJob={(comp, tit, st, wm) => handleQuickAddJob(comp, tit, st, wm)}
-                            />
-                        )}
-
-                        {/* ================= VIEW 2: TABLE VIEW ================= */}
+                        {/* ================= VIEW 1: TABLE VIEW (PRIMARY COMMAND REGISTER) ================= */}
                         {viewMode === 'table' && (
                             <JobTable
                                 jobs={filteredJobs}
@@ -460,10 +446,11 @@ export default function JobsPage() {
                                 onDelete={handleDeleteJob}
                                 onScan={handleOpenScan}
                                 onStatusChange={handleStatusChange}
+                                onQuickAddJob={(comp, tit, st, wm) => handleQuickAddJob(comp, tit, st, wm)}
                             />
                         )}
 
-                        {/* ================= VIEW 3: INTERVIEWS HUB ================= */}
+                        {/* ================= VIEW 2: INTERVIEWS HUB ================= */}
                         {viewMode === 'interviews' && (
                             <JobInterviewsCalendarView
                                 jobs={jobs}
@@ -472,7 +459,7 @@ export default function JobsPage() {
                             />
                         )}
 
-                        {/* ================= VIEW 4: OFFER COMPARISON ================= */}
+                        {/* ================= VIEW 3: OFFER COMPARISON ================= */}
                         {viewMode === 'compare' && (
                             <JobOfferComparisonModal
                                 jobs={jobs}

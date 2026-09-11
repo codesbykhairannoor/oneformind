@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
 import { 
     Sparkles, Trash2, Edit3, MapPin, 
     Calendar, DollarSign, ExternalLink, Video,
-    CheckCircle2, Clock, AlertCircle, Building2
+    CheckCircle2, Clock, AlertCircle, Building2,
+    Plus, Check, X, Search, ArrowUpDown, ChevronRight
 } from 'lucide-react';
 import { JobRowItem, formatSalaryDisplay } from '../lib/jobAnalytics';
 import JobStatusDropdown from './JobStatusDropdown';
@@ -16,6 +17,7 @@ interface JobTableProps {
     onDelete: (id: number | string) => void;
     onScan: (job: JobRowItem) => void;
     onStatusChange: (job: JobRowItem, newStatus: string) => void;
+    onQuickAddJob?: (company: string, title: string, status: string, workModel: string) => void;
 }
 
 export default function JobTable({ 
@@ -23,25 +25,83 @@ export default function JobTable({
     onEdit, 
     onDelete, 
     onScan, 
-    onStatusChange 
+    onStatusChange,
+    onQuickAddJob
 }: JobTableProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
 
+    // State for Inline Table Row Quick Add
+    const [isAddingRow, setIsAddingRow] = useState(false);
+    const [newCompany, setNewCompany] = useState('');
+    const [newTitle, setNewTitle] = useState('');
+    const [newStatus, setNewStatus] = useState('applied');
+    const [newWorkModel, setNewWorkModel] = useState('remote');
+
+    const handleSaveNewRow = () => {
+        if (!newCompany.trim() && !newTitle.trim()) return;
+
+        let comp = newCompany.trim();
+        let tit = newTitle.trim();
+
+        if (!comp && tit.includes('-')) {
+            const parts = tit.split('-');
+            comp = parts[0].trim();
+            tit = parts.slice(1).join('-').trim();
+        } else if (!comp) {
+            comp = isIndo ? 'Perusahaan Target' : 'Target Company';
+        }
+
+        if (!tit) {
+            tit = isIndo ? 'Posisi Lamaran' : 'Job Role';
+        }
+
+        if (onQuickAddJob) {
+            onQuickAddJob(comp, tit, newStatus, newWorkModel);
+        }
+
+        setNewCompany('');
+        setNewTitle('');
+        setIsAddingRow(false);
+    };
+
     const getWorkModelBadge = (wm?: string) => {
         switch (wm) {
-            case 'remote': return { text: 'Remote', color: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' };
-            case 'hybrid': return { text: 'Hybrid', color: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800' };
-            case 'onsite': return { text: 'On-site', color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700' };
+            case 'remote': return { text: 'Remote 🌐', color: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' };
+            case 'hybrid': return { text: 'Hybrid 🏢', color: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800' };
+            case 'onsite': return { text: 'On-site 📍', color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700' };
             default: return null;
         }
     };
 
     return (
-        <div className="relative">
+        <div className="space-y-4">
             
+            {/* Quick Add Row Button on Top of Table */}
+            <div className="flex items-center justify-between gap-3 px-1">
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        {isIndo ? 'Daftar Semua Lamaran Kerja' : 'Job Application Register'}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 text-xs font-mono font-black border border-indigo-100 dark:border-indigo-900/40">
+                        {jobs.length}
+                    </span>
+                </div>
+
+                {!isAddingRow && (
+                    <button
+                        type="button"
+                        onClick={() => setIsAddingRow(true)}
+                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-sm transition flex items-center gap-1.5 active:scale-95"
+                    >
+                        <Plus size={14} strokeWidth={3} />
+                        <span>{isIndo ? '+ Tambah Baris Baru' : '+ Quick Add Row'}</span>
+                    </button>
+                )}
+            </div>
+
             {/* ==================== MOBILE CARDS LAYOUT (<lg) ==================== */}
-            <div className="lg:hidden space-y-4">
+            <div className="lg:hidden space-y-3">
                 {jobs.map((job) => {
                     const wmBadge = getWorkModelBadge(job.work_model);
                     const salaryFormatted = formatSalaryDisplay(job.salary_min, job.salary_max, job.salary_currency, job.salary_period, isIndo);
@@ -49,31 +109,41 @@ export default function JobTable({
                     return (
                         <div 
                             key={job.id}
-                            className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 transition-all"
+                            className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3.5 transition-all"
                         >
                             {/* Header */}
                             <div className="flex items-start justify-between gap-2">
-                                <div className="space-y-1 min-w-0">
-                                    <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider block truncate">
-                                        {job.company}
-                                    </span>
-                                    <h4 className="text-sm font-black text-slate-800 dark:text-white">
-                                        {job.title}
-                                    </h4>
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-9 h-9 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-sm border border-indigo-100 dark:border-indigo-900/40 shrink-0">
+                                        {job.company ? job.company.charAt(0).toUpperCase() : '💼'}
+                                    </div>
+                                    <div className="space-y-0.5 min-w-0">
+                                        <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider block truncate">
+                                            {job.company}
+                                        </span>
+                                        <h4 
+                                            onClick={() => onEdit(job)}
+                                            className="text-sm font-black text-slate-800 dark:text-white truncate cursor-pointer hover:text-indigo-600"
+                                        >
+                                            {job.title}
+                                        </h4>
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center gap-1 shrink-0">
                                     <button
                                         type="button"
                                         onClick={() => onEdit(job)}
-                                        className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition"
+                                        className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition"
+                                        title="Inspect"
                                     >
                                         <Edit3 size={14} />
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => onDelete(job.id)}
-                                        className="p-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition"
+                                        className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition"
+                                        title="Delete"
                                     >
                                         <Trash2 size={14} />
                                     </button>
@@ -140,35 +210,130 @@ export default function JobTable({
 
             {/* ==================== DESKTOP TABLE LAYOUT (>=lg) ==================== */}
             <div className="hidden lg:block bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden">
-                <div className="overflow-x-auto custom-scrollbar min-h-[400px]">
+                <div className="overflow-x-auto custom-scrollbar min-h-[450px]">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-slate-50/80 dark:bg-slate-950/60 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <thead className="bg-slate-50/90 dark:bg-slate-950/70 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 sticky top-0 z-10 backdrop-blur-md">
                             <tr>
-                                <th className="py-4 px-6 min-w-[200px]">
+                                <th className="py-3.5 px-6 min-w-[240px]">
                                     {isIndo ? 'Perusahaan & Posisi' : 'Company & Title'}
                                 </th>
-                                <th className="py-4 px-4 min-w-[140px]">
+                                <th className="py-3.5 px-4 min-w-[150px]">
                                     {isIndo ? 'Lokasi & Model' : 'Location & Model'}
                                 </th>
-                                <th className="py-4 px-4 min-w-[180px]">
+                                <th className="py-3.5 px-4 min-w-[180px]">
                                     {isIndo ? 'Kompensasi Gaji' : 'Salary Range'}
                                 </th>
-                                <th className="py-4 px-4 min-w-[130px]">
+                                <th className="py-3.5 px-4 min-w-[130px]">
                                     {isIndo ? 'Tgl Melamar' : 'Applied Date'}
                                 </th>
-                                <th className="py-4 px-4 min-w-[160px]">
+                                <th className="py-3.5 px-4 min-w-[160px]">
                                     {isIndo ? 'Tahapan Status' : 'Status'}
                                 </th>
-                                <th className="py-4 px-4 min-w-[120px] text-center">
-                                    {isIndo ? 'Tahapan Interview' : 'Interviews'}
+                                <th className="py-3.5 px-4 min-w-[120px] text-center">
+                                    {isIndo ? 'Interview' : 'Interviews'}
                                 </th>
-                                <th className="py-4 px-4 text-center w-28">
+                                <th className="py-3.5 px-4 text-center w-28">
                                     {isIndo ? 'Aksi' : 'Actions'}
                                 </th>
                             </tr>
                         </thead>
 
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
+                            
+                            {/* INLINE QUICK ADD ROW IN TABLE */}
+                            {isAddingRow && (
+                                <tr className="bg-indigo-50/50 dark:bg-indigo-950/30 border-b-2 border-indigo-500 animate-in fade-in duration-200">
+                                    {/* Company & Title Inputs */}
+                                    <td className="py-3 px-6">
+                                        <div className="space-y-1">
+                                            <input
+                                                type="text"
+                                                autoFocus
+                                                placeholder={isIndo ? 'Nama Perusahaan' : 'Company Name'}
+                                                value={newCompany}
+                                                onChange={(e) => setNewCompany(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleSaveNewRow();
+                                                    if (e.key === 'Escape') setIsAddingRow(false);
+                                                }}
+                                                className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder={isIndo ? 'Posisi / Role' : 'Job Title'}
+                                                value={newTitle}
+                                                onChange={(e) => setNewTitle(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleSaveNewRow();
+                                                    if (e.key === 'Escape') setIsAddingRow(false);
+                                                }}
+                                                className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            />
+                                        </div>
+                                    </td>
+
+                                    {/* Model Selector */}
+                                    <td className="py-3 px-4">
+                                        <select
+                                            value={newWorkModel}
+                                            onChange={(e) => setNewWorkModel(e.target.value)}
+                                            className="px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none"
+                                        >
+                                            <option value="remote">Remote 🌐</option>
+                                            <option value="hybrid">Hybrid 🏢</option>
+                                            <option value="onsite">Onsite 📍</option>
+                                        </select>
+                                    </td>
+
+                                    {/* Salary Placeholder */}
+                                    <td className="py-3 px-4 text-slate-400 italic text-[11px]">
+                                        {isIndo ? 'Edit setelah simpan' : 'Set in details'}
+                                    </td>
+
+                                    {/* Date */}
+                                    <td className="py-3 px-4 font-mono text-slate-500">
+                                        {new Date().toISOString().split('T')[0]}
+                                    </td>
+
+                                    {/* Status Selector */}
+                                    <td className="py-3 px-4">
+                                        <select
+                                            value={newStatus}
+                                            onChange={(e) => setNewStatus(e.target.value)}
+                                            className="px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none"
+                                        >
+                                            <option value="wishlist">💭 Wishlist</option>
+                                            <option value="applied">📤 Applied</option>
+                                            <option value="interview">🎯 Interview</option>
+                                        </select>
+                                    </td>
+
+                                    <td className="py-3 px-4 text-center text-slate-400">-</td>
+
+                                    {/* Save / Cancel buttons */}
+                                    <td className="py-3 px-4 text-center">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={handleSaveNewRow}
+                                                className="p-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
+                                                title="Save"
+                                            >
+                                                <Check size={14} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsAddingRow(false)}
+                                                className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition"
+                                                title="Cancel"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+
                             {jobs.map((job) => {
                                 const wmBadge = getWorkModelBadge(job.work_model);
                                 const salaryFormatted = formatSalaryDisplay(job.salary_min, job.salary_max, job.salary_currency, job.salary_period, isIndo);
@@ -177,26 +342,28 @@ export default function JobTable({
                                 return (
                                     <tr 
                                         key={job.id}
-                                        className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition group"
+                                        onClick={() => onEdit(job)}
+                                        className="hover:bg-indigo-50/30 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
                                     >
-                                        {/* Company & Title */}
-                                        <td className="py-4 px-6">
-                                            <div className="space-y-0.5">
-                                                <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider block">
-                                                    {job.company}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onEdit(job)}
-                                                    className="font-black text-slate-800 dark:text-white hover:text-indigo-600 text-left transition"
-                                                >
-                                                    {job.title}
-                                                </button>
+                                        {/* Company & Title with Avatar Initial */}
+                                        <td className="py-3.5 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100 dark:border-indigo-900/40 shrink-0">
+                                                    {job.company ? job.company.charAt(0).toUpperCase() : '💼'}
+                                                </div>
+                                                <div className="space-y-0.5 min-w-0">
+                                                    <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider block truncate">
+                                                        {job.company}
+                                                    </span>
+                                                    <h4 className="font-black text-slate-800 dark:text-white group-hover:text-indigo-600 transition truncate">
+                                                        {job.title}
+                                                    </h4>
+                                                </div>
                                             </div>
                                         </td>
 
                                         {/* Location & Model */}
-                                        <td className="py-4 px-4">
+                                        <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
                                             <div className="space-y-1">
                                                 <span className="text-slate-600 dark:text-slate-300 font-bold block truncate max-w-[130px]">
                                                     {job.location || '-'}
@@ -210,7 +377,7 @@ export default function JobTable({
                                         </td>
 
                                         {/* Salary Range */}
-                                        <td className="py-4 px-4">
+                                        <td className="py-3.5 px-4">
                                             {(job.salary_min || job.salary_max) ? (
                                                 <span className="px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-200 dark:border-emerald-800/80 inline-block">
                                                     {salaryFormatted}
@@ -223,12 +390,12 @@ export default function JobTable({
                                         </td>
 
                                         {/* Applied Date */}
-                                        <td className="py-4 px-4 font-bold text-slate-600 dark:text-slate-400">
+                                        <td className="py-3.5 px-4 font-bold text-slate-600 dark:text-slate-400">
                                             {job.applied_date || '-'}
                                         </td>
 
                                         {/* Status Dropdown */}
-                                        <td className="py-4 px-4">
+                                        <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
                                             <JobStatusDropdown
                                                 value={job.status}
                                                 onChange={(val) => onStatusChange(job, val)}
@@ -236,7 +403,7 @@ export default function JobTable({
                                         </td>
 
                                         {/* Interview Rounds */}
-                                        <td className="py-4 px-4 text-center">
+                                        <td className="py-3.5 px-4 text-center" onClick={(e) => e.stopPropagation()}>
                                             {roundCount > 0 ? (
                                                 <button
                                                     type="button"
@@ -250,7 +417,7 @@ export default function JobTable({
                                                 <button
                                                     type="button"
                                                     onClick={() => onEdit(job)}
-                                                    className="text-[11px] text-slate-400 hover:text-indigo-600 transition"
+                                                    className="text-[11px] font-bold text-slate-400 hover:text-indigo-600 transition"
                                                 >
                                                     + {isIndo ? 'Tambah' : 'Add'}
                                                 </button>
@@ -258,21 +425,21 @@ export default function JobTable({
                                         </td>
 
                                         {/* Actions */}
-                                        <td className="py-4 px-4 text-center">
+                                        <td className="py-3.5 px-4 text-center" onClick={(e) => e.stopPropagation()}>
                                             <div className="flex items-center justify-center gap-1">
                                                 <button
                                                     type="button"
                                                     onClick={() => onScan(job)}
                                                     className="p-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 transition"
-                                                    title="ATS Scan"
+                                                    title="ATS Match Scan"
                                                 >
                                                     <Sparkles size={14} />
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onEdit(job)}
-                                                    className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 transition"
-                                                    title="Edit"
+                                                    className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 transition"
+                                                    title="Inspect in Drawer"
                                                 >
                                                     <Edit3 size={14} />
                                                 </button>
@@ -290,11 +457,16 @@ export default function JobTable({
                                 );
                             })}
 
-                            {jobs.length === 0 && (
+                            {jobs.length === 0 && !isAddingRow && (
                                 <tr>
-                                    <td colSpan={7} className="py-16 text-center text-slate-400">
+                                    <td colSpan={7} className="py-20 text-center text-slate-400">
                                         <span className="text-4xl block mb-2">💼</span>
-                                        {isIndo ? 'Tidak ada data lamaran kerja.' : 'No job applications found.'}
+                                        <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
+                                            {isIndo ? 'Belum ada data lamaran kerja.' : 'No job applications found.'}
+                                        </p>
+                                        <p className="text-xs text-slate-400 mt-1">
+                                            {isIndo ? 'Gunakan bar input di atas atau klik tombol Tambah Baris Baru.' : 'Use the quick add bar above or click Add Row.'}
+                                        </p>
                                     </td>
                                 </tr>
                             )}

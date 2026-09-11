@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { JobRowItem } from '../lib/jobAnalytics';
 
-export type JobViewMode = 'kanban' | 'table' | 'interviews' | 'compare';
+export type JobViewMode = 'table' | 'interviews' | 'compare';
 
 export interface JobFilterParams {
     search?: string;
@@ -212,38 +212,25 @@ export default function JobFilterBar({
                     )}
                 </div>
 
-                {/* 4-View Switcher Tabs */}
+                {/* 3-View Switcher Tabs */}
                 <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 shrink-0 self-start lg:self-auto overflow-x-auto no-scrollbar">
                     <button
                         type="button"
-                        onClick={() => setViewMode('kanban')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'kanban'
-                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
-                        }`}
-                    >
-                        <Kanban size={14} />
-                        <span>Kanban Pipeline</span>
-                    </button>
-
-                    <button
-                        type="button"
                         onClick={() => setViewMode('table')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
                             viewMode === 'table'
                                 ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
                         }`}
                     >
                         <Table size={14} />
-                        <span>{isIndo ? 'Tabel Detail' : 'Table View'}</span>
+                        <span>{isIndo ? 'Daftar Lamaran' : 'Application List'}</span>
                     </button>
 
                     <button
                         type="button"
                         onClick={() => setViewMode('interviews')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
                             viewMode === 'interviews'
                                 ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
@@ -256,7 +243,7 @@ export default function JobFilterBar({
                     <button
                         type="button"
                         onClick={() => setViewMode('compare')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
                             viewMode === 'compare'
                                 ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
