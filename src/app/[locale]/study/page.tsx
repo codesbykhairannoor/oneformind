@@ -12,6 +12,7 @@ import GpaSimulator from './components/GpaSimulator';
 import AssignmentRadar from './components/AssignmentRadar';
 import StudyFocusRoom from './components/StudyFocusRoom';
 import FlashcardsDeckView from './components/FlashcardsDeckView';
+import BookTracker from './components/BookTracker';
 import { useStudyData } from './hooks/useStudyData';
 import { CourseRecord } from './components/CourseCard';
 import { Loader2 } from 'lucide-react';
@@ -132,6 +133,13 @@ export default function StudyPage() {
 
                                     {activeTab === 'flashcards' && (
                                         <FlashcardsDeckView
+                                            courses={filteredCourses}
+                                            terms={terms}
+                                        />
+                                    )}
+
+                                    {activeTab === 'books' && (
+                                        <BookTracker
                                             courses={filteredCourses}
                                             terms={terms}
                                         />

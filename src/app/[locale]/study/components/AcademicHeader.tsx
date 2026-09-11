@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { 
     ChevronDown, Trash2, Plus, BookOpen, 
     Calendar, Clock, BrainCircuit, Sparkles, 
-    ExternalLink, Layers, CheckSquare
+    ExternalLink, Layers, CheckSquare, Bookmark
 } from 'lucide-react';
 
-export type StudyActiveTab = 'courses' | 'assignments' | 'focus' | 'flashcards';
+export type StudyActiveTab = 'courses' | 'assignments' | 'focus' | 'flashcards' | 'books';
 
 interface AcademicHeaderProps {
     userSettings: Record<string, any>;
@@ -73,6 +73,11 @@ export default function AcademicHeader({
             id: 'flashcards',
             label: isIndo ? 'Flashcards' : 'Active Recall',
             icon: <BrainCircuit size={15} />
+        },
+        {
+            id: 'books',
+            label: isIndo ? 'Rak Bacaan & Buku' : 'Book Tracker',
+            icon: <Bookmark size={15} />
         }
     ];
 
