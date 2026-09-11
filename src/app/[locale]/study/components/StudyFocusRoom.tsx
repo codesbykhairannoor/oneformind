@@ -12,12 +12,19 @@ import { CourseRecord } from './CourseCard';
 interface StudyFocusRoomProps {
     courses: CourseRecord[];
     terms: Record<string, string>;
+    focusStats?: { completedSessions: number; totalFocusMinutes: number };
+    onSaveFocusStats?: (stats: { completedSessions: number; totalFocusMinutes: number }) => void;
 }
 
 type TimerMode = 'focus' | 'short_break' | 'long_break';
 type SoundscapeType = 'rain' | 'waves' | 'cafe' | 'whitenoise' | 'none';
 
-export default function StudyFocusRoom({ courses, terms }: StudyFocusRoomProps) {
+export default function StudyFocusRoom({ 
+    courses, 
+    terms,
+    focusStats = { completedSessions: 0, totalFocusMinutes: 0 },
+    onSaveFocusStats
+}: StudyFocusRoomProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
 
@@ -25,11 +32,11 @@ export default function StudyFocusRoom({ courses, terms }: StudyFocusRoomProps) 
     const [mode, setMode] = useState<TimerMode>('focus');
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isRunning, setIsRunning] = useState(false);
-    const [selectedCourse, setSelectedCourse] = useState(courses[0]?.course_name || (isIndo ? 'Pemrograman Web' : 'Web Engineering'));
+    const [selectedCourse, setSelectedCourse] = useState(courses[0]?.course_name || (isIndo ? 'Mata Kuliah' : 'Course'));
 
     // Stats
-    const [completedSessions, setCompletedSessions] = useState(0);
-    const [totalFocusMinutes, setTotalFocusMinutes] = useState(0);
+    const completedSessions = focusStats.completedSessions || 0;
+    const totalFocusMinutes = focusStats.totalFocusMinutes || 0;
 
     // Ambient sound synthesizer state
     const [activeSound, setActiveSound] = useState<SoundscapeType>('none');
@@ -63,8 +70,11 @@ export default function StudyFocusRoom({ courses, terms }: StudyFocusRoomProps) 
             setIsRunning(false);
             playBeep();
             if (mode === 'focus') {
-                setCompletedSessions(prev => prev + 1);
-                setTotalFocusMinutes(prev => prev + 25);
+                const updated = {
+                    completedSessions: completedSessions + 1,
+                    totalFocusMinutes: totalFocusMinutes + 25
+                };
+                onSaveFocusStats?.(updated);
                 setMode('short_break');
                 setTimeLeft(durations.short_break);
             } else {
@@ -73,7 +83,7 @@ export default function StudyFocusRoom({ courses, terms }: StudyFocusRoomProps) 
             }
         }
         return () => clearInterval(interval);
-    }, [isRunning, timeLeft, mode]);
+    }, [isRunning, timeLeft, mode, completedSessions, totalFocusMinutes, onSaveFocusStats]);
 
     // Web Audio Synthesizer Beep
     const playBeep = () => {

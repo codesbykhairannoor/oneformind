@@ -21,15 +21,19 @@ export interface FlashcardItem {
 interface FlashcardsDeckViewProps {
     courses: CourseRecord[];
     terms: Record<string, string>;
+    cards?: FlashcardItem[];
+    onSaveFlashcards?: (items: FlashcardItem[]) => void;
 }
 
-const STORAGE_KEY = 'tranvas_study_flashcards';
-
-export default function FlashcardsDeckView({ courses, terms }: FlashcardsDeckViewProps) {
+export default function FlashcardsDeckView({ 
+    courses, 
+    terms,
+    cards = [],
+    onSaveFlashcards 
+}: FlashcardsDeckViewProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
 
-    const [cards, setCards] = useState<FlashcardItem[]>([]);
     const [selectedDeckCourse, setSelectedDeckCourse] = useState<string>('all');
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
@@ -41,54 +45,8 @@ export default function FlashcardsDeckView({ courses, terms }: FlashcardsDeckVie
         answer: ''
     });
 
-    // Load initial flashcards
-    useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                setCards(JSON.parse(saved));
-            } catch (e) {
-                console.error(e);
-            }
-        } else {
-            const defaults: FlashcardItem[] = [
-                {
-                    id: '1',
-                    course_name: courses[0]?.course_name || (isIndo ? 'Pemrograman Web' : 'Web Engineering'),
-                    question: isIndo ? 'Apa perbedaan utama antara React Server Components (RSC) dan Client Components?' : 'What is the key difference between React Server Components (RSC) and Client Components?',
-                    answer: isIndo ? 'RSC dieksekusi di server dan mengirim 0 KB client-side JavaScript bundle, sedangkan Client Components dieksekusi di browser untuk state dan interactivity.' : 'RSC executes on the server and ships 0 KB client-side JavaScript, whereas Client Components execute in the browser for local state and interactivity.',
-                    mastery_score: 1
-                },
-                {
-                    id: '2',
-                    course_name: courses[0]?.course_name || (isIndo ? 'Pemrograman Web' : 'Web Engineering'),
-                    question: isIndo ? 'Kapan sebaiknya menggunakan dynamic rendering vs static rendering di Next.js?' : 'When should you use dynamic rendering vs static rendering in Next.js?',
-                    answer: isIndo ? 'Gunakan static rendering untuk konten yang jarang berubah (blog, landing page), dan dynamic rendering jika data bergantung pada user headers/cookies/searchParams per request.' : 'Use static rendering for content that rarely changes (blogs, docs), and dynamic rendering when data depends on per-request cookies/headers/searchParams.',
-                    mastery_score: 2
-                },
-                {
-                    id: '3',
-                    course_name: courses[1]?.course_name || (isIndo ? 'Algoritma & Struktur Data' : 'Data Structures'),
-                    question: isIndo ? 'Berapa kompleksitas waktu algoritma Dijkstra dengan Priority Queue (Min-Heap)?' : 'What is the time complexity of Dijkstra algorithm with a Min-Heap Priority Queue?',
-                    answer: isIndo ? 'O((V + E) log V), di mana V adalah jumlah vertex dan E adalah jumlah edge graf.' : 'O((V + E) log V), where V is the number of vertices and E is the number of edges.',
-                    mastery_score: 0
-                },
-                {
-                    id: '4',
-                    course_name: courses[1]?.course_name || (isIndo ? 'Algoritma & Struktur Data' : 'Data Structures'),
-                    question: isIndo ? 'Apa prinsip dasar Dynamic Programming (Memoization vs Tabulation)?' : 'What is the core principle of Dynamic Programming (Memoization vs Tabulation)?',
-                    answer: isIndo ? 'Memoization menggunakan pendekatan Top-Down dengan rekursi + cache tabel. Tabulation menggunakan pendekatan Bottom-Up dengan iterasi mengisi tabel array.' : 'Memoization is Top-Down using recursion + cache table. Tabulation is Bottom-Up using iteration to fill table array sequentially.',
-                    mastery_score: 2
-                }
-            ];
-            setCards(defaults);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-        }
-    }, [courses, isIndo]);
-
     const saveCards = (newCards: FlashcardItem[]) => {
-        setCards(newCards);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newCards));
+        onSaveFlashcards?.(newCards);
     };
 
     // Filtered deck

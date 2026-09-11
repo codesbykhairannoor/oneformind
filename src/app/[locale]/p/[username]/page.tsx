@@ -38,103 +38,108 @@ export default function PublicPortfolioShowPage({ params }: PublicPortfolioPageP
     const isIndo = locale === 'id';
 
     const resolvedParams = React.use(params);
-    const username = resolvedParams.username || 'khairan_noor';
+    const username = resolvedParams.username || 'student';
 
-    const profile = {
-        name: username === 'khairan_noor' ? 'Khairan Noor' : username.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    const [profile, setProfile] = React.useState({
+        name: username.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
         headline: isIndo 
-            ? 'Software Engineer & Mahasiswa Teknik Informatika Berprestasi' 
-            : 'Software Engineer & High-Distinction Computer Science Student',
+            ? 'Software Engineer & Mahasiswa Berprestasi' 
+            : 'Software Engineer & High-Distinction Student',
         major: isIndo ? 'Teknik Informatika (Software Engineering)' : 'Computer Science & Software Engineering',
         ipk: '3.92',
-        sks: '112',
-        cumlaude: isIndo ? 'Summa Cum Laude Candidate 🏆' : 'Summa Cum Laude Candidate 🏆',
+        sks: '0',
+        cumlaude: isIndo ? 'Cum Laude Candidate 🏆' : 'Cum Laude Candidate 🏆',
         bio: isIndo
-            ? 'Fokus pada arsitektur sistem web performa tinggi (Next.js, Go, PostgreSQL), algoritma graf terdistribusi, dan riset publikasi terindeks SINTA.'
-            : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and SINTA-indexed academic research.',
-        github: 'https://github.com/codesbykhairannoor',
+            ? 'Fokus pada arsitektur sistem web performa tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi.'
+            : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and academic research.',
+        github: `https://github.com/${username}`,
         linkedin: 'https://linkedin.com',
-        email: 'khairan@tranvas.app',
+        email: `${username}@tranvas.app`,
         website: 'https://tranvas.app'
-    };
+    });
 
-    const projects = [
-        {
-            id: '1',
-            title: 'Tranvas OS - Next-Gen Productivity Suite',
-            description: isIndo 
-                ? 'Platform produktivitas modular all-in-one dengan arsitektur multi-tenant, Go backend, dan Next.js 16 App Router.' 
-                : 'All-in-one modular productivity platform with multi-tenant architecture, Go backend, and Next.js 16 App Router.',
-            tags: ['Next.js 16', 'TypeScript', 'Go', 'PostgreSQL', 'Tailwind CSS'],
-            demo_url: 'https://tranvas.app',
-            github_url: 'https://github.com/example/tranvas',
-            role: 'Lead Architect',
-            stars_or_metric: '< 45ms P99 Latency'
-        },
-        {
-            id: '2',
-            title: 'Neural Matrix Academic Engine',
-            description: isIndo
-                ? 'Sistem analisis kurikulum otomatis dan simulator IPK cerdas dengan integrasi Spaced Repetition Flashcards.'
-                : 'Automated curriculum analysis and GPA simulator engine with Spaced Repetition active recall integration.',
-            tags: ['React', 'Web Audio API', 'Canvas API', 'TypeScript'],
-            demo_url: 'https://tranvas.app/study',
-            github_url: 'https://github.com/example/academic-engine',
-            role: 'Fullstack Creator',
-            stars_or_metric: '100% Client-side Offline'
-        }
-    ];
+    const [projects, setProjects] = React.useState<any[]>([]);
+    const [honors, setHonors] = React.useState<any[]>([]);
+    const [coursework, setCoursework] = React.useState<any[]>([]);
 
-    const honors = [
-        {
-            id: '1',
-            title: isIndo ? 'Juara 1 Lomba Karya Tulis Ilmiah (LKTI) Nasional' : '1st Place National Scientific Paper Competition',
-            issuer: isIndo ? 'Kementerian Pendidikan & Riset' : 'Ministry of Education & Tech',
-            year: '2025',
-            badge: '🏆 1st Winner'
-        },
-        {
-            id: '2',
-            title: isIndo ? 'Publikasi Jurnal SINTA 2: Optimalisasi Query Graf' : 'SINTA 2 Journal Publication: Graph Query Optimization',
-            issuer: 'Journal of Computer Science & Systems',
-            year: '2025',
-            badge: '📄 SINTA 2'
-        },
-        {
-            id: '3',
-            title: isIndo ? 'Dean\'s List of Academic Excellence (4 Semesters)' : 'Dean\'s List of Academic Excellence (4 Semesters)',
-            issuer: 'Fakultas Ilmu Komputer',
-            year: '2024 - 2026',
-            badge: '✨ Honor Roll'
-        }
-    ];
+    React.useEffect(() => {
+        const fetchLivePublicData = async () => {
+            try {
+                const [userRes, coursesRes] = await Promise.all([
+                    fetch('/api/user'),
+                    fetch('/api/study/courses')
+                ]);
 
-    const coursework = [
-        {
-            id: '1',
-            course_name: isIndo ? 'Pemrograman Web & Sistem Terdistribusi' : 'Web Systems & Distributed Architecture',
-            grade: 'A (4.00)',
-            semester: 'Semester 5',
-            highlight: isIndo ? 'Implementasi fullstack Server Components & Optimistic UI' : 'Fullstack Server Components & Optimistic UI architecture',
-            artifact_link: 'https://github.com/example/web-systems'
-        },
-        {
-            id: '2',
-            course_name: isIndo ? 'Algoritma & Struktur Data Lanjut' : 'Advanced Algorithms & Data Structures',
-            grade: 'A (4.00)',
-            semester: 'Semester 4',
-            highlight: isIndo ? 'Analisis kompleksitas Dijkstra, Bellman-Ford, dan Graf Segment Tree' : 'Complexity analysis of Dijkstra, Bellman-Ford & Segment Trees',
-            artifact_link: 'https://github.com/example/algo-lab'
-        },
-        {
-            id: '3',
-            course_name: isIndo ? 'Desain & Manajemen Basis Data' : 'Database Systems & Architecture',
-            grade: 'A (4.00)',
-            semester: 'Semester 4',
-            highlight: isIndo ? 'Desain skema normalisasi 3NF & tuning PostgreSQL query execution plan' : '3NF schema design & PostgreSQL query execution plan tuning',
-            artifact_link: 'https://github.com/example/database-perf'
-        }
-    ];
+                let totalSksCalc = 0;
+                let totalPointsCalc = 0;
+
+                if (coursesRes.ok) {
+                    const coursesData = await coursesRes.json();
+                    if (Array.isArray(coursesData) && coursesData.length > 0) {
+                        const gradeWeights: Record<string, number> = {
+                            'A': 4.0, 'A-': 3.75, 'B+': 3.5, 'B': 3.0, 'B-': 2.75, 'C+': 2.5, 'C': 2.0, 'D': 1.0, 'E': 0.0
+                        };
+
+                        const ev = coursesData.map((c: any) => {
+                            const sksVal = Number(c.sks) || 3;
+                            const g = c.grade || 'A';
+                            const w = gradeWeights[g] ?? 4.0;
+                            totalSksCalc += sksVal;
+                            totalPointsCalc += (w * sksVal);
+
+                            const firstArchive = c.archives && c.archives.length > 0 ? c.archives[0] : null;
+
+                            return {
+                                id: String(c.id),
+                                course_name: c.courseName || 'Mata Kuliah',
+                                grade: `${g} (${w.toFixed(2)})`,
+                                semester: `Semester ${c.semester || 1}`,
+                                highlight: firstArchive?.fileName ? `Modul: ${firstArchive.fileName}` : (isIndo ? 'Mata Kuliah Kurikulum Inti' : 'Core Curriculum Course'),
+                                artifact_link: firstArchive?.linkUrl || (firstArchive?.filePath ? `/storage/${firstArchive.filePath}` : undefined)
+                            };
+                        });
+                        setCoursework(ev);
+                    }
+                }
+
+                if (userRes.ok) {
+                    const userData = await userRes.json();
+                    const studySettings = userData.settings?.study || {};
+                    const calculatedIpk = totalSksCalc > 0 ? (totalPointsCalc / totalSksCalc).toFixed(2) : (studySettings.prior_ipk ? Number(studySettings.prior_ipk).toFixed(2) : '3.92');
+                    const calculatedSks = totalSksCalc > 0 ? String(totalSksCalc) : (studySettings.prior_sks ? String(studySettings.prior_sks) : '0');
+                    const numIpk = parseFloat(calculatedIpk);
+
+                    setProfile({
+                        name: userData.name || username.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                        headline: studySettings.headline || (isIndo 
+                            ? 'Software Engineer & Mahasiswa Berprestasi' 
+                            : 'Software Engineer & High-Distinction Student'),
+                        major: studySettings.major || (isIndo ? 'Teknik Informatika (Software Engineering)' : 'Computer Science & Software Engineering'),
+                        ipk: calculatedIpk,
+                        sks: calculatedSks,
+                        cumlaude: numIpk >= 3.8 ? 'Summa Cum Laude Candidate 🏆' : numIpk >= 3.5 ? 'Cum Laude Candidate 🏆' : 'Good Standing',
+                        bio: studySettings.bio || (isIndo
+                            ? 'Fokus pada arsitektur sistem web performa tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi.'
+                            : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and academic research.'),
+                        github: userData.settings?.social_github || `https://github.com/${username}`,
+                        linkedin: userData.settings?.social_linkedin || 'https://linkedin.com',
+                        email: userData.email || `${username}@tranvas.app`,
+                        website: userData.settings?.social_website || 'https://tranvas.app'
+                    });
+
+                    if (Array.isArray(userData.settings?.portfolio_projects)) {
+                        setProjects(userData.settings.portfolio_projects);
+                    }
+                    if (Array.isArray(userData.settings?.portfolio_honors)) {
+                        setHonors(userData.settings.portfolio_honors);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load public live data:', e);
+            }
+        };
+        fetchLivePublicData();
+    }, [username, isIndo]);
 
     const competencies = [
         { name: 'Fullstack Architecture (Next.js, React)', level: '96%' },
@@ -277,7 +282,7 @@ export default function PublicPortfolioShowPage({ params }: PublicPortfolioPageP
                                     </p>
 
                                     <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                        {proj.tags.map((tag) => (
+                                        {Array.isArray(proj.tags) && proj.tags.map((tag: string) => (
                                             <span key={tag} className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold border border-slate-200 dark:border-slate-600">
                                                 {tag}
                                             </span>

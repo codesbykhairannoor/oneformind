@@ -25,6 +25,7 @@ export default function StudyPage() {
     const {
         isLoading,
         userSettings,
+        rawUserData,
         hasCompletedSetup,
         terms,
         selectedSemester,
@@ -33,6 +34,16 @@ export default function StudyPage() {
         filteredCourses,
         setSelectedCourse,
         activeCourseReactive,
+        assignments,
+        flashcards,
+        books,
+        readingGoal,
+        focusStats,
+        handleSaveAssignments,
+        handleSaveFlashcards,
+        handleSaveBooks,
+        handleSaveReadingGoal,
+        handleSaveFocusStats,
         handleSetupCompleted,
         handleAddSemester,
         handleDeleteSemester,
@@ -121,6 +132,8 @@ export default function StudyPage() {
                                         <AssignmentRadar
                                             courses={filteredCourses}
                                             terms={terms}
+                                            assignments={assignments}
+                                            onSaveAssignments={handleSaveAssignments}
                                         />
                                     )}
 
@@ -128,6 +141,8 @@ export default function StudyPage() {
                                         <StudyFocusRoom
                                             courses={filteredCourses}
                                             terms={terms}
+                                            focusStats={focusStats}
+                                            onSaveFocusStats={handleSaveFocusStats}
                                         />
                                     )}
 
@@ -135,6 +150,8 @@ export default function StudyPage() {
                                         <FlashcardsDeckView
                                             courses={filteredCourses}
                                             terms={terms}
+                                            cards={flashcards}
+                                            onSaveFlashcards={handleSaveFlashcards}
                                         />
                                     )}
 
@@ -142,6 +159,10 @@ export default function StudyPage() {
                                         <BookTracker
                                             courses={filteredCourses}
                                             terms={terms}
+                                            books={books}
+                                            readingGoal={readingGoal}
+                                            onSaveBooks={handleSaveBooks}
+                                            onSaveGoal={handleSaveReadingGoal}
                                         />
                                     )}
 

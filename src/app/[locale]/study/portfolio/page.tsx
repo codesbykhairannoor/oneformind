@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
@@ -62,115 +62,124 @@ export default function StudyPortfolioPage() {
     const locale = useLocale();
     const isIndo = locale === 'id';
 
-    const [username, setUsername] = useState('khairan_noor');
+    const [username, setUsername] = useState('student');
     const [isEditingUsername, setIsEditingUsername] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false);
     const [isExportCvModalOpen, setIsExportCvModalOpen] = useState(false);
 
-    // Profile state
+    // Profile state from Supabase
     const [profile, setProfile] = useState({
-        name: 'Khairan Noor',
+        name: 'Student',
         headline: isIndo 
-            ? 'Software Engineer & Mahasiswa Teknik Informatika Berprestasi' 
-            : 'Software Engineer & High-Distinction Computer Science Student',
+            ? 'Software Engineer & Mahasiswa Berprestasi' 
+            : 'Software Engineer & High-Distinction Student',
         major: isIndo ? 'Teknik Informatika (Software Engineering)' : 'Computer Science & Software Engineering',
         ipk: '3.92',
-        sks: '112',
-        cumlaude: isIndo ? 'Summa Cum Laude Candidate' : 'Summa Cum Laude Candidate',
+        sks: '0',
+        cumlaude: isIndo ? 'Cum Laude Candidate' : 'Cum Laude Candidate',
         bio: isIndo
-            ? 'Fokus pada arsitektur sistem web skala tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi terindeks SINTA.'
-            : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and SINTA-indexed academic research.',
-        github: 'https://github.com/codesbykhairannoor',
-        linkedin: 'https://linkedin.com',
-        email: 'khairan@tranvas.app',
-        website: 'https://tranvas.app'
+            ? 'Fokus pada arsitektur sistem web skala tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi.'
+            : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and academic research.',
+        github: '',
+        linkedin: '',
+        email: '',
+        website: ''
     });
 
-    // Featured Projects state
-    const [projects, setProjects] = useState<FeaturedProject[]>([
-        {
-            id: '1',
-            title: 'Tranvas OS - Next-Gen Productivity Suite',
-            description: isIndo 
-                ? 'Platform produktivitas modular all-in-one dengan arsitektur multi-tenant, Go backend, dan Next.js 16 App Router.' 
-                : 'All-in-one modular productivity platform with multi-tenant architecture, Go backend, and Next.js 16 App Router.',
-            tags: ['Next.js 16', 'TypeScript', 'Go', 'PostgreSQL', 'Tailwind CSS'],
-            demo_url: 'https://tranvas.app',
-            github_url: 'https://github.com/example/tranvas',
-            role: 'Lead Architect',
-            stars_or_metric: '< 45ms P99 Latency'
-        },
-        {
-            id: '2',
-            title: 'Neural Matrix Academic Engine',
-            description: isIndo
-                ? 'Sistem analisis kurikulum otomatis dan simulator IPK cerdas dengan integrasi Spaced Repetition Flashcards.'
-                : 'Automated curriculum analysis and GPA simulator engine with Spaced Repetition active recall integration.',
-            tags: ['React', 'Web Audio API', 'Canvas API', 'TypeScript'],
-            demo_url: 'https://tranvas.app/study',
-            github_url: 'https://github.com/example/academic-engine',
-            role: 'Fullstack Creator',
-            stars_or_metric: '100% Client-side Offline'
-        }
-    ]);
+    // Featured Projects state from Supabase
+    const [projects, setProjects] = useState<FeaturedProject[]>([]);
 
-    // Academic Honors & Publications
-    const [honors, setHonors] = useState<AcademicHonor[]>([
-        {
-            id: '1',
-            title: isIndo ? 'Juara 1 Lomba Karya Tulis Ilmiah (LKTI) Nasional' : '1st Place National Scientific Paper Competition',
-            issuer: isIndo ? 'Kementerian Pendidikan & Riset' : 'Ministry of Education & Tech',
-            year: '2025',
-            type: 'competition',
-            badge: '🏆 1st Winner'
-        },
-        {
-            id: '2',
-            title: isIndo ? 'Publikasi Jurnal SINTA 2: Optimalisasi Query Graf' : 'SINTA 2 Journal Publication: Graph Query Optimization',
-            issuer: 'Journal of Computer Science & Systems',
-            year: '2025',
-            type: 'publication',
-            badge: '📄 SINTA 2'
-        },
-        {
-            id: '3',
-            title: isIndo ? 'Dean\'s List of Academic Excellence (4 Semesters)' : 'Dean\'s List of Academic Excellence (4 Semesters)',
-            issuer: 'Fakultas Ilmu Komputer',
-            year: '2024 - 2026',
-            type: 'certification',
-            badge: '✨ Honor Roll'
-        }
-    ]);
+    // Academic Honors & Publications from Supabase
+    const [honors, setHonors] = useState<AcademicHonor[]>([]);
 
-    // Coursework Proof Transcripts
-    const [coursework, setCoursework] = useState<CourseworkEvidence[]>([
-        {
-            id: '1',
-            course_name: isIndo ? 'Pemrograman Web & Sistem Terdistribusi' : 'Web Systems & Distributed Architecture',
-            grade: 'A (4.00)',
-            semester: 'Semester 5',
-            highlight: isIndo ? 'Implementasi fullstack Server Components & Optimistic UI' : 'Fullstack Server Components & Optimistic UI architecture',
-            artifact_link: 'https://github.com/example/web-systems'
-        },
-        {
-            id: '2',
-            course_name: isIndo ? 'Algoritma & Struktur Data Lanjut' : 'Advanced Algorithms & Data Structures',
-            grade: 'A (4.00)',
-            semester: 'Semester 4',
-            highlight: isIndo ? 'Analisis kompleksitas Dijkstra, Bellman-Ford, dan Graf Segment Tree' : 'Complexity analysis of Dijkstra, Bellman-Ford & Segment Trees',
-            artifact_link: 'https://github.com/example/algo-lab'
-        },
-        {
-            id: '3',
-            course_name: isIndo ? 'Desain & Manajemen Basis Data' : 'Database Systems & Architecture',
-            grade: 'A (4.00)',
-            semester: 'Semester 4',
-            highlight: isIndo ? 'Desain skema normalisasi 3NF & tuning PostgreSQL query execution plan' : '3NF schema design & PostgreSQL query execution plan tuning',
-            artifact_link: 'https://github.com/example/database-perf'
+    // Coursework Proof Transcripts from Supabase
+    const [coursework, setCoursework] = useState<CourseworkEvidence[]>([]);
+
+    // Fetch live Supabase user & study courses
+    const loadSupabaseData = async () => {
+        try {
+            const [userRes, coursesRes] = await Promise.all([
+                fetch('/api/user'),
+                fetch('/api/study/courses')
+            ]);
+
+            let totalSksCalc = 0;
+            let totalPointsCalc = 0;
+
+            if (coursesRes.ok) {
+                const coursesData = await coursesRes.json();
+                if (Array.isArray(coursesData) && coursesData.length > 0) {
+                    const gradeWeights: Record<string, number> = {
+                        'A': 4.0, 'A-': 3.75, 'B+': 3.5, 'B': 3.0, 'B-': 2.75, 'C+': 2.5, 'C': 2.0, 'D': 1.0, 'E': 0.0
+                    };
+
+                    const ev: CourseworkEvidence[] = coursesData.map((c: any) => {
+                        const sksVal = Number(c.sks) || 3;
+                        const g = c.grade || 'A';
+                        const w = gradeWeights[g] ?? 4.0;
+                        totalSksCalc += sksVal;
+                        totalPointsCalc += (w * sksVal);
+
+                        const firstArchive = c.archives && c.archives.length > 0 ? c.archives[0] : null;
+
+                        return {
+                            id: String(c.id),
+                            course_name: c.courseName || 'Mata Kuliah',
+                            grade: `${g} (${w.toFixed(2)})`,
+                            semester: `Semester ${c.semester || 1}`,
+                            highlight: firstArchive?.fileName ? `Modul: ${firstArchive.fileName}` : (isIndo ? 'Mata Kuliah Kurikulum Inti' : 'Core Curriculum Course'),
+                            artifact_link: firstArchive?.linkUrl || (firstArchive?.filePath ? `/storage/${firstArchive.filePath}` : undefined)
+                        };
+                    });
+                    setCoursework(ev);
+                }
+            }
+
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                const uName = userData.username || (userData.name ? userData.name.toLowerCase().replace(/\s+/g, '_') : 'student');
+                setUsername(uName);
+
+                const studySettings = userData.settings?.study || {};
+                const calculatedIpk = totalSksCalc > 0 ? (totalPointsCalc / totalSksCalc).toFixed(2) : (studySettings.prior_ipk ? Number(studySettings.prior_ipk).toFixed(2) : '3.92');
+                const calculatedSks = totalSksCalc > 0 ? String(totalSksCalc) : (studySettings.prior_sks ? String(studySettings.prior_sks) : '0');
+                const numIpk = parseFloat(calculatedIpk);
+
+                setProfile({
+                    name: userData.name || 'Student',
+                    headline: studySettings.headline || (isIndo 
+                        ? 'Software Engineer & Mahasiswa Berprestasi' 
+                        : 'Software Engineer & High-Distinction Student'),
+                    major: studySettings.major || (isIndo ? 'Teknik Informatika (Software Engineering)' : 'Computer Science & Software Engineering'),
+                    ipk: calculatedIpk,
+                    sks: calculatedSks,
+                    cumlaude: numIpk >= 3.8 ? 'Summa Cum Laude Candidate' : numIpk >= 3.5 ? 'Cum Laude Candidate' : 'Good Standing',
+                    bio: studySettings.bio || (isIndo
+                        ? 'Fokus pada arsitektur sistem web skala tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi.'
+                        : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and academic research.'),
+                    github: userData.settings?.social_github || (userData.name ? `https://github.com/${uName}` : 'https://github.com'),
+                    linkedin: userData.settings?.social_linkedin || 'https://linkedin.com',
+                    email: userData.email || '',
+                    website: userData.settings?.social_website || 'https://tranvas.app'
+                });
+
+                if (Array.isArray(userData.settings?.portfolio_projects)) {
+                    setProjects(userData.settings.portfolio_projects);
+                }
+                if (Array.isArray(userData.settings?.portfolio_honors)) {
+                    setHonors(userData.settings.portfolio_honors);
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load portfolio Supabase data:', err);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        loadSupabaseData();
+    }, []);
 
     // New project form state
     const [newProject, setNewProject] = useState({
@@ -199,12 +208,13 @@ export default function StudyPortfolioPage() {
         }
     };
 
-    const handleRefresh = () => {
+    const handleRefresh = async () => {
         setIsRefreshing(true);
-        setTimeout(() => setIsRefreshing(false), 600);
+        await loadSupabaseData();
+        setIsRefreshing(false);
     };
 
-    const handleAddProjectSubmit = (e: React.FormEvent) => {
+    const handleAddProjectSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newProject.title.trim()) return;
 
@@ -219,8 +229,26 @@ export default function StudyPortfolioPage() {
             stars_or_metric: newProject.stars_or_metric
         };
 
-        setProjects([p, ...projects]);
+        const updated = [p, ...projects];
+        setProjects(updated);
         setIsAddProjectModalOpen(false);
+
+        // Save to Supabase
+        try {
+            const userRes = await fetch('/api/user');
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                const newSettings = { ...userData.settings, portfolio_projects: updated };
+                await fetch('/api/user', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings: newSettings })
+                });
+            }
+        } catch (err) {
+            console.error('Failed to save project to Supabase:', err);
+        }
+
         setNewProject({
             title: '',
             description: '',

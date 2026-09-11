@@ -15,17 +15,26 @@ import { STORAGE_KEY_BOOKS, STORAGE_KEY_GOAL, COVER_GRADIENTS } from './books/co
 interface BookTrackerProps {
     courses: CourseRecord[];
     terms: Record<string, string>;
+    books?: BookItem[];
+    readingGoal?: ReadingGoal;
+    onSaveBooks?: (books: BookItem[]) => void;
+    onSaveGoal?: (goal: ReadingGoal) => void;
 }
 
-export default function BookTracker({ courses, terms }: BookTrackerProps) {
+export default function BookTracker({ 
+    courses, 
+    terms,
+    books = [],
+    readingGoal = { year: 2026, target_books: 20 },
+    onSaveBooks,
+    onSaveGoal
+}: BookTrackerProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
 
-    const [books, setBooks] = useState<BookItem[]>([]);
     const [statusFilter, setStatusFilter] = useState<BookStatus | 'all'>('reading');
     const [categoryFilter, setCategoryFilter] = useState<BookCategory | 'all'>('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [readingGoal, setReadingGoal] = useState<ReadingGoal>({ year: 2026, target_books: 20 });
 
     // Modals
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -60,97 +69,13 @@ export default function BookTracker({ courses, terms }: BookTrackerProps) {
         rating: 5
     });
 
-    // Load initial data
-    useEffect(() => {
-        const savedBooks = localStorage.getItem(STORAGE_KEY_BOOKS);
-        const savedGoal = localStorage.getItem(STORAGE_KEY_GOAL);
-
-        if (savedGoal) {
-            try {
-                setReadingGoal(JSON.parse(savedGoal));
-            } catch (e) {}
-        }
-
-        if (savedBooks) {
-            try {
-                setBooks(JSON.parse(savedBooks));
-            } catch (e) {}
-        } else {
-            const defaults: BookItem[] = [
-                {
-                    id: '1',
-                    title: 'Designing Data-Intensive Applications',
-                    author: 'Martin Kleppmann',
-                    category: 'tech',
-                    status: 'reading',
-                    total_pages: 560,
-                    current_page: 240,
-                    cover_color: COVER_GRADIENTS[0],
-                    rating: 5,
-                    linked_course_name: courses[0]?.course_name || (isIndo ? 'Basis Data & Sistem Terdistribusi' : 'Database Systems'),
-                    summary_notes: isIndo 
-                        ? 'Bab 5 & 6 menjelaskan replikasi leader-follower, konsistensi eventual, dan partisi data terdistribusi.' 
-                        : 'Chapters 5 & 6 cover leader-follower replication, eventual consistency, and distributed partitioning.',
-                    started_at: '2026-02-01'
-                },
-                {
-                    id: '2',
-                    title: 'Atomic Habits: Perubahan Kecil Hasil Luar Biasa',
-                    author: 'James Clear',
-                    category: 'self_growth',
-                    status: 'completed',
-                    total_pages: 320,
-                    current_page: 320,
-                    cover_color: COVER_GRADIENTS[3],
-                    rating: 5,
-                    summary_notes: isIndo
-                        ? 'Prinsip 4 hukum perubahan perilaku: Make it Obvious, Attractive, Easy, and Satisfying.'
-                        : 'The 4 laws of behavior change: Make it Obvious, Attractive, Easy, and Satisfying.',
-                    started_at: '2026-01-10',
-                    finished_at: '2026-01-28'
-                },
-                {
-                    id: '3',
-                    title: 'Introduction to Algorithms (CLRS)',
-                    author: 'Cormen, Leiserson, Rivest, Stein',
-                    category: 'academic',
-                    status: 'reading',
-                    total_pages: 1312,
-                    current_page: 450,
-                    cover_color: COVER_GRADIENTS[1],
-                    rating: 5,
-                    linked_course_name: courses[1]?.course_name || (isIndo ? 'Algoritma & Struktur Data' : 'Algorithms'),
-                    summary_notes: isIndo
-                        ? 'Analisis formal kompleksitas Big-O, Master Theorem, dan Dynamic Programming.'
-                        : 'Formal Big-O complexity proofs, Master Theorem, and Dynamic Programming.',
-                    started_at: '2026-02-15'
-                },
-                {
-                    id: '4',
-                    title: 'Clean Code: A Handbook of Agile Software Craftsmanship',
-                    author: 'Robert C. Martin',
-                    category: 'tech',
-                    status: 'to_read',
-                    total_pages: 464,
-                    current_page: 0,
-                    cover_color: COVER_GRADIENTS[4],
-                    summary_notes: ''
-                }
-            ];
-            setBooks(defaults);
-            localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(defaults));
-        }
-    }, [courses, isIndo]);
-
     // Save helper
     const saveBooks = (updated: BookItem[]) => {
-        setBooks(updated);
-        localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(updated));
+        onSaveBooks?.(updated);
     };
 
     const handleSaveGoal = (newGoal: ReadingGoal) => {
-        setReadingGoal(newGoal);
-        localStorage.setItem(STORAGE_KEY_GOAL, JSON.stringify(newGoal));
+        onSaveGoal?.(newGoal);
     };
 
     // Quick page progress update

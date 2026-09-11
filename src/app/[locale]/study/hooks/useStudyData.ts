@@ -1,12 +1,26 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CourseRecord } from '../components/CourseCard';
 import { ArchiveItem } from '../components/ClassroomView';
+import { AssignmentItem } from '../components/AssignmentRadar';
+import { FlashcardItem } from '../components/FlashcardsDeckView';
+import { BookItem, ReadingGoal } from '../types/books';
 
 export function useStudyData(t: any) {
     const [isLoading, setIsLoading] = useState(true);
     const [userSettings, setUserSettings] = useState<Record<string, any>>({});
+    const [rawUserData, setRawUserData] = useState<Record<string, any>>({});
     const hasCompletedSetup = Boolean(userSettings.education_level);
     const [academicRecords, setAcademicRecords] = useState<CourseRecord[]>([]);
+
+    // Supabase-synced Study Modules
+    const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
+    const [flashcards, setFlashcards] = useState<FlashcardItem[]>([]);
+    const [books, setBooks] = useState<BookItem[]>([]);
+    const [readingGoal, setReadingGoal] = useState<ReadingGoal>({ year: 2026, target_books: 20 });
+    const [focusStats, setFocusStats] = useState<{ completedSessions: number; totalFocusMinutes: number }>({
+        completedSessions: 0,
+        totalFocusMinutes: 0
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -18,8 +32,26 @@ export function useStudyData(t: any) {
                 
                 if (userRes.ok) {
                     const userData = await userRes.json();
-                    if (userData.settings && userData.settings.study) {
-                        setUserSettings(userData.settings.study);
+                    setRawUserData(userData);
+                    if (userData.settings) {
+                        if (userData.settings.study) {
+                            setUserSettings(userData.settings.study);
+                        }
+                        if (Array.isArray(userData.settings.study_assignments)) {
+                            setAssignments(userData.settings.study_assignments);
+                        }
+                        if (Array.isArray(userData.settings.study_flashcards)) {
+                            setFlashcards(userData.settings.study_flashcards);
+                        }
+                        if (Array.isArray(userData.settings.study_books)) {
+                            setBooks(userData.settings.study_books);
+                        }
+                        if (userData.settings.study_reading_goal) {
+                            setReadingGoal(userData.settings.study_reading_goal);
+                        }
+                        if (userData.settings.study_focus_stats) {
+                            setFocusStats(userData.settings.study_focus_stats);
+                        }
                     }
                 }
                 
@@ -31,7 +63,7 @@ export function useStudyData(t: any) {
                         semester: c.semester,
                         sks: c.sks,
                         grade: c.grade,
-                        archives: c.archives.map((a: any) => ({
+                        archives: (c.archives || []).map((a: any) => ({
                             id: a.id,
                             meeting_tag: a.meetingTag,
                             type: a.type,
@@ -42,7 +74,7 @@ export function useStudyData(t: any) {
                     })));
                 }
             } catch (error) {
-                console.error("Failed to load study data", error);
+                console.error("Failed to load study data from Supabase", error);
             } finally {
                 setIsLoading(false);
             }
@@ -99,13 +131,13 @@ export function useStudyData(t: any) {
         }
     }, [userSettings.current_semester]);
 
-    const saveUserSettings = async (updatedSettings: Record<string, any>) => {
-        setUserSettings(updatedSettings);
+    // Generic Supabase user settings saver
+    const saveToSupabaseSettings = async (partialKey: string, value: any) => {
         try {
             const userRes = await fetch('/api/user');
             if (userRes.ok) {
                 const userData = await userRes.json();
-                const newSettings = { ...userData.settings, study: updatedSettings };
+                const newSettings = { ...userData.settings, [partialKey]: value };
                 await fetch('/api/user', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -113,8 +145,38 @@ export function useStudyData(t: any) {
                 });
             }
         } catch (error) {
-            console.error("Failed to save user settings", error);
+            console.error(`Failed to save ${partialKey} to Supabase:`, error);
         }
+    };
+
+    const saveUserSettings = async (updatedSettings: Record<string, any>) => {
+        setUserSettings(updatedSettings);
+        await saveToSupabaseSettings('study', updatedSettings);
+    };
+
+    const handleSaveAssignments = async (newAssignments: AssignmentItem[]) => {
+        setAssignments(newAssignments);
+        await saveToSupabaseSettings('study_assignments', newAssignments);
+    };
+
+    const handleSaveFlashcards = async (newFlashcards: FlashcardItem[]) => {
+        setFlashcards(newFlashcards);
+        await saveToSupabaseSettings('study_flashcards', newFlashcards);
+    };
+
+    const handleSaveBooks = async (newBooks: BookItem[]) => {
+        setBooks(newBooks);
+        await saveToSupabaseSettings('study_books', newBooks);
+    };
+
+    const handleSaveReadingGoal = async (newGoal: ReadingGoal) => {
+        setReadingGoal(newGoal);
+        await saveToSupabaseSettings('study_reading_goal', newGoal);
+    };
+
+    const handleSaveFocusStats = async (newStats: { completedSessions: number; totalFocusMinutes: number }) => {
+        setFocusStats(newStats);
+        await saveToSupabaseSettings('study_focus_stats', newStats);
     };
 
     const availableSemesters = useMemo(() => {
@@ -190,7 +252,9 @@ export function useStudyData(t: any) {
                     archives: []
                 }]);
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Failed to add course to Supabase", e);
+        }
     };
 
     const handleEditCourseSubmit = async (courseId: number | string, data: { course_name: string; sks: number; grade: string }) => {
@@ -214,7 +278,9 @@ export function useStudyData(t: any) {
                     grade: data.grade
                 } : r));
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Failed to update course in Supabase", e);
+        }
     };
 
     const handleDeleteCourse = async (id: number | string) => {
@@ -261,7 +327,9 @@ export function useStudyData(t: any) {
                     return r;
                 }));
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Failed to add archive to Supabase", e);
+        }
     };
 
     const handleDeleteArchive = async (id: number | string) => {
@@ -283,15 +351,27 @@ export function useStudyData(t: any) {
     return {
         isLoading,
         userSettings,
+        rawUserData,
         hasCompletedSetup,
         terms,
         selectedSemester,
         setSelectedSemester,
         availableSemesters,
         filteredCourses,
+        allCourses: academicRecords,
         selectedCourse,
         setSelectedCourse,
         activeCourseReactive,
+        assignments,
+        flashcards,
+        books,
+        readingGoal,
+        focusStats,
+        handleSaveAssignments,
+        handleSaveFlashcards,
+        handleSaveBooks,
+        handleSaveReadingGoal,
+        handleSaveFocusStats,
         handleSetupCompleted,
         handleAddSemester,
         handleDeleteSemester,

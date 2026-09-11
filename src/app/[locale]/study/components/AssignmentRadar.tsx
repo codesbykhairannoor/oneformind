@@ -30,15 +30,19 @@ export interface AssignmentItem {
 interface AssignmentRadarProps {
     courses: CourseRecord[];
     terms: Record<string, string>;
+    assignments?: AssignmentItem[];
+    onSaveAssignments?: (items: AssignmentItem[]) => void;
 }
 
-const STORAGE_KEY = 'tranvas_study_assignments';
-
-export default function AssignmentRadar({ courses, terms }: AssignmentRadarProps) {
+export default function AssignmentRadar({ 
+    courses, 
+    terms,
+    assignments = [],
+    onSaveAssignments 
+}: AssignmentRadarProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
 
-    const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
     const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
     const [filterCourse, setFilterCourse] = useState<string>('all');
     const [filterType, setFilterType] = useState<string>('all');
@@ -54,69 +58,8 @@ export default function AssignmentRadar({ courses, terms }: AssignmentRadarProps
         description: ''
     });
 
-    // Load initial assignments
-    useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                setAssignments(JSON.parse(saved));
-            } catch (e) {
-                console.error('Failed to parse saved assignments', e);
-            }
-        } else {
-            // Default sample items
-            const defaults: AssignmentItem[] = [
-                {
-                    id: '1',
-                    course_name: courses[0]?.course_name || (isIndo ? 'Pemrograman Web' : 'Web Engineering'),
-                    title: isIndo ? 'Implementasi API & Server Components' : 'Implement API & Server Components',
-                    description: isIndo ? 'Selesaikan modul 4 dan push ke GitHub repo.' : 'Finish module 4 and push to GitHub repository.',
-                    due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    type: 'project',
-                    priority: 'urgent',
-                    status: 'in_progress'
-                },
-                {
-                    id: '2',
-                    course_name: courses[1]?.course_name || (isIndo ? 'Algoritma & Struktur Data' : 'Data Structures'),
-                    title: isIndo ? 'Latihan Graf Dijkstra & BFS' : 'Dijkstra & BFS Graph Problem Set',
-                    description: isIndo ? 'Tugas praktikum analisis kompleksitas Big-O.' : 'Lab assignment for Big-O complexity analysis.',
-                    due_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    type: 'assignment',
-                    priority: 'medium',
-                    status: 'todo'
-                },
-                {
-                    id: '3',
-                    course_name: courses[0]?.course_name || (isIndo ? 'Pemrograman Web' : 'Web Engineering'),
-                    title: isIndo ? 'Kuis Tengah Semester 1' : 'Midterm Quiz 1',
-                    description: isIndo ? 'Materi: React Hooks, State Management & Routing.' : 'Scope: React Hooks, State Management & Routing.',
-                    due_date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    type: 'quiz',
-                    priority: 'urgent',
-                    status: 'todo'
-                },
-                {
-                    id: '4',
-                    course_name: courses[0]?.course_name || (isIndo ? 'Basis Data' : 'Database Systems'),
-                    title: isIndo ? 'Tugas Normalisasi Database 3NF' : '3NF Database Normalization',
-                    description: isIndo ? 'Desain skema tabel e-commerce ternormalisasi.' : 'Normalized e-commerce table schema design.',
-                    due_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    type: 'assignment',
-                    priority: 'normal',
-                    status: 'completed',
-                    grade: 95
-                }
-            ];
-            setAssignments(defaults);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-        }
-    }, [courses, isIndo]);
-
-    // Save on state change
     const saveAssignments = (items: AssignmentItem[]) => {
-        setAssignments(items);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        onSaveAssignments?.(items);
     };
 
     const handleCreateAssignment = (e: React.FormEvent) => {
