@@ -239,14 +239,10 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
         }
     };
 
-    // Save Action with Real Dynamic Cognitive AI Analysis
+    // Save Action
     const handleSave = async () => {
         if (!title && !content) return;
         setIsSaving(true);
-
-        // Dynamically analyze journal content using the real cognitive engine
-        const cognitiveResult = analyzeJournalCognitive(content, mood, locale);
-        const aiSentiment = `[Mindset: ${cognitiveResult.mindsetTheme}] ${cognitiveResult.summarySentence}`;
 
         try {
             if (journalId) {
@@ -258,7 +254,8 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                         content,
                         mood,
                         imagePath: imageUrl,
-                        aiSentiment
+                        image_url: imageUrl,
+                        aiSentiment: ''
                     })
                 });
             } else {
@@ -271,7 +268,8 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                         date: new Date().toISOString(),
                         mood,
                         imagePath: imageUrl,
-                        aiSentiment
+                        image_url: imageUrl,
+                        aiSentiment: ''
                     })
                 });
                 // Clear local draft upon successful save

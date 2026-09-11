@@ -163,37 +163,7 @@ export default function JournalDetailModal({
                             );
                         })()}
 
-                        {/* Cognitive AI Reflection Insight Box */}
-                        <div className="p-5 rounded-3xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
-                            <div className="flex items-center gap-2">
-                                <Sparkles size={16} className="text-indigo-600 dark:text-indigo-400" />
-                                <span className="text-xs font-black tracking-wide text-indigo-900 dark:text-indigo-300">
-                                    {isIndo ? 'Analisis Kognitif & Refleksi Neural' : 'Cognitive AI Reflection'}
-                                </span>
-                            </div>
 
-                            <p className="text-xs text-slate-700 dark:text-slate-300 font-medium italic leading-relaxed">
-                                "{journal.ai_sentiment || aiAnalysis.summarySentence}"
-                            </p>
-
-                            {distortionText && (
-                                <div className="flex items-start gap-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/40 text-[11px] text-amber-700 dark:text-amber-400">
-                                    <ShieldAlert size={14} className="shrink-0 mt-0.5" />
-                                    <span>
-                                        <strong>{isIndo ? 'Pola Pikiran Terdeteksi:' : 'Pattern Detected:'}</strong> {distortionText}
-                                    </span>
-                                </div>
-                            )}
-
-                            <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-indigo-100/80 dark:border-indigo-900/40 space-y-1">
-                                <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-                                    <Lightbulb size={12} /> {isIndo ? 'Pertanyaan untuk Eksplorasi Diri:' : 'Self-Reflection Prompt:'}
-                                </span>
-                                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                    {aiAnalysis.reflectiveQuestion}
-                                </p>
-                            </div>
-                        </div>
 
                         {/* Journal Body Content with Clean HTML / Plain Text Handling */}
                         {(() => {

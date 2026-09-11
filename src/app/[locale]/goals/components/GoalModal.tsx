@@ -142,11 +142,15 @@ export default function GoalModal({
         const file = e.target.files?.[0];
         if (!file) return;
         setIsUploading(true);
-        const url = URL.createObjectURL(file);
-        setImagePreview(url);
-        setForm(prev => ({ ...prev, cover_image_url: url }));
-        onUploadImage?.(file);
-        setIsUploading(false);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+                setImagePreview(reader.result);
+                setForm(prev => ({ ...prev, cover_image_url: reader.result as string }));
+            }
+            setIsUploading(false);
+        };
+        reader.readAsDataURL(file);
     };
 
     const colorOptions = [
@@ -565,6 +569,24 @@ export default function GoalModal({
                                     </button>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* 11. Cover Image URL Option */}
+                        <div className="space-y-1.5">
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                {isIndo ? 'Link Gambar Cover (URL Foto / Gambar)' : 'Cover Image URL'}
+                            </label>
+                            <input 
+                                type="url"
+                                value={form.cover_image_url || ''}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setForm(prev => ({ ...prev, cover_image_url: val }));
+                                    setImagePreview(val || null);
+                                }}
+                                placeholder={isIndo ? 'https://images.unsplash.com/... atau gunakan tombol upload di atas' : 'https://images.unsplash.com/... or use upload button above'}
+                                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs text-slate-800 dark:text-white"
+                            />
                         </div>
 
                     </div>

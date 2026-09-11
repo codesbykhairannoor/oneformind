@@ -346,69 +346,6 @@ export default function JournalEditorBody({
 
             </div>
 
-            {/* 4. REAL-TIME COGNITIVE NEURAL AI INSIGHT BOX */}
-            <div className="bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-white dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 rounded-3xl p-5 sm:p-6 border border-indigo-100 dark:border-indigo-900/40 shadow-sm space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-200 dark:shadow-none">
-                            <Sparkles className="w-4 h-4" />
-                        </div>
-                        <div>
-                            <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                <span>{isIndo ? 'Analisa Kognitif Neural AI' : 'AI Neural Cognitive Analysis'}</span>
-                                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                                    {cognitiveInsight.mindsetTheme}
-                                </span>
-                            </h4>
-                            <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                                {isIndo 
-                                    ? 'Mendeteksi dinamika emosi, bias berpikir, dan menyajikan reframe Stoik secara real-time' 
-                                    : 'Detecting emotional dynamics, thinking biases, and offering Stoic reframes in real-time'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {cognitiveInsight.detectedDistortion && (
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black">
-                            <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-                            <span>{cognitiveInsight.detectedDistortion.name}</span>
-                        </div>
-                    )}
-                </div>
-
-                {/* Summary Quote */}
-                <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-semibold text-slate-700 dark:text-slate-200 italic leading-relaxed">
-                    "{cognitiveInsight.summarySentence}"
-                </div>
-
-                {/* Distortion Reframe if any */}
-                {cognitiveInsight.detectedDistortion && (
-                    <div className="p-3.5 rounded-2xl bg-amber-500/5 dark:bg-amber-950/20 border border-amber-500/20 space-y-1">
-                        <div className="flex items-center gap-1.5 text-[11px] font-black text-amber-700 dark:text-amber-300">
-                            <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-                            <span>{isIndo ? 'Rekomendasi Stoik / CBT Reframe:' : 'Stoic / CBT Reframing Advice:'}</span>
-                        </div>
-                        <p className="text-xs font-medium text-slate-700 dark:text-slate-300 leading-relaxed">
-                            {cognitiveInsight.detectedDistortion.reframeAdvice}
-                        </p>
-                    </div>
-                )}
-
-                {/* Self-Reflection Question */}
-                <div className="p-3.5 rounded-2xl bg-indigo-500/5 dark:bg-indigo-950/30 border border-indigo-500/20 flex items-start gap-2.5">
-                    <HelpCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-0.5">
-                            {isIndo ? 'Pertanyaan Refleksi Diri:' : 'Self-Inquiry Prompt:'}
-                        </p>
-                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-relaxed">
-                            {cognitiveInsight.reflectionPrompt}
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-
         </main>
     );
 }

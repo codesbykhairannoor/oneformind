@@ -136,20 +136,7 @@ export default function JournalTimelineView({
                                 </p>
                             </div>
 
-                            {/* AI Neural Reflection Pill */}
-                            {journal.ai_sentiment && (
-                                <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-start gap-2.5 text-xs">
-                                    <Sparkles size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-                                    <div className="space-y-0.5 min-w-0">
-                                        <span className="text-[9px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300 block">
-                                            {isIndo ? 'Insight Kognitif AI' : 'Cognitive Neural Insight'}
-                                        </span>
-                                        <p className="text-xs text-slate-700 dark:text-slate-300 font-medium italic line-clamp-2">
-                                            "{journal.ai_sentiment}"
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+
 
                         </div>
                     </div>

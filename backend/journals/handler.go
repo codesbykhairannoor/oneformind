@@ -56,8 +56,6 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-
 	if db == nil {
 		http.Error(w, `{"error": "Database connection not initialized"}`, http.StatusInternalServerError)
 		return
@@ -95,18 +93,28 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodPost:
 		var req struct {
-			Date        string   `json:"date"`
-			Title       *string  `json:"title"`
-			Content     *string  `json:"content"`
-			Mood        *string  `json:"mood"`
-			ImagePath   *string  `json:"imagePath"`
-			IsPinned    bool     `json:"isPinned"`
-			AiSentiment *string  `json:"aiSentiment"`
-			MoodScore   *float64 `json:"moodScore"`
+			Date         string   `json:"date"`
+			Title        *string  `json:"title"`
+			Content      *string  `json:"content"`
+			Mood         *string  `json:"mood"`
+			ImagePath    *string  `json:"imagePath"`
+			ImagePathAlt *string  `json:"image_path"`
+			ImageUrlAlt  *string  `json:"image_url"`
+			IsPinned     bool     `json:"isPinned"`
+			AiSentiment  *string  `json:"aiSentiment"`
+			MoodScore    *float64 `json:"moodScore"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, `{"error": "Invalid input"}`, http.StatusBadRequest)
 			return
+		}
+
+		if req.ImagePath == nil {
+			if req.ImagePathAlt != nil {
+				req.ImagePath = req.ImagePathAlt
+			} else if req.ImageUrlAlt != nil {
+				req.ImagePath = req.ImageUrlAlt
+			}
 		}
 
 		query := `INSERT INTO journals (user_id, date, title, content, mood, image_path, is_pinned, ai_sentiment, mood_score, created_at, updated_at) 
@@ -122,18 +130,18 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 		
 		dateParsed, _ := time.Parse(time.RFC3339, req.Date)
 		json.NewEncoder(w).Encode(Journal{
-			ID: id,
-			UserID: userID,
-			Date: dateParsed,
-			Title: req.Title,
-			Content: req.Content,
-			Mood: req.Mood,
-			ImagePath: req.ImagePath,
-			IsPinned: req.IsPinned,
+			ID:          id,
+			UserID:      userID,
+			Date:        dateParsed,
+			Title:       req.Title,
+			Content:     req.Content,
+			Mood:        req.Mood,
+			ImagePath:   req.ImagePath,
+			IsPinned:    req.IsPinned,
 			AiSentiment: req.AiSentiment,
-			MoodScore: req.MoodScore,
-			CreatedAt: ca,
-			UpdatedAt: ua,
+			MoodScore:   req.MoodScore,
+			CreatedAt:   ca,
+			UpdatedAt:   ua,
 		})
 
 	case http.MethodPut:
@@ -158,15 +166,24 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			dbCol := ""
 			switch k {
-			case "date": dbCol = "date"
-			case "title": dbCol = "title"
-			case "content": dbCol = "content"
-			case "mood": dbCol = "mood"
-			case "imagePath": dbCol = "image_path"
-			case "isPinned": dbCol = "is_pinned"
-			case "aiSentiment": dbCol = "ai_sentiment"
-			case "moodScore": dbCol = "mood_score"
-			default: continue
+			case "date":
+				dbCol = "date"
+			case "title":
+				dbCol = "title"
+			case "content":
+				dbCol = "content"
+			case "mood":
+				dbCol = "mood"
+			case "imagePath", "image_path", "imageUrl", "image_url":
+				dbCol = "image_path"
+			case "isPinned", "is_pinned":
+				dbCol = "is_pinned"
+			case "aiSentiment", "ai_sentiment":
+				dbCol = "ai_sentiment"
+			case "moodScore", "mood_score":
+				dbCol = "mood_score"
+			default:
+				continue
 			}
 			setParts = append(setParts, fmt.Sprintf("%s = $%d", dbCol, i))
 			args = append(args, v)
@@ -178,7 +195,7 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		
-		setParts = append(setParts, fmt.Sprintf("updated_at = NOW()"))
+		setParts = append(setParts, "updated_at = NOW()")
 
 		query := fmt.Sprintf(`UPDATE journals SET %s WHERE user_id = $1 AND id = $2 RETURNING id`, strings.Join(setParts, ", "))
 		

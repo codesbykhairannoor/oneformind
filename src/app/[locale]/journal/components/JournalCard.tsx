@@ -178,26 +178,6 @@ export default function JournalCard({ journal, isExplorer = false, onDelete, onO
                     </div>
                 )}
 
-                {/* Cognitive Neural AI Pill */}
-                <div className="p-3 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 transition-all group-hover:border-indigo-200 dark:group-hover:border-indigo-900/40 mb-3">
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <div className="flex items-center gap-1.5">
-                            <Sparkles className="w-3 h-3 text-indigo-500 animate-pulse" />
-                            <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">
-                                {cognitiveInsight.mindsetTheme}
-                            </span>
-                        </div>
-                        {cognitiveInsight.detectedDistortion && (
-                            <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                {cognitiveInsight.detectedDistortion.name}
-                            </span>
-                        )}
-                    </div>
-                    <p className="text-[10.5px] font-semibold text-slate-600 dark:text-slate-300 italic line-clamp-2 leading-relaxed">
-                        "{cognitiveInsight.summarySentence}"
-                    </p>
-                </div>
-
                 {/* Footer: Word count, read time & Read Story action */}
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500">
                     <div className="flex items-center gap-2">
