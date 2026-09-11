@@ -33,6 +33,7 @@ export default function StudyPage() {
         setSelectedSemester,
         availableSemesters,
         filteredCourses,
+        allCourses,
         setSelectedCourse,
         activeCourseReactive,
         assignments,
@@ -52,7 +53,9 @@ export default function StudyPage() {
         handleEditCourseSubmit,
         handleDeleteCourse,
         handleAddArchive,
-        handleDeleteArchive
+        handleDeleteArchive,
+        handleBatchEditGrades,
+        saveUserSettings
     } = useStudyData(t);
 
     // Active tab in Study Hub
@@ -122,8 +125,11 @@ export default function StudyPage() {
                                     {activeTab !== 'portfolio' && (
                                         <GpaSimulator
                                             courses={filteredCourses}
+                                            allCourses={allCourses}
                                             terms={terms}
                                             userSettings={userSettings}
+                                            onSaveBatchCourseGrades={handleBatchEditGrades}
+                                            onSaveUserSettings={saveUserSettings}
                                         />
                                     )}
 

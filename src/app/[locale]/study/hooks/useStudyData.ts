@@ -283,6 +283,33 @@ export function useStudyData(t: any) {
         }
     };
 
+    const handleBatchEditGrades = async (updates: { id: number | string; grade: string }[]) => {
+        try {
+            await Promise.all(updates.map(u => {
+                const course = academicRecords.find(c => String(c.id) === String(u.id));
+                if (!course) return Promise.resolve();
+                return fetch('/api/study/courses', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: u.id,
+                        courseName: course.course_name,
+                        semester: course.semester,
+                        sks: course.sks,
+                        grade: u.grade
+                    })
+                });
+            }));
+
+            setAcademicRecords(prev => prev.map(c => {
+                const up = updates.find(u => String(u.id) === String(c.id));
+                return up ? { ...c, grade: up.grade } : c;
+            }));
+        } catch (e) {
+            console.error('Failed to batch update course grades', e);
+        }
+    };
+
     const handleDeleteCourse = async (id: number | string) => {
         if (confirm(`Hapus ${terms.course} ini?`)) {
             setAcademicRecords(prev => prev.filter(r => r.id !== id));
@@ -379,6 +406,8 @@ export function useStudyData(t: any) {
         handleEditCourseSubmit,
         handleDeleteCourse,
         handleAddArchive,
-        handleDeleteArchive
+        handleDeleteArchive,
+        handleBatchEditGrades,
+        saveUserSettings
     };
 }

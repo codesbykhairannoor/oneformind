@@ -78,9 +78,9 @@ export default function StudyPortfolioView({ showBackButton = false }: StudyPort
             ? 'Software Engineer & Mahasiswa Berprestasi' 
             : 'Software Engineer & High-Distinction Student',
         major: isIndo ? 'Teknik Informatika (Software Engineering)' : 'Computer Science & Software Engineering',
-        ipk: '3.92',
+        ipk: '0.00',
         sks: '0',
-        cumlaude: isIndo ? 'Cum Laude Candidate' : 'Cum Laude Candidate',
+        cumlaude: isIndo ? 'Status Akademik' : 'Academic Standing',
         bio: isIndo
             ? 'Fokus pada arsitektur sistem web skala tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi.'
             : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and academic research.',
@@ -119,7 +119,7 @@ export default function StudyPortfolioView({ showBackButton = false }: StudyPort
 
                     const ev: CourseworkEvidence[] = coursesData.map((c: any) => {
                         const sksVal = Number(c.sks) || 3;
-                        const g = c.grade || 'A';
+                        const g = (c.grade || '').trim().toUpperCase() || 'A';
                         const w = gradeWeights[g] ?? 4.0;
                         totalSksCalc += sksVal;
                         totalPointsCalc += (w * sksVal);
@@ -145,8 +145,13 @@ export default function StudyPortfolioView({ showBackButton = false }: StudyPort
                 setUsername(uName);
 
                 const studySettings = userData.settings?.study || {};
-                const calculatedIpk = totalSksCalc > 0 ? (totalPointsCalc / totalSksCalc).toFixed(2) : (studySettings.prior_ipk ? Number(studySettings.prior_ipk).toFixed(2) : '3.92');
-                const calculatedSks = totalSksCalc > 0 ? String(totalSksCalc) : (studySettings.prior_sks ? String(studySettings.prior_sks) : '0');
+                const priorSks = Number(studySettings.prior_sks) || 0;
+                const priorIpk = Number(studySettings.prior_ipk) || 0;
+                const grandTotalSks = totalSksCalc + priorSks;
+                const grandTotalPoints = totalPointsCalc + (priorSks * priorIpk);
+
+                const calculatedIpk = grandTotalSks > 0 ? (grandTotalPoints / grandTotalSks).toFixed(2) : '0.00';
+                const calculatedSks = String(grandTotalSks);
                 const numIpk = parseFloat(calculatedIpk);
 
                 setProfile({
@@ -157,7 +162,13 @@ export default function StudyPortfolioView({ showBackButton = false }: StudyPort
                     major: studySettings.major || (isIndo ? 'Teknik Informatika (Software Engineering)' : 'Computer Science & Software Engineering'),
                     ipk: calculatedIpk,
                     sks: calculatedSks,
-                    cumlaude: numIpk >= 3.8 ? 'Summa Cum Laude Candidate' : numIpk >= 3.5 ? 'Cum Laude Candidate' : 'Good Standing',
+                    cumlaude: grandTotalSks === 0 
+                        ? (isIndo ? 'Belum Ada Transkrip' : 'No Transcript Yet')
+                        : numIpk >= 3.8 
+                        ? 'Summa Cum Laude Candidate 🏆' 
+                        : numIpk >= 3.5 
+                        ? 'Cum Laude Candidate ✨' 
+                        : 'Good Standing 🎯',
                     bio: studySettings.bio || (isIndo
                         ? 'Fokus pada arsitektur sistem web skala tinggi (Next.js, Go, PostgreSQL), algoritma terdistribusi, dan riset publikasi.'
                         : 'Focused on high-performance web systems (Next.js, Go, PostgreSQL), distributed algorithms, and academic research.'),
