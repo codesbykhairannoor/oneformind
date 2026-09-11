@@ -86,7 +86,18 @@ export default function JournalMemoriesView({ journals = [], onSelectJournal }: 
 
     const stripHtml = (html?: string) => {
         if (!html) return '';
-        return html.replace(/<[^>]*>?/gm, '');
+        return html
+            .replace(/<\/?(p|div|li|br|h[1-6])[^>]*>/gi, ' ')
+            .replace(/<[^>]*>?/gm, '')
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/&amp;/gi, '&')
+            .replace(/&lt;/gi, '<')
+            .replace(/&gt;/gi, '>')
+            .replace(/&quot;/gi, '"')
+            .replace(/&#39;/gi, "'")
+            .replace(/#\w+/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
     };
 
     const getMoodEmoji = (mood?: string) => {

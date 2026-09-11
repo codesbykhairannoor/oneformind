@@ -153,11 +153,15 @@ export default function JournalDetailModal({
                         </div>
 
                         {/* Attached Cover Photo */}
-                        {journal.image_url && (
-                            <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 max-h-80 shadow-sm">
-                                <img src={journal.image_url} alt="Cover" className="w-full h-full object-cover" />
-                            </div>
-                        )}
+                        {(() => {
+                            const coverImage = journal.image_url || journal.imagePath || (journal as any).coverImage || (journal as any).cover_image;
+                            if (!coverImage) return null;
+                            return (
+                                <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 max-h-80 shadow-sm bg-slate-100 dark:bg-slate-800">
+                                    <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
+                                </div>
+                            );
+                        })()}
 
                         {/* Cognitive AI Reflection Insight Box */}
                         <div className="p-5 rounded-3xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
@@ -169,7 +173,7 @@ export default function JournalDetailModal({
                             </div>
 
                             <p className="text-xs text-slate-700 dark:text-slate-300 font-medium italic leading-relaxed">
-                                "{journal.ai_sentiment || aiAnalysis.sentimentSummary}"
+                                "{journal.ai_sentiment || aiAnalysis.summarySentence}"
                             </p>
 
                             {distortionText && (
@@ -191,10 +195,41 @@ export default function JournalDetailModal({
                             </div>
                         </div>
 
-                        {/* Journal Body Content */}
-                        <div className="text-sm sm:text-base text-slate-800 dark:text-slate-200 leading-relaxed space-y-4 whitespace-pre-wrap font-serif">
-                            {journal.content || (isIndo ? 'Tidak ada isi tulisan.' : 'No content written.')}
-                        </div>
+                        {/* Journal Body Content with Clean HTML / Plain Text Handling */}
+                        {(() => {
+                            const rawContent = journal.content || '';
+                            const hasHtml = /<[a-z0-9]+/i.test(rawContent);
+
+                            if (!rawContent) {
+                                return (
+                                    <p className="text-sm italic text-slate-400">
+                                        {isIndo ? 'Tidak ada isi tulisan.' : 'No content written.'}
+                                    </p>
+                                );
+                            }
+
+                            if (hasHtml) {
+                                // Normalize HTML tags & strip empty paragraphs
+                                const cleanHtml = rawContent
+                                    .replace(/<\/?P>/g, (m) => m.toLowerCase())
+                                    .replace(/<p>\s*<\/p>/gi, '')
+                                    .replace(/<p><p>/gi, '<p>')
+                                    .replace(/<\/p><\/p>/gi, '</p>');
+
+                                return (
+                                    <div 
+                                        className="text-sm sm:text-base text-slate-800 dark:text-slate-200 leading-relaxed font-sans [&_p]:mb-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-3 [&_li]:mb-1 [&_strong]:font-bold [&_h1]:text-xl [&_h1]:font-black [&_h2]:text-lg [&_h2]:font-bold"
+                                        dangerouslySetInnerHTML={{ __html: cleanHtml }}
+                                    />
+                                );
+                            }
+
+                            return (
+                                <div className="text-sm sm:text-base text-slate-800 dark:text-slate-200 leading-relaxed space-y-4 whitespace-pre-wrap font-sans">
+                                    {rawContent}
+                                </div>
+                            );
+                        })()}
 
                     </div>
 

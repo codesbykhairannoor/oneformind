@@ -45,7 +45,18 @@ export default function JournalCard({ journal, isExplorer = false, onDelete, onO
 
     const stripHtml = (html?: string) => {
         if (!html) return '';
-        return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').replace(/#\w+/g, '').trim();
+        return html
+            .replace(/<\/?(p|div|li|br|h[1-6])[^>]*>/gi, ' ')
+            .replace(/<[^>]*>?/gm, '')
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/&amp;/gi, '&')
+            .replace(/&lt;/gi, '<')
+            .replace(/&gt;/gi, '>')
+            .replace(/&quot;/gi, '"')
+            .replace(/&#39;/gi, "'")
+            .replace(/#\w+/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
     };
 
     const handleDelete = (e: React.MouseEvent) => {
@@ -90,7 +101,7 @@ export default function JournalCard({ journal, isExplorer = false, onDelete, onO
     }, [journal.content, journal.mood, locale]);
 
     const moodObj = getMoodDetails(journal.mood);
-    const coverImage = journal.image_url || journal.imagePath;
+    const coverImage = journal.image_url || journal.imagePath || (journal as any).coverImage || (journal as any).cover_image;
 
     const handleCardClick = (e: React.MouseEvent) => {
         if (onSelect) {

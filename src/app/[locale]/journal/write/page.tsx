@@ -292,8 +292,13 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const url = URL.createObjectURL(file);
-            setImageUrl(url);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result === 'string') {
+                    setImageUrl(reader.result);
+                }
+            };
+            reader.readAsDataURL(file);
         }
     };
 

@@ -269,7 +269,14 @@ export default function JournalCalendarView({ journals = [], onSelectJournal }: 
                                             </h5>
                                         </div>
                                         <p className="text-xs text-slate-400 line-clamp-2">
-                                            {j.content ? j.content.replace(/<[^>]*>?/gm, '') : '...'}
+                                            {j.content 
+                                                ? j.content
+                                                    .replace(/<\/?(p|div|li|br|h[1-6])[^>]*>/gi, ' ')
+                                                    .replace(/<[^>]*>?/gm, '')
+                                                    .replace(/&nbsp;/gi, ' ')
+                                                    .replace(/\s+/g, ' ')
+                                                    .trim()
+                                                : '...'}
                                         </p>
                                     </div>
                                     <ArrowRight size={16} className="text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition shrink-0 mt-1" />

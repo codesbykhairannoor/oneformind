@@ -24,28 +24,30 @@ export function analyzeJournalCognitive(
     locale: string = 'id'
 ): CognitiveAnalysisResult {
     const isIndo = locale === 'id';
-    const cleanText = (text || '').trim();
+    const cleanText = (text || '').replace(/<[^>]*>?/gm, ' ').trim();
     const words = cleanText.split(/\s+/).filter(Boolean);
     const wordCount = words.length;
     const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 180));
 
     const lower = cleanText.toLowerCase();
 
-    // Cognitive distortion & stress indicators
+    // 1. Content pattern detection
+    const isAmbitionMultitask = /bingung|lomba|prosiding|sinta|penelitian|intern|remote|conversation|seo|meta ads|banyak banget|mana dulu|target|proyek|bikin \d+|jasa web/i.test(lower);
     const isCatastrophizing = /hancur|bubar|kiamat|segalanya rusak|ruined|disaster|hopeless|terburuk|berantakan/i.test(lower);
     const isAllOrNothing = /selalu|tidak pernah|gagal total|pasti gagal|always|never|total failure|worthless|sia-sia/i.test(lower);
-    const isOverwhelmed = /kewalahan|stres|capek banget|muak|burnout|overwhelmed|exhausted|too much|panik|pusing/i.test(lower);
+    const isOverwhelmed = /kewalahan|stres|capek banget|muak|burnout|overwhelmed|exhausted|too much|panik|pusing|mumet|frustrasi/i.test(lower);
     const isGratitude = /bersyukur|terima kasih|alhamdulillah|beruntung|grateful|thankful|blessed|senang sekali/i.test(lower);
-    const isAchievement = /berhasil|selesai|tuntas|capai|sukses|win|achieved|finished|progress|goal|tuntas/i.test(lower);
+    const isAchievement = /berhasil|selesai|tuntas|capai|sukses|win|achieved|finished|progress|goal/i.test(lower);
     const isDeepThinking = /kenapa|mengapa|makna|tujuan|belajar|future|purpose|meaning|lesson|hikmah/i.test(lower);
 
     // Auto-detect suggested tags
     const suggestedTags: string[] = [];
+    if (isAmbitionMultitask) suggestedTags.push(isIndo ? 'ambisi' : 'ambition');
     if (isGratitude) suggestedTags.push(isIndo ? 'syukur' : 'gratitude');
     if (isAchievement) suggestedTags.push(isIndo ? 'pencapaian' : 'win');
-    if (isOverwhelmed) suggestedTags.push(isIndo ? 'dekompresi' : 'decompression');
+    if (isOverwhelmed || isAmbitionMultitask) suggestedTags.push(isIndo ? 'kejelasan' : 'clarity');
     if (isDeepThinking) suggestedTags.push(isIndo ? 'refleksi' : 'reflection');
-    if (/kerja|tugas|klien|proyek|kantor|work|project|code|bug/i.test(lower)) suggestedTags.push(isIndo ? 'karier' : 'career');
+    if (/kerja|tugas|klien|proyek|kantor|work|project|code|bug|seo|web/i.test(lower)) suggestedTags.push(isIndo ? 'karier' : 'career');
     if (/keluarga|teman|istri|suami|anak|family|friends|partner/i.test(lower)) suggestedTags.push(isIndo ? 'keluarga' : 'family');
     if (/kesehatan|olahraga|gym|lari|tidur|health|sleep|workout/i.test(lower)) suggestedTags.push(isIndo ? 'kesehatan' : 'wellness');
 
@@ -60,30 +62,26 @@ export function analyzeJournalCognitive(
     let reframeAdvice = '';
     let reflectionPrompt = '';
 
-    if (mood === 'awesome' || (isAchievement && isGratitude)) {
-        mindsetTheme = isIndo ? 'Puncak Momentum & Rasa Syukur' : 'Peak Momentum & Gratitude';
-        cognitiveTone = 'highly_positive';
-        summarySentence = isIndo 
-            ? 'Gelombang energi tinggi, rasa syukur mendalam, dan momentum pencapaian yang kuat.'
-            : 'High-energy state, profound gratitude, and strong goal momentum.';
-        reframeAdvice = isIndo
-            ? 'Kunci pemicu keberhasilan hari ini agar pola pikir produktif ini dapat diulang kembali esok hari.'
-            : 'Capture the key triggers of your win today so you can intentionally replicate this peak state.';
-        reflectionPrompt = isIndo
-            ? 'Pola pikir atau tindakan apa yang paling berkontribusi pada pencapaianmu hari ini?'
-            : 'What mindset or action contributed the most to your wins today?';
-    } else if (mood === 'good' || isAchievement) {
-        mindsetTheme = isIndo ? 'Fokus Berkelanjutan (Productive Flow)' : 'Sustainable Flow & Progress';
+    // Content-aware evaluation order: Ambition/Overload -> Distortion/Stress -> Low/Sad -> Wins/Gratitude -> Baseline
+    if (isAmbitionMultitask) {
+        mindsetTheme = isIndo ? 'Ambisi Tinggi & Kejelasan Fokus' : 'High Ambition & Priority Focus';
         cognitiveTone = 'productive_flow';
+        detectedDistortion = {
+            name: isIndo ? 'Beban Pilihan & Keinginan Multitasking' : 'Choice Overload & Multitasking Impulse',
+            description: isIndo 
+                ? 'Terlalu banyak ide dan target besar berbarengan memicu kebingungan arah awal.' 
+                : 'Having too many high-stakes goals simultaneously causes directional confusion.',
+            reframeAdvice: isIndo
+                ? 'Prinsip Prioritas Stoik: Kamu bisa melakukan segalanya, tapi TIDAK semuanya sekaligus. Pilih 1 prioritas terbesar minggu ini dan eksekusi dulu.'
+                : 'Stoic Priority Principle: You can do anything, but NOT everything at once. Choose 1 primary goal this week and execute.'
+        };
         summarySentence = isIndo
-            ? 'Fokus stabil, kemajuan bertahap yang konsisten, dan suasana batin yang seimbang.'
-            : 'Steady focus, consistent progressive growth, and balanced mental clarity.';
-        reframeAdvice = isIndo
-            ? 'Konsistensi kecil yang berulang adalah kunci kesuksesan jangka panjang. Kamu berada di jalur yang benar.'
-            : 'Small continuous daily progress compounds into massive results. You are on track.';
+            ? 'Terdeteksi banyak target besar (lomba, penelitian, karir, web). Diperlukan urutan prioritas agar energi tidak terpecah.'
+            : 'Multiple high-ambition targets detected (contests, research, career, web). Prioritization is key to prevent split focus.';
+        reframeAdvice = detectedDistortion.reframeAdvice;
         reflectionPrompt = isIndo
-            ? 'Bagaimana kamu bisa mempertahankan ritme yang stabil ini untuk esok hari?'
-            : 'How can you maintain this positive steady rhythm going into tomorrow?';
+            ? 'Dari semua target yang kamu tulis, mana 1 hal yang paling berdampak besar jika kamu selesaikan lebih dulu?'
+            : 'Of all the goals listed, which single one will create the biggest leverage if completed first?';
     } else if (mood === 'angry' || isCatastrophizing || isOverwhelmed) {
         mindsetTheme = isIndo ? 'Tekanan Emosi & Ujian Stoik' : 'High Friction & Stoic Test';
         cognitiveTone = 'stressed_friction';
@@ -114,7 +112,7 @@ export function analyzeJournalCognitive(
         cognitiveTone = 'reflective_low';
         detectedDistortion = isAllOrNothing
             ? {
-                name: isIndo ? 'Pola Pikir Serba Hitam-Putih' : 'All-or-Nothing Thinking',
+                name: isIndo ? 'Pola Pikiran Serba Hitam-Putih' : 'All-or-Nothing Thinking',
                 description: isIndo ? 'Melihat situasi hanya sebagai sukses total atau gagal total.' : 'Viewing outcomes purely as 100% success or complete failure.',
                 reframeAdvice: isIndo
                     ? 'Hidup bukan angka biner. Kemajuan kecil sebesar 1% tetaplah sebuah kemajuan berharga.'
@@ -134,6 +132,30 @@ export function analyzeJournalCognitive(
         reflectionPrompt = isIndo
             ? 'Apa 1 hal sederhana penuh kehangatan yang bisa kamu berikan pada dirimu malam ini?'
             : 'What is 1 simple, soothing act of care you can give yourself tonight?';
+    } else if (isAchievement || isGratitude || mood === 'awesome') {
+        mindsetTheme = isIndo ? 'Puncak Momentum & Rasa Syukur' : 'Peak Momentum & Gratitude';
+        cognitiveTone = 'highly_positive';
+        summarySentence = isIndo 
+            ? 'Gelombang energi tinggi, rasa syukur mendalam, dan momentum pencapaian yang kuat.'
+            : 'High-energy state, profound gratitude, and strong goal momentum.';
+        reframeAdvice = isIndo
+            ? 'Kunci pemicu keberhasilan hari ini agar pola pikir produktif ini dapat diulang kembali esok hari.'
+            : 'Capture the key triggers of your win today so you can intentionally replicate this peak state.';
+        reflectionPrompt = isIndo
+            ? 'Pola pikir atau tindakan apa yang paling berkontribusi pada pencapaianmu hari ini?'
+            : 'What mindset or action contributed the most to your wins today?';
+    } else if (mood === 'good') {
+        mindsetTheme = isIndo ? 'Fokus Berkelanjutan (Productive Flow)' : 'Sustainable Flow & Progress';
+        cognitiveTone = 'productive_flow';
+        summarySentence = isIndo
+            ? 'Fokus stabil, kemajuan bertahap yang konsisten, dan suasana batin yang seimbang.'
+            : 'Steady focus, consistent progressive growth, and balanced mental clarity.';
+        reframeAdvice = isIndo
+            ? 'Konsistensi kecil yang berulang adalah kunci kesuksesan jangka panjang. Kamu berada di jalur yang benar.'
+            : 'Small continuous daily progress compounds into massive results. You are on track.';
+        reflectionPrompt = isIndo
+            ? 'Bagaimana kamu bisa mempertahankan ritme yang stabil ini untuk esok hari?'
+            : 'How can you maintain this positive steady rhythm going into tomorrow?';
     } else {
         mindsetTheme = isIndo ? 'Ketenangan & Observasi Sadar' : 'Calm & Mindful Baseline';
         cognitiveTone = 'balanced_calm';
@@ -165,4 +187,5 @@ export function analyzeJournalCognitive(
 
 // Alias for backward compatibility
 export const analyzeJournalEntry = analyzeJournalCognitive;
+
 

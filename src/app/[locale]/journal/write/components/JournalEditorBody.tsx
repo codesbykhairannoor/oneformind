@@ -233,7 +233,7 @@ export default function JournalEditorBody({
                     ))}
                 </div>
 
-                {/* Cover Image Upload Preview */}
+                {/* Cover Image Upload & URL Input Preview */}
                 <div className="mb-8 group relative">
                     <input
                         type="file"
@@ -244,7 +244,7 @@ export default function JournalEditorBody({
                     />
 
                     {imageUrl ? (
-                        <div className="relative rounded-[2rem] overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm max-h-[400px]">
+                        <div className="relative rounded-[2rem] overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm max-h-[400px] bg-slate-100 dark:bg-slate-800">
                             <img src={imageUrl} alt="Journal Attachment" className="w-full h-full object-cover" />
                             <button
                                 type="button"
@@ -256,16 +256,37 @@ export default function JournalEditorBody({
                             </button>
                         </div>
                     ) : (
-                        <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 hover:border-indigo-300 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer"
-                        >
-                            <Camera className="w-5 h-5" />
-                            <span className="text-xs font-bold">
-                                {isIndo ? 'Sisipkan Foto / Memori Visual' : 'Attach Photo / Visual Memory'}
-                            </span>
-                        </button>
+                        <div className="flex flex-col sm:flex-row items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full sm:flex-1 py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 hover:border-indigo-300 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer"
+                            >
+                                <Camera className="w-5 h-5" />
+                                <span className="text-xs font-bold">
+                                    {isIndo ? 'Upload Foto / Memori Visual' : 'Upload Cover Photo'}
+                                </span>
+                            </button>
+
+                            <div className="w-full sm:flex-1 flex items-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50">
+                                <input
+                                    type="url"
+                                    placeholder={isIndo ? 'Atau tempel Link URL Foto (https://...)' : 'Or paste Image URL (https://...)'}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            const val = (e.target as HTMLInputElement).value.trim();
+                                            if (val) setImageUrl(val);
+                                        }
+                                    }}
+                                    onBlur={(e) => {
+                                        const val = e.target.value.trim();
+                                        if (val) setImageUrl(val);
+                                    }}
+                                    className="w-full text-xs bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 outline-none"
+                                />
+                            </div>
+                        </div>
                     )}
                 </div>
 
