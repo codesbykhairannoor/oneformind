@@ -9,7 +9,7 @@ import {
     ExternalLink, Layers, CheckSquare, Bookmark
 } from 'lucide-react';
 
-export type StudyActiveTab = 'courses' | 'assignments' | 'focus' | 'flashcards' | 'books';
+export type StudyActiveTab = 'courses' | 'assignments' | 'focus' | 'flashcards' | 'books' | 'portfolio';
 
 interface AcademicHeaderProps {
     userSettings: Record<string, any>;
@@ -78,6 +78,11 @@ export default function AcademicHeader({
             id: 'books',
             label: isIndo ? 'Rak Bacaan & Buku' : 'Book Tracker',
             icon: <Bookmark size={15} />
+        },
+        {
+            id: 'portfolio',
+            label: isIndo ? 'Neural Portfolio' : 'Neural Portfolio',
+            icon: <Sparkles size={15} />
         }
     ];
 
@@ -161,15 +166,19 @@ export default function AcademicHeader({
                             )}
                         </div>
 
-                        {/* Public Portfolio Link */}
-                        <Link
-                            href="/study/portfolio"
-                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 text-xs font-black transition active:scale-95"
+                        {/* Quick Portfolio Tab Trigger */}
+                        <button
+                            type="button"
+                            onClick={() => onSelectTab('portfolio')}
+                            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black transition active:scale-95 border ${
+                                activeTab === 'portfolio'
+                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20'
+                                    : 'bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 border-indigo-200/60 dark:border-indigo-800/60'
+                            }`}
                         >
                             <Sparkles size={14} />
                             <span>{isIndo ? 'Portofolio Bento' : 'Bento Portfolio'}</span>
-                            <ExternalLink size={12} />
-                        </Link>
+                        </button>
 
                         {/* Add Course Button */}
                         <button

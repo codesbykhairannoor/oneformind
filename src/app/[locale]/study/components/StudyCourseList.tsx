@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { Sparkles, ChevronRight, FolderOpen, Trash2 } from 'lucide-react';
+import { FolderOpen, Trash2 } from 'lucide-react';
 import CourseCard, { CourseRecord } from './CourseCard';
 
 interface StudyCourseListProps {
@@ -29,25 +28,7 @@ export default function StudyCourseList({
     onAddCourseClick
 }: StudyCourseListProps) {
     return (
-        <div className="max-w-[1600px] w-full md:w-[95%] mx-auto px-4 sm:px-8 py-8">
-            <Link
-                href="/study/portfolio"
-                className="group relative flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 overflow-hidden rounded-2xl border border-slate-800 transition-all hover:border-indigo-500/50 shadow-lg mb-8 hover:-translate-y-0.5"
-            >
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <div className="relative z-10 flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform border border-indigo-500/30">
-                        <Sparkles className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-white font-bold text-sm sm:text-base tracking-wide">
-                        Neural Portfolio{' '}
-                        <span className="hidden sm:inline text-slate-400 font-normal ml-2">
-                            &mdash; {t('study_portfolio_banner_sub') || 'Statistik & AI Competency Framework'}
-                        </span>
-                    </h3>
-                </div>
-                <ChevronRight className="relative z-10 h-5 w-5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
-            </Link>
+        <div className="max-w-[1600px] w-full md:w-[95%] mx-auto px-4 sm:px-8 py-4">
 
             <div className="flex items-end justify-between mb-6 border-b border-slate-200 dark:border-slate-800 pb-4 group/header">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">

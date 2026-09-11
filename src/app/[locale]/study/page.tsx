@@ -13,6 +13,7 @@ import AssignmentRadar from './components/AssignmentRadar';
 import StudyFocusRoom from './components/StudyFocusRoom';
 import FlashcardsDeckView from './components/FlashcardsDeckView';
 import BookTracker from './components/BookTracker';
+import StudyPortfolioView from './components/StudyPortfolioView';
 import { useStudyData } from './hooks/useStudyData';
 import { CourseRecord } from './components/CourseCard';
 import { Loader2 } from 'lucide-react';
@@ -56,6 +57,17 @@ export default function StudyPage() {
 
     // Active tab in Study Hub
     const [activeTab, setActiveTab] = useState<StudyActiveTab>('courses');
+
+    // Sync tab from URL search params if present
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab') as StudyActiveTab;
+            if (tab && ['courses', 'assignments', 'focus', 'flashcards', 'books', 'portfolio'].includes(tab)) {
+                setActiveTab(tab);
+            }
+        }
+    }, []);
 
     // Modals visibility state
     const [isAddSemesterModalOpen, setIsAddSemesterModalOpen] = useState(false);
@@ -106,12 +118,14 @@ export default function StudyPage() {
 
                                 <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
                                     
-                                    {/* Interactive GPA Simulator Banner */}
-                                    <GpaSimulator
-                                        courses={filteredCourses}
-                                        terms={terms}
-                                        userSettings={userSettings}
-                                    />
+                                    {/* Interactive GPA Simulator Banner (hidden on portfolio tab for clean layout) */}
+                                    {activeTab !== 'portfolio' && (
+                                        <GpaSimulator
+                                            courses={filteredCourses}
+                                            terms={terms}
+                                            userSettings={userSettings}
+                                        />
+                                    )}
 
                                     {/* Active Tab View */}
                                     {activeTab === 'courses' && (
@@ -164,6 +178,10 @@ export default function StudyPage() {
                                             onSaveBooks={handleSaveBooks}
                                             onSaveGoal={handleSaveReadingGoal}
                                         />
+                                    )}
+
+                                    {activeTab === 'portfolio' && (
+                                        <StudyPortfolioView />
                                     )}
 
                                 </main>
