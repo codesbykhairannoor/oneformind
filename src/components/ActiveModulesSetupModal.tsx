@@ -1,7 +1,7 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { 
     useActiveModules, 
     MODULE_PRESETS, 
@@ -129,12 +129,12 @@ export default function ActiveModulesSetupModal() {
                         <span>{isIndo ? 'Setup Awal Tranvas OS' : 'Initial Tranvas Setup'}</span>
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                        {isIndo ? 'Pilih 3 Tab Utama Anda' : 'Choose Your Power Trio'}
+                        {isIndo ? 'Pilih 3 Tab Bebas (Tanpa Kartu Kredit)' : 'Pick 3 Free Tabs (No Card Needed)'}
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
                         {isIndo
-                            ? 'Fokus pada hal terpenting. Anda bebas mengganti 3 tab ini kapan saja selama 30 hari ke depan sebelum terkunci.'
-                            : 'Focus on what moves the needle. You can freely swap these 3 tabs anytime during your first 30 days.'}
+                            ? 'Mulai gratis tanpa kartu kredit. Anda memiliki masa 30 hari untuk bebas menukar 3 tab aktif ini sebelum dikunci permanen.'
+                            : 'Start free without a credit card. You have 30 days to freely swap your 3 active tabs before they lock permanently.'}
                     </p>
                 </div>
 
@@ -215,16 +215,40 @@ export default function ActiveModulesSetupModal() {
                 </div>
 
                 {/* 3-Step Lifecycle & AI Coach Note */}
-                <div className="mb-6 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5 leading-relaxed">
+                <div className="mb-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5 leading-relaxed">
                     <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
                         <Sparkles size={13} className="text-indigo-500 shrink-0" />
-                        <span>{isIndo ? 'Mekanisme 3 Tab & Aturan Fitur:' : '3-Tab Mechanics & Tier Rules:'}</span>
+                        <span>{isIndo ? 'Mekanisme 3 Tab (Tanpa Kartu Kredit):' : '3-Tab Mechanics (No Card Needed):'}</span>
                     </div>
                     <ul className="list-disc list-inside space-y-0.5 pl-1 text-[10.5px]">
                         <li>{isIndo ? 'Masa fleksibel 30 hari: bebas menukar 3 tab aktif Anda kapan saja di menu Pengaturan.' : '30-day trial: freely swap your 3 active tabs anytime in Settings.'}</li>
                         <li>{isIndo ? 'Setelah 30 hari: 3 tab yang Anda gunakan akan terkunci permanen.' : 'After 30 days: your 3 active tabs will permanently lock.'}</li>
-                        <li className="font-semibold text-indigo-600 dark:text-indigo-400">{isIndo ? 'Neural AI Coach hanya terbuka eksklusif di paket Quantum Plan (tidak termasuk di Free atau Architect).' : 'Neural AI Coach is exclusively available on Quantum Plan (not included in Free or Architect).'}</li>
+                        <li className="font-semibold text-slate-600 dark:text-slate-300">{isIndo ? 'AI Coach tidak termasuk dalam paket Free 3-Tab tanpa kartu kredit.' : 'AI Coach is not included in the Free 3-Tab tier.'}</li>
                     </ul>
+                </div>
+
+                {/* 14-Day Card Trial Full Access Banner */}
+                <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 via-purple-50/60 to-pink-50/80 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 border border-indigo-200/80 dark:border-indigo-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div className="flex items-start gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <Sparkles size={16} />
+                        </div>
+                        <div>
+                            <p className="font-extrabold text-slate-900 dark:text-white">
+                                {isIndo ? 'Mau Coba SEMUA 8 Tab + AI Coach Sekaligus?' : 'Want ALL 8 Tabs + AI Coach right now?'}
+                            </p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                {isIndo ? 'Mulai 14 Hari Free Trial dengan Kartu Kredit ($0 Hari Ini, Batal Kapan Saja).' : 'Start 14-Day Free Trial with Card ($0 Today, Cancel Anytime).'}
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        href="/billing"
+                        onClick={handleComplete}
+                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] shrink-0 text-center shadow-md shadow-indigo-300/30"
+                    >
+                        {isIndo ? 'Mulai Trial 14 Hari' : 'Start 14-Day Trial'} &rarr;
+                    </Link>
                 </div>
 
                 {/* Footer Action */}

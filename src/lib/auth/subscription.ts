@@ -27,10 +27,10 @@ export interface TrialStatus {
   percentRemaining: number;
 }
 
-export const TRIAL_DURATION_DAYS = 30;
+export const TRIAL_DURATION_DAYS = 14;
 
 /**
- * Calculates 30-day free trial / grace period status for any user object
+ * Calculates 14-day credit card free trial status (unlocks all tabs and AI)
  */
 export function getTrialStatus(user: any): TrialStatus {
   if (!user) {

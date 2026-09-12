@@ -85,11 +85,14 @@ export const useGating = () => {
     const isQuantum   = tier === 3;
     const isLegendary = tier === 4;
 
-    // AI: quantum + legendary 2 bulan
+    // AI: quantum + legendary 2 bulan + (14 hari trial kartu kredit membuka semua tab dan AI)
     const isAiEnabled = useMemo(() => {
         if (!user) return false;
         const plan = (user.planType || user.plan_type)?.toLowerCase();
         if (plan === 'quantum') return true;
+
+        // 14 hari trial kartu kredit membuka semua tab dan AI (paket Architect + AI)
+        if (trial.isActive) return true;
         
         if (plan === 'legendary') {
             const createdAtStr = user.created_at || user.createdAt;
@@ -103,7 +106,7 @@ export const useGating = () => {
             return true; // Fallback if no creation date exists
         }
         return false;
-    }, [user]);
+    }, [user, trial.isActive]);
 
     const canUse = (feature: string) => {
         const required = FEATURE_TIERS[feature] ?? 'architect';

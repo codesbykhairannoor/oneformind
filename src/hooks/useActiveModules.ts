@@ -105,8 +105,8 @@ export function useActiveModules() {
 
     const trial = getTrialStatus(user);
     const isPremium = Boolean(user?.is_premium);
-    // If user has paid subscription (Architect / Quantum), they have unlimited tabs unlocked
-    const isUnlimited = isPremium || (user?.plan_type && user.plan_type.toLowerCase() !== 'explorer' && !trial.isExpired);
+    // If user has paid subscription (Architect / Quantum), OR active 14-day credit card trial, all tabs are unlocked!
+    const isUnlimited = isPremium || trial.isActive || (user?.plan_type && user.plan_type.toLowerCase() !== 'explorer' && !trial.isExpired);
 
     // Hydrate state from localStorage
     useEffect(() => {
@@ -186,20 +186,23 @@ export function useActiveModules() {
     const activeCount = activeKeys.length;
     const canActivateMore = isUnlimited || activeCount < MAX_FREE_ACTIVE_MODULES;
 
-    // AI Coach is only enabled for Quantum plan
+    // AI Coach is enabled for Quantum plan OR active 14-day credit card trial (Architect + AI)
     const isAiEnabled = useMemo(() => {
         if (!user) return false;
+        if (trial.isActive) return true; // 14-day credit card trial unlocks all tabs & AI
         const plan = (user.plan_type)?.toLowerCase();
         return plan === 'quantum' || plan === 'legendary';
-    }, [user]);
+    }, [user, trial.isActive]);
 
     const isTabActive = useCallback((key: string): boolean => {
         // System Core: Dashboard is always active
         if (key === 'dashboard') return true;
-        // AI Coach requires Quantum tier
+        // AI Coach requires Quantum tier OR 14-day card trial
         if (key === 'coach') return isAiEnabled;
+        // Unlimited tier (Architect, Quantum, or 14-day card trial) unlocks all 8 tabs
+        if (isUnlimited) return true;
         return Boolean(modules[key]);
-    }, [modules, isAiEnabled]);
+    }, [modules, isAiEnabled, isUnlimited]);
 
     // Persist modules both locally and to server
     const persistModules = useCallback(async (
@@ -316,6 +319,7 @@ export function useActiveModules() {
         daysRemaining,
         isLocked,
         isUnlimited,
+        trial,
         isSaving,
         hasHydrated,
         isAiEnabled,

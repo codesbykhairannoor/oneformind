@@ -313,8 +313,8 @@ export default function CoachPage() {
 
                         <p className="relative z-10 text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-3 max-w-lg mx-auto leading-relaxed font-medium">
                             {isIndo
-                                ? 'Neural AI Coach hanya tersedia untuk member paket Quantum Plan. Paket Free dan Architect tidak mencakup akses asisten AI. Upgrade untuk membuka asisten kecerdasan buatan terpadu 24/7.'
-                                : 'Neural AI Coach is exclusively available for Quantum Plan members. Free and Architect tiers do not include AI Coach access. Upgrade to Quantum to unlock 24/7 unified intelligence.'}
+                                ? 'Neural AI Coach hanya tersedia untuk member Quantum Plan atau selama 14 Hari Free Trial (dengan kartu kredit yang membuka semua tab & AI). Akun Free 3-Tab tanpa kartu kredit dan paket Architect tidak mencakup akses AI Coach.'
+                                : 'Neural AI Coach is exclusive to Quantum Plan or during the 14-Day Card Trial (which unlocks all tabs & AI). Free 3-Tab accounts and Architect tiers do not include AI Coach access.'}
                         </p>
 
                         {/* Highlights Grid */}

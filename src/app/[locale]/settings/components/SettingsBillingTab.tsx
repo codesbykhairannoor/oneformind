@@ -66,13 +66,13 @@ export default function SettingsBillingTab({
                         {trial.isActive && (
                             <div className="max-w-md pt-1">
                                 <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5 font-medium">
-                                    <span>{isIndo ? `Hari ke-${trial.daysUsed + 1} dari ${totalDays}` : `Day ${trial.daysUsed + 1} of ${totalDays}`}</span>
+                                    <span>{isIndo ? `Hari ke-${trial.daysUsed + 1} dari 14 (Trial Kartu Kredit: Semua Tab & AI Terbuka)` : `Day ${trial.daysUsed + 1} of 14 (Card Trial: All Tabs & AI Open)`}</span>
                                     <span>{trial.daysRemaining} {isIndo ? 'hari tersisa' : 'days left'}</span>
                                 </div>
                                 <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
                                     <div 
                                         className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-500"
-                                        style={{ width: `${Math.min(100, Math.max(5, ((totalDays - trial.daysRemaining) / totalDays) * 100))}%` }}
+                                        style={{ width: `${Math.min(100, Math.max(5, ((14 - trial.daysRemaining) / 14) * 100))}%` }}
                                     />
                                 </div>
                             </div>
@@ -106,8 +106,8 @@ export default function SettingsBillingTab({
 
                 <p className="mt-6 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-600/50 pt-4">
                     {isIndo
-                        ? 'Pengguna baru mendapatkan masa eksperimen 30 hari untuk bebas menukar 3 tab aktif. Setelah 30 hari, tab terkunci atau Anda dapat meng-upgrade ke paket Architect/Quantum.'
-                        : 'New users enjoy a 30-day trial to swap 3 active tabs. After 30 days, your 3 tabs lock permanently unless upgraded to Architect or Quantum.'}
+                        ? 'Tersedia 2 jalur: (1) Trial 14 Hari dengan Kartu Kredit yang membuka SEMUA 8 Tab + AI Coach ($0 hari ini, batal kapan saja), atau (2) Free 3-Tab tanpa kartu kredit dengan masa bebas tukar 30 hari.'
+                        : 'Two trial options: (1) 14-Day Card Trial unlocking ALL 8 Tabs + AI Coach ($0 today, cancel anytime), or (2) Free 3-Tab tier with 30-day swap trial without a credit card.'}
                 </p>
             </div>
 
@@ -134,16 +134,16 @@ export default function SettingsBillingTab({
                             </div>
                             <h5 className="text-lg font-black text-slate-900 dark:text-white mb-2">Explorer</h5>
                             <p className="text-xs text-slate-500 leading-relaxed mb-4">
-                                {isIndo ? 'Pondasi awal untuk membangun fokus pada 3 modul esensial.' : 'Basic foundation focused on 3 core functional tabs.'}
+                                {isIndo ? 'Pondasi awal gratis tanpa kartu kredit untuk fokus pada 3 tab esensial.' : 'Free foundation without credit card focused on 3 core tabs.'}
                             </p>
                             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
                                 <li className="flex items-start gap-2">
                                     <Check size={14} className="text-emerald-500 mt-0.5 shrink-0" />
-                                    <span>{isIndo ? 'Pilih 3 Tab Bebas (Bebas ganti 30 hari)' : 'Pick any 3 tabs (30-day swap trial)'}</span>
+                                    <span>{isIndo ? 'Pilih 3 Tab Bebas (Tanpa Kartu Kredit)' : 'Pick 3 Free Tabs (No Card Needed)'}</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check size={14} className="text-emerald-500 mt-0.5 shrink-0" />
-                                    <span>{isIndo ? 'Dashboard & Sinergi dasar' : 'Base Dashboard & Life Synergy'}</span>
+                                    <span>{isIndo ? 'Bebas tukar 3 tab selama 30 hari' : 'Free to swap 3 tabs for 30 days'}</span>
                                 </li>
                                 <li className="flex items-start gap-2 text-slate-400">
                                     <Lock size={14} className="text-slate-400 mt-0.5 shrink-0" />
@@ -166,7 +166,7 @@ export default function SettingsBillingTab({
                             </div>
                             <h5 className="text-lg font-black text-slate-900 dark:text-white mb-2">Architect</h5>
                             <p className="text-xs text-slate-500 leading-relaxed mb-4">
-                                {isIndo ? 'Buka seluruh modul tanpa batas kuota tab & tanpa kunci.' : 'Unlock all 8 modules without any tab limit or lock.'}
+                                {isIndo ? 'Buka seluruh modul tanpa batas kuota tab & tanpa kunci permanen.' : 'Unlock all 8 modules without any tab limit or lock.'}
                             </p>
                             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
                                 <li className="flex items-start gap-2 font-bold text-indigo-700 dark:text-indigo-300">
@@ -174,8 +174,8 @@ export default function SettingsBillingTab({
                                     <span>{isIndo ? 'Buka SEMUA 8 Tab Tanpa Batas' : 'Unlock ALL 8 Modules Unlimited'}</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <Check size={14} className="text-emerald-500 mt-0.5 shrink-0" />
-                                    <span>{isIndo ? 'Tidak ada batasan kuota 3 tab' : 'No 3-tab limit or lock'}</span>
+                                    <Sparkles size={14} className="text-amber-500 mt-0.5 shrink-0" />
+                                    <span className="text-amber-700 dark:text-amber-300 font-semibold">{isIndo ? 'Trial 14 Hari Kartu Kredit ($0): Buka Semua Tab + AI' : '14-Day Card Trial ($0): Unlocks All Tabs + AI'}</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check size={14} className="text-emerald-500 mt-0.5 shrink-0" />
@@ -183,7 +183,7 @@ export default function SettingsBillingTab({
                                 </li>
                                 <li className="flex items-start gap-2 text-slate-400">
                                     <X size={14} className="text-rose-400 mt-0.5 shrink-0" />
-                                    <span className="font-semibold text-rose-500/80">{isIndo ? 'AI Coach TIDAK tersedia' : 'AI Coach NOT included'}</span>
+                                    <span className="font-semibold text-rose-500/80">{isIndo ? 'AI Coach setelah trial hanya di Quantum' : 'AI Coach post-trial requires Quantum'}</span>
                                 </li>
                             </ul>
                         </div>

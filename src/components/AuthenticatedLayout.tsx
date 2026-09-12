@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
@@ -46,6 +46,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
 
     const trial = getTrialStatus(session?.user || user);
     const isExplorer = (!user?.plan_type || user.plan_type.toLowerCase() === 'explorer') && !trial.isActive;
+    const isUnlimited = Boolean(user?.is_premium) || trial.isActive || (user?.plan_type && user.plan_type.toLowerCase() !== 'explorer' && !trial.isExpired);
 
     // Layout States
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -68,6 +69,23 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         job: true,
         goal: true,
     });
+
+    // If unlimited (Architect / Quantum / 14-day credit card trial), all 8 modules are unlocked
+    const effectiveModuleSettings = useMemo(() => {
+        if (isUnlimited) {
+            return {
+                habit: true,
+                planner: true,
+                finance: true,
+                study: true,
+                journal: true,
+                calendar: true,
+                job: true,
+                goal: true,
+            };
+        }
+        return moduleSettings;
+    }, [isUnlimited, moduleSettings]);
 
     useEffect(() => {
         const handleResize = () => setIsDesktop(window.innerWidth >= 768);
@@ -254,7 +272,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                     isMobileDrawerOpen={isMobileDrawerOpen}
                     coreExpanded={coreExpanded}
                     platinumExpanded={platinumExpanded}
-                    moduleSettings={moduleSettings}
+                    moduleSettings={effectiveModuleSettings}
                     trial={trial}
                     locale={locale}
                     pathname={pathname}
@@ -290,7 +308,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
             />
 
             {/* MOBILE BOTTOM NAVIGATION BAR */}
-            <AuthMobileBottomNav moduleSettings={moduleSettings} />
+            <AuthMobileBottomNav moduleSettings={effectiveModuleSettings} />
 
         </div>
     );

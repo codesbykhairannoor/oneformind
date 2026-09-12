@@ -82,9 +82,9 @@ export default function Register() {
                 </div>
 
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[11px] font-black uppercase tracking-wider mb-3 shadow-sm">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500/10 via-indigo-500/10 to-purple-500/10 border border-emerald-200/60 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-[11px] font-black uppercase tracking-wider mb-3 shadow-sm">
                         <span>⚡</span>
-                        <span>{locale === 'id' ? 'Pilih 3 Tab Bebas • 30 Hari Bebas Eksperimen' : 'Pick Any 3 Tabs • 30-Day Free Trial'}</span>
+                        <span>{locale === 'id' ? 'Pilih 3 Tab Bebas (Tanpa Kartu Kredit) • 30 Hari Bebas Ganti' : 'Pick Any 3 Tabs (No Card Needed) • 30-Day Free Swap'}</span>
                     </div>
                     <h1 className="text-2xl font-black text-slate-900 mb-1.5 tracking-tight">
                         {t('auth_register_title') || 'Buat Akun Baru'}
