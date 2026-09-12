@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
 import ModalPortal from '@/components/ModalPortal';
-import { X, Clock, Calendar, Zap, Anchor, Sparkles, Check, ChevronRight } from 'lucide-react';
+import { X, Clock, Calendar, Sparkles, Check, ChevronRight } from 'lucide-react';
 
 interface PlannerRoutineModalProps {
     show: boolean;
@@ -33,20 +33,10 @@ export default function PlannerRoutineModal({
     const [frequencyDays, setFrequencyDays] = useState<number[]>([1, 2, 3, 4, 5]); // Mon - Fri default
     const [endDate, setEndDate] = useState<string>('');
     const [horizonPreset, setHorizonPreset] = useState<'forever' | 'month_end' | '3_months' | 'custom'>('forever');
-    const [anchorCue, setAnchorCue] = useState('');
-    const [elasticMini, setElasticMini] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     if (!show) return null;
-
-    const anchorCuePresets = [
-        { label: '🌅 Bangun Tidur', cue: isIndo ? 'Setelah bangun tidur pagi' : 'After waking up in the morning' },
-        { label: '☕ Kopi / Sarapan', cue: isIndo ? 'Setelah minum kopi / sarapan' : 'After drinking morning coffee / breakfast' },
-        { label: '💻 Mulai Kerja', cue: isIndo ? 'Sebelum mulai membuka laptop / kerja' : 'Before opening laptop / starting work' },
-        { label: '🍱 Makan Siang', cue: isIndo ? 'Setelah selesai jam makan siang' : 'After lunch break' },
-        { label: '🌙 Sebelum Tidur', cue: isIndo ? 'Sebelum beranjak tidur malam' : 'Before going to sleep' }
-    ];
 
     const applyDuration = (mins: number) => {
         const [h, m] = startTime.split(':').map(Number);
@@ -68,15 +58,13 @@ export default function PlannerRoutineModal({
             const d = new Date(now);
             d.setDate(d.getDate() + 90);
             setEndDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
-        } else if (preset === 'custom' && !endDate) {
-            setEndDate(selectedDate);
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) {
-            setError(isIndo ? 'Nama rutinitas wajib diisi!' : 'Routine name is required!');
+            setError(isIndo ? 'Nama rutinitas wajib diisi' : 'Routine name is required');
             return;
         }
 
@@ -96,8 +84,6 @@ export default function PlannerRoutineModal({
             endTime: endTime.trim() || undefined,
             startDate: selectedDate,
             endDate: endDate.trim() || undefined,
-            anchorCue: anchorCue.trim() || undefined,
-            elasticMini: elasticMini.trim() || undefined,
             syncedTabs: ['planner', 'calendar']
         };
 
@@ -405,59 +391,6 @@ export default function PlannerRoutineModal({
                                     />
                                 </div>
                             )}
-                        </div>
-
-                        {/* 5. PEMICU PELAKSANAAN (ANCHOR CUE / HABIT STACKING) */}
-                        <div>
-                            <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1.5 mb-1.5">
-                                <Anchor size={12} className="text-blue-500" />
-                                <span>{isIndo ? 'Pemicu Pelaksanaan (Anchor Cue / Habit Stacking)' : 'Anchor Cue (Habit Stacking)'}</span>
-                            </label>
-
-                            <div className="flex flex-wrap gap-1.5 mb-2">
-                                {anchorCuePresets.map(preset => (
-                                    <button
-                                        key={preset.cue}
-                                        type="button"
-                                        onClick={() => setAnchorCue(preset.cue)}
-                                        className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition ${
-                                            anchorCue === preset.cue
-                                                ? 'bg-blue-600 text-white border-blue-600'
-                                                : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-                                        }`}
-                                    >
-                                        {preset.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <input
-                                type="text"
-                                value={anchorCue}
-                                onChange={(e) => setAnchorCue(e.target.value)}
-                                placeholder={isIndo ? 'Misal: Setelah minum kopi pagi, saya akan...' : 'e.g. After morning coffee, I will...'}
-                                className="w-full text-xs font-medium py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white outline-none focus:border-blue-500 transition"
-                            />
-                        </div>
-
-                        {/* 6. ATURAN 2 MENIT (VERSI ELASTIS SAAT LELAH/SIBUK) */}
-                        <div className="p-3.5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 space-y-1.5">
-                            <label className="text-[10px] font-black uppercase text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
-                                <Zap size={13} className="text-amber-500 fill-current" />
-                                <span>{isIndo ? 'Aturan 2 Menit (Versi Elastis saat Lelah/Sibuk)' : '2-Minute Elastic Rule (Busy Fallback)'}</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={elasticMini}
-                                onChange={(e) => setElasticMini(e.target.value)}
-                                placeholder={isIndo ? 'Misal: Baca 1 halaman saja / Buka editor 1 menit' : 'e.g. Read 1 paragraph / Open editor 1 min'}
-                                className="w-full text-xs font-medium py-2 px-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800/60 text-slate-800 dark:text-white outline-none focus:border-amber-500 transition"
-                            />
-                            <p className="text-[9px] text-amber-700 dark:text-amber-400 font-bold leading-relaxed">
-                                ⚡ {isIndo 
-                                    ? 'Otomatis diaktifkan di Planner saat beban tugas hari ini tinggi (≥ 4 tugas) agar streak momentum Anda tidak terputus.' 
-                                    : 'Auto-triggered in Planner on busy days (≥ 4 tasks) so your streak momentum never breaks.'}
-                            </p>
                         </div>
 
                         {/* Submit Button */}

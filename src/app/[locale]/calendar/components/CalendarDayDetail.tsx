@@ -326,9 +326,9 @@ export default function CalendarDayDetail({
                                                             {h.name}
                                                         </span>
                                                     </div>
-                                                    {(h.reminderTime || h.anchorCue || h.timeOfDay) && (
+                                                    {(h.reminderTime || h.timeOfDay) && (
                                                         <p className="text-[10px] text-slate-400 font-medium mt-0.5">
-                                                            {h.reminderTime ? `⏰ ${h.reminderTime}` : (h.anchorCue ? `⚓ ${h.anchorCue}` : (h.timeOfDay === 'morning' ? '🌅 Pagi' : h.timeOfDay === 'afternoon' ? '☀️ Siang' : h.timeOfDay === 'evening' ? '🌙 Malam' : ''))}
+                                                            {h.reminderTime ? `⏰ ${h.reminderTime}` : (h.timeOfDay === 'morning' ? '🌅 Pagi' : h.timeOfDay === 'afternoon' ? '☀️ Siang' : h.timeOfDay === 'evening' ? '🌙 Malam' : '')}
                                                         </p>
                                                     )}
                                                 </div>

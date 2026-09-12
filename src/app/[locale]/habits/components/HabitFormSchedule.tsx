@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import { calculateScheduledDays } from '../utils/habitMath';
-import { Target, Anchor, Zap, Coins, Sparkles, Calendar, CheckSquare, BookOpen, Briefcase, Dumbbell, BookMarked, Clock } from 'lucide-react';
+import { Target, Coins, Sparkles, Calendar, CheckSquare, BookOpen, Briefcase, Dumbbell, BookMarked, Clock } from 'lucide-react';
 import { LifeOSTab } from '../types';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -87,14 +87,6 @@ export default function HabitFormSchedule({
 }: HabitFormScheduleProps) {
     const { data: rawGoals } = useSWR('/api/goals', fetcher);
     const availableGoals = Array.isArray(rawGoals) ? rawGoals : [];
-
-    const anchorCuePresets = [
-        { label: '🌅 Bangun Tidur', cue: 'Setelah bangun tidur pagi' },
-        { label: '☕ Kopi / Sarapan', cue: 'Setelah selesai minum kopi/sarapan' },
-        { label: '💻 Mulai Kerja', cue: 'Sebelum membuka laptop/mulai kerja' },
-        { label: '🍱 Makan Siang', cue: 'Setelah jam makan siang' },
-        { label: '🌙 Sebelum Tidur', cue: 'Sebelum beranjak tidur malam' },
-    ];
 
     return (
         <div className="space-y-6">
@@ -524,60 +516,7 @@ export default function HabitFormSchedule({
                     </div>
                 )}
 
-                {/* 2. Anchor Cue (Habit Stacking) */}
-                <div>
-                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
-                        <Anchor className="w-3.5 h-3.5 text-blue-500" />
-                        <span>{isIndo ? 'Pemicu Pelaksanaan (Anchor Cue / Habit Stacking)' : 'Anchor Cue (Habit Stacking)'}</span>
-                    </label>
-                    
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                        {anchorCuePresets.map(preset => (
-                            <button
-                                key={preset.cue}
-                                type="button"
-                                onClick={() => setFormAnchorCue(preset.cue)}
-                                className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border transition ${
-                                    formAnchorCue === preset.cue
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-                                }`}
-                            >
-                                {preset.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    <input
-                        type="text"
-                        value={formAnchorCue || ''}
-                        onChange={(e) => setFormAnchorCue(e.target.value)}
-                        placeholder={isIndo ? 'Misal: Setelah menuangkan kopi pagi, saya akan...' : 'e.g. After pouring morning coffee, I will...'}
-                        className="w-full text-xs font-medium py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition"
-                    />
-                </div>
-
-                {/* 3. Aturan 2 Menit (Versi Elastis) */}
-                <div>
-                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
-                        <Zap className="w-3.5 h-3.5 text-amber-500" />
-                        <span>{isIndo ? 'Aturan 2 Menit (Versi Elastis saat Lelah/Sibuk)' : '2-Minute Elastic Rule (Low Energy Fallback)'}</span>
-                    </label>
-                    <input
-                        type="text"
-                        value={formElasticMini || ''}
-                        onChange={(e) => setFormElasticMini(e.target.value)}
-                        placeholder={isIndo ? 'Misal: Baca 1 paragraf saja / 1 push-up saja' : 'e.g. Read just 1 page / Do 2 pushups'}
-                        className="w-full text-xs font-medium py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition"
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">
-                        {isIndo 
-                            ? 'Otomatis diaktifkan di Planner saat beban tugas harian Anda tinggi agar momentum streak tidak terputus.' 
-                            : 'Auto-triggered in Planner on overloaded days so your momentum never breaks.'}
-                    </p>
-                </div>
-
-                {/* 4. Dampak Finansial Harian (Compounding Savings / Cost-of-Vice) */}
+                {/* Dampak Finansial Harian (Compounding Savings / Cost-of-Vice) */}
                 {formSyncedTabs.includes('finance') && (
                     <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-900/50 space-y-1.5 animate-in fade-in duration-200">
                         <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">

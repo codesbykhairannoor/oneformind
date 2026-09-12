@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
-import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, Leaf, Zap, Anchor } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, Leaf } from 'lucide-react';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 import { InboxTask } from '../types';
 
@@ -53,8 +53,7 @@ export default function PlannerSidebar({
 
     const [newInboxTitle, setNewInboxTitle] = useState('');
     const [dailyHubTab, setDailyHubTab] = useState<'habits' | 'notes' | 'meals' | 'water'>('habits');
-    const [elasticMode, setElasticMode] = useState(false);
-    const [anchorFilter, setAnchorFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
+    const [timeFilter, setTimeFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
 
     // Cross-Module Synergy: Real-time Today's Habits
     const activeDate = selectedDate || new Date().toISOString().split('T')[0];
@@ -96,8 +95,6 @@ export default function PlannerSidebar({
                 icon: h.icon || '🌱',
                 color: h.color || '#10b981',
                 isCompleted: isDone,
-                anchorCue: meta.anchorCue || '',
-                elasticMini: meta.elasticMini || '',
                 timeOfDay: meta.timeOfDay || 'anytime',
                 goalTitle: meta.goalTitle || ''
             };
@@ -105,9 +102,9 @@ export default function PlannerSidebar({
     }, [rawHabits, activeDate]);
 
     const filteredTodayHabits = useMemo(() => {
-        if (anchorFilter === 'all') return todayHabits;
-        return todayHabits.filter((h: any) => h.timeOfDay === anchorFilter || h.timeOfDay === 'anytime');
-    }, [todayHabits, anchorFilter]);
+        if (timeFilter === 'all') return todayHabits;
+        return todayHabits.filter((h: any) => h.timeOfDay === timeFilter || h.timeOfDay === 'anytime');
+    }, [todayHabits, timeFilter]);
 
     const completedHabitsCount = todayHabits.filter((h: any) => h.isCompleted).length;
 
@@ -430,29 +427,18 @@ export default function PlannerSidebar({
                 {/* Tab 0: Habits Checklist Hari Ini */}
                 {dailyHubTab === 'habits' && (
                     <div className="space-y-2.5 animate-in fade-in">
-                        {/* Control Strip: Elastic Mode & Anchor Filter */}
+                        {/* Control Strip: Time-of-Day Filter */}
                         <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <button
-                                    type="button"
-                                    onClick={() => setElasticMode(!elasticMode)}
-                                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-1.5 transition-all border ${
-                                        elasticMode 
-                                            ? 'bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/20 scale-[1.02]' 
-                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-amber-400'
-                                    }`}
-                                    title={isIndo ? 'Gunakan versi mini 2 menit agar streak tidak putus saat lelah' : 'Use 2-minute elastic mini version'}
-                                >
-                                    <Zap size={11} className={elasticMode ? 'fill-current' : ''} />
-                                    <span>{elasticMode ? (isIndo ? '⚡ Mode Elastis AKTIF' : '⚡ 2-Min Mode ACTIVE') : (isIndo ? '⚡ Mode Elastis (2 Menit)' : '⚡ 2-Min Elastic Mode')}</span>
-                                </button>
-
+                            <div className="flex items-center justify-between px-1">
+                                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                                    {isIndo ? 'Rutinitas Hari Ini' : "Today's Habits"}
+                                </span>
                                 <span className="text-[10px] font-bold text-slate-400 font-mono">
                                     {completedHabitsCount}/{todayHabits.length}
                                 </span>
                             </div>
 
-                            {/* Anchor Moment / Time-of-Day Filter Pills */}
+                            {/* Time-of-Day Filter Pills */}
                             <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
                                 {[
                                     { key: 'all', label: isIndo ? 'Semua' : 'All' },
@@ -463,9 +449,9 @@ export default function PlannerSidebar({
                                     <button
                                         key={filter.key}
                                         type="button"
-                                        onClick={() => setAnchorFilter(filter.key as any)}
+                                        onClick={() => setTimeFilter(filter.key as any)}
                                         className={`px-2 py-0.5 rounded-lg text-[9px] font-black transition-all shrink-0 ${
-                                            anchorFilter === filter.key
+                                            timeFilter === filter.key
                                                 ? 'bg-indigo-600 text-white shadow-xs'
                                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                         }`}
@@ -485,7 +471,7 @@ export default function PlannerSidebar({
                         ) : (
                             <div className="space-y-1.5 max-h-60 overflow-y-auto no-scrollbar">
                                 {filteredTodayHabits.map((h: any) => {
-                                    const displayName = (elasticMode && h.elasticMini) ? h.elasticMini : h.name;
+                                    const displayName = h.name;
                                     return (
                                         <div 
                                             key={h.id}
@@ -519,27 +505,16 @@ export default function PlannerSidebar({
                                                         }`}>
                                                             {displayName}
                                                         </span>
-                                                        {elasticMode && h.elasticMini && (
-                                                            <span className="text-[8px] font-black px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
-                                                                ⚡ 2-Min
-                                                            </span>
-                                                        )}
                                                     </div>
 
-                                                    {/* Contextual cues & goal links */}
-                                                    <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-                                                        {h.anchorCue && (
-                                                            <span className="text-[9px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-0.5">
-                                                                <Anchor size={9} />
-                                                                <span className="truncate max-w-[140px]">{h.anchorCue}</span>
-                                                            </span>
-                                                        )}
-                                                        {h.goalTitle && (
+                                                    {/* Contextual goal links */}
+                                                    {h.goalTitle && (
+                                                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                                                             <span className="text-[9px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-0.5">
                                                                 <span className="truncate max-w-[120px]">🎯 {h.goalTitle}</span>
                                                             </span>
-                                                        )}
-                                                    </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </button>
 
