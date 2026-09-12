@@ -1,9 +1,21 @@
 'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
-import { Menu } from 'lucide-react';
+import { useGating } from '@/hooks/useGating';
+import { 
+    Menu, 
+    Sparkles, 
+    Lock, 
+    Brain, 
+    ArrowRight, 
+    Check, 
+    Zap, 
+    ShieldCheck, 
+    ChevronRight,
+    Loader2 
+} from 'lucide-react';
 import { ChatMessage, ChatSession, QuickAction } from './types';
 import CoachSidebar from './components/CoachSidebar';
 import CoachWelcomeView from './components/CoachWelcomeView';
@@ -12,6 +24,9 @@ import CoachInputBar from './components/CoachInputBar';
 
 export default function CoachPage() {
     const t = useTranslations();
+    const locale = useLocale();
+    const isIndo = locale === 'id';
+    const { isAiEnabled, isLoading: isGatingLoading } = useGating();
     const [userName] = useState('Kamu');
 
     // SESSIONS & MESSAGES STATE
@@ -253,6 +268,108 @@ export default function CoachPage() {
             scrollToBottom();
         }, 1200);
     };
+
+    if (isGatingLoading) {
+        return (
+            <AuthenticatedLayout>
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[75vh] p-6 text-center">
+                    <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+                    <p className="text-sm font-bold text-slate-400 animate-pulse">
+                        {isIndo ? 'Memverifikasi izin Neural OS...' : 'Verifying Neural OS permissions...'}
+                    </p>
+                </div>
+            </AuthenticatedLayout>
+        );
+    }
+
+    if (!isAiEnabled) {
+        return (
+            <AuthenticatedLayout>
+                <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 md:p-8 bg-slate-50 dark:bg-slate-950">
+                    <div className="relative max-w-2xl w-full bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-950/60 rounded-3xl p-6 sm:p-10 shadow-2xl overflow-hidden text-center">
+                        
+                        {/* Glow effects */}
+                        <div className="absolute -right-24 -top-24 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute -left-24 -bottom-24 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+
+                        {/* Quantum Icon */}
+                        <div className="relative z-10 flex justify-center mb-6">
+                            <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-0.5 shadow-xl shadow-indigo-500/25">
+                                <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[22px] flex items-center justify-center">
+                                    <Sparkles className="w-9 h-9 text-indigo-600 dark:text-indigo-400" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Badges */}
+                        <div className="relative z-10 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[11px] font-black uppercase tracking-wider mb-4">
+                            <Lock size={12} />
+                            <span>{isIndo ? 'Fitur Eksklusif Quantum Plan' : 'Exclusive Quantum Tier Feature'}</span>
+                        </div>
+
+                        <h2 className="relative z-10 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                            {isIndo ? 'Neural AI Coach Terkunci' : 'Neural AI Coach Locked'}
+                        </h2>
+
+                        <p className="relative z-10 text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-3 max-w-lg mx-auto leading-relaxed font-medium">
+                            {isIndo
+                                ? 'Neural AI Coach hanya tersedia untuk member paket Quantum Plan. Paket Free dan Architect tidak mencakup akses asisten AI. Upgrade untuk membuka asisten kecerdasan buatan terpadu 24/7.'
+                                : 'Neural AI Coach is exclusively available for Quantum Plan members. Free and Architect tiers do not include AI Coach access. Upgrade to Quantum to unlock 24/7 unified intelligence.'}
+                        </p>
+
+                        {/* Highlights Grid */}
+                        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-3 my-8 text-left">
+                            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 shrink-0">
+                                    <Brain size={16} />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                                        {isIndo ? 'Memori Konteks Hidup' : 'Contextual Life Memory'}
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                                        {isIndo ? 'AI memahami data habit, agenda, dan finansial Anda.' : 'AI connects your habits, planner tasks, and cashflow.'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                                <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 shrink-0">
+                                    <Zap size={16} />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                                        {isIndo ? 'Audit & Intervensi Harian' : 'Daily Life Audits'}
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                                        {isIndo ? 'Evaluasi korelasi performa dan pencegahan burnout.' : 'Detect performance drops and prevent burnout.'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <Link
+                                href="/billing"
+                                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-xs shadow-xl shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+                            >
+                                <Sparkles size={14} />
+                                <span>{isIndo ? 'Upgrade ke Quantum Plan' : 'Upgrade to Quantum Plan'}</span>
+                                <ArrowRight size={14} />
+                            </Link>
+                            <Link
+                                href="/dashboard"
+                                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition-all"
+                            >
+                                {isIndo ? 'Kembali ke Dashboard' : 'Back to Dashboard'}
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </AuthenticatedLayout>
+        );
+    }
 
     return (
         <AuthenticatedLayout>

@@ -422,16 +422,23 @@ export default function SettingsModulesTab({
                 </div>
             </div>
 
-            {/* SYSTEM CORE NOTE */}
-            <div className="p-4 rounded-2xl bg-slate-100/70 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            {/* SYSTEM CORE & AI COACH NOTE */}
+            <div className="p-4 rounded-2xl bg-slate-100/70 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
                 <div className="flex items-center gap-2">
                     <Sparkles size={15} className="text-indigo-500 shrink-0" />
                     <span>
                         {isIndo 
-                            ? 'Catatan: Tab Dashboard dan Neural Coach AI selalu aktif sebagai pondasi sistem gratis tanpa memakan kuota 3 tab Anda.'
-                            : 'Note: Dashboard and Neural Coach AI are always active as complimentary system foundations without counting towards your 3 slots.'}
+                            ? 'Catatan: Tab Dashboard selalu aktif gratis. Fitur Neural AI Coach hanya terbuka khusus untuk Quantum Plan (tidak termasuk di Free atau Architect).'
+                            : 'Note: Dashboard is always free. Neural AI Coach is an exclusive feature for Quantum Plan (not included in Free or Architect).'}
                     </span>
                 </div>
+                <Link
+                    href="/billing"
+                    className="inline-flex items-center gap-1 font-bold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
+                >
+                    <span>{isIndo ? 'Lihat Detail Paket' : 'View Plan Details'}</span>
+                    <ArrowRight size={12} />
+                </Link>
             </div>
         </div>
     );

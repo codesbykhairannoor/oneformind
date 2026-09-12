@@ -186,11 +186,20 @@ export function useActiveModules() {
     const activeCount = activeKeys.length;
     const canActivateMore = isUnlimited || activeCount < MAX_FREE_ACTIVE_MODULES;
 
+    // AI Coach is only enabled for Quantum plan
+    const isAiEnabled = useMemo(() => {
+        if (!user) return false;
+        const plan = (user.plan_type)?.toLowerCase();
+        return plan === 'quantum' || plan === 'legendary';
+    }, [user]);
+
     const isTabActive = useCallback((key: string): boolean => {
-        // System Core: Dashboard and Coach are always active
-        if (key === 'dashboard' || key === 'coach') return true;
+        // System Core: Dashboard is always active
+        if (key === 'dashboard') return true;
+        // AI Coach requires Quantum tier
+        if (key === 'coach') return isAiEnabled;
         return Boolean(modules[key]);
-    }, [modules]);
+    }, [modules, isAiEnabled]);
 
     // Persist modules both locally and to server
     const persistModules = useCallback(async (
@@ -309,6 +318,7 @@ export function useActiveModules() {
         isUnlimited,
         isSaving,
         hasHydrated,
+        isAiEnabled,
         isTabActive,
         toggleTab,
         swapTab,

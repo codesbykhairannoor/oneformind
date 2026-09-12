@@ -27,10 +27,10 @@ export interface TrialStatus {
   percentRemaining: number;
 }
 
-export const TRIAL_DURATION_DAYS = 14;
+export const TRIAL_DURATION_DAYS = 30;
 
 /**
- * Calculates 14-day free trial status for any user object
+ * Calculates 30-day free trial / grace period status for any user object
  */
 export function getTrialStatus(user: any): TrialStatus {
   if (!user) {

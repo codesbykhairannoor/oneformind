@@ -25,8 +25,8 @@ export default function AuthCoachFloatingButton({ pathname, onClick }: AuthCoach
                     <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse z-20" />
                 </div>
                 <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-[10px] font-bold px-4 py-2.5 rounded-2xl whitespace-nowrap opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none shadow-2xl border border-white/10 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    <span>Neural OS AI Active</span>
+                    <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
+                    <span>Neural AI Coach (Quantum)</span>
                 </div>
             </div>
         </button>

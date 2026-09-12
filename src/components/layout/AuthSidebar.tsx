@@ -312,7 +312,9 @@ export default function AuthSidebar({
                     {!isSidebarCollapsed && (
                         <>
                             <span className="text-[15px] font-semibold tracking-tight truncate flex-1 text-left">Coach</span>
-                            <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-100 dark:bg-indigo-500/20 px-1.5 py-0.5 rounded-full shrink-0">AI</span>
+                            <span className="text-[7.5px] font-black text-indigo-600 dark:text-indigo-400 uppercase bg-indigo-100 dark:bg-indigo-500/20 px-1.5 py-0.5 rounded-full shrink-0 tracking-wider">
+                                QUANTUM
+                            </span>
                         </>
                     )}
                     {isActive('/coach') && !isSidebarCollapsed && (

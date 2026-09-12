@@ -148,7 +148,7 @@ export default function SettingsPage() {
     const trial = getTrialStatus(user);
     const isExplorer = !user.is_premium && !trial.isActive;
     const planLabel = trial.isActive 
-        ? (locale === 'id' ? 'Architect (Free Trial 14 Hari)' : 'Architect (14-Day Free Trial)')
+        ? (locale === 'id' ? `Free (Trial ${trial.daysRemaining} Hari Tersisa)` : `Free (${trial.daysRemaining}d Trial Left)`)
         : (user.plan_type || 'Explorer');
 
     const premiumUntilFormatted = (() => {

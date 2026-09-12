@@ -214,6 +214,19 @@ export default function ActiveModulesSetupModal() {
                     })}
                 </div>
 
+                {/* 3-Step Lifecycle & AI Coach Note */}
+                <div className="mb-6 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5 leading-relaxed">
+                    <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+                        <Sparkles size={13} className="text-indigo-500 shrink-0" />
+                        <span>{isIndo ? 'Mekanisme 3 Tab & Aturan Fitur:' : '3-Tab Mechanics & Tier Rules:'}</span>
+                    </div>
+                    <ul className="list-disc list-inside space-y-0.5 pl-1 text-[10.5px]">
+                        <li>{isIndo ? 'Masa fleksibel 30 hari: bebas menukar 3 tab aktif Anda kapan saja di menu Pengaturan.' : '30-day trial: freely swap your 3 active tabs anytime in Settings.'}</li>
+                        <li>{isIndo ? 'Setelah 30 hari: 3 tab yang Anda gunakan akan terkunci permanen.' : 'After 30 days: your 3 active tabs will permanently lock.'}</li>
+                        <li className="font-semibold text-indigo-600 dark:text-indigo-400">{isIndo ? 'Neural AI Coach hanya terbuka eksklusif di paket Quantum Plan (tidak termasuk di Free atau Architect).' : 'Neural AI Coach is exclusively available on Quantum Plan (not included in Free or Architect).'}</li>
+                    </ul>
+                </div>
+
                 {/* Footer Action */}
                 <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                     <span className="text-xs text-slate-400">

@@ -60,61 +60,39 @@ export default function DashboardAiGatingBanner({
         );
     }
 
-    if (isTrialActive) {
+    if (!isAiEnabled) {
         return (
-            <div className="rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-indigo-50/90 via-purple-50/70 to-pink-50/90 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 p-5 md:p-6 dark:border-indigo-500/20 md:flex md:items-center md:justify-between md:gap-6">
-                <div className="flex gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none">
-                        <Sparkles size={24} />
+            <div className="rounded-2xl border border-indigo-200/80 dark:border-indigo-500/20 bg-gradient-to-r from-indigo-50/90 via-purple-50/70 to-pink-50/90 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 p-5 md:p-6 md:flex md:items-center md:justify-between md:gap-6 shadow-sm">
+                <div className="flex gap-4 min-w-0">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <Brain size={24} />
                     </div>
                     <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider">
-                                {locale === 'id' ? 'Free Trial 14 Hari' : '14-Day Free Trial'}
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
+                                {locale === 'id' ? 'Eksklusif Quantum Plan' : 'Exclusive Quantum Plan'}
                             </span>
-                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
-                                {locale === 'id' ? `${trial?.daysRemaining} hari tersisa` : `${trial?.daysRemaining} days left`}
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                                {locale === 'id' ? 'AI Life Coach 24/7' : '24/7 AI Life Coach'}
                             </span>
                         </div>
                         <h3 className="text-base font-bold text-slate-900 dark:text-white mt-1">
-                            {t('trial_active_title') || (locale === 'id' ? 'Akses Penuh Pro Architect Aktif' : 'Pro Architect Access Active')}
+                            {locale === 'id' ? 'Aktifkan Asisten Cerdas Neural OS' : 'Activate Neural OS AI Companion'}
                         </h3>
-                        <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
-                            {t('trial_active_desc') || (locale === 'id' ? 'Nikmati akses tak terbatas ke Jurnal, Kalender, Target Goals, & Pelacak Lamaran Kerja gratis.' : 'Enjoy full access to Journal, Calendar, Goals, and Job Tracker during your trial.')}
+                        <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                            {locale === 'id' 
+                                ? 'AI Coach hanya tersedia pada paket Quantum Plan (tidak termasuk di Free atau Architect). Dapatkan audit kebiasaan, analisis keuangan, dan evaluasi fokus harian.' 
+                                : 'AI Coach is exclusive to Quantum Plan (not included in Free or Architect). Unlock automated habit audits, cashflow intelligence, and real-time focus feedback.'}
                         </p>
                     </div>
                 </div>
                 <Link
                     href="/billing"
-                    className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 px-5 py-2.5 text-xs font-black text-white transition-all shadow-md shadow-indigo-200 dark:shadow-none md:mt-0 md:w-auto shrink-0 active:scale-95"
+                    className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-5 py-2.5 text-xs font-black text-white transition-all shadow-md shadow-indigo-300/30 dark:shadow-none md:mt-0 md:w-auto shrink-0 active:scale-95"
                 >
-                    {locale === 'id' ? 'Kunci Akses (Hemat 40%)' : 'Lock Pro (Save 40%)'}
-                </Link>
-            </div>
-        );
-    }
-
-    if (isExplorer) {
-        return (
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 md:flex md:items-center md:justify-between md:gap-6 md:p-6">
-                <div className="flex gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 dark:bg-indigo-500/15 dark:text-indigo-300">
-                        <LayoutDashboard size={24} />
-                    </div>
-                    <div className="min-w-0">
-                        <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                            {t('dash_explorer_rank') || 'Explorer Tier Active'}
-                        </h3>
-                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                            {t('dash_explorer_desc') || 'Tingkatkan ke Architect atau Quantum AI untuk membuka modul tak terbatas.'}
-                        </p>
-                    </div>
-                </div>
-                <Link
-                    href="/billing"
-                    className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-800 md:mt-0 md:w-auto dark:bg-indigo-600 dark:hover:bg-indigo-500"
-                >
-                    {t('dash_upgrade_tier') || 'Upgrade Sekarang'}
+                    <Sparkles size={14} />
+                    <span>{locale === 'id' ? 'Upgrade ke Quantum' : 'Upgrade to Quantum'}</span>
+                    <ArrowRight size={14} />
                 </Link>
             </div>
         );

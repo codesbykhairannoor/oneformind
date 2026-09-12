@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import InputError from '@/components/InputError';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -10,6 +10,7 @@ import { createClient } from '@/utils/supabase/client';
 export default function Register() {
     usePageTitle('Register');
     const t = useTranslations();
+    const locale = useLocale();
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -83,7 +84,7 @@ export default function Register() {
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[11px] font-black uppercase tracking-wider mb-3 shadow-sm">
                         <span>⚡</span>
-                        <span>{t('register_trial_perk') || 'Free Trial 14 Hari Pro Architect'}</span>
+                        <span>{locale === 'id' ? 'Pilih 3 Tab Bebas • 30 Hari Bebas Eksperimen' : 'Pick Any 3 Tabs • 30-Day Free Trial'}</span>
                     </div>
                     <h1 className="text-2xl font-black text-slate-900 mb-1.5 tracking-tight">
                         {t('auth_register_title') || 'Buat Akun Baru'}
