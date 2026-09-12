@@ -48,6 +48,17 @@ export default function WorkoutQuickLoggerModal({
 
             // 1. Find or auto-create matching Gym/Workout habit
             let gymHabit = habitsList.find((h: any) => {
+                let meta: any = {};
+                if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                    try { meta = JSON.parse(h.status); } catch {}
+                } else if (h.status && typeof h.status === 'object') {
+                    meta = h.status;
+                }
+
+                if (meta.syncedTabs && Array.isArray(meta.syncedTabs)) {
+                    return meta.syncedTabs.includes('gym');
+                }
+
                 const name = (h.name || '').toLowerCase();
                 return name.includes('gym') || name.includes('workout') || name.includes('olahraga') || 
                        name.includes('fitness') || name.includes('angkat beban') || name.includes('lari');
@@ -68,7 +79,8 @@ export default function WorkoutQuickLoggerModal({
                             frequencyDays: [1, 2, 4, 5], // Mon, Tue, Thu, Fri
                             timeOfDay: 'evening',
                             anchorCue: isIndo ? 'Setelah Selesai Kerja' : 'After Work Hours',
-                            isKeystone: true
+                            isKeystone: true,
+                            syncedTabs: ['calendar', 'planner', 'gym']
                         })
                     })
                 });

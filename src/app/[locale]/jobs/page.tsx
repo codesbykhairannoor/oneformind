@@ -221,6 +221,17 @@ export default function JobsPage() {
             if (!Array.isArray(habits)) return;
 
             const jobHabit = habits.find((h: any) => {
+                let meta: any = {};
+                if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                    try { meta = JSON.parse(h.status); } catch {}
+                } else if (h.status && typeof h.status === 'object') {
+                    meta = h.status;
+                }
+
+                if (meta.syncedTabs && Array.isArray(meta.syncedTabs)) {
+                    return meta.syncedTabs.includes('jobs');
+                }
+
                 const name = (h.name || '').toLowerCase();
                 return name.includes('lamar') || name.includes('apply') || name.includes('job') || 
                        name.includes('karir') || name.includes('career') || name.includes('kerja');

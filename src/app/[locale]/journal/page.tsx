@@ -104,6 +104,17 @@ export default function JournalIndexPage() {
 
         const frictions: Array<{ id: number; name: string; icon: string; missedDays: number }> = [];
         rawHabits.forEach((h: any) => {
+            let meta: any = {};
+            if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                try { meta = JSON.parse(h.status); } catch {}
+            } else if (h.status && typeof h.status === 'object') {
+                meta = h.status;
+            }
+
+            if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('journal')) {
+                return;
+            }
+
             const logs = h.logs || [];
             let missedCount = 0;
             pastDays.forEach(dateStr => {

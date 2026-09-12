@@ -121,6 +121,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         formElasticMini: form.formElasticMini,
         formDailyFinancialImpact: form.formDailyFinancialImpact,
         formIsKeystone: form.formIsKeystone,
+        formSyncedTabs: form.formSyncedTabs,
         setShowCreateModal: form.setShowCreateModal,
         habitToDelete: form.habitToDelete,
         setShowDeleteModal: form.setShowDeleteModal,
@@ -297,6 +298,8 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setFormDailyFinancialImpact={form.setFormDailyFinancialImpact}
                     formIsKeystone={form.formIsKeystone}
                     setFormIsKeystone={form.setFormIsKeystone}
+                    formSyncedTabs={form.formSyncedTabs}
+                    setFormSyncedTabs={form.setFormSyncedTabs}
                     onToggleStatus={actions.toggleStatus}
                     onSaveNote={actions.handleSaveNote}
                     onSubmitSingleHabit={actions.submitSingleHabit}

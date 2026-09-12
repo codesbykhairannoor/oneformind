@@ -71,6 +71,17 @@ export default function StudyFocusRoom({
             if (!Array.isArray(habits)) return;
 
             const studyHabit = habits.find((h: any) => {
+                let meta: any = {};
+                if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                    try { meta = JSON.parse(h.status); } catch {}
+                } else if (h.status && typeof h.status === 'object') {
+                    meta = h.status;
+                }
+
+                if (meta.syncedTabs && Array.isArray(meta.syncedTabs)) {
+                    return meta.syncedTabs.includes('study');
+                }
+
                 const name = (h.name || '').toLowerCase();
                 return name.includes('belajar') || name.includes('study') || name.includes('baca') || 
                        name.includes('read') || name.includes('kuliah') || name.includes('fokus') || 

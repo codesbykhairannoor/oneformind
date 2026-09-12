@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HabitItem } from '../types';
+import { HabitItem, LifeOSTab } from '../types';
 
 export function useHabitFormState(daysInCurrentMonth: number) {
     // Single Habit Form Modal State
@@ -25,6 +25,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
     const [formElasticMini, setFormElasticMini] = useState<string>('');
     const [formDailyFinancialImpact, setFormDailyFinancialImpact] = useState<number | undefined>(undefined);
     const [formIsKeystone, setFormIsKeystone] = useState<boolean>(false);
+    const [formSyncedTabs, setFormSyncedTabs] = useState<LifeOSTab[]>(['calendar', 'planner']);
 
     // Delete Modal State
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -66,6 +67,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormElasticMini('');
         setFormDailyFinancialImpact(undefined);
         setFormIsKeystone(false);
+        setFormSyncedTabs(['calendar', 'planner']);
         setShowCreateModal(true);
     };
 
@@ -88,6 +90,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormElasticMini(habit.elasticMini || '');
         setFormDailyFinancialImpact(habit.dailyFinancialImpact);
         setFormIsKeystone(!!habit.isKeystone);
+        setFormSyncedTabs(habit.syncedTabs || (habit.goalId ? ['calendar', 'planner', 'goal'] : ['calendar', 'planner']));
         setShowCreateModal(true);
     };
 
@@ -135,6 +138,8 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormDailyFinancialImpact,
         formIsKeystone,
         setFormIsKeystone,
+        formSyncedTabs,
+        setFormSyncedTabs,
         showDeleteModal,
         setShowDeleteModal,
         habitToDelete,

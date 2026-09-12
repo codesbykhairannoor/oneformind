@@ -158,6 +158,9 @@ export default function FinanceClient({
             } else if (h.status && typeof h.status === 'object') {
                 meta = h.status;
             }
+            if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('finance')) {
+                return;
+            }
             const impact = Number(meta.dailyFinancialImpact) || 0;
             if (impact > 0) {
                 const completedCount = (h.logs || []).filter((l: any) => l.status === 'completed').length;

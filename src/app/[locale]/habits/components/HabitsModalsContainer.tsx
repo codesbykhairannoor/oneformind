@@ -2,7 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { HabitItem } from '../types';
+import { HabitItem, LifeOSTab } from '../types';
 import HabitFormModal from './HabitFormModal';
 import HabitDeleteModal from './HabitDeleteModal';
 import WorkoutQuickLoggerModal from './WorkoutQuickLoggerModal';
@@ -68,6 +68,8 @@ interface HabitsModalsContainerProps {
     setFormDailyFinancialImpact: (v: number | undefined) => void;
     formIsKeystone?: boolean;
     setFormIsKeystone: (v: boolean) => void;
+    formSyncedTabs?: LifeOSTab[];
+    setFormSyncedTabs?: (v: LifeOSTab[]) => void;
     onToggleStatus: (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => void;
     onSaveNote: (habitId: number, dateStr: string, noteText: string) => void;
     onSubmitSingleHabit: (e: React.FormEvent) => void;
@@ -132,6 +134,8 @@ export default function HabitsModalsContainer({
     setFormDailyFinancialImpact,
     formIsKeystone,
     setFormIsKeystone,
+    formSyncedTabs,
+    setFormSyncedTabs,
     onToggleStatus,
     onSaveNote,
     onSubmitSingleHabit,
@@ -204,6 +208,8 @@ export default function HabitsModalsContainer({
                 setFormDailyFinancialImpact={setFormDailyFinancialImpact}
                 formIsKeystone={formIsKeystone}
                 setFormIsKeystone={setFormIsKeystone}
+                formSyncedTabs={formSyncedTabs}
+                setFormSyncedTabs={setFormSyncedTabs}
                 onClose={() => setShowCreateModal(false)}
                 onDelete={onExecuteDelete}
                 onSubmit={onSubmitSingleHabit}

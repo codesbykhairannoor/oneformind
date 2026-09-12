@@ -62,6 +62,9 @@ export default function GoalsPage() {
                     } else if (h.status && typeof h.status === 'object') {
                         meta = h.status;
                     }
+                    if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('goal')) {
+                        return;
+                    }
                     const isMatched = (meta.goalId && String(meta.goalId) === String(g.id)) ||
                                       (meta.goalTitle && meta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
                     if (isMatched) {

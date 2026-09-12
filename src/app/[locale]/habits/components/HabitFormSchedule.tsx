@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import { calculateScheduledDays } from '../utils/habitMath';
-import { Target, Anchor, Zap, Coins, Sparkles } from 'lucide-react';
+import { Target, Anchor, Zap, Coins, Sparkles, Calendar, CheckSquare, BookOpen, Briefcase, Dumbbell, BookMarked } from 'lucide-react';
+import { LifeOSTab } from '../types';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -34,6 +35,8 @@ interface HabitFormScheduleProps {
     setFormDailyFinancialImpact: (v: number | undefined) => void;
     formIsKeystone?: boolean;
     setFormIsKeystone: (v: boolean) => void;
+    formSyncedTabs?: LifeOSTab[];
+    setFormSyncedTabs?: (v: LifeOSTab[]) => void;
 }
 
 export default function HabitFormSchedule({
@@ -62,7 +65,9 @@ export default function HabitFormSchedule({
     formDailyFinancialImpact,
     setFormDailyFinancialImpact,
     formIsKeystone,
-    setFormIsKeystone
+    setFormIsKeystone,
+    formSyncedTabs = ['calendar', 'planner'],
+    setFormSyncedTabs
 }: HabitFormScheduleProps) {
     const { data: rawGoals } = useSWR('/api/goals', fetcher);
     const availableGoals = Array.isArray(rawGoals) ? rawGoals : [];
@@ -223,54 +228,117 @@ export default function HabitFormSchedule({
                 </div>
             </div>
 
-            {/* SECTION 8: INTEGRASI LIFE OS & BEHAVIORAL DESIGN */}
-            <div className="p-4 rounded-3xl bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 pb-2">
-                    <div className="flex items-center gap-2">
-                        <span className="text-base">🧬</span>
-                        <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-                            {isIndo ? 'Sinergi Life OS & Behavioral Design' : 'Life OS Synergy & Science'}
-                        </span>
+            {/* SECTION 8: INTEGRASI LIFE OS & PILIH TAB */}
+            <div className="p-4 md:p-5 rounded-3xl bg-slate-50/90 dark:bg-slate-950/70 border-2 border-indigo-100 dark:border-indigo-900/50 space-y-5">
+                <div className="flex items-center justify-between border-b border-slate-200/70 dark:border-slate-800 pb-3">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-base">🧬</span>
+                            <h4 className="text-xs md:text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                                {isIndo ? 'Pilih Tab yang Ingin Disambungkan' : 'Select Connected Tabs / Modules'}
+                            </h4>
+                        </div>
+                        <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                            {isIndo 
+                                ? 'Pilih modul yang aktif untuk habit ini. Kamu bebas memilih mau sambung ke tab mana saja!' 
+                                : 'Choose which tabs sync with this habit. Full freedom of module connection!'}
+                        </p>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400">
-                        {isIndo ? 'Atomic Habits' : 'High Performance'}
+                    <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-indigo-600 text-white shadow-xs shrink-0">
+                        {formSyncedTabs.length} / 8 {isIndo ? 'Tab Aktif' : 'Tabs'}
                     </span>
                 </div>
 
-                {/* 1. Tautkan ke Target Hidup (Leading Measure) */}
-                <div>
-                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
-                        <Target className="w-3.5 h-3.5 text-indigo-500" />
-                        <span>{isIndo ? 'Tautkan ke Target Hidup (Goals)' : 'Link to Master Goal'}</span>
-                    </label>
-                    <select
-                        value={formGoalId || ''}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            if (!val) {
-                                setFormGoalId(undefined);
-                                setFormGoalTitle('');
-                            } else {
-                                setFormGoalId(val);
-                                const g = availableGoals.find((item: any) => String(item.id) === String(val));
-                                if (g) setFormGoalTitle(g.title || '');
-                            }
-                        }}
-                        className="w-full text-xs font-bold py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition"
-                    >
-                        <option value="">{isIndo ? '— Tanpa Tautan Target (Berdiri Sendiri) —' : '— Standalone Habit (No Goal) —'}</option>
-                        {availableGoals.map((g: any) => (
-                            <option key={g.id} value={g.id}>
-                                🎯 {g.title}
-                            </option>
-                        ))}
-                    </select>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                        {isIndo 
-                            ? 'Kebiasaan ini akan menjadi mesin penggerak (leading measure) yang memproyeksikan kecepatan capaian target Anda.' 
-                            : 'This habit acts as the leading velocity engine forecasting your target completion date.'}
-                    </p>
+                {/* Grid 8 Tab Selector */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                        { id: 'calendar' as LifeOSTab, icon: '📅', label: isIndo ? 'Kalender' : 'Calendar', desc: isIndo ? 'Jadwal & centang di kalender' : 'Schedule on calendar' },
+                        { id: 'planner' as LifeOSTab, icon: '📝', label: isIndo ? 'Planner' : 'Planner', desc: isIndo ? 'Checklist harian timeline' : 'Daily timeline item' },
+                        { id: 'goal' as LifeOSTab, icon: '🎯', label: isIndo ? 'Goals' : 'Goals', desc: isIndo ? 'Tautkan ke target hidup' : 'Link to master goal' },
+                        { id: 'study' as LifeOSTab, icon: '📚', label: isIndo ? 'Study' : 'Study', desc: isIndo ? 'Auto-centang sesi fokus 25m' : 'Auto-log 25m focus' },
+                        { id: 'jobs' as LifeOSTab, icon: '💼', label: isIndo ? 'Jobs' : 'Jobs', desc: isIndo ? 'Auto-centang saat melamar' : 'Auto-log job apply' },
+                        { id: 'gym' as LifeOSTab, icon: '🏋️', label: isIndo ? 'Workout' : 'Workout', desc: isIndo ? 'Log sesi gym & fitness' : 'Quick log gym session' },
+                        { id: 'finance' as LifeOSTab, icon: '💰', label: isIndo ? 'Keuangan' : 'Finance', desc: isIndo ? 'Dampak hemat & insight' : 'Compounding savings' },
+                        { id: 'journal' as LifeOSTab, icon: '📔', label: isIndo ? 'Jurnal' : 'Journal', desc: isIndo ? 'Refleksi friksi saat bolos' : 'Friction audit on miss' },
+                    ].map(tab => {
+                        const isSelected = formSyncedTabs.includes(tab.id);
+                        return (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                onClick={() => {
+                                    if (!setFormSyncedTabs) return;
+                                    if (isSelected) {
+                                        setFormSyncedTabs(formSyncedTabs.filter(t => t !== tab.id));
+                                    } else {
+                                        setFormSyncedTabs([...formSyncedTabs, tab.id]);
+                                    }
+                                }}
+                                className={`p-2.5 rounded-2xl border-2 text-left transition-all relative flex flex-col justify-between min-h-[76px] ${
+                                    isSelected
+                                        ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-600 dark:border-indigo-500 shadow-xs scale-[1.02]'
+                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 opacity-60 hover:opacity-90'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between w-full">
+                                    <span className="text-lg">{tab.icon}</span>
+                                    <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black ${
+                                        isSelected 
+                                            ? 'bg-indigo-600 text-white' 
+                                            : 'border border-slate-300 dark:border-slate-700 text-transparent'
+                                    }`}>
+                                        ✓
+                                    </span>
+                                </div>
+                                <div className="mt-1">
+                                    <div className={`text-xs font-black leading-tight ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
+                                        {tab.label}
+                                    </div>
+                                    <div className="text-[9px] font-medium text-slate-400 dark:text-slate-500 line-clamp-1 mt-0.5">
+                                        {tab.desc}
+                                    </div>
+                                </div>
+                            </button>
+                        );
+                    })}
                 </div>
+
+                {/* 1. Tautkan ke Target Hidup (Goals) - Ditampilkan jika Tab Goal Dipilih */}
+                {formSyncedTabs.includes('goal') && (
+                    <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/50 space-y-1.5 animate-in fade-in duration-200">
+                        <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                            <Target className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>{isIndo ? 'Pilih Target Goal yang Didukung (Leading Measure):' : 'Select Supported Master Goal:'}</span>
+                        </label>
+                        <select
+                            value={formGoalId || ''}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (!val) {
+                                    setFormGoalId(undefined);
+                                    setFormGoalTitle('');
+                                } else {
+                                    setFormGoalId(val);
+                                    const g = availableGoals.find((item: any) => String(item.id) === String(val));
+                                    if (g) setFormGoalTitle(g.title || '');
+                                }
+                            }}
+                            className="w-full text-xs font-bold py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition"
+                        >
+                            <option value="">{isIndo ? '— Pilih Goal —' : '— Select Goal —'}</option>
+                            {availableGoals.map((g: any) => (
+                                <option key={g.id} value={g.id}>
+                                    🎯 {g.title}
+                                </option>
+                            ))}
+                        </select>
+                        <p className="text-[10px] text-slate-400">
+                            {isIndo 
+                                ? 'Habit ini akan muncul di kartu Goal tersebut dan menghitung kecepatan capaian targetmu.' 
+                                : 'This habit will be rendered on the Goal card as supporting velocity.'}
+                        </p>
+                    </div>
+                )}
 
                 {/* 2. Anchor Cue (Habit Stacking) */}
                 <div>
@@ -326,32 +394,34 @@ export default function HabitFormSchedule({
                 </div>
 
                 {/* 4. Dampak Finansial Harian (Compounding Savings / Cost-of-Vice) */}
-                <div>
-                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
-                        <Coins className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>{isIndo ? 'Dampak Finansial Harian (Cost-of-Vice / Hemat Harian)' : 'Daily Financial Impact (ROI / Savings)'}</span>
-                    </label>
-                    <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 font-mono">Rp</span>
-                        <input
-                            type="number"
-                            min="0"
-                            step="1000"
-                            value={formDailyFinancialImpact !== undefined ? formDailyFinancialImpact : ''}
-                            onChange={(e) => {
-                                const val = e.target.value;
-                                setFormDailyFinancialImpact(val === '' ? undefined : Number(val));
-                            }}
-                            placeholder="Contoh: 25000 (biaya rokok/kopi harian yang dihemat)"
-                            className="w-full text-xs font-mono font-bold py-2.5 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500 transition"
-                        />
+                {formSyncedTabs.includes('finance') && (
+                    <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-900/50 space-y-1.5 animate-in fade-in duration-200">
+                        <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                            <Coins className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>{isIndo ? 'Dampak Finansial Harian (Cost-of-Vice / Hemat Harian)' : 'Daily Financial Impact (ROI / Savings)'}</span>
+                        </label>
+                        <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 font-mono">Rp</span>
+                            <input
+                                type="number"
+                                min="0"
+                                step="1000"
+                                value={formDailyFinancialImpact !== undefined ? formDailyFinancialImpact : ''}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setFormDailyFinancialImpact(val === '' ? undefined : Number(val));
+                                }}
+                                placeholder="Contoh: 25000 (biaya rokok/kopi harian yang dihemat)"
+                                className="w-full text-xs font-mono font-bold py-2.5 pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500 transition"
+                            />
+                        </div>
+                        <p className="text-[10px] text-slate-400">
+                            {isIndo 
+                                ? 'Tiap hari tuntas, nominal ini dikalikan dan diakumulasikan ke tab Keuangan sebagai tabungan nyata.' 
+                                : 'Each completed day compounds into the Finance tab as tangible accumulated savings.'}
+                        </p>
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                        {isIndo 
-                            ? 'Tiap hari tuntas, nominal ini dikalikan dan diakumulasikan ke tab Keuangan sebagai tabungan nyata.' 
-                            : 'Each completed day compounds into the Finance tab as tangible accumulated savings.'}
-                    </p>
-                </div>
+                )}
             </div>
         </div>
     );

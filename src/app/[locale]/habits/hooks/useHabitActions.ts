@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { HabitItem } from '../types';
+import { HabitItem, LifeOSTab } from '../types';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 
 interface UseHabitActionsParams {
@@ -10,7 +10,7 @@ interface UseHabitActionsParams {
     currentMonthKey: string;
     daysInCurrentMonth: number;
     isIndo: boolean;
-    mutateHabits: () => void;
+    mutateHabits?: () => void;
     editingHabitId: number | null;
     formName: string;
     formIcon: string;
@@ -29,6 +29,7 @@ interface UseHabitActionsParams {
     formElasticMini?: string;
     formDailyFinancialImpact?: number;
     formIsKeystone?: boolean;
+    formSyncedTabs?: LifeOSTab[];
     setShowCreateModal: (v: boolean) => void;
     habitToDelete: HabitItem | null;
     setShowDeleteModal: (v: boolean) => void;
@@ -61,6 +62,7 @@ export function useHabitActions({
     formElasticMini,
     formDailyFinancialImpact,
     formIsKeystone,
+    formSyncedTabs,
     setShowCreateModal,
     habitToDelete,
     setShowDeleteModal,
@@ -270,7 +272,8 @@ export function useHabitActions({
             anchorCue: formAnchorCue,
             elasticMini: formElasticMini,
             dailyFinancialImpact: formDailyFinancialImpact,
-            isKeystone: formIsKeystone
+            isKeystone: formIsKeystone,
+            syncedTabs: formSyncedTabs
         };
 
         const statusPayload = JSON.stringify(metadata);
@@ -296,6 +299,7 @@ export function useHabitActions({
                     elasticMini: formElasticMini,
                     dailyFinancialImpact: formDailyFinancialImpact,
                     isKeystone: formIsKeystone,
+                    syncedTabs: formSyncedTabs,
                     status: statusPayload
                 } : h));
 
@@ -333,6 +337,7 @@ export function useHabitActions({
                     elasticMini: formElasticMini,
                     dailyFinancialImpact: formDailyFinancialImpact,
                     isKeystone: formIsKeystone,
+                    syncedTabs: formSyncedTabs,
                     status: statusPayload,
                     logs: {}
                 };
@@ -388,7 +393,7 @@ export function useHabitActions({
             });
             const data = await res.json();
             if (res.ok && data.success) {
-                mutateHabits();
+                mutateHabits?.();
                 alert(isIndo ? `Berhasil menyalin ${data.copied_count} habit dari bulan lalu!` : `Successfully copied ${data.copied_count} habits from last month!`);
             } else {
                 alert(data.error || (isIndo ? 'Gagal menyalin habit dari bulan lalu' : 'Failed to copy habits'));

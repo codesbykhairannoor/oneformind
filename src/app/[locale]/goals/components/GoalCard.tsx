@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import useSWR from 'swr';
 import { useLocale } from 'next-intl';
 import { 
     Target, Calendar, Award, Trash2, Edit3, 
@@ -15,6 +16,8 @@ import {
     calculateGoalProgress, 
     calculateGoalPace 
 } from '../lib/goalPaceCalculator';
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export type { GoalItem };
 

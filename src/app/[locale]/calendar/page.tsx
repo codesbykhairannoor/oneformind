@@ -403,6 +403,11 @@ export default function CalendarPage() {
                 meta = h.status;
             }
 
+            // Respect chosen synced tabs
+            if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('calendar')) {
+                return null;
+            }
+
             const frequencyType = meta.frequencyType || 'daily';
             const frequencyDays = Array.isArray(meta.frequencyDays) ? meta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
             const isScheduledToday = frequencyType === 'daily' || frequencyDays.includes(dayOfWeek);

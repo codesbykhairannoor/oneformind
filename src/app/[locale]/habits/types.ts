@@ -1,3 +1,5 @@
+export type LifeOSTab = 'calendar' | 'planner' | 'goal' | 'study' | 'jobs' | 'gym' | 'finance' | 'journal';
+
 export interface HabitItem {
     id: number;
     name: string;
@@ -22,6 +24,7 @@ export interface HabitItem {
     elasticMini?: string; // 2-Minute Rule fallback version when days are overloaded
     dailyFinancialImpact?: number; // Estimated IDR saved/earned per completed day
     isKeystone?: boolean; // Catalyst habit that triggers other positive behaviors
+    syncedTabs?: LifeOSTab[]; // Explicitly selected connected tabs/modules
     logs: Record<string, {
         status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest' | 'in_progress';
         value?: number;

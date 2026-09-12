@@ -3,6 +3,7 @@
 import React from 'react';
 import ModalPortal from '@/components/ModalPortal';
 import { X, Check, Trash2 } from 'lucide-react';
+import { LifeOSTab } from '../types';
 import HabitFormTypeMeasure from './HabitFormTypeMeasure';
 import HabitFormSchedule from './HabitFormSchedule';
 
@@ -51,6 +52,8 @@ interface HabitFormModalProps {
     setFormDailyFinancialImpact: (v: number | undefined) => void;
     formIsKeystone?: boolean;
     setFormIsKeystone: (v: boolean) => void;
+    formSyncedTabs?: LifeOSTab[];
+    setFormSyncedTabs?: (v: LifeOSTab[]) => void;
     onClose: () => void;
     onDelete: () => void;
     onSubmit: (e: React.FormEvent) => void;
@@ -101,6 +104,8 @@ export default function HabitFormModal({
     setFormDailyFinancialImpact,
     formIsKeystone,
     setFormIsKeystone,
+    formSyncedTabs,
+    setFormSyncedTabs,
     onClose,
     onDelete,
     onSubmit
@@ -283,6 +288,8 @@ export default function HabitFormModal({
                             setFormDailyFinancialImpact={setFormDailyFinancialImpact}
                             formIsKeystone={formIsKeystone}
                             setFormIsKeystone={setFormIsKeystone}
+                            formSyncedTabs={formSyncedTabs}
+                            setFormSyncedTabs={setFormSyncedTabs}
                         />
 
                     </form>
