@@ -70,7 +70,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     // Persistent display mode for quantitative habits (Angka vs Persentase)
     const [numericViewMode, setNumericViewMode] = useState<'value' | 'percent'>('value');
     const [isExportOpen, setIsExportOpen] = useState(false);
-    const [showWorkoutModal, setShowWorkoutModal] = useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -170,7 +169,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     showHint={period.showHint}
                     setShowHint={period.setShowHint}
                     openCreateModal={form.openCreateModal}
-                    onOpenWorkoutModal={() => setShowWorkoutModal(true)}
                     openExportModal={() => setIsExportOpen(true)}
                 />
 
@@ -247,9 +245,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setNoteModalData={form.setNoteModalData}
                     showCreateModal={form.showCreateModal}
                     setShowCreateModal={form.setShowCreateModal}
-                    showWorkoutModal={showWorkoutModal}
-                    setShowWorkoutModal={setShowWorkoutModal}
-                    onWorkoutSuccess={() => mutateHabits()}
                     editingHabitId={form.editingHabitId}
                     showDeleteModal={form.showDeleteModal}
                     setShowDeleteModal={form.setShowDeleteModal}

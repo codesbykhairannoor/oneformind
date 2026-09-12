@@ -1,4 +1,4 @@
-export type LifeOSTab = 'calendar' | 'planner' | 'goal' | 'study' | 'jobs' | 'gym' | 'finance' | 'journal';
+export type LifeOSTab = 'calendar' | 'planner' | 'goal' | 'study' | 'jobs' | 'finance' | 'journal';
 
 export interface HabitItem {
     id: number;

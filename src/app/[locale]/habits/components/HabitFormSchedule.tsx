@@ -245,11 +245,11 @@ export default function HabitFormSchedule({
                         </p>
                     </div>
                     <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-indigo-600 text-white shadow-xs shrink-0">
-                        {formSyncedTabs.length} / 8 {isIndo ? 'Tab Aktif' : 'Tabs'}
+                        {formSyncedTabs.length} / 7 {isIndo ? 'Tab Aktif' : 'Tabs'}
                     </span>
                 </div>
 
-                {/* Grid 8 Tab Selector */}
+                {/* Grid 7 Tab Selector */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
                         { id: 'calendar' as LifeOSTab, icon: '📅', label: isIndo ? 'Kalender' : 'Calendar', desc: isIndo ? 'Jadwal & centang di kalender' : 'Schedule on calendar' },
@@ -257,7 +257,6 @@ export default function HabitFormSchedule({
                         { id: 'goal' as LifeOSTab, icon: '🎯', label: isIndo ? 'Goals' : 'Goals', desc: isIndo ? 'Tautkan ke target hidup' : 'Link to master goal' },
                         { id: 'study' as LifeOSTab, icon: '📚', label: isIndo ? 'Study' : 'Study', desc: isIndo ? 'Auto-centang sesi fokus 25m' : 'Auto-log 25m focus' },
                         { id: 'jobs' as LifeOSTab, icon: '💼', label: isIndo ? 'Jobs' : 'Jobs', desc: isIndo ? 'Auto-centang saat melamar' : 'Auto-log job apply' },
-                        { id: 'gym' as LifeOSTab, icon: '🏋️', label: isIndo ? 'Workout' : 'Workout', desc: isIndo ? 'Log sesi gym & fitness' : 'Quick log gym session' },
                         { id: 'finance' as LifeOSTab, icon: '💰', label: isIndo ? 'Keuangan' : 'Finance', desc: isIndo ? 'Dampak hemat & insight' : 'Compounding savings' },
                         { id: 'journal' as LifeOSTab, icon: '📔', label: isIndo ? 'Jurnal' : 'Journal', desc: isIndo ? 'Refleksi friksi saat bolos' : 'Friction audit on miss' },
                     ].map(tab => {
