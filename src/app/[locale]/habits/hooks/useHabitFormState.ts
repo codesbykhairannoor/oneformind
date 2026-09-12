@@ -75,7 +75,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormElasticMini('');
         setFormDailyFinancialImpact(undefined);
         setFormIsKeystone(false);
-        setFormSyncedTabs(['calendar', 'planner']);
+        setFormSyncedTabs([]);
         setShowCreateModal(true);
     };
 
@@ -102,7 +102,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormElasticMini(habit.elasticMini || '');
         setFormDailyFinancialImpact(habit.dailyFinancialImpact);
         setFormIsKeystone(!!habit.isKeystone);
-        setFormSyncedTabs(habit.syncedTabs || (habit.goalId ? ['calendar', 'planner', 'goal'] : ['calendar', 'planner']));
+        setFormSyncedTabs(habit.syncedTabs || (habit.startTime ? ['planner'] : []));
         setShowCreateModal(true);
     };
 
