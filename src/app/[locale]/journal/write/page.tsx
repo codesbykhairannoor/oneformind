@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import JournalEditorHeader from './components/JournalEditorHeader';
 import JournalEditorBody from './components/JournalEditorBody';
 import { analyzeJournalCognitive } from '../lib/journalAi';
@@ -18,13 +19,16 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const habitFriction = searchParams ? searchParams.get('habitFriction') : null;
+    const habitIcon = (searchParams ? searchParams.get('habitIcon') : null) || '🌱';
 
     const resolvedParams = params ? React.use(params) : null;
     const journalId = resolvedParams?.id;
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [mood, setMood] = useState<string>('awesome');
+    const [mood, setMood] = useState<string>('okay');
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isInsertingBrief, setIsInsertingBrief] = useState(false);
@@ -81,6 +85,43 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                 }
             };
             fetchJournal();
+        } else if (habitFriction) {
+            // Guided Habit Friction Audit template
+            setTitle(isIndo ? `🔍 Diagnostik Friksi: ${habitIcon} ${habitFriction}` : `🔍 Habit Friction Audit: ${habitIcon} ${habitFriction}`);
+            setContent(isIndo ? `# 🔍 Diagnostik Friksi: ${habitIcon} ${habitFriction}
+
+> "Jangan hukum diri sendiri saat kebiasaan terputus. Perlakukan ini sebagai eksperimen ilmiah untuk memperbaiki sistem lingkungan dan ekspektasi energi Anda."
+
+### 1. 🧬 Analisis Akar Hambatan (Root Cause):
+- [ ] Energi Rendah: Kelelahan, waktu tidur kurang, atau kehabisan willpower
+- [ ] Friksi Lingkungan: Alat/pemicu tidak siap, lingkungan penuh distraksi
+- [ ] Beban Mental Terlalu Berat: Target terlalu muluk saat hari sedang padat
+
+### 2. 📝 Fakta Obyektif (Tanpa Menghakimi):
+Apa yang sebenarnya terjadi pada jam pelaksanaan kebiasaan ini dalam beberapa hari terakhir?
+
+
+### 3. 🛡️ Penyesuaian Sistem (Implementation Intention):
+- **JIKA** [kondisi hambatan/lelah serupa terulang],
+- **MAKA** saya akan [aktifkan Mode 2 Menit / siapkan pemicu 1 jam lebih awal].
+` : `# 🔍 Habit Friction Audit: ${habitIcon} ${habitFriction}
+
+> "Never blame lack of willpower for a broken streak. Audit the friction in your environment and energy like a scientist observing an experiment."
+
+### 1. 🧬 Root Cause Analysis:
+- [ ] Low Energy / Poor Sleep: Willpower depletion from work
+- [ ] Environmental Friction: Trigger hidden, workspace unprepared
+- [ ] High Cognitive Load: Target too ambitious on overloaded days
+
+### 2. 📝 Objective Reality:
+What actually happened during the scheduled habit window over the last few days?
+
+
+### 3. 🛡️ Systemic Adjustment (Implementation Intention):
+- **IF** [this obstacle occurs again],
+- **THEN** I will [switch to the 2-Minute fallback / prepare cues earlier].
+`);
+            setMood('okay');
         } else {
             // Restore draft from localStorage if available
             try {
@@ -97,7 +138,7 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                 console.error('Draft restore error', e);
             }
         }
-    }, [journalId]);
+    }, [journalId, habitFriction, isIndo, habitIcon]);
 
     // 2. Auto-save Draft to LocalStorage every 5s if creating new
     useEffect(() => {

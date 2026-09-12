@@ -144,6 +144,38 @@ export default function FinanceClient({
     const { data: catRawData, mutate: mutateCat } = useSWR(`/api/finance/categories`, fetcher, swrOptions);
     const { data: budRawData, mutate: mutateBud } = useSWR(`/api/finance/budgets?month=${selectedMonthKey}`, fetcher, swrOptions);
     const { data: savRawData, mutate: mutateSav } = useSWR(`/api/finance/savings`, fetcher, swrOptions);
+    const { data: habitsRawData } = useSWR(`/api/habits?period=${selectedMonthKey}`, fetcher, swrOptions);
+
+    // Cross-Domain Habit Compounding Savings & Cost-of-Vice
+    const habitSavingsSummary = useMemo(() => {
+        if (!habitsRawData || !Array.isArray(habitsRawData)) return { totalSaved: 0, items: [] };
+        let totalSaved = 0;
+        const items: Array<{ id: number; name: string; icon: string; saved: number; daysCompleted: number }> = [];
+        habitsRawData.forEach((h: any) => {
+            let meta: any = {};
+            if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                try { meta = JSON.parse(h.status); } catch {}
+            } else if (h.status && typeof h.status === 'object') {
+                meta = h.status;
+            }
+            const impact = Number(meta.dailyFinancialImpact) || 0;
+            if (impact > 0) {
+                const completedCount = (h.logs || []).filter((l: any) => l.status === 'completed').length;
+                const saved = completedCount * impact;
+                if (completedCount > 0) {
+                    totalSaved += saved;
+                    items.push({
+                        id: h.id,
+                        name: h.name,
+                        icon: h.icon || '🌱',
+                        saved,
+                        daysCompleted: completedCount
+                    });
+                }
+            }
+        });
+        return { totalSaved, items };
+    }, [habitsRawData]);
 
     // Derive parsed data from SWR cache or fallback to initial data
     const transactions: TransactionItem[] = (txRawData || initialTransactions).map((t: any) => ({
@@ -591,6 +623,40 @@ export default function FinanceClient({
                                 </div>
 
                             </div>
+
+                            {/* Habit Compounding Savings & Cost-of-Vice Tracker */}
+                            {habitSavingsSummary.totalSaved > 0 && (
+                                <div className="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in duration-300">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl shadow-sm shrink-0">
+                                            💰
+                                        </div>
+                                        <div>
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                                                {isIndo ? 'Akumulasi Hemat Kebiasaan (Cost-of-Vice)' : 'Habits Compounding Savings'}
+                                            </span>
+                                            <p className="text-xs text-slate-200 font-medium leading-snug">
+                                                {isIndo 
+                                                    ? `Konsistensi kebiasaan Anda telah mengamankan ${formatMoney(habitSavingsSummary.totalSaved)} bulan ini!` 
+                                                    : `Your habit consistency has secured ${formatMoney(habitSavingsSummary.totalSaved)} this month!`}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                        {habitSavingsSummary.items.map(item => (
+                                            <span
+                                                key={item.id}
+                                                className="px-2.5 py-1 rounded-xl bg-black/30 border border-emerald-500/30 text-[10px] font-bold text-emerald-300 flex items-center gap-1.5 font-mono"
+                                            >
+                                                <span>{item.icon}</span>
+                                                <span>{item.name}</span>
+                                                <span className="text-white font-black">+{formatMoney(item.saved)}</span>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                         </div>
                     </div>

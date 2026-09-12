@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
@@ -13,9 +14,11 @@ import JournalMemoriesView from './components/JournalMemoriesView';
 import JournalDetailModal from './components/JournalDetailModal';
 import NeuralBridge from '@/components/NeuralBridge';
 import GatedPage from '@/components/GatedPage';
-import { Plus, Trash2, BookOpen, Sparkles } from 'lucide-react';
+import { Plus, Trash2, BookOpen, Sparkles, AlertTriangle } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import ExportModal from '@/components/export/ExportModal';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function JournalIndexPage() {
     const locale = useLocale();
@@ -85,6 +88,41 @@ export default function JournalIndexPage() {
 
         fetchData();
     }, []);
+
+    // Habits Cross-Domain Metacognitive Friction Detection
+    const { data: rawHabits } = useSWR('/api/habits', fetcher);
+
+    const habitFrictions = useMemo(() => {
+        if (!rawHabits || !Array.isArray(rawHabits)) return [];
+        const today = new Date();
+        const pastDays: string[] = [];
+        for (let i = 1; i <= 3; i++) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            pastDays.push(d.toISOString().split('T')[0]);
+        }
+
+        const frictions: Array<{ id: number; name: string; icon: string; missedDays: number }> = [];
+        rawHabits.forEach((h: any) => {
+            const logs = h.logs || [];
+            let missedCount = 0;
+            pastDays.forEach(dateStr => {
+                const log = logs.find((l: any) => l.date?.startsWith(dateStr));
+                if (!log || (log.status !== 'completed' && log.status !== 'rest')) {
+                    missedCount++;
+                }
+            });
+            if (missedCount >= 2) {
+                frictions.push({
+                    id: h.id,
+                    name: h.name,
+                    icon: h.icon || '🌱',
+                    missedDays: missedCount
+                });
+            }
+        });
+        return frictions;
+    }, [rawHabits]);
 
     // Calculate Writing Streak
     const streakDays = useMemo(() => {
@@ -241,6 +279,55 @@ export default function JournalIndexPage() {
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                         <NeuralBridge module="Journal" />
+
+                        {/* Habits Friction Diagnostic (Metacognition) */}
+                        {habitFrictions.length > 0 && (
+                            <div className="p-5 sm:p-6 rounded-[2rem] bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent border border-amber-500/30 dark:border-amber-500/20 backdrop-blur-sm space-y-3 shadow-sm">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg shadow-sm">
+                                            🔍
+                                        </div>
+                                        <div>
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
+                                                {isIndo ? 'Diagnostik Friksi Kebiasaan (Metakognisi)' : 'Habit Friction Diagnostic (Metacognition)'}
+                                            </span>
+                                            <h4 className="text-sm sm:text-base font-black text-slate-800 dark:text-slate-100">
+                                                {isIndo 
+                                                    ? `Terdeteksi hambatan pada ${habitFrictions.length} kebiasaan dalam 3 hari terakhir` 
+                                                    : `Friction detected on ${habitFrictions.length} habits over the last 3 days`}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-mono hidden sm:inline">
+                                        Stoic Clarity
+                                    </span>
+                                </div>
+
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
+                                    {isIndo 
+                                        ? 'Streak terputus bukan tanda kegagalan kemauan, melainkan sinyal adanya friksi lingkungan atau kelelahan energi. Gunakan template terpandu untuk mengidentifikasi penyebabnya dan merancang penyesuaian sistem.'
+                                        : 'Broken streaks are not willpower failures—they are signals of environmental friction or fatigue. Use guided Stoic reflection to audit root causes and adjust your system.'}
+                                </p>
+
+                                <div className="flex items-center gap-2 flex-wrap pt-1">
+                                    {habitFrictions.map(f => (
+                                        <Link
+                                            key={f.id}
+                                            href={`/journal/write?habitFriction=${encodeURIComponent(f.name)}&habitIcon=${encodeURIComponent(f.icon)}`}
+                                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-amber-300/80 dark:border-amber-700/60 hover:border-amber-500 text-slate-800 dark:text-slate-100 text-xs font-black shadow-xs hover:shadow-md transition active:scale-95 group"
+                                        >
+                                            <span>{f.icon}</span>
+                                            <span className="group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">{f.name}</span>
+                                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                                                {f.missedDays} {isIndo ? 'hari lolos' : 'days missed'}
+                                            </span>
+                                            <span className="text-xs text-amber-500 ml-1">✍️ {isIndo ? 'Audit' : 'Audit'}</span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Filter Bar & View Switcher */}
                         <JournalFilterBar 

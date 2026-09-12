@@ -279,6 +279,48 @@ export default function GoalCard({
                     </p>
                 )}
 
+                {/* 3b. Habit Engine Velocity & Leading Measures */}
+                {pace.habitEngineNotice && goal.status !== 'completed' && (
+                    <div className={`p-2.5 rounded-xl border text-[11px] font-semibold flex items-start gap-2 ${
+                        pace.habitEngineNotice.type === 'boost'
+                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
+                            : pace.habitEngineNotice.type === 'warning'
+                            ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20'
+                            : 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20'
+                    }`}>
+                        <span className="text-sm shrink-0">
+                            {pace.habitEngineNotice.type === 'boost' ? '🚀' : pace.habitEngineNotice.type === 'warning' ? '⚠️' : '⚡'}
+                        </span>
+                        <div className="flex-1">
+                            <span className="font-black block text-[10px] uppercase tracking-wider mb-0.5 opacity-80">
+                                {isIndo ? 'Mesin Penggerak Kebiasaan' : 'Habit Velocity Engine'}
+                            </span>
+                            <span className="leading-tight">
+                                {isIndo ? pace.habitEngineNotice.id : pace.habitEngineNotice.en}
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Linked Habit Chips */}
+                {goal.linked_habits && goal.linked_habits.length > 0 && (
+                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                            {isIndo ? 'Rutinitas:' : 'Engine:'}
+                        </span>
+                        {goal.linked_habits.map(h => (
+                            <span 
+                                key={h.id}
+                                className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1"
+                            >
+                                <span>{h.icon}</span>
+                                <span>{h.name}</span>
+                                <span className="text-indigo-600 dark:text-indigo-400 font-mono font-black">{h.consistencyPercent}%</span>
+                            </span>
+                        ))}
+                    </div>
+                )}
+
                 {/* 4. DYNAMIC TARGET TYPES */}
                 
                 {/* A. Numeric Target Type */}

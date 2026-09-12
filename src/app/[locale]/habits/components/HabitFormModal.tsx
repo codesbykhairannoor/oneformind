@@ -39,6 +39,18 @@ interface HabitFormModalProps {
     setFormFreqDays: (v: number[]) => void;
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
     setFormTimeOfDay: (v: 'morning' | 'afternoon' | 'evening' | 'anytime') => void;
+    formGoalId?: string | number;
+    setFormGoalId: (v: string | number | undefined) => void;
+    formGoalTitle?: string;
+    setFormGoalTitle: (v: string) => void;
+    formAnchorCue?: string;
+    setFormAnchorCue: (v: string) => void;
+    formElasticMini?: string;
+    setFormElasticMini: (v: string) => void;
+    formDailyFinancialImpact?: number;
+    setFormDailyFinancialImpact: (v: number | undefined) => void;
+    formIsKeystone?: boolean;
+    setFormIsKeystone: (v: boolean) => void;
     onClose: () => void;
     onDelete: () => void;
     onSubmit: (e: React.FormEvent) => void;
@@ -77,6 +89,18 @@ export default function HabitFormModal({
     setFormFreqDays,
     formTimeOfDay,
     setFormTimeOfDay,
+    formGoalId,
+    setFormGoalId,
+    formGoalTitle,
+    setFormGoalTitle,
+    formAnchorCue,
+    setFormAnchorCue,
+    formElasticMini,
+    setFormElasticMini,
+    formDailyFinancialImpact,
+    setFormDailyFinancialImpact,
+    formIsKeystone,
+    setFormIsKeystone,
     onClose,
     onDelete,
     onSubmit
@@ -231,7 +255,7 @@ export default function HabitFormModal({
                             </div>
                         </div>
 
-                        {/* SECTION 5 & 6: JADWAL & WAKTU */}
+                        {/* SECTION 5 & 6 & 8: JADWAL, WAKTU & LIFE OS */}
                         <HabitFormSchedule
                             isIndo={isIndo}
                             daysInCurrentMonth={daysInCurrentMonth}
@@ -247,6 +271,18 @@ export default function HabitFormModal({
                             setFormFreqDays={setFormFreqDays}
                             formTimeOfDay={formTimeOfDay}
                             setFormTimeOfDay={setFormTimeOfDay}
+                            formGoalId={formGoalId}
+                            setFormGoalId={setFormGoalId}
+                            formGoalTitle={formGoalTitle}
+                            setFormGoalTitle={setFormGoalTitle}
+                            formAnchorCue={formAnchorCue}
+                            setFormAnchorCue={setFormAnchorCue}
+                            formElasticMini={formElasticMini}
+                            setFormElasticMini={setFormElasticMini}
+                            formDailyFinancialImpact={formDailyFinancialImpact}
+                            setFormDailyFinancialImpact={setFormDailyFinancialImpact}
+                            formIsKeystone={formIsKeystone}
+                            setFormIsKeystone={setFormIsKeystone}
                         />
 
                     </form>

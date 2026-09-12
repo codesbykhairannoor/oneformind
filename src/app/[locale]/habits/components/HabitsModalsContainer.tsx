@@ -52,6 +52,18 @@ interface HabitsModalsContainerProps {
     setFormFreqDays: (v: number[]) => void;
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
     setFormTimeOfDay: (v: 'morning' | 'afternoon' | 'evening' | 'anytime') => void;
+    formGoalId?: string | number;
+    setFormGoalId: (v: string | number | undefined) => void;
+    formGoalTitle?: string;
+    setFormGoalTitle: (v: string) => void;
+    formAnchorCue?: string;
+    setFormAnchorCue: (v: string) => void;
+    formElasticMini?: string;
+    setFormElasticMini: (v: string) => void;
+    formDailyFinancialImpact?: number;
+    setFormDailyFinancialImpact: (v: number | undefined) => void;
+    formIsKeystone?: boolean;
+    setFormIsKeystone: (v: boolean) => void;
     onToggleStatus: (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => void;
     onSaveNote: (habitId: number, dateStr: string, noteText: string) => void;
     onSubmitSingleHabit: (e: React.FormEvent) => void;
@@ -101,6 +113,18 @@ export default function HabitsModalsContainer({
     setFormFreqDays,
     formTimeOfDay,
     setFormTimeOfDay,
+    formGoalId,
+    setFormGoalId,
+    formGoalTitle,
+    setFormGoalTitle,
+    formAnchorCue,
+    setFormAnchorCue,
+    formElasticMini,
+    setFormElasticMini,
+    formDailyFinancialImpact,
+    setFormDailyFinancialImpact,
+    formIsKeystone,
+    setFormIsKeystone,
     onToggleStatus,
     onSaveNote,
     onSubmitSingleHabit,
@@ -161,6 +185,18 @@ export default function HabitsModalsContainer({
                 setFormFreqDays={setFormFreqDays}
                 formTimeOfDay={formTimeOfDay}
                 setFormTimeOfDay={setFormTimeOfDay}
+                formGoalId={formGoalId}
+                setFormGoalId={setFormGoalId}
+                formGoalTitle={formGoalTitle}
+                setFormGoalTitle={setFormGoalTitle}
+                formAnchorCue={formAnchorCue}
+                setFormAnchorCue={setFormAnchorCue}
+                formElasticMini={formElasticMini}
+                setFormElasticMini={setFormElasticMini}
+                formDailyFinancialImpact={formDailyFinancialImpact}
+                setFormDailyFinancialImpact={setFormDailyFinancialImpact}
+                formIsKeystone={formIsKeystone}
+                setFormIsKeystone={setFormIsKeystone}
                 onClose={() => setShowCreateModal(false)}
                 onDelete={onExecuteDelete}
                 onSubmit={onSubmitSingleHabit}

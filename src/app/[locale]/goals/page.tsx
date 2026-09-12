@@ -48,41 +48,72 @@ export default function GoalsPage() {
     const [hasMounted, setHasMounted] = useState(false);
 
     const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
+    const { data: fetchedHabits } = useSWR('/api/habits', fetcher);
 
     const parsedGoals = useMemo(() => {
         if (!fetchedGoals || !Array.isArray(fetchedGoals)) return null;
-        return fetchedGoals.map((g: any) => ({
-            id: g.id,
-            title: g.title,
-            color: g.color || '#6366f1',
-            type: g.type || 'milestones',
-            status: g.status || 'active',
-            priority: g.priority || 'important',
-            category: g.category || 'other',
-            time_horizon: g.time_horizon || g.timeHorizon || 'yearly',
-            is_north_star: Boolean(g.is_north_star || g.isNorthStar),
-            start_value: Number(g.start_value ?? g.startValue ?? 0),
-            current_value: Number(g.current_value ?? g.currentValue ?? 0),
-            target_value: Number(g.target_value ?? g.targetValue ?? 10),
-            unit: g.unit || (isIndo ? 'buku' : 'books'),
-            currency: g.currency || 'IDR',
-            core_why: g.core_why || g.coreWhy || '',
-            obstacle: g.obstacle || '',
-            obstacle_plan: g.obstacle_plan || g.obstaclePlan || '',
-            reward: g.reward || '',
-            start_date: g.startDate ? g.startDate.split('T')[0] : (g.start_date || ''),
-            end_date: g.endDate ? g.endDate.split('T')[0] : (g.end_date || ''),
-            cover_image_url: g.cover_image_url || g.coverImageUrl || '',
-            milestones: (g.milestones || []).map((m: any) => ({
-                id: m.id,
-                title: m.title,
-                is_completed: Boolean(m.completed || m.is_completed),
-                completed: Boolean(m.completed || m.is_completed),
-                weight: Number(m.weight || 1),
-                target_date: m.target_date || m.targetDate || null
-            })),
-        }));
-    }, [fetchedGoals, isIndo]);
+        return fetchedGoals.map((g: any) => {
+            const linkedHabits: any[] = [];
+            if (fetchedHabits && Array.isArray(fetchedHabits)) {
+                fetchedHabits.forEach((h: any) => {
+                    let meta: any = {};
+                    if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                        try { meta = JSON.parse(h.status); } catch {}
+                    } else if (h.status && typeof h.status === 'object') {
+                        meta = h.status;
+                    }
+                    const isMatched = (meta.goalId && String(meta.goalId) === String(g.id)) ||
+                                      (meta.goalTitle && meta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
+                    if (isMatched) {
+                        const completedDays = (h.logs || []).filter((l: any) => l.status === 'completed').length;
+                        const target = Number(h.monthlyTarget) || 30;
+                        const consistency = Math.min(100, Math.round((completedDays / target) * 100));
+                        linkedHabits.push({
+                            id: h.id,
+                            name: h.name,
+                            icon: h.icon || '🌱',
+                            color: h.color,
+                            consistencyPercent: consistency,
+                            streak: completedDays
+                        });
+                    }
+                });
+            }
+
+            return {
+                id: g.id,
+                title: g.title,
+                color: g.color || '#6366f1',
+                type: g.type || 'milestones',
+                status: g.status || 'active',
+                priority: g.priority || 'important',
+                category: g.category || 'other',
+                time_horizon: g.time_horizon || g.timeHorizon || 'yearly',
+                is_north_star: Boolean(g.is_north_star || g.isNorthStar),
+                start_value: Number(g.start_value ?? g.startValue ?? 0),
+                current_value: Number(g.current_value ?? g.currentValue ?? 0),
+                target_value: Number(g.target_value ?? g.targetValue ?? 10),
+                unit: g.unit || (isIndo ? 'buku' : 'books'),
+                currency: g.currency || 'IDR',
+                core_why: g.core_why || g.coreWhy || '',
+                obstacle: g.obstacle || '',
+                obstacle_plan: g.obstacle_plan || g.obstaclePlan || '',
+                reward: g.reward || '',
+                start_date: g.startDate ? g.startDate.split('T')[0] : (g.start_date || ''),
+                end_date: g.endDate ? g.endDate.split('T')[0] : (g.end_date || ''),
+                cover_image_url: g.cover_image_url || g.coverImageUrl || '',
+                linked_habits: linkedHabits,
+                milestones: (g.milestones || []).map((m: any) => ({
+                    id: m.id,
+                    title: m.title,
+                    is_completed: Boolean(m.completed || m.is_completed),
+                    completed: Boolean(m.completed || m.is_completed),
+                    weight: Number(m.weight || 1),
+                    target_date: m.target_date || m.targetDate || null
+                })),
+            };
+        });
+    }, [fetchedGoals, fetchedHabits, isIndo]);
 
     const [goals, setGoals] = useState<GoalItem[]>(parsedGoals || []);
 

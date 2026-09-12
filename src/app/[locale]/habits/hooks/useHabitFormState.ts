@@ -18,6 +18,13 @@ export function useHabitFormState(daysInCurrentMonth: number) {
     const [formFreqType, setFormFreqType] = useState<'daily' | 'weekly_days'>('daily');
     const [formFreqDays, setFormFreqDays] = useState<number[]>([1, 2, 3, 4, 5]);
     const [formTimeOfDay, setFormTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'anytime'>('morning');
+    // Systemic Life OS Cross-Module Fields
+    const [formGoalId, setFormGoalId] = useState<string | number | undefined>(undefined);
+    const [formGoalTitle, setFormGoalTitle] = useState<string>('');
+    const [formAnchorCue, setFormAnchorCue] = useState<string>('');
+    const [formElasticMini, setFormElasticMini] = useState<string>('');
+    const [formDailyFinancialImpact, setFormDailyFinancialImpact] = useState<number | undefined>(undefined);
+    const [formIsKeystone, setFormIsKeystone] = useState<boolean>(false);
 
     // Delete Modal State
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -53,6 +60,12 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormFreqType('daily');
         setFormFreqDays([1, 2, 3, 4, 5]);
         setFormTimeOfDay('morning');
+        setFormGoalId(undefined);
+        setFormGoalTitle('');
+        setFormAnchorCue('');
+        setFormElasticMini('');
+        setFormDailyFinancialImpact(undefined);
+        setFormIsKeystone(false);
         setShowCreateModal(true);
     };
 
@@ -69,6 +82,12 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormFreqType((habit.frequencyType as any) || 'daily');
         setFormFreqDays(habit.frequencyDays || [1, 2, 3, 4, 5]);
         setFormTimeOfDay(habit.timeOfDay || 'morning');
+        setFormGoalId(habit.goalId);
+        setFormGoalTitle(habit.goalTitle || '');
+        setFormAnchorCue(habit.anchorCue || '');
+        setFormElasticMini(habit.elasticMini || '');
+        setFormDailyFinancialImpact(habit.dailyFinancialImpact);
+        setFormIsKeystone(!!habit.isKeystone);
         setShowCreateModal(true);
     };
 
@@ -104,6 +123,18 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormFreqDays,
         formTimeOfDay,
         setFormTimeOfDay,
+        formGoalId,
+        setFormGoalId,
+        formGoalTitle,
+        setFormGoalTitle,
+        formAnchorCue,
+        setFormAnchorCue,
+        formElasticMini,
+        setFormElasticMini,
+        formDailyFinancialImpact,
+        setFormDailyFinancialImpact,
+        formIsKeystone,
+        setFormIsKeystone,
         showDeleteModal,
         setShowDeleteModal,
         habitToDelete,

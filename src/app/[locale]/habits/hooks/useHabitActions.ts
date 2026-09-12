@@ -23,6 +23,12 @@ interface UseHabitActionsParams {
     formFreqType: 'daily' | 'weekly_days';
     formFreqDays: number[];
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
+    formGoalId?: string | number;
+    formGoalTitle?: string;
+    formAnchorCue?: string;
+    formElasticMini?: string;
+    formDailyFinancialImpact?: number;
+    formIsKeystone?: boolean;
     setShowCreateModal: (v: boolean) => void;
     habitToDelete: HabitItem | null;
     setShowDeleteModal: (v: boolean) => void;
@@ -49,6 +55,12 @@ export function useHabitActions({
     formFreqType,
     formFreqDays,
     formTimeOfDay,
+    formGoalId,
+    formGoalTitle,
+    formAnchorCue,
+    formElasticMini,
+    formDailyFinancialImpact,
+    formIsKeystone,
     setShowCreateModal,
     habitToDelete,
     setShowDeleteModal,
@@ -252,7 +264,13 @@ export function useHabitActions({
             targetValue: formTargetValue,
             frequencyType: formFreqType,
             frequencyDays: formFreqDays,
-            timeOfDay: formTimeOfDay
+            timeOfDay: formTimeOfDay,
+            goalId: formGoalId,
+            goalTitle: formGoalTitle,
+            anchorCue: formAnchorCue,
+            elasticMini: formElasticMini,
+            dailyFinancialImpact: formDailyFinancialImpact,
+            isKeystone: formIsKeystone
         };
 
         const statusPayload = JSON.stringify(metadata);
@@ -272,6 +290,12 @@ export function useHabitActions({
                     frequencyType: formFreqType,
                     frequencyDays: formFreqDays,
                     timeOfDay: formTimeOfDay,
+                    goalId: formGoalId,
+                    goalTitle: formGoalTitle,
+                    anchorCue: formAnchorCue,
+                    elasticMini: formElasticMini,
+                    dailyFinancialImpact: formDailyFinancialImpact,
+                    isKeystone: formIsKeystone,
                     status: statusPayload
                 } : h));
 
@@ -303,6 +327,12 @@ export function useHabitActions({
                     frequencyType: formFreqType,
                     frequencyDays: formFreqDays,
                     timeOfDay: formTimeOfDay,
+                    goalId: formGoalId,
+                    goalTitle: formGoalTitle,
+                    anchorCue: formAnchorCue,
+                    elasticMini: formElasticMini,
+                    dailyFinancialImpact: formDailyFinancialImpact,
+                    isKeystone: formIsKeystone,
                     status: statusPayload,
                     logs: {}
                 };

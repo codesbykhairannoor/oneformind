@@ -114,6 +114,12 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         formFreqType: form.formFreqType,
         formFreqDays: form.formFreqDays,
         formTimeOfDay: form.formTimeOfDay,
+        formGoalId: form.formGoalId,
+        formGoalTitle: form.formGoalTitle,
+        formAnchorCue: form.formAnchorCue,
+        formElasticMini: form.formElasticMini,
+        formDailyFinancialImpact: form.formDailyFinancialImpact,
+        formIsKeystone: form.formIsKeystone,
         setShowCreateModal: form.setShowCreateModal,
         habitToDelete: form.habitToDelete,
         setShowDeleteModal: form.setShowDeleteModal,
@@ -274,6 +280,18 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setFormFreqDays={form.setFormFreqDays}
                     formTimeOfDay={form.formTimeOfDay}
                     setFormTimeOfDay={form.setFormTimeOfDay}
+                    formGoalId={form.formGoalId}
+                    setFormGoalId={form.setFormGoalId}
+                    formGoalTitle={form.formGoalTitle}
+                    setFormGoalTitle={form.setFormGoalTitle}
+                    formAnchorCue={form.formAnchorCue}
+                    setFormAnchorCue={form.setFormAnchorCue}
+                    formElasticMini={form.formElasticMini}
+                    setFormElasticMini={form.setFormElasticMini}
+                    formDailyFinancialImpact={form.formDailyFinancialImpact}
+                    setFormDailyFinancialImpact={form.setFormDailyFinancialImpact}
+                    formIsKeystone={form.formIsKeystone}
+                    setFormIsKeystone={form.setFormIsKeystone}
                     onToggleStatus={actions.toggleStatus}
                     onSaveNote={actions.handleSaveNote}
                     onSubmitSingleHabit={actions.submitSingleHabit}

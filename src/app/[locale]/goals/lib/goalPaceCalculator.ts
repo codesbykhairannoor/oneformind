@@ -46,6 +46,18 @@ export interface GoalItem {
     cover_image_url?: string;
     milestones?: GoalMilestone[];
     is_saving?: boolean;
+
+    // Cross-Domain Habit Engine (Leading Measures)
+    linked_habits?: LinkedHabitEngine[];
+}
+
+export interface LinkedHabitEngine {
+    id: number | string;
+    name: string;
+    icon: string;
+    color?: string;
+    consistencyPercent: number;
+    streak: number;
 }
 
 export interface GoalPaceResult {
@@ -58,6 +70,7 @@ export interface GoalPaceResult {
     paceLabel: { id: string; en: string };
     paceColor: string;
     runRateNotice: { id: string; en: string } | null;
+    habitEngineNotice?: { id: string; en: string; type: 'boost' | 'warning' | 'neutral' } | null;
 }
 
 /**
@@ -231,6 +244,34 @@ export function calculateGoalPace(goal: GoalItem): GoalPaceResult {
         };
     }
 
+    // Predictive Velocity from Linked Habit Engines
+    let habitEngineNotice: GoalPaceResult['habitEngineNotice'] = null;
+    if (goal.linked_habits && goal.linked_habits.length > 0) {
+        const totalCons = goal.linked_habits.reduce((acc, h) => acc + h.consistencyPercent, 0);
+        const avgCons = Math.round(totalCons / goal.linked_habits.length);
+        const habitNames = goal.linked_habits.map(h => `${h.icon} ${h.name}`).join(', ');
+
+        if (avgCons >= 75) {
+            habitEngineNotice = {
+                type: 'boost',
+                id: `Mesin Kebiasaan Prima (${avgCons}% konsistensi): Rutinitas [${habitNames}] memproyeksikan target tercapai lebih cepat!`,
+                en: `High-Velocity Habit Engine (${avgCons}% consistency): Your routine [${habitNames}] is accelerating completion ahead of schedule!`
+            };
+        } else if (avgCons < 50) {
+            habitEngineNotice = {
+                type: 'warning',
+                id: `Hambatan Rutinitas (${avgCons}% konsistensi): Kebiasaan pendukung [${habitNames}] terhambat. Akselerasi kebiasaan harian Anda.`,
+                en: `Habit Engine Drag (${avgCons}% consistency): Supporting routine [${habitNames}] is lagging. Tighten daily execution to stay on pace.`
+            };
+        } else {
+            habitEngineNotice = {
+                type: 'neutral',
+                id: `Mesin Kebiasaan Stabil (${avgCons}% konsistensi): Didukung oleh [${habitNames}].`,
+                en: `Steady Habit Engine (${avgCons}% consistency): Powered by [${habitNames}].`
+            };
+        }
+    }
+
     return {
         progressPercent,
         daysTotal,
@@ -240,7 +281,8 @@ export function calculateGoalPace(goal: GoalItem): GoalPaceResult {
         paceStatus,
         paceLabel,
         paceColor,
-        runRateNotice
+        runRateNotice,
+        habitEngineNotice
     };
 }
 

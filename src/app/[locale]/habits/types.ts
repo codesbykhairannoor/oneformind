@@ -15,6 +15,13 @@ export interface HabitItem {
     frequencyDays?: number[]; // [0, 1, 2, 3, 4, 5, 6] where 0=Sun, 1=Mon, ...
     frequencyCount?: number;
     timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
+    // Systemic Life OS Cross-Domain Fields
+    goalId?: number | string;
+    goalTitle?: string;
+    anchorCue?: string; // e.g. "Setelah Bangun Tidur", "Sebelum Mulai Kerja", "Setelah Makan Siang", "Sebelum Tidur"
+    elasticMini?: string; // 2-Minute Rule fallback version when days are overloaded
+    dailyFinancialImpact?: number; // Estimated IDR saved/earned per completed day
+    isKeystone?: boolean; // Catalyst habit that triggers other positive behaviors
     logs: Record<string, {
         status: 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest' | 'in_progress';
         value?: number;

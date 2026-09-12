@@ -19,12 +19,76 @@ export default function NeuralBridge({ module }: NeuralBridgeProps) {
     // Check subscription — Neural Bridge is only for premium users with specific plans
     const hasAccess = isArchitect;
 
-    const handleFetchSynergy = () => {
+    const handleFetchSynergy = async () => {
         setLoading(true);
-        setTimeout(() => {
-            setSynergy(`Analisis Neural AI terbaru: Terdeteksi konsistensi penulisan jurnal & penyelesaian tugas modul ${module}.`);
+        try {
+            const [dashRes, habitsRes, goalsRes] = await Promise.all([
+                fetch('/api/dashboard').catch(() => null),
+                fetch('/api/habits').catch(() => null),
+                fetch('/api/goals').catch(() => null)
+            ]);
+
+            let habitsCount = 0;
+            let habitsCompleted = 0;
+            let savedMoney = 0;
+            let hasFriction = false;
+            let linkedGoalsCount = 0;
+
+            if (habitsRes && habitsRes.ok) {
+                const habitsData = await habitsRes.json();
+                if (Array.isArray(habitsData)) {
+                    habitsCount = habitsData.length;
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    habitsData.forEach((h: any) => {
+                        const logs = h.logs || [];
+                        const isDoneToday = logs.some((l: any) => l.date?.startsWith(todayStr) && l.status === 'completed');
+                        if (isDoneToday) habitsCompleted++;
+                        
+                        let meta: any = {};
+                        if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                            try { meta = JSON.parse(h.status); } catch {}
+                        } else if (h.status && typeof h.status === 'object') {
+                            meta = h.status;
+                        }
+
+                        if (meta.goalId || meta.goalTitle) linkedGoalsCount++;
+                        if (meta.dailyFinancialImpact) {
+                            const completedCount = logs.filter((l: any) => l.status === 'completed').length;
+                            savedMoney += completedCount * Number(meta.dailyFinancialImpact);
+                        }
+                    });
+                }
+            }
+
+            let advice = '';
+            if (module.toLowerCase() === 'journal') {
+                if (habitsCompleted > 0) {
+                    advice = `Sintesis Sinergi: Terdeteksi ${habitsCompleted} kebiasaan harian telah Anda selesaikan hari ini. Catat apa pemicu lingkungan yang membuat Anda fokus hari ini untuk menduplikasi keberhasilan tersebut di masa depan.`;
+                } else {
+                    advice = `Refleksi Metakognisi: Hari ini belum ada kebiasaan yang dicentang. Gunakan jurnal untuk mencatat hambatan energi atau distraksi tanpa menghakimi diri sendiri, lalu rencanakan versi 2-menit untuk esok hari.`;
+                }
+            } else if (module.toLowerCase() === 'goals') {
+                if (linkedGoalsCount > 0) {
+                    advice = `Dinamika Leading Measure: Terdapat ${linkedGoalsCount} kebiasaan yang aktif berfungsi sebagai mesin penggerak target Anda. Eksekusi kebiasaan mikro setiap hari memproyeksikan pencapaian deadline lebih cepat.`;
+                } else {
+                    advice = `Optimasi Sistemik: Target Anda belum memiliki kebiasaan penggerak harian (leading measures). Tautkan setidaknya satu kebiasaan rutin ke target ini agar kemajuan tidak bergantung pada motivasi sesaat.`;
+                }
+            } else if (module.toLowerCase() === 'finance') {
+                if (savedMoney > 0) {
+                    advice = `Korelasi Finansial-Perilaku: Konsistensi kebiasaan positif & penghentian kebiasaan boros Anda berhasil mengamankan sekitar Rp ${savedMoney.toLocaleString('id-ID')} bulan ini. Disiplin diri terbukti langsung memperkuat arus kas Anda.`;
+                } else {
+                    advice = `Peluang Sinergi: Tentukan 'Dampak Finansial Harian' pada kebiasaan berhenti (misal: kurangi jajan/kopi luar) di tab Kebiasaan untuk memantau akumulasi tabungan riil Anda.`;
+                }
+            } else {
+                advice = `Sintesis Neural Life OS: Terhubung ${habitsCount} kebiasaan aktif, ${linkedGoalsCount} tautan target, dan sinkronisasi lintas modul. Menjaga kebiasaan mikro adalah fondasi kejelasan mental Anda.`;
+            }
+
+            setSynergy(advice);
+        } catch (e) {
+            setSynergy(`Analisis Neural AI: Terdeteksi konsistensi penulisan jurnal & penyelesaian tugas modul ${module}.`);
+        } finally {
             setLoading(false);
-        }, 600);
+        }
     };
 
     // If user doesn't have access, show upgrade teaser

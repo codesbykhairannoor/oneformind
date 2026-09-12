@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
-import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, Leaf } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, Leaf, Zap, Anchor } from 'lucide-react';
 import { InboxTask } from '../types';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -52,6 +52,8 @@ export default function PlannerSidebar({
 
     const [newInboxTitle, setNewInboxTitle] = useState('');
     const [dailyHubTab, setDailyHubTab] = useState<'habits' | 'notes' | 'meals' | 'water'>('habits');
+    const [elasticMode, setElasticMode] = useState(false);
+    const [anchorFilter, setAnchorFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
 
     // Cross-Module Synergy: Real-time Today's Habits
     const activeDate = selectedDate || new Date().toISOString().split('T')[0];
@@ -61,16 +63,32 @@ export default function PlannerSidebar({
     const todayHabits = useMemo(() => {
         if (!rawHabits || !Array.isArray(rawHabits)) return [];
         return rawHabits.map((h: any) => {
+            let meta: any = {};
+            if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                try { meta = JSON.parse(h.status); } catch {}
+            } else if (h.status && typeof h.status === 'object') {
+                meta = h.status;
+            }
+
             const isDone = (h.logs || []).some((l: any) => l.date?.startsWith(activeDate) && l.status === 'completed');
             return {
                 id: h.id,
                 name: h.name,
                 icon: h.icon || '🌱',
                 color: h.color || '#10b981',
-                isCompleted: isDone
+                isCompleted: isDone,
+                anchorCue: meta.anchorCue || '',
+                elasticMini: meta.elasticMini || '',
+                timeOfDay: meta.timeOfDay || 'anytime',
+                goalTitle: meta.goalTitle || ''
             };
         });
     }, [rawHabits, activeDate]);
+
+    const filteredTodayHabits = useMemo(() => {
+        if (anchorFilter === 'all') return todayHabits;
+        return todayHabits.filter(h => h.timeOfDay === anchorFilter || h.timeOfDay === 'anytime');
+    }, [todayHabits, anchorFilter]);
 
     const completedHabitsCount = todayHabits.filter(h => h.isCompleted).length;
 
@@ -386,58 +404,133 @@ export default function PlannerSidebar({
 
                 {/* Tab 0: Habits Checklist Hari Ini */}
                 {dailyHubTab === 'habits' && (
-                    <div className="space-y-2 animate-in fade-in">
-                        {todayHabits.length === 0 ? (
+                    <div className="space-y-2.5 animate-in fade-in">
+                        {/* Control Strip: Elastic Mode & Anchor Filter */}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <button
+                                    type="button"
+                                    onClick={() => setElasticMode(!elasticMode)}
+                                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-1.5 transition-all border ${
+                                        elasticMode 
+                                            ? 'bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/20 scale-[1.02]' 
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-amber-400'
+                                    }`}
+                                    title={isIndo ? 'Gunakan versi mini 2 menit agar streak tidak putus saat lelah' : 'Use 2-minute elastic mini version'}
+                                >
+                                    <Zap size={11} className={elasticMode ? 'fill-current' : ''} />
+                                    <span>{elasticMode ? (isIndo ? '⚡ Mode Elastis AKTIF' : '⚡ 2-Min Mode ACTIVE') : (isIndo ? '⚡ Mode Elastis (2 Menit)' : '⚡ 2-Min Elastic Mode')}</span>
+                                </button>
+
+                                <span className="text-[10px] font-bold text-slate-400 font-mono">
+                                    {completedHabitsCount}/{todayHabits.length}
+                                </span>
+                            </div>
+
+                            {/* Anchor Moment / Time-of-Day Filter Pills */}
+                            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
+                                {[
+                                    { key: 'all', label: isIndo ? 'Semua' : 'All' },
+                                    { key: 'morning', label: '🌅 Pagi' },
+                                    { key: 'afternoon', label: '☀️ Siang' },
+                                    { key: 'evening', label: '🌙 Malam' },
+                                ].map(filter => (
+                                    <button
+                                        key={filter.key}
+                                        type="button"
+                                        onClick={() => setAnchorFilter(filter.key as any)}
+                                        className={`px-2 py-0.5 rounded-lg text-[9px] font-black transition-all shrink-0 ${
+                                            anchorFilter === filter.key
+                                                ? 'bg-indigo-600 text-white shadow-xs'
+                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        {filter.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {filteredTodayHabits.length === 0 ? (
                             <div className="p-4 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                                 <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                                    {isIndo ? 'Belum ada kebiasaan aktif bulan ini.' : 'No active habits for this month.'}
+                                    {isIndo ? 'Tidak ada kebiasaan untuk filter ini.' : 'No habits for this filter.'}
                                 </p>
                             </div>
                         ) : (
-                            <div className="space-y-1.5 max-h-56 overflow-y-auto no-scrollbar">
-                                {todayHabits.map((h: any) => (
-                                    <div 
-                                        key={h.id}
-                                        className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
-                                            h.isCompleted 
-                                                ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-800/40' 
-                                                : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/60 dark:border-slate-800 hover:border-slate-300'
-                                        }`}
-                                    >
-                                        <button
-                                            type="button"
-                                            onClick={() => handleToggleHabit(h.id, h.isCompleted)}
-                                            className="flex items-center gap-2.5 text-left flex-1 min-w-0"
+                            <div className="space-y-1.5 max-h-60 overflow-y-auto no-scrollbar">
+                                {filteredTodayHabits.map((h: any) => {
+                                    const displayName = (elasticMode && h.elasticMini) ? h.elasticMini : h.name;
+                                    return (
+                                        <div 
+                                            key={h.id}
+                                            className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                                                h.isCompleted 
+                                                    ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-800/40' 
+                                                    : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/60 dark:border-slate-800 hover:border-slate-300'
+                                            }`}
                                         >
-                                            <span className={`w-5 h-5 rounded-lg flex items-center justify-center text-xs font-black transition-all ${
-                                                h.isCompleted 
-                                                    ? 'bg-emerald-600 text-white shadow-xs' 
-                                                    : 'border-2 border-slate-300 dark:border-slate-600'
-                                            }`}>
-                                                {h.isCompleted && <Check size={12} strokeWidth={3} />}
-                                            </span>
-                                            <span className="text-sm shrink-0">{h.icon}</span>
-                                            <span className={`text-xs font-bold truncate ${
-                                                h.isCompleted 
-                                                    ? 'line-through text-slate-400 dark:text-slate-500' 
-                                                    : 'text-slate-700 dark:text-slate-200'
-                                            }`}>
-                                                {h.name}
-                                            </span>
-                                        </button>
-
-                                        {onScheduleInboxTaskModal && (
                                             <button
                                                 type="button"
-                                                onClick={() => onScheduleInboxTaskModal({ id: Date.now(), title: `${h.icon} ${h.name}`, completed: false, type: 3 })}
-                                                className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 transition shrink-0"
-                                                title={isIndo ? 'Jadwalkan di Timeline Planner' : 'Schedule on Timeline'}
+                                                onClick={() => handleToggleHabit(h.id, h.isCompleted)}
+                                                className="flex items-start gap-2.5 text-left flex-1 min-w-0"
                                             >
-                                                <Clock size={12} />
+                                                <span className={`w-5 h-5 rounded-lg flex items-center justify-center text-xs font-black transition-all shrink-0 mt-0.5 ${
+                                                    h.isCompleted 
+                                                        ? 'bg-emerald-600 text-white shadow-xs' 
+                                                        : 'border-2 border-slate-300 dark:border-slate-600'
+                                                }`}>
+                                                    {h.isCompleted && <Check size={12} strokeWidth={3} />}
+                                                </span>
+
+                                                <span className="text-sm shrink-0">{h.icon}</span>
+
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                        <span className={`text-xs font-bold truncate ${
+                                                            h.isCompleted 
+                                                                ? 'line-through text-slate-400 dark:text-slate-500' 
+                                                                : 'text-slate-700 dark:text-slate-200'
+                                                        }`}>
+                                                            {displayName}
+                                                        </span>
+                                                        {elasticMode && h.elasticMini && (
+                                                            <span className="text-[8px] font-black px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                                                                ⚡ 2-Min
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Contextual cues & goal links */}
+                                                    <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                                                        {h.anchorCue && (
+                                                            <span className="text-[9px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-0.5">
+                                                                <Anchor size={9} />
+                                                                <span className="truncate max-w-[140px]">{h.anchorCue}</span>
+                                                            </span>
+                                                        )}
+                                                        {h.goalTitle && (
+                                                            <span className="text-[9px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-0.5">
+                                                                <span className="truncate max-w-[120px]">🎯 {h.goalTitle}</span>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </button>
-                                        )}
-                                    </div>
-                                ))}
+
+                                            {onScheduleInboxTaskModal && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onScheduleInboxTaskModal({ id: Date.now(), title: `${h.icon} ${displayName}`, completed: false, type: 3 })}
+                                                    className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 transition shrink-0 ml-1.5"
+                                                    title={isIndo ? 'Jadwalkan di Timeline Planner' : 'Schedule on Timeline'}
+                                                >
+                                                    <Clock size={12} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

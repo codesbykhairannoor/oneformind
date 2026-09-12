@@ -1,7 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import useSWR from 'swr';
 import { calculateScheduledDays } from '../utils/habitMath';
+import { Target, Anchor, Zap, Coins, Sparkles } from 'lucide-react';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 interface HabitFormScheduleProps {
     isIndo: boolean;
@@ -18,6 +22,18 @@ interface HabitFormScheduleProps {
     setFormFreqDays: (v: number[]) => void;
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
     setFormTimeOfDay: (v: 'morning' | 'afternoon' | 'evening' | 'anytime') => void;
+    formGoalId?: string | number;
+    setFormGoalId: (v: string | number | undefined) => void;
+    formGoalTitle?: string;
+    setFormGoalTitle: (v: string) => void;
+    formAnchorCue?: string;
+    setFormAnchorCue: (v: string) => void;
+    formElasticMini?: string;
+    setFormElasticMini: (v: string) => void;
+    formDailyFinancialImpact?: number;
+    setFormDailyFinancialImpact: (v: number | undefined) => void;
+    formIsKeystone?: boolean;
+    setFormIsKeystone: (v: boolean) => void;
 }
 
 export default function HabitFormSchedule({
@@ -34,8 +50,31 @@ export default function HabitFormSchedule({
     formFreqDays,
     setFormFreqDays,
     formTimeOfDay,
-    setFormTimeOfDay
+    setFormTimeOfDay,
+    formGoalId,
+    setFormGoalId,
+    formGoalTitle,
+    setFormGoalTitle,
+    formAnchorCue,
+    setFormAnchorCue,
+    formElasticMini,
+    setFormElasticMini,
+    formDailyFinancialImpact,
+    setFormDailyFinancialImpact,
+    formIsKeystone,
+    setFormIsKeystone
 }: HabitFormScheduleProps) {
+    const { data: rawGoals } = useSWR('/api/goals', fetcher);
+    const availableGoals = Array.isArray(rawGoals) ? rawGoals : [];
+
+    const anchorCuePresets = [
+        { label: '🌅 Bangun Tidur', cue: 'Setelah bangun tidur pagi' },
+        { label: '☕ Kopi / Sarapan', cue: 'Setelah selesai minum kopi/sarapan' },
+        { label: '💻 Mulai Kerja', cue: 'Sebelum membuka laptop/mulai kerja' },
+        { label: '🍱 Makan Siang', cue: 'Setelah jam makan siang' },
+        { label: '🌙 Sebelum Tidur', cue: 'Sebelum beranjak tidur malam' },
+    ];
+
     return (
         <div className="space-y-6">
             {/* SECTION 5: JADWAL & KOMITMEN BULANAN */}
@@ -181,6 +220,137 @@ export default function HabitFormSchedule({
                             <span className="text-[9px] font-medium text-slate-400">{t.desc}</span>
                         </button>
                     ))}
+                </div>
+            </div>
+
+            {/* SECTION 8: INTEGRASI LIFE OS & BEHAVIORAL DESIGN */}
+            <div className="p-4 rounded-3xl bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 pb-2">
+                    <div className="flex items-center gap-2">
+                        <span className="text-base">🧬</span>
+                        <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                            {isIndo ? 'Sinergi Life OS & Behavioral Design' : 'Life OS Synergy & Science'}
+                        </span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400">
+                        {isIndo ? 'Atomic Habits' : 'High Performance'}
+                    </span>
+                </div>
+
+                {/* 1. Tautkan ke Target Hidup (Leading Measure) */}
+                <div>
+                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
+                        <Target className="w-3.5 h-3.5 text-indigo-500" />
+                        <span>{isIndo ? 'Tautkan ke Target Hidup (Goals)' : 'Link to Master Goal'}</span>
+                    </label>
+                    <select
+                        value={formGoalId || ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (!val) {
+                                setFormGoalId(undefined);
+                                setFormGoalTitle('');
+                            } else {
+                                setFormGoalId(val);
+                                const g = availableGoals.find((item: any) => String(item.id) === String(val));
+                                if (g) setFormGoalTitle(g.title || '');
+                            }
+                        }}
+                        className="w-full text-xs font-bold py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition"
+                    >
+                        <option value="">{isIndo ? '— Tanpa Tautan Target (Berdiri Sendiri) —' : '— Standalone Habit (No Goal) —'}</option>
+                        {availableGoals.map((g: any) => (
+                            <option key={g.id} value={g.id}>
+                                🎯 {g.title}
+                            </option>
+                        ))}
+                    </select>
+                    <p className="text-[10px] text-slate-400 mt-1">
+                        {isIndo 
+                            ? 'Kebiasaan ini akan menjadi mesin penggerak (leading measure) yang memproyeksikan kecepatan capaian target Anda.' 
+                            : 'This habit acts as the leading velocity engine forecasting your target completion date.'}
+                    </p>
+                </div>
+
+                {/* 2. Anchor Cue (Habit Stacking) */}
+                <div>
+                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
+                        <Anchor className="w-3.5 h-3.5 text-blue-500" />
+                        <span>{isIndo ? 'Pemicu Pelaksanaan (Anchor Cue / Habit Stacking)' : 'Anchor Cue (Habit Stacking)'}</span>
+                    </label>
+                    
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                        {anchorCuePresets.map(preset => (
+                            <button
+                                key={preset.cue}
+                                type="button"
+                                onClick={() => setFormAnchorCue(preset.cue)}
+                                className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border transition ${
+                                    formAnchorCue === preset.cue
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                                }`}
+                            >
+                                {preset.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <input
+                        type="text"
+                        value={formAnchorCue || ''}
+                        onChange={(e) => setFormAnchorCue(e.target.value)}
+                        placeholder={isIndo ? 'Misal: Setelah menuangkan kopi pagi, saya akan...' : 'e.g. After pouring morning coffee, I will...'}
+                        className="w-full text-xs font-medium py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition"
+                    />
+                </div>
+
+                {/* 3. Aturan 2 Menit (Versi Elastis) */}
+                <div>
+                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
+                        <Zap className="w-3.5 h-3.5 text-amber-500" />
+                        <span>{isIndo ? 'Aturan 2 Menit (Versi Elastis saat Lelah/Sibuk)' : '2-Minute Elastic Rule (Low Energy Fallback)'}</span>
+                    </label>
+                    <input
+                        type="text"
+                        value={formElasticMini || ''}
+                        onChange={(e) => setFormElasticMini(e.target.value)}
+                        placeholder={isIndo ? 'Misal: Baca 1 paragraf saja / 1 push-up saja' : 'e.g. Read just 1 page / Do 2 pushups'}
+                        className="w-full text-xs font-medium py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">
+                        {isIndo 
+                            ? 'Otomatis diaktifkan di Planner saat beban tugas harian Anda tinggi agar momentum streak tidak terputus.' 
+                            : 'Auto-triggered in Planner on overloaded days so your momentum never breaks.'}
+                    </p>
+                </div>
+
+                {/* 4. Dampak Finansial Harian (Compounding Savings / Cost-of-Vice) */}
+                <div>
+                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
+                        <Coins className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>{isIndo ? 'Dampak Finansial Harian (Cost-of-Vice / Hemat Harian)' : 'Daily Financial Impact (ROI / Savings)'}</span>
+                    </label>
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 font-mono">Rp</span>
+                        <input
+                            type="number"
+                            min="0"
+                            step="1000"
+                            value={formDailyFinancialImpact !== undefined ? formDailyFinancialImpact : ''}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setFormDailyFinancialImpact(val === '' ? undefined : Number(val));
+                            }}
+                            placeholder="Contoh: 25000 (biaya rokok/kopi harian yang dihemat)"
+                            className="w-full text-xs font-mono font-bold py-2.5 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500 transition"
+                        />
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1">
+                        {isIndo 
+                            ? 'Tiap hari tuntas, nominal ini dikalikan dan diakumulasikan ke tab Keuangan sebagai tabungan nyata.' 
+                            : 'Each completed day compounds into the Finance tab as tangible accumulated savings.'}
+                    </p>
                 </div>
             </div>
         </div>

@@ -119,6 +119,12 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
             frequencyDays,
             frequencyCount,
             timeOfDay,
+            goalId: extraMeta.goalId,
+            goalTitle: extraMeta.goalTitle,
+            anchorCue: extraMeta.anchorCue,
+            elasticMini: extraMeta.elasticMini,
+            dailyFinancialImpact: typeof extraMeta.dailyFinancialImpact === 'number' ? extraMeta.dailyFinancialImpact : (extraMeta.dailyFinancialImpact ? Number(extraMeta.dailyFinancialImpact) : undefined),
+            isKeystone: !!extraMeta.isKeystone,
             status: h.status,
             logs: logsMap
         };
