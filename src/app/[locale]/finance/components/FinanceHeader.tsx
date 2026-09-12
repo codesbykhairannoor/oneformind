@@ -11,6 +11,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import FinanceMonthPicker from './FinanceMonthPicker';
+import ExportModal from '@/components/export/ExportModal';
 
 export interface CurrencyOption {
     code: string;
@@ -49,8 +50,10 @@ export default function FinanceHeader({
 }: FinanceHeaderProps) {
     const t = useTranslations();
     const locale = useLocale();
+    const isIndo = locale === 'id';
     
     const [isExportOpen, setIsExportOpen] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
 
     const activeCurrencyObj = SUPPORTED_CURRENCIES.find(c => c.code === activeCurrency) || SUPPORTED_CURRENCIES[0];
@@ -233,13 +236,16 @@ export default function FinanceHeader({
                             <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-700 p-1.5 z-[100] origin-top-right transition-colors duration-500">
                                 <div className="fixed inset-0 z-[-1]" onClick={() => setIsExportOpen(false)}></div>
                                 <div className="relative z-10 space-y-0.5">
-                                    <button onClick={exportToCSV} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item">
+                                    <button 
+                                        onClick={() => { setIsExportOpen(false); setIsExportModalOpen(true); }} 
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item"
+                                    >
                                         <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover/item:scale-110 transition-transform">
                                             <FileText size={14} strokeWidth={2.5} />
                                         </div>
                                         <div className="text-left">
-                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">Export Excel</p>
-                                            <p className="text-[9px] text-slate-400 font-medium">Buka di Excel / Sheets</p>
+                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">{isIndo ? 'Ekspor CSV / JSON' : 'Export CSV / JSON'}</p>
+                                            <p className="text-[9px] text-slate-400 font-medium">{isIndo ? 'Semua Waktu, Tahunan, Bulanan' : 'All-time, yearly, monthly'}</p>
                                         </div>
                                     </button>
                                     <button onClick={exportTaxReport} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item">
@@ -247,23 +253,22 @@ export default function FinanceHeader({
                                             <FileText size={14} strokeWidth={2.5} />
                                         </div>
                                         <div className="text-left">
-                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 text-left">Laporan Pajak</p>
+                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 text-left">{isIndo ? 'Laporan Pajak' : 'Tax / Fiscal Report'}</p>
                                             <p className="text-[9px] text-slate-400 font-medium font-mono">Format Fiscal PDF</p>
-                                        </div>
-                                    </button>
-                                    <div className="h-px bg-slate-100 dark:bg-slate-700 mx-3 my-1"></div>
-                                    <button className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item">
-                                        <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover/item:scale-110 transition-transform">
-                                            <Sparkles size={14} strokeWidth={2.5} />
-                                        </div>
-                                        <div className="text-left">
-                                            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200">AI Financial Audit</p>
-                                            <p className="text-[9px] text-slate-400 font-medium">Auto-review dari asisten AI</p>
                                         </div>
                                     </button>
                                 </div>
                             </div>
                         )}
+
+                        <ExportModal
+                            isOpen={isExportModalOpen}
+                            onClose={() => setIsExportModalOpen(false)}
+                            moduleType="finance"
+                            defaultYear={Number(selectedMonthKey.split('-')[0]) || new Date().getFullYear()}
+                            defaultMonth={Number(selectedMonthKey.split('-')[1]) || (new Date().getMonth() + 1)}
+                            currentData={transactions}
+                        />
                     </div>
 
                     <button 

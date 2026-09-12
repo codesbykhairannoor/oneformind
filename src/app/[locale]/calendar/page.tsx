@@ -21,6 +21,7 @@ import {
     parseEventMetadata, 
     exportCalendarToIcs 
 } from './lib/calendarAnalytics';
+import ExportModal from '@/components/export/ExportModal';
 
 export default function CalendarPage() {
     const locale = useLocale();
@@ -52,6 +53,7 @@ export default function CalendarPage() {
     const [isTaskDrawerOpen, setIsTaskDrawerOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<UnifiedCalendarEvent | null>(null);
     const [initialModalStartTime, setInitialModalStartTime] = useState<string>('09:00');
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     // Data State
     const [events, setEvents] = useState<UnifiedCalendarEvent[]>([]);
@@ -390,6 +392,7 @@ export default function CalendarPage() {
                         onAddEvent={() => handleOpenEventModal(selectedDate)}
                         onOpenTaskDrawer={() => setIsTaskDrawerOpen(true)}
                         onGoToToday={handleGoToToday}
+                        onOpenExportModal={() => setIsExportOpen(true)}
                     />
 
                     {/* Main Container */}
@@ -492,6 +495,14 @@ export default function CalendarPage() {
                         onClose={() => setIsTaskDrawerOpen(false)}
                         plannerTasks={plannerTasks}
                         onScheduleTask={handleScheduleTaskToCalendar}
+                    />
+
+                    {/* Universal Export Modal (CSV & JSON) */}
+                    <ExportModal
+                        isOpen={isExportOpen}
+                        onClose={() => setIsExportOpen(false)}
+                        moduleType="calendar"
+                        currentData={events}
                     />
 
                 </div>

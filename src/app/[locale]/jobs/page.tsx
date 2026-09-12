@@ -26,12 +26,14 @@ import {
     serializeJobPayload, 
     deserializeJobPayload 
 } from './lib/jobAnalytics';
+import ExportModal from '@/components/export/ExportModal';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function JobsPage() {
     const locale = useLocale();
     const isIndo = locale === 'id';
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     const { data: fetchedJobs, mutate: mutateJobs } = useSWR('/api/jobs', fetcher);
 
@@ -451,6 +453,7 @@ export default function JobsPage() {
                             jobs={jobs}
                             totalCount={jobs.length}
                             filteredCount={filteredJobs.length}
+                            onOpenExportModal={() => setIsExportOpen(true)}
                         />
 
                         {/* ================= VIEW 1: TABLE VIEW (PRIMARY COMMAND REGISTER) ================= */}
@@ -604,6 +607,14 @@ export default function JobsPage() {
                             </div>
                         </ModalPortal>
                     )}
+
+                    {/* Universal Export Modal (CSV & JSON) */}
+                    <ExportModal
+                        isOpen={isExportOpen}
+                        onClose={() => setIsExportOpen(false)}
+                        moduleType="jobs"
+                        currentData={jobs}
+                    />
 
                 </div>
             </GatedPage>

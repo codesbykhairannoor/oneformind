@@ -65,8 +65,28 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
+		monthStr := r.URL.Query().Get("month")
+		if monthStr == "" {
+			monthStr = r.URL.Query().Get("period")
+		}
+
+		query := `SELECT id, user_id, date, title, content, mood, image_path, is_pinned, ai_sentiment, mood_score, created_at, updated_at FROM journals WHERE user_id = $1`
+		args := []interface{}{userID}
+
+		if monthStr != "" && monthStr != "all" {
+			if len(monthStr) == 4 {
+				query += ` AND TO_CHAR(date, 'YYYY') = $2`
+				args = append(args, monthStr)
+			} else {
+				query += ` AND TO_CHAR(date, 'YYYY-MM') = $2`
+				args = append(args, monthStr)
+			}
+		}
+
+		query += ` ORDER BY date DESC`
+
 		journals := []Journal{}
-		rows, err := db.Query(`SELECT id, user_id, date, title, content, mood, image_path, is_pinned, ai_sentiment, mood_score, created_at, updated_at FROM journals WHERE user_id = $1 ORDER BY date DESC`, userID)
+		rows, err := db.Query(query, args...)
 		if err == nil {
 			defer rows.Close()
 			for rows.Next() {

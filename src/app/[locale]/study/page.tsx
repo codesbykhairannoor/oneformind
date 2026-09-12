@@ -17,6 +17,7 @@ import StudyPortfolioView from './components/StudyPortfolioView';
 import { useStudyData } from './hooks/useStudyData';
 import { CourseRecord } from './components/CourseCard';
 import { Loader2 } from 'lucide-react';
+import ExportModal from '@/components/export/ExportModal';
 
 export default function StudyPage() {
     const t = useTranslations();
@@ -79,6 +80,7 @@ export default function StudyPage() {
     const [editingCourse, setEditingCourse] = useState<CourseRecord | null>(null);
     const [isAddArchiveModalOpen, setIsAddArchiveModalOpen] = useState(false);
     const [prefillArchiveTag, setPrefillArchiveTag] = useState('');
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     if (isLoading) {
         return (
@@ -117,6 +119,7 @@ export default function StudyPage() {
                                     onDeleteSpecificSemester={handleDeleteSemester}
                                     onAddSemesterClick={() => setIsAddSemesterModalOpen(true)}
                                     onAddCourseClick={() => setIsAddCourseModalOpen(true)}
+                                    onOpenExportModal={() => setIsExportOpen(true)}
                                 />
 
                                 <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -223,6 +226,14 @@ export default function StudyPage() {
                             prefillArchiveTag={prefillArchiveTag}
                             onCloseAddArchiveModal={() => setIsAddArchiveModalOpen(false)}
                             onAddArchiveSubmit={handleAddArchive}
+                        />
+
+                        {/* EXPORT STUDY DATA MODAL */}
+                        <ExportModal
+                            isOpen={isExportOpen}
+                            onClose={() => setIsExportOpen(false)}
+                            moduleType="study"
+                            currentData={allCourses}
                         />
                     </>
                 )}

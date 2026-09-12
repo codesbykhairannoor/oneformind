@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { 
     Search, LayoutGrid, Kanban, CalendarRange, 
     PieChart, X, SlidersHorizontal, ArrowUpDown, 
-    Star, Flame, Tag
+    Star, Flame, Tag, Download
 } from 'lucide-react';
 import { archetypes } from './GoalArchetypesGrid';
 
@@ -28,6 +28,7 @@ interface GoalFilterBarProps {
     totalCount: number;
     filteredCount: number;
     categoryCounts: Record<string, number>;
+    onOpenExportModal?: () => void;
 }
 
 export default function GoalFilterBar({
@@ -45,7 +46,8 @@ export default function GoalFilterBar({
     setSortBy,
     totalCount,
     filteredCount,
-    categoryCounts
+    categoryCounts,
+    onOpenExportModal
 }: GoalFilterBarProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -100,63 +102,77 @@ export default function GoalFilterBar({
                     )}
                 </div>
 
-                {/* View Switcher Tabs */}
-                <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 shrink-0 self-start lg:self-auto overflow-x-auto no-scrollbar">
-                    <button
-                        type="button"
-                        onClick={() => setViewMode('gallery')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'gallery'
-                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                        title={isIndo ? 'Galeri Kartu' : 'Gallery Cards'}
-                    >
-                        <LayoutGrid size={14} />
-                        <span>{isIndo ? 'Galeri' : 'Gallery'}</span>
-                    </button>
+                {/* View Switcher Tabs & Export */}
+                <div className="flex items-center gap-2 shrink-0 self-start lg:self-auto">
+                    <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 overflow-x-auto no-scrollbar">
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('gallery')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                viewMode === 'gallery'
+                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                            title={isIndo ? 'Galeri Kartu' : 'Gallery Cards'}
+                        >
+                            <LayoutGrid size={14} />
+                            <span>{isIndo ? 'Galeri' : 'Gallery'}</span>
+                        </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setViewMode('kanban')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'kanban'
-                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                        title={isIndo ? 'Papan Alur Kerja' : 'Kanban Pipeline'}
-                    >
-                        <Kanban size={14} />
-                        <span>Kanban</span>
-                    </button>
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('kanban')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                viewMode === 'kanban'
+                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                            title={isIndo ? 'Papan Alur Kerja' : 'Kanban Pipeline'}
+                        >
+                            <Kanban size={14} />
+                            <span>Kanban</span>
+                        </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setViewMode('timeline')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'timeline'
-                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                        title={isIndo ? 'Garis Waktu Roadmap' : 'Timeline Roadmap'}
-                    >
-                        <CalendarRange size={14} />
-                        <span>{isIndo ? 'Roadmap' : 'Roadmap'}</span>
-                    </button>
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('timeline')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                viewMode === 'timeline'
+                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                            title={isIndo ? 'Garis Waktu Roadmap' : 'Timeline Roadmap'}
+                        >
+                            <CalendarRange size={14} />
+                            <span>{isIndo ? 'Roadmap' : 'Roadmap'}</span>
+                        </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setViewMode('wheel_of_life')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'wheel_of_life'
-                                ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                        title={isIndo ? 'Keseimbangan Hidup' : 'Wheel of Life Balance'}
-                    >
-                        <PieChart size={14} />
-                        <span>{isIndo ? 'Roda Hidup' : 'Balance'}</span>
-                    </button>
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('wheel_of_life')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                viewMode === 'wheel_of_life'
+                                    ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                            title={isIndo ? 'Keseimbangan Hidup' : 'Wheel of Life Balance'}
+                        >
+                            <PieChart size={14} />
+                            <span>{isIndo ? 'Roda Hidup' : 'Balance'}</span>
+                        </button>
+                    </div>
+
+                    {onOpenExportModal && (
+                        <button
+                            type="button"
+                            onClick={onOpenExportModal}
+                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition"
+                            title={isIndo ? 'Ekspor Target & Sasaran (CSV / JSON)' : 'Export Goals (CSV / JSON)'}
+                        >
+                            <Download className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>{isIndo ? 'Ekspor' : 'Export'}</span>
+                        </button>
+                    )}
                 </div>
 
             </div>

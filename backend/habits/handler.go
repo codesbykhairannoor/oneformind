@@ -121,9 +121,14 @@ func handleGetHabits(w http.ResponseWriter, r *http.Request, userID int) {
 	
 	args := []interface{}{userID}
 	
-	if period != "" {
-		query += ` AND period = $2`
-		args = append(args, period)
+	if period != "" && period != "all" {
+		if len(period) == 4 {
+			query += ` AND period LIKE $2`
+			args = append(args, period+"-%")
+		} else {
+			query += ` AND period = $2`
+			args = append(args, period)
+		}
 	}
 	
 	query += ` ORDER BY position ASC`

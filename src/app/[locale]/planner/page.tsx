@@ -7,12 +7,14 @@ import PlannerHeader from './components/PlannerHeader';
 import PlannerSidebar from './components/PlannerSidebar';
 import PlannerTimeline from './components/PlannerTimeline';
 import PlannerModalsContainer from './components/PlannerModalsContainer';
+import ExportModal from '@/components/export/ExportModal';
 import { usePlannerState } from './hooks/usePlannerState';
 
 export default function PlannerPage() {
     usePageTitle('Planner');
     const planner = usePlannerState();
     const [mobileTab, setMobileTab] = useState<'timeline' | 'sidebar'>('timeline');
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     // Global keyboard shortcuts (T: today, N: new task, ArrowLeft/Right: date navigation)
     useEffect(() => {
@@ -76,6 +78,7 @@ export default function PlannerPage() {
                     }}
                     onOpenTaskModal={() => planner.openNewTaskModal()}
                     onResetBoard={planner.requestResetBoard}
+                    onOpenExportModal={() => setIsExportOpen(true)}
                 />
 
                 <div className="flex-1 w-full bg-slate-50/50 dark:bg-slate-950 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 transition-colors duration-500">
@@ -190,6 +193,16 @@ export default function PlannerPage() {
                     showResetConfirmModal={planner.showResetConfirmModal}
                     setShowResetConfirmModal={planner.setShowResetConfirmModal}
                     confirmResetBoard={planner.confirmResetBoard}
+                />
+
+                {/* EXPORT DATA MODAL */}
+                <ExportModal
+                    isOpen={isExportOpen}
+                    onClose={() => setIsExportOpen(false)}
+                    moduleType="planner"
+                    defaultYear={Number(planner.selectedDate.split('-')[0]) || new Date().getFullYear()}
+                    defaultMonth={Number(planner.selectedDate.split('-')[1]) || (new Date().getMonth() + 1)}
+                    currentData={planner.tasks}
                 />
             </div>
         </AuthenticatedLayout>

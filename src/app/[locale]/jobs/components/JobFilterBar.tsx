@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { 
     Search, X, Kanban, Table, Calendar, 
     BarChart3, SlidersHorizontal, ArrowUpDown, 
-    Building2, MapPin, DollarSign, Filter
+    Building2, MapPin, DollarSign, Filter, Download
 } from 'lucide-react';
 import { JobRowItem } from '../lib/jobAnalytics';
 
@@ -28,6 +28,7 @@ interface JobFilterBarProps {
     jobs: JobRowItem[];
     totalCount: number;
     filteredCount: number;
+    onOpenExportModal?: () => void;
 }
 
 export default function JobFilterBar({
@@ -38,7 +39,8 @@ export default function JobFilterBar({
     uniqueTitles = [],
     jobs = [],
     totalCount = 0,
-    filteredCount = 0
+    filteredCount = 0,
+    onOpenExportModal
 }: JobFilterBarProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -212,46 +214,60 @@ export default function JobFilterBar({
                     )}
                 </div>
 
-                {/* 3-View Switcher Tabs */}
-                <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 shrink-0 self-start lg:self-auto overflow-x-auto no-scrollbar">
-                    <button
-                        type="button"
-                        onClick={() => setViewMode('table')}
-                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'table'
-                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
-                        }`}
-                    >
-                        <Table size={14} />
-                        <span>{isIndo ? 'Daftar Lamaran' : 'Application List'}</span>
-                    </button>
+                {/* 3-View Switcher Tabs & Export */}
+                <div className="flex items-center gap-2 shrink-0 self-start lg:self-auto">
+                    <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 overflow-x-auto no-scrollbar">
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('table')}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                viewMode === 'table'
+                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                            }`}
+                        >
+                            <Table size={14} />
+                            <span>{isIndo ? 'Daftar Lamaran' : 'Application List'}</span>
+                        </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setViewMode('interviews')}
-                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'interviews'
-                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
-                        }`}
-                    >
-                        <Calendar size={14} />
-                        <span>{isIndo ? 'Jadwal Interview' : 'Interviews'}</span>
-                    </button>
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('interviews')}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                viewMode === 'interviews'
+                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                            }`}
+                        >
+                            <Calendar size={14} />
+                            <span>{isIndo ? 'Jadwal Interview' : 'Interviews'}</span>
+                        </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setViewMode('compare')}
-                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                            viewMode === 'compare'
-                                ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
-                        }`}
-                    >
-                        <BarChart3 size={14} />
-                        <span>{isIndo ? 'Komparasi Offer' : 'Offer Matrix'}</span>
-                    </button>
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('compare')}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                viewMode === 'compare'
+                                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                            }`}
+                        >
+                            <BarChart3 size={14} />
+                            <span>{isIndo ? 'Komparasi Offer' : 'Offer Matrix'}</span>
+                        </button>
+                    </div>
+
+                    {onOpenExportModal && (
+                        <button
+                            type="button"
+                            onClick={onOpenExportModal}
+                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition"
+                            title={isIndo ? 'Ekspor Data Lamaran (CSV / JSON)' : 'Export Applications (CSV / JSON)'}
+                        >
+                            <Download className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>{isIndo ? 'Ekspor' : 'Export'}</span>
+                        </button>
+                    )}
                 </div>
 
             </div>

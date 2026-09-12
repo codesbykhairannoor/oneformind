@@ -60,9 +60,14 @@ func FinanceTransactionsHandler(w http.ResponseWriter, r *http.Request) {
 		query := `SELECT id, user_id, title, amount, type, category, date, notes, created_at, updated_at FROM finance_transactions WHERE user_id = $1`
 		args := []interface{}{userID}
 
-		if monthStr != "" {
-			query += ` AND TO_CHAR(date, 'YYYY-MM') = $2`
-			args = append(args, monthStr)
+		if monthStr != "" && monthStr != "all" {
+			if len(monthStr) == 4 {
+				query += ` AND TO_CHAR(date, 'YYYY') = $2`
+				args = append(args, monthStr)
+			} else {
+				query += ` AND TO_CHAR(date, 'YYYY-MM') = $2`
+				args = append(args, monthStr)
+			}
 		}
 		
 		query += ` ORDER BY date DESC, id DESC`

@@ -15,6 +15,7 @@ import NeuralBridge from '@/components/NeuralBridge';
 import GatedPage from '@/components/GatedPage';
 import { Plus, Trash2, BookOpen, Sparkles } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
+import ExportModal from '@/components/export/ExportModal';
 
 export default function JournalIndexPage() {
     const locale = useLocale();
@@ -41,6 +42,7 @@ export default function JournalIndexPage() {
     // Delete Modal State
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [journalToDelete, setJournalToDelete] = useState<number | string | null>(null);
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -234,6 +236,7 @@ export default function JournalIndexPage() {
                         totalWords={totalWords}
                         streakDays={streakDays}
                         synergy={synergy}
+                        onOpenExportModal={() => setIsExportOpen(true)}
                     />
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -381,6 +384,14 @@ export default function JournalIndexPage() {
                         </div>
                     </ModalPortal>
                 )}
+
+                {/* EXPORT DATA MODAL */}
+                <ExportModal
+                    isOpen={isExportOpen}
+                    onClose={() => setIsExportOpen(false)}
+                    moduleType="journal"
+                    currentData={journals}
+                />
 
             </GatedPage>
         </AuthenticatedLayout>

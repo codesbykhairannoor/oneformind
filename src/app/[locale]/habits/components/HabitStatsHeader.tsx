@@ -8,7 +8,8 @@ import {
     ChevronDown,
     Volume2,
     VolumeX,
-    X
+    X,
+    Download
 } from 'lucide-react';
 import { ProcessedHabitItem } from '../types';
 
@@ -33,6 +34,7 @@ interface HabitStatsHeaderProps {
     showHint: boolean;
     setShowHint: (show: boolean) => void;
     openCreateModal: () => void;
+    openExportModal?: () => void;
 }
 
 export default function HabitStatsHeader({
@@ -55,7 +57,8 @@ export default function HabitStatsHeader({
     todayProgress,
     showHint,
     setShowHint,
-    openCreateModal
+    openCreateModal,
+    openExportModal
 }: HabitStatsHeaderProps) {
     return (
         <div className="relative z-50 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 transition-all duration-500">
@@ -265,6 +268,19 @@ export default function HabitStatsHeader({
                                 </svg>
                             </div>
                         </div>
+
+                        {/* Export Button */}
+                        {openExportModal && (
+                            <button
+                                type="button"
+                                onClick={openExportModal}
+                                title={isIndo ? 'Ekspor Data Habits (CSV/JSON)' : 'Export Habits Data (CSV/JSON)'}
+                                className="px-2.5 sm:px-3 py-2 sm:py-2.5 flex items-center gap-1.5 text-slate-700 dark:text-slate-200 rounded-xl font-bold bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 shadow-xs transition-all active:scale-95 text-xs"
+                            >
+                                <Download size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+                                <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
+                            </button>
+                        )}
 
                         {/* Add Habit Button */}
                         <button

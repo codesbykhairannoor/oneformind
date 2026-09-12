@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { 
     ChevronDown, Trash2, Plus, BookOpen, 
     Calendar, Clock, BrainCircuit, Sparkles, 
-    ExternalLink, Layers, CheckSquare, Bookmark
+    ExternalLink, Layers, CheckSquare, Bookmark, Download
 } from 'lucide-react';
 
 export type StudyActiveTab = 'courses' | 'assignments' | 'focus' | 'flashcards' | 'books' | 'portfolio';
@@ -22,6 +22,7 @@ interface AcademicHeaderProps {
     onDeleteSpecificSemester: (sem: number | string) => void;
     onAddSemesterClick: () => void;
     onAddCourseClick: () => void;
+    onOpenExportModal?: () => void;
 }
 
 export default function AcademicHeader({
@@ -34,7 +35,8 @@ export default function AcademicHeader({
     onSelectSemester,
     onDeleteSpecificSemester,
     onAddSemesterClick,
-    onAddCourseClick
+    onAddCourseClick,
+    onOpenExportModal
 }: AcademicHeaderProps) {
     const t = useTranslations();
     const locale = useLocale();
@@ -179,6 +181,19 @@ export default function AcademicHeader({
                             <Sparkles size={14} />
                             <span>{isIndo ? 'Portofolio Bento' : 'Bento Portfolio'}</span>
                         </button>
+
+                        {/* Export Button */}
+                        {onOpenExportModal && (
+                            <button
+                                type="button"
+                                onClick={onOpenExportModal}
+                                title={isIndo ? 'Ekspor Data Akademik (CSV/JSON)' : 'Export Academic Data (CSV/JSON)'}
+                                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold shadow-xs active:scale-95 transition"
+                            >
+                                <Download size={14} className="text-indigo-600 dark:text-indigo-400" />
+                                <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
+                            </button>
+                        )}
 
                         {/* Add Course Button */}
                         <button

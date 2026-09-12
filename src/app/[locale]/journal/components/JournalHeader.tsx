@@ -3,7 +3,7 @@
 import React from 'react';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import { Plus, Flame, Sparkles, BookOpen, CheckCircle2, DollarSign, Calendar } from 'lucide-react';
+import { Plus, Flame, Sparkles, BookOpen, CheckCircle2, DollarSign, Calendar, Download } from 'lucide-react';
 
 interface JournalHeaderProps {
     todayDate?: string;
@@ -16,13 +16,15 @@ interface JournalHeaderProps {
         habits_completed?: number;
         expense_total?: number;
     };
+    onOpenExportModal?: () => void;
 }
 
 export default function JournalHeader({ 
     totalJournals = 0,
     totalWords = 0,
     streakDays = 1,
-    synergy 
+    synergy,
+    onOpenExportModal
 }: JournalHeaderProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -118,6 +120,19 @@ export default function JournalHeader({
                                 </div>
                             </div>
                         </div>
+
+                        {/* Export Button */}
+                        {onOpenExportModal && (
+                            <button
+                                type="button"
+                                onClick={onOpenExportModal}
+                                title={isIndo ? 'Ekspor Data Jurnal (CSV/JSON)' : 'Export Journal Data (CSV/JSON)'}
+                                className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition-all shadow-xs"
+                            >
+                                <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
+                            </button>
+                        )}
 
                         {/* CTA: Write New Journal Button */}
                         <Link 

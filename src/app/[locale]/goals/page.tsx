@@ -22,12 +22,14 @@ import {
     calculateGlobalGoalStats 
 } from './lib/goalPaceCalculator';
 import { Target, Sparkles, Plus } from 'lucide-react';
+import ExportModal from '@/components/export/ExportModal';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function GoalsPage() {
     const locale = useLocale();
     const isIndo = locale === 'id';
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     const [currentTab, setCurrentTab] = useState<'active' | 'completed'>('active');
     const [viewMode, setViewMode] = useState<GoalViewMode>('gallery');
@@ -481,6 +483,7 @@ export default function GoalsPage() {
                             totalCount={goals.length}
                             filteredCount={filteredGoals.length}
                             categoryCounts={categoryCounts}
+                            onOpenExportModal={() => setIsExportOpen(true)}
                         />
 
                         {/* VIEW MODE RENDERER */}
@@ -587,6 +590,14 @@ export default function GoalsPage() {
                         goal={celebratingGoal}
                         isOpen={isCelebrationOpen}
                         onClose={() => setIsCelebrationOpen(false)}
+                    />
+
+                    {/* Universal Export Modal (CSV & JSON) */}
+                    <ExportModal
+                        isOpen={isExportOpen}
+                        onClose={() => setIsExportOpen(false)}
+                        moduleType="goals"
+                        currentData={goals}
                     />
 
                 </div>

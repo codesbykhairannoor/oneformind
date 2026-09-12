@@ -65,9 +65,14 @@ func PlannerTasksHandler(w http.ResponseWriter, r *http.Request) {
 		if dateStr != "" {
 			query += ` AND date = $2`
 			args = append(args, dateStr)
-		} else if monthStr != "" {
-			query += ` AND TO_CHAR(date, 'YYYY-MM') = $2`
-			args = append(args, monthStr)
+		} else if monthStr != "" && monthStr != "all" {
+			if len(monthStr) == 4 {
+				query += ` AND TO_CHAR(date, 'YYYY') = $2`
+				args = append(args, monthStr)
+			} else {
+				query += ` AND TO_CHAR(date, 'YYYY-MM') = $2`
+				args = append(args, monthStr)
+			}
 		}
 
 		query += ` ORDER BY start_time ASC, id ASC`

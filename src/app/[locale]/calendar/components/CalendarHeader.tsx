@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { 
     ChevronDown, ChevronLeft, ChevronRight, 
-    Plus, Zap, Calendar as CalendarIcon, Sparkles 
+    Plus, Zap, Calendar as CalendarIcon, Sparkles, Download 
 } from 'lucide-react';
 
 interface CalendarHeaderProps {
@@ -13,6 +13,7 @@ interface CalendarHeaderProps {
     onAddEvent: () => void;
     onOpenTaskDrawer?: () => void;
     onGoToToday?: () => void;
+    onOpenExportModal?: () => void;
 }
 
 export default function CalendarHeader({ 
@@ -20,7 +21,8 @@ export default function CalendarHeader({
     onChangeMonth, 
     onAddEvent,
     onOpenTaskDrawer,
-    onGoToToday
+    onGoToToday,
+    onOpenExportModal
 }: CalendarHeaderProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -180,6 +182,19 @@ export default function CalendarHeader({
                             >
                                 <Zap size={14} />
                                 <span className="hidden sm:inline">{isIndo ? 'Time-Block Tugas' : 'Time-Block Tasks'}</span>
+                            </button>
+                        )}
+
+                        {/* Export Button */}
+                        {onOpenExportModal && (
+                            <button
+                                type="button"
+                                onClick={onOpenExportModal}
+                                title={isIndo ? 'Ekspor Kalender (CSV/JSON)' : 'Export Calendar (CSV/JSON)'}
+                                className="px-3 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs shrink-0"
+                            >
+                                <Download size={14} className="text-indigo-600 dark:text-indigo-400" />
+                                <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
                             </button>
                         )}
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { ChevronLeft, ChevronRight, ChevronDown, Calendar, ArrowLeft, Plus, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Calendar, ArrowLeft, Plus, RotateCcw, Download } from 'lucide-react';
 import PlannerDatePicker from './PlannerDatePicker';
 
 interface PlannerHeaderProps {
@@ -13,6 +13,7 @@ interface PlannerHeaderProps {
     stats: { percent: number; completed: number; pending: number };
     onOpenTaskModal: () => void;
     onResetBoard: () => void;
+    onOpenExportModal?: () => void;
 }
 
 export default function PlannerHeader({
@@ -21,7 +22,8 @@ export default function PlannerHeader({
     tasks,
     stats,
     onOpenTaskModal,
-    onResetBoard
+    onResetBoard,
+    onOpenExportModal
 }: PlannerHeaderProps) {
     const t = useTranslations();
     const locale = useLocale();
@@ -102,8 +104,13 @@ export default function PlannerHeader({
                             </div>
                         </div>
 
-                        {/* Mobile Actions: Add + Reset */}
+                        {/* Mobile Actions: Add + Export + Reset */}
                         <div className="flex md:hidden items-center gap-1.5 shrink-0">
+                            {onOpenExportModal && (
+                                <button onClick={onOpenExportModal} title={isIndo ? 'Ekspor' : 'Export'} className="w-8 h-8 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-bold border border-slate-200 dark:border-slate-700 active:scale-95">
+                                    <Download size={14} className="text-indigo-600 dark:text-indigo-400" />
+                                </button>
+                            )}
                             <button onClick={onOpenTaskModal} className="px-3 py-1.5 bg-indigo-600 text-white rounded-xl font-black hover:bg-indigo-700 transition shadow-sm flex items-center justify-center gap-1 text-xs active:scale-95">
                                 <Plus size={14} strokeWidth={3} /> <span>{isIndo ? 'Tambah' : 'Add'}</span>
                             </button>
@@ -138,6 +145,16 @@ export default function PlannerHeader({
 
                     {/* Desktop Actions */}
                     <div className="hidden md:flex gap-2.5 items-center shrink-0">
+                        {onOpenExportModal && (
+                            <button 
+                                onClick={onOpenExportModal} 
+                                title={isIndo ? 'Ekspor Data Planner (CSV/JSON)' : 'Export Planner Data (CSV/JSON)'} 
+                                className="px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-2xl font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 text-xs active:scale-95 shadow-xs"
+                            >
+                                <Download size={15} className="text-indigo-600 dark:text-indigo-400" />
+                                <span>{isIndo ? 'Ekspor' : 'Export'}</span>
+                            </button>
+                        )}
                         <button onClick={onOpenTaskModal} className="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 text-xs active:scale-95">
                             <Plus size={16} strokeWidth={3} /> {isIndo ? 'Tambah' : 'Add Task'}
                         </button>

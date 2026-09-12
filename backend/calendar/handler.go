@@ -116,13 +116,20 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 		startDate := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC)
 		endDate := startDate.AddDate(0, 1, -1).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 
-		if period != "" {
+		if period == "all" {
+			startDate = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+			endDate = time.Date(2099, 12, 31, 23, 59, 59, 0, time.UTC)
+		} else if period != "" {
 			parts := strings.Split(period, "-")
 			if len(parts) == 2 {
 				y, _ := strconv.Atoi(parts[0])
 				m, _ := strconv.Atoi(parts[1])
 				startDate = time.Date(y, time.Month(m), 1, 0, 0, 0, 0, time.UTC)
 				endDate = startDate.AddDate(0, 1, -1).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+			} else if len(period) == 4 {
+				y, _ := strconv.Atoi(period)
+				startDate = time.Date(y, 1, 1, 0, 0, 0, 0, time.UTC)
+				endDate = time.Date(y, 12, 31, 23, 59, 59, 0, time.UTC)
 			}
 		}
 

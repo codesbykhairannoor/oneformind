@@ -21,6 +21,7 @@ import HabitNumericPopover from './components/HabitNumericPopover';
 import HabitBottomMetrics from './components/HabitBottomMetrics';
 import HabitsModalsContainer from './components/HabitsModalsContainer';
 import HabitEmptyState from './components/HabitEmptyState';
+import ExportModal from '@/components/export/ExportModal';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -68,6 +69,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
 
     // Persistent display mode for quantitative habits (Angka vs Persentase)
     const [numericViewMode, setNumericViewMode] = useState<'value' | 'percent'>('value');
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -160,6 +162,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     showHint={period.showHint}
                     setShowHint={period.setShowHint}
                     openCreateModal={form.openCreateModal}
+                    openExportModal={() => setIsExportOpen(true)}
                 />
 
                 <main className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
@@ -275,6 +278,16 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     onSaveNote={actions.handleSaveNote}
                     onSubmitSingleHabit={actions.submitSingleHabit}
                     onExecuteDelete={actions.executeDelete}
+                />
+
+                {/* EXPORT DATA MODAL */}
+                <ExportModal
+                    isOpen={isExportOpen}
+                    onClose={() => setIsExportOpen(false)}
+                    moduleType="habits"
+                    defaultYear={period.selectedYear}
+                    defaultMonth={period.selectedMonthIndex + 1}
+                    currentData={habits}
                 />
             </div>
         </AuthenticatedLayout>
