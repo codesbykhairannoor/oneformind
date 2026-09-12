@@ -17,6 +17,7 @@ interface CalendarDayDetailProps {
     milestones: any[];
     plannerTasks: any[];
     habitCount: number;
+    completedHabits?: any[];
     financeExpense: number;
     onClose: () => void;
     onAddEvent: () => void;
@@ -32,6 +33,7 @@ export default function CalendarDayDetail({
     milestones,
     plannerTasks,
     habitCount,
+    completedHabits = [],
     financeExpense,
     onClose,
     onAddEvent,
@@ -265,6 +267,34 @@ export default function CalendarDayDetail({
                                 </p>
                             </div>
                         </div>
+
+                        {/* Section 5: List of Completed Habits */}
+                        {completedHabits && completedHabits.length > 0 && (
+                            <div className="space-y-2 pt-1">
+                                <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                    <Leaf size={13} className="text-emerald-500" />
+                                    <span>{isIndo ? 'Kebiasaan Tuntas Hari Ini' : 'Completed Habits Today'}</span>
+                                </span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {completedHabits.map((h: any, idx: number) => (
+                                        <div 
+                                            key={h.id || idx}
+                                            className="px-3 py-2 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/30 flex items-center justify-between gap-2"
+                                        >
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <span className="text-base shrink-0">{h.icon || '🌱'}</span>
+                                                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
+                                                    {h.name}
+                                                </span>
+                                            </div>
+                                            <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800/50 shrink-0">
+                                                ✓ {isIndo ? 'Selesai' : 'Done'}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                     </div>
                 </div>

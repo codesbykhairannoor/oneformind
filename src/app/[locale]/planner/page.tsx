@@ -123,6 +123,7 @@ export default function PlannerPage() {
                             mobileTab === 'sidebar' ? 'block pb-24' : 'hidden lg:block'
                         }`}>
                             <PlannerSidebar 
+                                selectedDate={planner.selectedDate}
                                 notes={planner.notes} 
                                 setNotes={planner.handleSetNotes}
                                 meals={planner.meals} 

@@ -375,7 +375,8 @@ export default function CalendarPage() {
     const selectedDayInterviews = jobInterviews.filter(j => j.date === selectedDate);
     const selectedDayMilestones = milestones.filter(m => m.date === selectedDate);
     const selectedDayPlanner = plannerTasks.filter(p => p.date?.startsWith(selectedDate));
-    const selectedDayHabits = habitLogs.filter(h => h.date?.startsWith(selectedDate)).length;
+    const selectedDayHabitLogs = habitLogs.filter(h => h.date?.startsWith(selectedDate));
+    const selectedDayHabits = selectedDayHabitLogs.length;
     const selectedDayFinance = financeTransactions
         .filter(f => f.date?.startsWith(selectedDate) && f.type === 'expense')
         .reduce((sum, f) => sum + Number(f.amount || 0), 0);
@@ -481,6 +482,7 @@ export default function CalendarPage() {
                             milestones={selectedDayMilestones}
                             plannerTasks={selectedDayPlanner}
                             habitCount={selectedDayHabits}
+                            completedHabits={selectedDayHabitLogs}
                             financeExpense={selectedDayFinance}
                             onClose={() => setIsDetailModalOpen(false)}
                             onAddEvent={() => handleOpenEventModal(selectedDate)}

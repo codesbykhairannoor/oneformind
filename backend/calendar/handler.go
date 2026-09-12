@@ -67,6 +67,9 @@ type HabitLog struct {
 	HabitID int       `json:"habitId"`
 	Date    time.Time `json:"date"`
 	Status  string    `json:"status"`
+	Name    string    `json:"name"`
+	Icon    string    `json:"icon"`
+	Color   string    `json:"color"`
 }
 
 func CalendarHandler(w http.ResponseWriter, r *http.Request) {
@@ -204,12 +207,12 @@ func CalendarHandler(w http.ResponseWriter, r *http.Request) {
 
 		// HabitLogs
 		habitLogs := []HabitLog{}
-		hRows, err := db.Query(`SELECT hl.id, hl.habit_id, hl.date, hl.status FROM habit_logs hl JOIN habits h ON hl.habit_id = h.id WHERE h.user_id = $1 AND hl.date >= $2 AND hl.date <= $3 AND hl.status = 'completed'`, userID, startDate, endDate)
+		hRows, err := db.Query(`SELECT hl.id, hl.habit_id, hl.date, hl.status, h.name, COALESCE(h.icon, '🌱'), COALESCE(h.color, '#10b981') FROM habit_logs hl JOIN habits h ON hl.habit_id = h.id WHERE h.user_id = $1 AND hl.date >= $2 AND hl.date <= $3 AND hl.status = 'completed'`, userID, startDate, endDate)
 		if err == nil {
 			defer hRows.Close()
 			for hRows.Next() {
 				var hl HabitLog
-				err := hRows.Scan(&hl.ID, &hl.HabitID, &hl.Date, &hl.Status)
+				err := hRows.Scan(&hl.ID, &hl.HabitID, &hl.Date, &hl.Status, &hl.Name, &hl.Icon, &hl.Color)
 				if err == nil {
 					habitLogs = append(habitLogs, hl)
 				}
