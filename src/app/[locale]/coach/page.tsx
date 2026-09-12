@@ -199,19 +199,6 @@ export default function CoachPage() {
         target.style.height = Math.min(target.scrollHeight, 180) + 'px';
     };
 
-    const handleKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    };
-
-    const editMessage = (index: number) => {
-        setEditingIndex(index);
-        setNewMessage(messages[index].content);
-        if (textareaRef.current) textareaRef.current.focus();
-    };
-
     const sendMessage = () => {
         if ((!newMessage.trim() && !imagePreview) || isLoading) return;
 
@@ -267,6 +254,19 @@ export default function CoachPage() {
 
             scrollToBottom();
         }, 1200);
+    };
+
+    const editMessage = (index: number) => {
+        setEditingIndex(index);
+        setNewMessage(messages[index].content);
+        if (textareaRef.current) textareaRef.current.focus();
+    };
+
+    const handleKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     };
 
     if (isGatingLoading) {

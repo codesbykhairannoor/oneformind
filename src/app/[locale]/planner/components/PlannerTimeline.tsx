@@ -5,11 +5,38 @@ import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X, Leaf } from 'lucide-react';
 import { TaskItem } from '../types';
+import { normalizeDate } from '../utils/plannerMath';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const VIEW_LIMIT = 24;
 const TIME_COL_WIDTH = 76;
+
+const parseTimeMinutes = (timeStr: any): number => {
+    if (!timeStr) return 0;
+    const clean = String(timeStr).trim();
+    let timePart = clean;
+    if (clean.includes('T')) {
+        timePart = clean.split('T')[1];
+    }
+    const parts = timePart.split(':');
+    const h = parseInt(parts[0] || '0', 10);
+    const m = parseInt(parts[1] || '0', 10);
+    return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m);
+};
+
+const formatDisplayTime = (timeStr: any): string => {
+    if (!timeStr) return '';
+    const clean = String(timeStr).trim();
+    let timePart = clean;
+    if (clean.includes('T')) {
+        timePart = clean.split('T')[1];
+    }
+    const parts = timePart.split(':');
+    const h = String(parseInt(parts[0] || '0', 10)).padStart(2, '0');
+    const m = String(parseInt(parts[1] || '0', 10)).padStart(2, '0');
+    return `${h}:${m}`;
+};
 
 interface PlannerTimelineProps {
     tasks: any[];
@@ -184,37 +211,6 @@ export default function PlannerTimeline({
         if (!isNaN(taskId)) {
             onMoveTask(taskId, newStartTime);
         }
-    };
-
-    const normalizeDate = (d: any) => {
-        if (!d) return '';
-        return String(d).split('T')[0];
-    };
-
-    const parseTimeMinutes = (timeStr: any): number => {
-        if (!timeStr) return 0;
-        const clean = String(timeStr).trim();
-        let timePart = clean;
-        if (clean.includes('T')) {
-            timePart = clean.split('T')[1];
-        }
-        const parts = timePart.split(':');
-        const h = parseInt(parts[0] || '0', 10);
-        const m = parseInt(parts[1] || '0', 10);
-        return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m);
-    };
-
-    const formatDisplayTime = (timeStr: any): string => {
-        if (!timeStr) return '';
-        const clean = String(timeStr).trim();
-        let timePart = clean;
-        if (clean.includes('T')) {
-            timePart = clean.split('T')[1];
-        }
-        const parts = timePart.split(':');
-        const h = String(parseInt(parts[0] || '0', 10)).padStart(2, '0');
-        const m = String(parseInt(parts[1] || '0', 10)).padStart(2, '0');
-        return `${h}:${m}`;
     };
 
     // Helpers

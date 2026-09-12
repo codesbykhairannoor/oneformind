@@ -95,6 +95,22 @@ export default function BookTracker({
         saveBooks(updated);
     };
 
+    const resetForm = () => {
+        setFormData({
+            title: '',
+            author: '',
+            category: 'tech',
+            status: 'reading',
+            total_pages: 300,
+            current_page: 0,
+            cover_color: COVER_GRADIENTS[Math.floor(Math.random() * COVER_GRADIENTS.length)],
+            cover_url: '',
+            linked_course_name: '',
+            summary_notes: '',
+            rating: 5
+        });
+    };
+
     const handleSaveBook = (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.title.trim()) return;
@@ -137,22 +153,6 @@ export default function BookTracker({
 
         setIsAddModalOpen(false);
         resetForm();
-    };
-
-    const resetForm = () => {
-        setFormData({
-            title: '',
-            author: '',
-            category: 'tech',
-            status: 'reading',
-            total_pages: 300,
-            current_page: 0,
-            cover_color: COVER_GRADIENTS[Math.floor(Math.random() * COVER_GRADIENTS.length)],
-            cover_url: '',
-            linked_course_name: '',
-            summary_notes: '',
-            rating: 5
-        });
     };
 
     const handleOpenEdit = (book: BookItem) => {
