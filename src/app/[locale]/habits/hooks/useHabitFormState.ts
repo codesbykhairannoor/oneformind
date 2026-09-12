@@ -18,6 +18,10 @@ export function useHabitFormState(daysInCurrentMonth: number) {
     const [formFreqType, setFormFreqType] = useState<'daily' | 'weekly_days'>('daily');
     const [formFreqDays, setFormFreqDays] = useState<number[]>([1, 2, 3, 4, 5]);
     const [formTimeOfDay, setFormTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'anytime'>('morning');
+    const [formStartTime, setFormStartTime] = useState<string>('');
+    const [formEndTime, setFormEndTime] = useState<string>('');
+    const [formStartDate, setFormStartDate] = useState<string>('');
+    const [formEndDate, setFormEndDate] = useState<string>('');
     // Systemic Life OS Cross-Module Fields
     const [formGoalId, setFormGoalId] = useState<string | number | undefined>(undefined);
     const [formGoalTitle, setFormGoalTitle] = useState<string>('');
@@ -61,6 +65,10 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormFreqType('daily');
         setFormFreqDays([1, 2, 3, 4, 5]);
         setFormTimeOfDay('morning');
+        setFormStartTime('');
+        setFormEndTime('');
+        setFormStartDate('');
+        setFormEndDate('');
         setFormGoalId(undefined);
         setFormGoalTitle('');
         setFormAnchorCue('');
@@ -84,6 +92,10 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormFreqType((habit.frequencyType as any) || 'daily');
         setFormFreqDays(habit.frequencyDays || [1, 2, 3, 4, 5]);
         setFormTimeOfDay(habit.timeOfDay || 'morning');
+        setFormStartTime(habit.startTime || '');
+        setFormEndTime(habit.endTime || '');
+        setFormStartDate(habit.startDate || '');
+        setFormEndDate(habit.endDate || '');
         setFormGoalId(habit.goalId);
         setFormGoalTitle(habit.goalTitle || '');
         setFormAnchorCue(habit.anchorCue || '');
@@ -126,6 +138,14 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormFreqDays,
         formTimeOfDay,
         setFormTimeOfDay,
+        formStartTime,
+        setFormStartTime,
+        formEndTime,
+        setFormEndTime,
+        formStartDate,
+        setFormStartDate,
+        formEndDate,
+        setFormEndDate,
         formGoalId,
         setFormGoalId,
         formGoalTitle,

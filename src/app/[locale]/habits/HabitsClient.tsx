@@ -114,6 +114,10 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         formFreqType: form.formFreqType,
         formFreqDays: form.formFreqDays,
         formTimeOfDay: form.formTimeOfDay,
+        formStartTime: form.formStartTime,
+        formEndTime: form.formEndTime,
+        formStartDate: form.formStartDate,
+        formEndDate: form.formEndDate,
         formGoalId: form.formGoalId,
         formGoalTitle: form.formGoalTitle,
         formAnchorCue: form.formAnchorCue,
@@ -281,6 +285,14 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setFormFreqDays={form.setFormFreqDays}
                     formTimeOfDay={form.formTimeOfDay}
                     setFormTimeOfDay={form.setFormTimeOfDay}
+                    formStartTime={form.formStartTime}
+                    setFormStartTime={form.setFormStartTime}
+                    formEndTime={form.formEndTime}
+                    setFormEndTime={form.setFormEndTime}
+                    formStartDate={form.formStartDate}
+                    setFormStartDate={form.setFormStartDate}
+                    formEndDate={form.formEndDate}
+                    setFormEndDate={form.setFormEndDate}
                     formGoalId={form.formGoalId}
                     setFormGoalId={form.setFormGoalId}
                     formGoalTitle={form.formGoalTitle}

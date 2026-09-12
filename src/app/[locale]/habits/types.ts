@@ -17,6 +17,10 @@ export interface HabitItem {
     frequencyDays?: number[]; // [0, 1, 2, 3, 4, 5, 6] where 0=Sun, 1=Mon, ...
     frequencyCount?: number;
     timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
+    startTime?: string; // e.g. "20:00"
+    endTime?: string; // e.g. "20:45"
+    startDate?: string; // e.g. "2026-09-01"
+    endDate?: string; // e.g. "2026-12-31" or undefined for forever
     // Systemic Life OS Cross-Domain Fields
     goalId?: number | string;
     goalTitle?: string;

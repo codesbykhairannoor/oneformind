@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, Leaf, Zap, Anchor } from 'lucide-react';
+import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 import { InboxTask } from '../types';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -62,6 +63,9 @@ export default function PlannerSidebar({
 
     const todayHabits = useMemo(() => {
         if (!rawHabits || !Array.isArray(rawHabits)) return [];
+        const dateObj = new Date(activeDate);
+        const dayOfWeek = isNaN(dateObj.getTime()) ? new Date().getDay() : dateObj.getDay();
+
         return rawHabits.map((h: any) => {
             let meta: any = {};
             if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
@@ -69,6 +73,21 @@ export default function PlannerSidebar({
             } else if (h.status && typeof h.status === 'object') {
                 meta = h.status;
             }
+
+            // Respect chosen synced tabs
+            if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('planner')) {
+                return null;
+            }
+
+            // Date Range Check
+            if (meta.startDate && activeDate < meta.startDate) return null;
+            if (meta.endDate && activeDate > meta.endDate) return null;
+
+            // Weekday Frequency Check
+            const frequencyType = meta.frequencyType || 'daily';
+            const frequencyDays = Array.isArray(meta.frequencyDays) ? meta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
+            const isScheduledToday = frequencyType === 'daily' || frequencyDays.includes(dayOfWeek);
+            if (!isScheduledToday) return null;
 
             const isDone = (h.logs || []).some((l: any) => l.date?.startsWith(activeDate) && l.status === 'completed');
             return {
@@ -82,18 +101,24 @@ export default function PlannerSidebar({
                 timeOfDay: meta.timeOfDay || 'anytime',
                 goalTitle: meta.goalTitle || ''
             };
-        });
+        }).filter(Boolean);
     }, [rawHabits, activeDate]);
 
     const filteredTodayHabits = useMemo(() => {
         if (anchorFilter === 'all') return todayHabits;
-        return todayHabits.filter(h => h.timeOfDay === anchorFilter || h.timeOfDay === 'anytime');
+        return todayHabits.filter((h: any) => h.timeOfDay === anchorFilter || h.timeOfDay === 'anytime');
     }, [todayHabits, anchorFilter]);
 
-    const completedHabitsCount = todayHabits.filter(h => h.isCompleted).length;
+    const completedHabitsCount = todayHabits.filter((h: any) => h.isCompleted).length;
 
     const handleToggleHabit = async (habitId: number, isCurrentlyCompleted: boolean) => {
         const nextStatus = isCurrentlyCompleted ? 'empty' : 'completed';
+        if (nextStatus === 'completed') {
+            playCheckSound();
+        } else {
+            playUncheckSound();
+        }
+
         mutateHabits((prev: any) => {
             if (!Array.isArray(prev)) return prev;
             return prev.map((h: any) => {

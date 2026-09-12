@@ -23,6 +23,10 @@ interface UseHabitActionsParams {
     formFreqType: 'daily' | 'weekly_days';
     formFreqDays: number[];
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
+    formStartTime?: string;
+    formEndTime?: string;
+    formStartDate?: string;
+    formEndDate?: string;
     formGoalId?: string | number;
     formGoalTitle?: string;
     formAnchorCue?: string;
@@ -56,6 +60,10 @@ export function useHabitActions({
     formFreqType,
     formFreqDays,
     formTimeOfDay,
+    formStartTime,
+    formEndTime,
+    formStartDate,
+    formEndDate,
     formGoalId,
     formGoalTitle,
     formAnchorCue,
@@ -267,6 +275,10 @@ export function useHabitActions({
             frequencyType: formFreqType,
             frequencyDays: formFreqDays,
             timeOfDay: formTimeOfDay,
+            startTime: formStartTime || undefined,
+            endTime: formEndTime || undefined,
+            startDate: formStartDate || undefined,
+            endDate: formEndDate || undefined,
             goalId: formGoalId,
             goalTitle: formGoalTitle,
             anchorCue: formAnchorCue,
@@ -293,6 +305,10 @@ export function useHabitActions({
                     frequencyType: formFreqType,
                     frequencyDays: formFreqDays,
                     timeOfDay: formTimeOfDay,
+                    startTime: formStartTime || undefined,
+                    endTime: formEndTime || undefined,
+                    startDate: formStartDate || undefined,
+                    endDate: formEndDate || undefined,
                     goalId: formGoalId,
                     goalTitle: formGoalTitle,
                     anchorCue: formAnchorCue,
@@ -331,6 +347,10 @@ export function useHabitActions({
                     frequencyType: formFreqType,
                     frequencyDays: formFreqDays,
                     timeOfDay: formTimeOfDay,
+                    startTime: formStartTime || undefined,
+                    endTime: formEndTime || undefined,
+                    startDate: formStartDate || undefined,
+                    endDate: formEndDate || undefined,
                     goalId: formGoalId,
                     goalTitle: formGoalTitle,
                     anchorCue: formAnchorCue,

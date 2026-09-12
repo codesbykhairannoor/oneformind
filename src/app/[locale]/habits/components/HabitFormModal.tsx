@@ -40,6 +40,14 @@ interface HabitFormModalProps {
     setFormFreqDays: (v: number[]) => void;
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
     setFormTimeOfDay: (v: 'morning' | 'afternoon' | 'evening' | 'anytime') => void;
+    formStartTime?: string;
+    setFormStartTime?: (v: string) => void;
+    formEndTime?: string;
+    setFormEndTime?: (v: string) => void;
+    formStartDate?: string;
+    setFormStartDate?: (v: string) => void;
+    formEndDate?: string;
+    setFormEndDate?: (v: string) => void;
     formGoalId?: string | number;
     setFormGoalId: (v: string | number | undefined) => void;
     formGoalTitle?: string;
@@ -92,6 +100,14 @@ export default function HabitFormModal({
     setFormFreqDays,
     formTimeOfDay,
     setFormTimeOfDay,
+    formStartTime,
+    setFormStartTime,
+    formEndTime,
+    setFormEndTime,
+    formStartDate,
+    setFormStartDate,
+    formEndDate,
+    setFormEndDate,
     formGoalId,
     setFormGoalId,
     formGoalTitle,
@@ -276,6 +292,14 @@ export default function HabitFormModal({
                             setFormFreqDays={setFormFreqDays}
                             formTimeOfDay={formTimeOfDay}
                             setFormTimeOfDay={setFormTimeOfDay}
+                            formStartTime={formStartTime}
+                            setFormStartTime={setFormStartTime}
+                            formEndTime={formEndTime}
+                            setFormEndTime={setFormEndTime}
+                            formStartDate={formStartDate}
+                            setFormStartDate={setFormStartDate}
+                            formEndDate={formEndDate}
+                            setFormEndDate={setFormEndDate}
                             formGoalId={formGoalId}
                             setFormGoalId={setFormGoalId}
                             formGoalTitle={formGoalTitle}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { ChevronLeft, ChevronRight, ChevronDown, Calendar, ArrowLeft, Plus, RotateCcw, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Calendar, ArrowLeft, Plus, RotateCcw, Download, Sparkles } from 'lucide-react';
 import PlannerDatePicker from './PlannerDatePicker';
 
 interface PlannerHeaderProps {
@@ -12,6 +12,7 @@ interface PlannerHeaderProps {
     tasks: any[];
     stats: { percent: number; completed: number; pending: number };
     onOpenTaskModal: () => void;
+    onOpenRoutineModal?: () => void;
     onResetBoard: () => void;
     onOpenExportModal?: () => void;
 }
@@ -22,6 +23,7 @@ export default function PlannerHeader({
     tasks,
     stats,
     onOpenTaskModal,
+    onOpenRoutineModal,
     onResetBoard,
     onOpenExportModal
 }: PlannerHeaderProps) {
@@ -104,15 +106,20 @@ export default function PlannerHeader({
                             </div>
                         </div>
 
-                        {/* Mobile Actions: Add + Export + Reset */}
+                        {/* Mobile Actions: Routine + Add + Export + Reset */}
                         <div className="flex md:hidden items-center gap-1.5 shrink-0">
+                            {onOpenRoutineModal && (
+                                <button onClick={onOpenRoutineModal} title={isIndo ? 'Tambah Rutinitas' : 'Add Routine'} className="w-8 h-8 flex items-center justify-center bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl font-bold border border-emerald-200 dark:border-emerald-500/20 active:scale-95">
+                                    <Sparkles size={14} />
+                                </button>
+                            )}
                             {onOpenExportModal && (
                                 <button onClick={onOpenExportModal} title={isIndo ? 'Ekspor' : 'Export'} className="w-8 h-8 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-bold border border-slate-200 dark:border-slate-700 active:scale-95">
                                     <Download size={14} className="text-indigo-600 dark:text-indigo-400" />
                                 </button>
                             )}
                             <button onClick={onOpenTaskModal} className="px-3 py-1.5 bg-indigo-600 text-white rounded-xl font-black hover:bg-indigo-700 transition shadow-sm flex items-center justify-center gap-1 text-xs active:scale-95">
-                                <Plus size={14} strokeWidth={3} /> <span>{isIndo ? 'Tambah' : 'Add'}</span>
+                                <Plus size={14} strokeWidth={3} /> <span>{isIndo ? 'Tugas' : 'Task'}</span>
                             </button>
                             <button onClick={onResetBoard} title={isIndo ? "Kosongkan jadwal hari ini" : "Clear today's schedule"} className="w-8 h-8 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95">
                                 <RotateCcw size={14} strokeWidth={2.5} />
@@ -155,8 +162,17 @@ export default function PlannerHeader({
                                 <span>{isIndo ? 'Ekspor' : 'Export'}</span>
                             </button>
                         )}
+                        {onOpenRoutineModal && (
+                            <button 
+                                onClick={onOpenRoutineModal} 
+                                title={isIndo ? 'Jadwalkan Rutinitas & Habit dengan Jam dan Hari' : 'Schedule Routine with Hours and Days'}
+                                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 text-xs active:scale-95"
+                            >
+                                <Sparkles size={15} /> <span>{isIndo ? 'Jadwal Rutin' : 'Add Routine'}</span>
+                            </button>
+                        )}
                         <button onClick={onOpenTaskModal} className="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 text-xs active:scale-95">
-                            <Plus size={16} strokeWidth={3} /> {isIndo ? 'Tambah' : 'Add Task'}
+                            <Plus size={16} strokeWidth={3} /> {isIndo ? 'Tambah Tugas' : 'Add Task'}
                         </button>
                         <button onClick={onResetBoard} title={isIndo ? "Kosongkan jadwal hari ini" : "Clear today's schedule"} className="w-10 h-10 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-2xl font-black hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-sm dark:shadow-none">
                             <RotateCcw size={16} strokeWidth={2.5} />

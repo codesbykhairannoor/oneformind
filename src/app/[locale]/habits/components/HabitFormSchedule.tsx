@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import { calculateScheduledDays } from '../utils/habitMath';
-import { Target, Anchor, Zap, Coins, Sparkles, Calendar, CheckSquare, BookOpen, Briefcase, Dumbbell, BookMarked } from 'lucide-react';
+import { Target, Anchor, Zap, Coins, Sparkles, Calendar, CheckSquare, BookOpen, Briefcase, Dumbbell, BookMarked, Clock } from 'lucide-react';
 import { LifeOSTab } from '../types';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -23,6 +23,14 @@ interface HabitFormScheduleProps {
     setFormFreqDays: (v: number[]) => void;
     formTimeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
     setFormTimeOfDay: (v: 'morning' | 'afternoon' | 'evening' | 'anytime') => void;
+    formStartTime?: string;
+    setFormStartTime?: (v: string) => void;
+    formEndTime?: string;
+    setFormEndTime?: (v: string) => void;
+    formStartDate?: string;
+    setFormStartDate?: (v: string) => void;
+    formEndDate?: string;
+    setFormEndDate?: (v: string) => void;
     formGoalId?: string | number;
     setFormGoalId: (v: string | number | undefined) => void;
     formGoalTitle?: string;
@@ -54,6 +62,14 @@ export default function HabitFormSchedule({
     setFormFreqDays,
     formTimeOfDay,
     setFormTimeOfDay,
+    formStartTime = '',
+    setFormStartTime,
+    formEndTime = '',
+    setFormEndTime,
+    formStartDate = '',
+    setFormStartDate,
+    formEndDate = '',
+    setFormEndDate,
     formGoalId,
     setFormGoalId,
     formGoalTitle,
@@ -199,11 +215,17 @@ export default function HabitFormSchedule({
                 </div>
             </div>
 
-            {/* SECTION 6: WAKTU PELAKSANAAN */}
-            <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
-                    7. {isIndo ? 'Waktu Pelaksanaan' : 'Time of Day'}
-                </label>
+            {/* SECTION 6: WAKTU PELAKSANAAN & PLOT TIMELINE PLANNER */}
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+                        7. {isIndo ? 'Waktu Pelaksanaan & Jadwal Timeline' : 'Time & Timeline Schedule'}
+                    </label>
+                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                        {formStartTime ? (formEndTime ? `${formStartTime} - ${formEndTime}` : formStartTime) : (isIndo ? 'Fleksibel' : 'Flexible')}
+                    </span>
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
                         { code: 'morning', label: '🌅 Pagi', desc: '05:00 - 11:00' },
@@ -225,6 +247,169 @@ export default function HabitFormSchedule({
                             <span className="text-[9px] font-medium text-slate-400">{t.desc}</span>
                         </button>
                     ))}
+                </div>
+
+                {/* EXACT TIME PICKER FOR PLANNER TIMELINE */}
+                <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border-2 border-indigo-100 dark:border-indigo-900/40 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <Clock size={13} className="text-indigo-600 dark:text-indigo-400" />
+                            <span>{isIndo ? 'Jam Spesifik di Timeline Planner (Opsional):' : 'Specific Hour in Planner Timeline (Optional):'}</span>
+                        </span>
+                        {formStartTime && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (setFormStartTime) setFormStartTime('');
+                                    if (setFormEndTime) setFormEndTime('');
+                                }}
+                                className="text-[10px] font-bold text-rose-500 hover:underline"
+                            >
+                                {isIndo ? 'Hapus Jam' : 'Clear Time'}
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label className="text-[9px] font-bold text-slate-400 block mb-1">
+                                {isIndo ? 'Jam Mulai' : 'Start Time'}
+                            </label>
+                            <input
+                                type="time"
+                                value={formStartTime || ''}
+                                onChange={(e) => {
+                                    const startVal = e.target.value;
+                                    if (setFormStartTime) setFormStartTime(startVal);
+                                    if (startVal && !formEndTime && setFormEndTime) {
+                                        const [h, m] = startVal.split(':').map(Number);
+                                        const endTotal = h * 60 + m + 30;
+                                        const endH = String(Math.floor(endTotal / 60) % 24).padStart(2, '0');
+                                        const endM = String(endTotal % 60).padStart(2, '0');
+                                        setFormEndTime(`${endH}:${endM}`);
+                                    }
+                                }}
+                                className="w-full text-xs font-mono font-bold py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-[9px] font-bold text-slate-400 block mb-1">
+                                {isIndo ? 'Jam Selesai' : 'End Time'}
+                            </label>
+                            <input
+                                type="time"
+                                value={formEndTime || ''}
+                                onChange={(e) => setFormEndTime && setFormEndTime(e.target.value)}
+                                className="w-full text-xs font-mono font-bold py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Quick Duration Shortcuts */}
+                    {formStartTime && (
+                        <div className="flex items-center gap-1.5 pt-1">
+                            <span className="text-[9px] font-bold text-slate-400 shrink-0">{isIndo ? 'Durasi Cepat:' : 'Quick Duration:'}</span>
+                            {[15, 30, 45, 60].map(mins => (
+                                <button
+                                    key={mins}
+                                    type="button"
+                                    onClick={() => {
+                                        if (!formStartTime || !setFormEndTime) return;
+                                        const [h, m] = formStartTime.split(':').map(Number);
+                                        const total = h * 60 + m + mins;
+                                        const endH = String(Math.floor(total / 60) % 24).padStart(2, '0');
+                                        const endM = String(total % 60).padStart(2, '0');
+                                        setFormEndTime(`${endH}:${endM}`);
+                                    }}
+                                    className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[10px] font-black hover:bg-indigo-100 transition"
+                                >
+                                    +{mins}m
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 bg-indigo-50/50 dark:bg-indigo-950/20 p-2 rounded-xl border border-indigo-100/60 dark:border-indigo-900/30">
+                        ⚡ {isIndo 
+                            ? 'Jika diisi, rutinitas ini otomatis muncul langsung pada grid jam Planner Timeline sesuai jadwal harinya!' 
+                            : 'If set, this routine will be plotted directly onto the Planner Timeline grid at these exact hours!'}
+                    </p>
+                </div>
+
+                {/* HORIZON / SAMPAI KAPAN */}
+                <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <Calendar size={13} className="text-emerald-500" />
+                            <span>{isIndo ? 'Sampai Kapan (Rentang Tanggal Pelaksanaan):' : 'Schedule Horizon (Active Date Range):'}</span>
+                        </label>
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                            {formEndDate ? (isIndo ? `Sampai ${formEndDate}` : `Until ${formEndDate}`) : (isIndo ? 'Seterusnya' : 'Indefinitely')}
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        {[
+                            { key: 'forever', label: isIndo ? 'Seterusnya' : 'Forever', desc: isIndo ? 'Tanpa batas' : 'No end date', getEndDate: () => '' },
+                            { 
+                                key: 'month_end', 
+                                label: isIndo ? 'Akhir Bulan' : 'End of Month', 
+                                desc: `${monthNames[selectedMonthIndex]} ${selectedYear}`, 
+                                getEndDate: () => {
+                                    const lastDay = new Date(selectedYear, selectedMonthIndex + 1, 0).getDate();
+                                    return `${selectedYear}-${String(selectedMonthIndex + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+                                }
+                            },
+                            { 
+                                key: '3_months', 
+                                label: isIndo ? '3 Bulan' : '3 Months', 
+                                desc: '+90 hari', 
+                                getEndDate: () => {
+                                    const d = new Date();
+                                    d.setDate(d.getDate() + 90);
+                                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                                }
+                            },
+                            { 
+                                key: 'custom', 
+                                label: isIndo ? 'Pilih Tanggal' : 'Pick Date', 
+                                desc: formEndDate || (isIndo ? 'Kalender' : 'Calendar'), 
+                                getEndDate: () => formEndDate || new Date().toISOString().split('T')[0]
+                            }
+                        ].map(opt => {
+                            const isSelected = opt.key === 'forever' ? !formEndDate : (opt.key === 'custom' ? !!formEndDate : formEndDate === opt.getEndDate());
+                            return (
+                                <button
+                                    key={opt.key}
+                                    type="button"
+                                    onClick={() => {
+                                        if (setFormEndDate) setFormEndDate(opt.getEndDate());
+                                    }}
+                                    className={`p-2 rounded-xl border text-left transition-all ${
+                                        isSelected
+                                            ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 text-emerald-800 dark:text-emerald-200 shadow-xs'
+                                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500'
+                                    }`}
+                                >
+                                    <div className="text-[11px] font-black">{opt.label}</div>
+                                    <div className="text-[9px] opacity-75 truncate">{opt.desc}</div>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {formEndDate && (
+                        <div className="pt-1.5 flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 shrink-0">{isIndo ? 'Tanggal Selesai:' : 'End Date:'}</span>
+                            <input
+                                type="date"
+                                value={formEndDate}
+                                onChange={(e) => setFormEndDate && setFormEndDate(e.target.value)}
+                                className="text-xs font-mono font-bold py-1.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500"
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 
