@@ -74,6 +74,7 @@ interface HabitsModalsContainerProps {
     setFormIsKeystone: (v: boolean) => void;
     formSyncedTabs?: LifeOSTab[];
     setFormSyncedTabs?: (v: LifeOSTab[]) => void;
+    isSubmitting?: boolean;
     onToggleStatus: (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => void;
     onSaveNote: (habitId: number, dateStr: string, noteText: string) => void;
     onSubmitSingleHabit: (e: React.FormEvent) => void;
@@ -145,6 +146,7 @@ export default function HabitsModalsContainer({
     setFormIsKeystone,
     formSyncedTabs,
     setFormSyncedTabs,
+    isSubmitting,
     onToggleStatus,
     onSaveNote,
     onSubmitSingleHabit,
@@ -175,6 +177,7 @@ export default function HabitsModalsContainer({
             <HabitFormModal
                 isOpen={showCreateModal}
                 editingHabitId={editingHabitId}
+                isSubmitting={isSubmitting}
                 isIndo={isIndo}
                 monthNames={monthNames}
                 selectedMonthIndex={selectedMonthIndex}

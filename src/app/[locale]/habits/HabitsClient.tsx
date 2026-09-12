@@ -307,6 +307,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setFormIsKeystone={form.setFormIsKeystone}
                     formSyncedTabs={form.formSyncedTabs}
                     setFormSyncedTabs={form.setFormSyncedTabs}
+                    isSubmitting={actions.isSubmitting}
                     onToggleStatus={actions.toggleStatus}
                     onSaveNote={actions.handleSaveNote}
                     onSubmitSingleHabit={actions.submitSingleHabit}

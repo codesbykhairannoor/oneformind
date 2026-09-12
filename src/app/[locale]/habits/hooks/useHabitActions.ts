@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { mutate as globalMutate } from 'swr';
 import { HabitItem, LifeOSTab } from '../types';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 
@@ -77,58 +78,56 @@ export function useHabitActions({
     setHabitToDelete,
     setNumericPopover
 }: UseHabitActionsParams) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Toggle Habit Log Status
+    // Toggle Habit Status (Complete / Uncheck / Skip / Relapse)
     const toggleStatus = async (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => {
-        const targetHabit = habits.find(h => h.id === habitId);
-        if (!targetHabit) return;
+        const habit = habits.find(h => h.id === habitId);
+        if (!habit) return;
 
-        const currentLog = targetHabit.logs[dateString];
-        const currentStatus = currentLog?.status || 'empty';
-        let nextStatus: 'completed' | 'skipped' | 'empty' | 'relapse' = 'completed';
+        const currentLog = habit.logs?.[dateString];
+        const currentStatus = currentLog?.status;
+
+        let nextStatus: 'completed' | 'skipped' | 'relapse' | 'empty';
 
         if (forceStatus) {
-            nextStatus = currentStatus === forceStatus ? 'empty' : forceStatus;
-            if (nextStatus === 'completed') playCheckSound();
-            else playUncheckSound();
-        } else if (targetHabit.habitType === 'negative') {
-            if (currentStatus === 'empty' || currentStatus === 'skipped' || currentStatus === 'rest') {
-                nextStatus = 'completed';
-                playCheckSound();
-            } else if (currentStatus === 'completed') {
-                nextStatus = 'relapse';
-                playUncheckSound();
-            } else {
+            nextStatus = forceStatus;
+        } else if (habit.measurementType === 'numeric') {
+            const currentVal = currentLog?.value || 0;
+            const targetVal = habit.targetValue || 10;
+            if (currentVal >= targetVal) {
                 nextStatus = 'empty';
-                playUncheckSound();
+            } else {
+                nextStatus = 'completed';
             }
         } else {
-            if (currentStatus === 'empty' || currentStatus === 'skipped' || currentStatus === 'rest') {
-                nextStatus = 'completed';
-                playCheckSound();
+            if (!currentStatus || currentStatus === 'empty') {
+                nextStatus = habit.habitType === 'negative' ? 'relapse' : 'completed';
             } else {
                 nextStatus = 'empty';
-                playUncheckSound();
             }
         }
 
-        // For numeric habits, calculate proper next value: completed -> targetValue, empty -> 0
-        const targetVal = targetHabit.targetValue || 10;
-        const nextVal = targetHabit.measurementType === 'numeric'
-            ? (nextStatus === 'completed' ? (currentLog?.value && currentLog.value >= targetVal ? currentLog.value : targetVal) : (nextStatus === 'empty' ? 0 : currentLog?.value))
-            : currentLog?.value;
+        if (nextStatus === 'completed') {
+            playCheckSound();
+        } else if (nextStatus === 'empty') {
+            playUncheckSound();
+        }
 
         // Optimistic UI update
-        setHabits(prev => prev.map(h => {
+        setHabits(prevHabits => prevHabits.map(h => {
             if (h.id === habitId) {
                 const updatedLogs = { ...h.logs };
                 if (nextStatus === 'empty') {
                     delete updatedLogs[dateString];
                 } else {
+                    const targetVal = h.targetValue || 10;
                     updatedLogs[dateString] = {
                         status: nextStatus,
-                        value: nextVal,
-                        notes: currentLog?.notes
+                        value: h.measurementType === 'numeric' 
+                            ? (nextStatus === 'completed' ? targetVal : 0)
+                            : (nextStatus === 'completed' ? 1 : 0),
+                        notes: currentLog?.notes || ''
                     };
                 }
                 return { ...h, logs: updatedLogs };
@@ -137,101 +136,90 @@ export function useHabitActions({
         }));
 
         try {
-            const notePayload = targetHabit.measurementType === 'numeric' && nextVal !== undefined
-                ? JSON.stringify({ val: nextVal, note: currentLog?.notes || '' })
-                : (currentLog?.notes ? currentLog.notes : undefined);
-
-            await fetch(`/api/habits/${habitId}/logs`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date: dateString, status: nextStatus, notes: nextStatus === 'empty' ? '' : notePayload })
-            });
-            if (mutateHabits) {
-                mutateHabits();
-            }
-        } catch (e) {
-            console.error('Failed to toggle habit log', e);
-        }
-    };
-
-    // Save Contextual Micro-Note
-    const handleSaveNote = async (habitId: number, dateStr: string, noteText: string) => {
-        const targetHabit = habits.find(h => h.id === habitId);
-        if (!targetHabit) return;
-
-        const currentLog = targetHabit.logs[dateStr];
-        const currentStatus = currentLog?.status || 'empty';
-
-        setHabits(prev => prev.map(h => {
-            if (h.id === habitId) {
-                return {
-                    ...h,
-                    logs: {
-                        ...h.logs,
-                        [dateStr]: {
-                            status: currentStatus,
-                            value: currentLog?.value,
-                            notes: noteText
-                        }
-                    }
-                };
-            }
-            return h;
-        }));
-
-        try {
-            const notePayload = currentLog?.value !== undefined ? JSON.stringify({ val: currentLog.value, note: noteText }) : noteText;
             await fetch(`/api/habits/${habitId}/logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    date: dateStr,
-                    status: currentStatus,
-                    notes: notePayload
+                    date: dateString,
+                    status: nextStatus,
+                    value: habit.measurementType === 'numeric'
+                        ? (nextStatus === 'completed' ? habit.targetValue : 0)
+                        : (nextStatus === 'completed' ? 1 : 0),
+                    notes: currentLog?.notes || ''
                 })
             });
             if (mutateHabits) {
                 mutateHabits();
             }
-        } catch (e) {
-            console.error('Failed to save habit note', e);
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+        } catch (error) {
+            console.error('Failed to sync habit log', error);
         }
     };
 
-    // Adjust Numeric Value
-    const handleUpdateNumericValue = async (habitId: number, dateStr: string, newValue: number, updatedNote?: string) => {
-        const targetHabit = habits.find(h => h.id === habitId);
-        if (!targetHabit) return;
+    // Save Note to Habit Log
+    const handleSaveNote = async (habitId: number, dateStr: string, noteText: string) => {
+        setHabits(prevHabits => prevHabits.map(h => {
+            if (h.id === habitId) {
+                const updatedLogs = { ...h.logs };
+                const current = updatedLogs[dateStr];
+                updatedLogs[dateStr] = {
+                    status: current?.status || 'empty',
+                    value: current?.value,
+                    notes: noteText
+                };
+                return { ...h, logs: updatedLogs };
+            }
+            return h;
+        }));
 
-        const targetVal = targetHabit.targetValue || 10;
-        const currentLog = targetHabit.logs[dateStr];
-        const finalNote = updatedNote !== undefined ? updatedNote : (currentLog?.notes || '');
-        const isDone = newValue >= targetVal;
+        try {
+            const habit = habits.find(h => h.id === habitId);
+            const currentLog = habit?.logs?.[dateStr];
 
-        // Determine correct status: 0 = delete from DB, >= target = completed, > 0 = in_progress
-        let nextStatus: 'completed' | 'in_progress' | 'empty' = 'empty';
-        if (newValue === 0 && !finalNote.trim()) {
-            nextStatus = 'empty';
-        } else if (isDone) {
-            nextStatus = 'completed';
-        } else {
-            nextStatus = 'in_progress';
+            await fetch(`/api/habits/${habitId}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: dateStr,
+                    status: currentLog?.status || 'empty',
+                    value: currentLog?.value,
+                    notes: noteText
+                })
+            });
+            if (mutateHabits) {
+                mutateHabits();
+            }
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+        } catch (error) {
+            console.error('Failed to save habit note', error);
         }
+    };
 
-        if (isDone && currentLog?.status !== 'completed') {
+    // Update Numeric Value (for quantitative habits)
+    const handleUpdateNumericValue = async (habitId: number, dateStr: string, val: number, notes?: string) => {
+        const habit = habits.find(h => h.id === habitId);
+        if (!habit) return;
+
+        const targetVal = habit.targetValue || 10;
+        const currentLog = habit.logs?.[dateStr];
+        const nextStatus = val >= targetVal ? 'completed' : (val > 0 ? 'in_progress' : 'empty');
+
+        if (nextStatus === 'completed' && currentLog?.status !== 'completed') {
             playCheckSound();
         }
 
-        setHabits(prev => prev.map(h => {
+        // Optimistic UI update
+        setHabits(prevHabits => prevHabits.map(h => {
             if (h.id === habitId) {
                 const updatedLogs = { ...h.logs };
-                if (nextStatus === 'empty') {
+                if (nextStatus === 'empty' && !notes) {
                     delete updatedLogs[dateStr];
                 } else {
                     updatedLogs[dateStr] = {
                         status: nextStatus,
-                        value: newValue,
-                        notes: finalNote
+                        value: val,
+                        notes: notes !== undefined ? notes : (currentLog?.notes || '')
                     };
                 }
                 return { ...h, logs: updatedLogs };
@@ -240,32 +228,31 @@ export function useHabitActions({
         }));
 
         try {
-            const noteObj = { val: newValue, note: finalNote };
-            // Send 'completed' to database for any positive quantitative entry so PostgreSQL table CHECK constraints (e.g. status IN ('completed','skipped','relapse')) never reject partial progress.
-            const dbStatus = nextStatus === 'empty' ? 'empty' : 'completed';
             await fetch(`/api/habits/${habitId}/logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     date: dateStr,
-                    status: dbStatus,
-                    notes: nextStatus === 'empty' ? '' : JSON.stringify(noteObj)
+                    status: nextStatus,
+                    value: val,
+                    notes: notes !== undefined ? notes : (currentLog?.notes || '')
                 })
             });
             if (mutateHabits) {
                 mutateHabits();
             }
-        } catch (e) {
-            console.error('Failed to update numeric habit log', e);
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+        } catch (error) {
+            console.error('Failed to update numeric habit log', error);
         }
 
         setNumericPopover(null);
     };
 
-    // Submit Single Habit
+    // Submit Single Habit (Create or Edit)
     const submitSingleHabit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formName.trim()) return;
+        if (!formName.trim() || isSubmitting) return;
 
         const metadata = {
             habitType: formType,
@@ -290,8 +277,10 @@ export function useHabitActions({
 
         const statusPayload = JSON.stringify(metadata);
 
+        setIsSubmitting(true);
         try {
             if (editingHabitId) {
+                // Optimistically update
                 setHabits(prev => prev.map(h => h.id === editingHabitId ? {
                     ...h,
                     name: formName,
@@ -319,7 +308,7 @@ export function useHabitActions({
                     status: statusPayload
                 } : h));
 
-                fetch(`/api/habits/${editingHabitId}`, {
+                const res = await fetch(`/api/habits/${editingHabitId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -329,7 +318,17 @@ export function useHabitActions({
                         monthlyTarget: formTarget,
                         status: statusPayload
                     })
-                }).catch(err => console.error('Failed to update habit', err));
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.error || 'Failed to update habit');
+                }
+
+                if (mutateHabits) {
+                    await mutateHabits();
+                }
+                globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
             } else {
                 const tempId = Date.now();
                 const newHabit: HabitItem = {
@@ -363,7 +362,7 @@ export function useHabitActions({
                 };
                 setHabits(prev => [...prev, newHabit]);
 
-                fetch('/api/habits', {
+                const res = await fetch('/api/habits', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -374,20 +373,29 @@ export function useHabitActions({
                         monthlyTarget: formTarget,
                         status: statusPayload
                     })
-                })
-                .then(res => res.json())
-                .then(realHabit => {
-                    setHabits(prev => prev.map(h => h.id === tempId ? { ...newHabit, id: realHabit.id } : h));
-                })
-                .catch(err => {
-                    console.error('Failed to create habit', err);
-                    setHabits(prev => prev.filter(h => h.id !== tempId));
                 });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    setHabits(prev => prev.filter(h => h.id !== tempId));
+                    throw new Error(errData.error || 'Failed to create habit');
+                }
+
+                const realHabit = await res.json();
+                setHabits(prev => prev.map(h => h.id === tempId ? { ...newHabit, id: realHabit.id } : h));
+
+                if (mutateHabits) {
+                    await mutateHabits();
+                }
+                globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
             }
-        } catch (error) {
+            setShowCreateModal(false);
+        } catch (error: any) {
             console.error('Failed to submit habit', error);
+            alert(isIndo ? 'Gagal menyimpan habit ke database.' : 'Failed to save habit to database.');
+        } finally {
+            setIsSubmitting(false);
         }
-        setShowCreateModal(false);
     };
 
     // Confirm & Execute Delete
@@ -395,16 +403,30 @@ export function useHabitActions({
         if (habitToDelete) {
             const targetId = habitToDelete.id;
             setHabits(prev => prev.filter(h => h.id !== targetId));
-            fetch(`/api/habits/${targetId}`, { method: 'DELETE' }).catch(error => {
+            setShowDeleteModal(false);
+            setHabitToDelete(null);
+
+            try {
+                const res = await fetch(`/api/habits/${targetId}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    console.error('Failed to delete habit on server');
+                }
+                if (mutateHabits) {
+                    await mutateHabits();
+                }
+                globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+            } catch (error) {
                 console.error('Failed to delete habit', error);
-            });
+            }
         }
-        setShowDeleteModal(false);
-        setHabitToDelete(null);
     };
 
-    // Copy Habits from Last Month
+    // Copy Habits from Previous Month
     const handleCopyPreviousHabits = async () => {
+        if (!confirm(isIndo ? 'Salin semua habit dari bulan sebelumnya ke bulan ini?' : 'Copy all habits from previous month to this month?')) {
+            return;
+        }
+
         try {
             const res = await fetch(`/api/habits?action=copy`, {
                 method: 'POST',
@@ -413,7 +435,10 @@ export function useHabitActions({
             });
             const data = await res.json();
             if (res.ok && data.success) {
-                mutateHabits?.();
+                if (mutateHabits) {
+                    await mutateHabits();
+                }
+                globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
                 alert(isIndo ? `Berhasil menyalin ${data.copied_count} habit dari bulan lalu!` : `Successfully copied ${data.copied_count} habits from last month!`);
             } else {
                 alert(data.error || (isIndo ? 'Gagal menyalin habit dari bulan lalu' : 'Failed to copy habits'));
@@ -424,6 +449,7 @@ export function useHabitActions({
     };
 
     return {
+        isSubmitting,
         toggleStatus,
         handleSaveNote,
         handleUpdateNumericValue,

@@ -62,6 +62,7 @@ interface HabitFormModalProps {
     setFormIsKeystone: (v: boolean) => void;
     formSyncedTabs?: LifeOSTab[];
     setFormSyncedTabs?: (v: LifeOSTab[]) => void;
+    isSubmitting?: boolean;
     onClose: () => void;
     onDelete: () => void;
     onSubmit: (e: React.FormEvent) => void;
@@ -122,6 +123,7 @@ export default function HabitFormModal({
     setFormIsKeystone,
     formSyncedTabs,
     setFormSyncedTabs,
+    isSubmitting = false,
     onClose,
     onDelete,
     onSubmit
@@ -341,11 +343,23 @@ export default function HabitFormModal({
                             </button>
                             <button
                                 type="button"
+                                disabled={isSubmitting}
                                 onClick={onSubmit}
-                                className="px-7 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none transition active:scale-95 flex items-center gap-2"
+                                className={`px-7 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none transition active:scale-95 flex items-center gap-2 ${
+                                    isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                                }`}
                             >
-                                <Check size={16} strokeWidth={3} />
-                                <span>{editingHabitId ? (isIndo ? 'Update Habit' : 'Update Habit') : (isIndo ? 'Simpan Habit' : 'Save Habit')}</span>
+                                {isSubmitting ? (
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                    <Check size={16} strokeWidth={3} />
+                                )}
+                                <span>
+                                    {isSubmitting 
+                                        ? (isIndo ? 'Menyimpan...' : 'Saving...')
+                                        : (editingHabitId ? (isIndo ? 'Update Habit' : 'Update Habit') : (isIndo ? 'Simpan Habit' : 'Save Habit'))
+                                    }
+                                </span>
                             </button>
                         </div>
                     </div>

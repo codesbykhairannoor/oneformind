@@ -1,13 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import useSWR from 'swr';
+import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, Leaf } from 'lucide-react';
-import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
+import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote } from 'lucide-react';
 import { InboxTask } from '../types';
-
-const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 interface PlannerSidebarProps {
     notes: string;
@@ -52,96 +48,8 @@ export default function PlannerSidebar({
     const isIndo = locale === 'id';
 
     const [newInboxTitle, setNewInboxTitle] = useState('');
-    const [dailyHubTab, setDailyHubTab] = useState<'habits' | 'notes' | 'meals' | 'water'>('habits');
-    const [timeFilter, setTimeFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
+    const [dailyHubTab, setDailyHubTab] = useState<'notes' | 'meals' | 'water'>('notes');
 
-    // Cross-Module Synergy: Real-time Today's Habits
-    const activeDate = selectedDate || new Date().toISOString().split('T')[0];
-    const currentPeriod = activeDate.substring(0, 7);
-    const { data: rawHabits, mutate: mutateHabits } = useSWR(`/api/habits?period=${currentPeriod}`, fetcher);
-
-    const todayHabits = useMemo(() => {
-        if (!rawHabits || !Array.isArray(rawHabits)) return [];
-        const dateObj = new Date(activeDate);
-        const dayOfWeek = isNaN(dateObj.getTime()) ? new Date().getDay() : dateObj.getDay();
-
-        return rawHabits.map((h: any) => {
-            let meta: any = {};
-            if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
-                try { meta = JSON.parse(h.status); } catch {}
-            } else if (h.status && typeof h.status === 'object') {
-                meta = h.status;
-            }
-
-            // Respect chosen synced tabs
-            if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('planner')) {
-                return null;
-            }
-
-            // Date Range Check
-            if (meta.startDate && activeDate < meta.startDate) return null;
-            if (meta.endDate && activeDate > meta.endDate) return null;
-
-            // Weekday Frequency Check
-            const frequencyType = meta.frequencyType || 'daily';
-            const frequencyDays = Array.isArray(meta.frequencyDays) ? meta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
-            const isScheduledToday = frequencyType === 'daily' || frequencyDays.includes(dayOfWeek);
-            if (!isScheduledToday) return null;
-
-            const isDone = (h.logs || []).some((l: any) => l.date?.startsWith(activeDate) && l.status === 'completed');
-            return {
-                id: h.id,
-                name: h.name,
-                icon: h.icon || '🌱',
-                color: h.color || '#10b981',
-                isCompleted: isDone,
-                timeOfDay: meta.timeOfDay || 'anytime',
-                goalTitle: meta.goalTitle || ''
-            };
-        }).filter(Boolean);
-    }, [rawHabits, activeDate]);
-
-    const filteredTodayHabits = useMemo(() => {
-        if (timeFilter === 'all') return todayHabits;
-        return todayHabits.filter((h: any) => h.timeOfDay === timeFilter || h.timeOfDay === 'anytime');
-    }, [todayHabits, timeFilter]);
-
-    const completedHabitsCount = todayHabits.filter((h: any) => h.isCompleted).length;
-
-    const handleToggleHabit = async (habitId: number, isCurrentlyCompleted: boolean) => {
-        const nextStatus = isCurrentlyCompleted ? 'empty' : 'completed';
-        if (nextStatus === 'completed') {
-            playCheckSound();
-        } else {
-            playUncheckSound();
-        }
-
-        mutateHabits((prev: any) => {
-            if (!Array.isArray(prev)) return prev;
-            return prev.map((h: any) => {
-                if (h.id === habitId) {
-                    const filtered = (h.logs || []).filter((l: any) => !l.date?.startsWith(activeDate));
-                    if (nextStatus === 'completed') {
-                        filtered.push({ date: activeDate, status: 'completed' });
-                    }
-                    return { ...h, logs: filtered };
-                }
-                return h;
-            });
-        }, false);
-
-        try {
-            await fetch(`/api/habits/${habitId}/logs`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date: activeDate, status: nextStatus })
-            });
-            mutateHabits();
-        } catch (e) {
-            console.error('Failed to toggle habit', e);
-        }
-    };
-    
     // Inbox Themes
     const getInboxTaskTheme = (type: number) => {
         switch (type) {
@@ -379,19 +287,6 @@ export default function PlannerSidebar({
                 <div className="flex items-center justify-between gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3 overflow-x-auto no-scrollbar">
                     <button
                         type="button"
-                        onClick={() => setDailyHubTab('habits')}
-                        className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${dailyHubTab === 'habits' ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
-                    >
-                        <span>{isIndo ? '🌱 Habit' : '🌱 Habits'}</span>
-                        {todayHabits.length > 0 && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono font-bold">
-                                {completedHabitsCount}/{todayHabits.length}
-                            </span>
-                        )}
-                    </button>
-
-                    <button
-                        type="button"
                         onClick={() => setDailyHubTab('notes')}
                         className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${dailyHubTab === 'notes' ? 'bg-white dark:bg-slate-900 text-yellow-600 dark:text-yellow-400 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
                     >
@@ -423,118 +318,6 @@ export default function PlannerSidebar({
                         </span>
                     </button>
                 </div>
-
-                {/* Tab 0: Habits Checklist Hari Ini */}
-                {dailyHubTab === 'habits' && (
-                    <div className="space-y-2.5 animate-in fade-in">
-                        {/* Control Strip: Time-of-Day Filter */}
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between px-1">
-                                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
-                                    {isIndo ? 'Rutinitas Hari Ini' : "Today's Habits"}
-                                </span>
-                                <span className="text-[10px] font-bold text-slate-400 font-mono">
-                                    {completedHabitsCount}/{todayHabits.length}
-                                </span>
-                            </div>
-
-                            {/* Time-of-Day Filter Pills */}
-                            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
-                                {[
-                                    { key: 'all', label: isIndo ? 'Semua' : 'All' },
-                                    { key: 'morning', label: '🌅 Pagi' },
-                                    { key: 'afternoon', label: '☀️ Siang' },
-                                    { key: 'evening', label: '🌙 Malam' },
-                                ].map(filter => (
-                                    <button
-                                        key={filter.key}
-                                        type="button"
-                                        onClick={() => setTimeFilter(filter.key as any)}
-                                        className={`px-2 py-0.5 rounded-lg text-[9px] font-black transition-all shrink-0 ${
-                                            timeFilter === filter.key
-                                                ? 'bg-indigo-600 text-white shadow-xs'
-                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                                        }`}
-                                    >
-                                        {filter.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {filteredTodayHabits.length === 0 ? (
-                            <div className="p-4 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                                <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                                    {isIndo ? 'Tidak ada kebiasaan untuk filter ini.' : 'No habits for this filter.'}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="space-y-1.5 max-h-60 overflow-y-auto no-scrollbar">
-                                {filteredTodayHabits.map((h: any) => {
-                                    const displayName = h.name;
-                                    return (
-                                        <div 
-                                            key={h.id}
-                                            className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
-                                                h.isCompleted 
-                                                    ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-800/40' 
-                                                    : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/60 dark:border-slate-800 hover:border-slate-300'
-                                            }`}
-                                        >
-                                            <button
-                                                type="button"
-                                                onClick={() => handleToggleHabit(h.id, h.isCompleted)}
-                                                className="flex items-start gap-2.5 text-left flex-1 min-w-0"
-                                            >
-                                                <span className={`w-5 h-5 rounded-lg flex items-center justify-center text-xs font-black transition-all shrink-0 mt-0.5 ${
-                                                    h.isCompleted 
-                                                        ? 'bg-emerald-600 text-white shadow-xs' 
-                                                        : 'border-2 border-slate-300 dark:border-slate-600'
-                                                }`}>
-                                                    {h.isCompleted && <Check size={12} strokeWidth={3} />}
-                                                </span>
-
-                                                <span className="text-sm shrink-0">{h.icon}</span>
-
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                                        <span className={`text-xs font-bold truncate ${
-                                                            h.isCompleted 
-                                                                ? 'line-through text-slate-400 dark:text-slate-500' 
-                                                                : 'text-slate-700 dark:text-slate-200'
-                                                        }`}>
-                                                            {displayName}
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Contextual goal links */}
-                                                    {h.goalTitle && (
-                                                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-                                                            <span className="text-[9px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-0.5">
-                                                                <span className="truncate max-w-[120px]">🎯 {h.goalTitle}</span>
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </button>
-
-                                            {onScheduleInboxTaskModal && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onScheduleInboxTaskModal({ id: Date.now(), title: `${h.icon} ${displayName}`, completed: false, type: 3 })}
-                                                    className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 transition shrink-0 ml-1.5"
-                                                    title={isIndo ? 'Jadwalkan di Timeline Planner' : 'Schedule on Timeline'}
-                                                >
-                                                    <Clock size={12} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 {/* Tab 1: Catatan Cepat */}
                 {dailyHubTab === 'notes' && (
