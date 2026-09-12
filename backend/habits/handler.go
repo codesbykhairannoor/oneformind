@@ -257,8 +257,8 @@ func handleCreateHabit(w http.ResponseWriter, r *http.Request, userID int) {
 		status = s
 	}
 
-	query := `INSERT INTO habits (user_id, period, name, icon, color, monthly_target, position, status) 
-			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+	query := `INSERT INTO habits (user_id, period, name, icon, color, monthly_target, position, status, created_at, updated_at) 
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()) 
 			  RETURNING id, created_at, updated_at, status, is_archived`
 	
 	var h Habit
@@ -271,13 +271,25 @@ func handleCreateHabit(w http.ResponseWriter, r *http.Request, userID int) {
 	h.Position = position
 	h.Status = status
 
+	var createdAt, updatedAt sql.NullTime
 	err = db.QueryRow(query, userID, period, name, icon, color, monthlyTarget, position, status).
-		Scan(&h.ID, &h.CreatedAt, &h.UpdatedAt, &h.Status, &h.IsArchived)
+		Scan(&h.ID, &createdAt, &updatedAt, &h.Status, &h.IsArchived)
 
 	if err != nil {
 		fmt.Printf("Error creating habit: %v\n", err)
-		http.Error(w, `{"error": "Failed to create habit"}`, http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf(`{"error": "Failed to create habit: %v"}`, err), http.StatusInternalServerError)
 		return
+	}
+
+	if createdAt.Valid {
+		h.CreatedAt = createdAt.Time
+	} else {
+		h.CreatedAt = time.Now()
+	}
+	if updatedAt.Valid {
+		h.UpdatedAt = updatedAt.Time
+	} else {
+		h.UpdatedAt = time.Now()
 	}
 
 	h.Logs = []HabitLog{} // empty logs for new habit
