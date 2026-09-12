@@ -115,19 +115,25 @@ export function useHabitActions({
         }
 
         // Optimistic UI update
+        const isNumeric = habit.measurementType === 'numeric';
+        const targetVal = habit.targetValue || 10;
+        const noteText = currentLog?.notes || '';
+        const numericNotePayload = isNumeric
+            ? JSON.stringify({ val: nextStatus === 'completed' ? targetVal : 0, note: noteText })
+            : noteText;
+
         setHabits(prevHabits => prevHabits.map(h => {
             if (h.id === habitId) {
                 const updatedLogs = { ...h.logs };
                 if (nextStatus === 'empty') {
                     delete updatedLogs[dateString];
                 } else {
-                    const targetVal = h.targetValue || 10;
                     updatedLogs[dateString] = {
                         status: nextStatus,
-                        value: h.measurementType === 'numeric' 
+                        value: isNumeric 
                             ? (nextStatus === 'completed' ? targetVal : 0)
                             : (nextStatus === 'completed' ? 1 : 0),
-                        notes: currentLog?.notes || ''
+                        notes: noteText
                     };
                 }
                 return { ...h, logs: updatedLogs };
@@ -142,10 +148,10 @@ export function useHabitActions({
                 body: JSON.stringify({
                     date: dateString,
                     status: nextStatus,
-                    value: habit.measurementType === 'numeric'
-                        ? (nextStatus === 'completed' ? habit.targetValue : 0)
+                    value: isNumeric
+                        ? (nextStatus === 'completed' ? targetVal : 0)
                         : (nextStatus === 'completed' ? 1 : 0),
-                    notes: currentLog?.notes || ''
+                    notes: numericNotePayload
                 })
             });
             if (mutateHabits) {
@@ -254,11 +260,15 @@ export function useHabitActions({
         e.preventDefault();
         if (!formName.trim() || isSubmitting) return;
 
+        const isBoolean = formMeasure === 'boolean';
+        const finalUnit = isBoolean ? 'x' : (formUnit && formUnit !== 'x' ? formUnit : 'ml');
+        const finalTargetValue = isBoolean ? 1 : (formTargetValue && formTargetValue > 0 ? formTargetValue : 10);
+
         const metadata = {
             habitType: formType,
             measurementType: formMeasure,
-            unit: formUnit,
-            targetValue: formTargetValue,
+            unit: finalUnit,
+            targetValue: finalTargetValue,
             frequencyType: formFreqType,
             frequencyDays: formFreqDays,
             timeOfDay: formTimeOfDay,
@@ -289,8 +299,8 @@ export function useHabitActions({
                     monthlyTarget: formTarget,
                     habitType: formType,
                     measurementType: formMeasure,
-                    unit: formUnit,
-                    targetValue: formTargetValue,
+                    unit: finalUnit,
+                    targetValue: finalTargetValue,
                     frequencyType: formFreqType,
                     frequencyDays: formFreqDays,
                     timeOfDay: formTimeOfDay,
@@ -341,8 +351,8 @@ export function useHabitActions({
                     position: habits.length > 0 ? Math.max(...habits.map(h => h.position)) + 1 : 1,
                     habitType: formType,
                     measurementType: formMeasure,
-                    unit: formUnit,
-                    targetValue: formTargetValue,
+                    unit: finalUnit,
+                    targetValue: finalTargetValue,
                     frequencyType: formFreqType,
                     frequencyDays: formFreqDays,
                     timeOfDay: formTimeOfDay,

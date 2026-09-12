@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { Check, Plus, Coffee, FileText, Sparkles } from 'lucide-react';
+import { Check, Plus, Coffee, FileText, Sparkles, Edit3 } from 'lucide-react';
 import { HabitItem, ProcessedHabitItem, MonthDateItem } from '../types';
 import { getHabitDayInfo } from '../utils/habitMath';
 
@@ -14,17 +14,18 @@ interface HabitMobileViewProps {
     onSelectHabitDetail: (habit: HabitItem) => void;
     onOpenNumericPopover: (data: { 
         habitId: number; 
-        habitName?: string;
-        habitIcon?: string;
-        habitColor?: string;
+        habitName?: string; 
+        habitIcon?: string; 
+        habitColor?: string; 
         dateStr: string; 
         currentVal: number; 
         targetVal: number; 
-        unit: string;
-        currentNotes?: string;
+        unit: string; 
+        currentNotes?: string; 
     }) => void;
     onToggleStatus: (habitId: number, dateStr: string) => void;
     onOpenNoteModal?: (d: { habit: HabitItem; dateStr: string; notes: string }) => void;
+    onEditHabit?: (habit: HabitItem) => void;
 }
 
 export default function HabitMobileView({
@@ -36,7 +37,8 @@ export default function HabitMobileView({
     onSelectHabitDetail,
     onOpenNumericPopover,
     onToggleStatus,
-    onOpenNoteModal
+    onOpenNoteModal,
+    onEditHabit
 }: HabitMobileViewProps) {
     const dateStripRef = useRef<HTMLDivElement>(null);
     const activeDateBtnRef = useRef<HTMLButtonElement>(null);
@@ -151,6 +153,18 @@ export default function HabitMobileView({
 
                                 {/* Right Action Buttons */}
                                 <div className="flex items-center gap-1.5 shrink-0">
+                                    {/* Edit Habit Trigger */}
+                                    {onEditHabit && (
+                                        <button
+                                            type="button"
+                                            onClick={() => onEditHabit(habit)}
+                                            title="Edit Habit"
+                                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all text-slate-300 dark:text-slate-600 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                        >
+                                            <Edit3 size={15} strokeWidth={2.5} />
+                                        </button>
+                                    )}
+
                                     {/* Micro-Note Trigger */}
                                     {onOpenNoteModal && (
                                         <button

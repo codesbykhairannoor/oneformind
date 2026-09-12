@@ -52,6 +52,21 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         currentNotes?: string;
     } | null>(null);
 
+    const handleSetFormMeasure = (measure: 'boolean' | 'numeric') => {
+        setFormMeasure(measure);
+        if (measure === 'boolean') {
+            setFormUnit('x');
+            setFormTargetValue(1);
+        } else if (measure === 'numeric') {
+            if (!formUnit || formUnit === 'x') {
+                setFormUnit('ml');
+            }
+            if (!formTargetValue || formTargetValue <= 1) {
+                setFormTargetValue(2000);
+            }
+        }
+    };
+
     const openCreateModal = () => {
         setEditingHabitId(null);
         setFormName('');
@@ -60,8 +75,8 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormTarget(daysInCurrentMonth);
         setFormType('positive');
         setFormMeasure('boolean');
-        setFormUnit('ml');
-        setFormTargetValue(2000);
+        setFormUnit('x');
+        setFormTargetValue(1);
         setFormFreqType('daily');
         setFormFreqDays([1, 2, 3, 4, 5]);
         setFormTimeOfDay('morning');
@@ -80,6 +95,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
     };
 
     const editHabit = (habit: HabitItem) => {
+        const isBool = habit.measurementType === 'boolean';
         setEditingHabitId(habit.id);
         setFormName(habit.name);
         setFormIcon(habit.icon);
@@ -87,8 +103,8 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormTarget(habit.monthlyTarget);
         setFormType(habit.habitType || 'positive');
         setFormMeasure(habit.measurementType || 'boolean');
-        setFormUnit(habit.unit || 'ml');
-        setFormTargetValue(habit.targetValue || 2000);
+        setFormUnit(isBool ? 'x' : (habit.unit && habit.unit !== 'x' ? habit.unit : 'ml'));
+        setFormTargetValue(isBool ? 1 : (habit.targetValue && habit.targetValue > 1 ? habit.targetValue : 2000));
         setFormFreqType((habit.frequencyType as any) || 'daily');
         setFormFreqDays(habit.frequencyDays || [1, 2, 3, 4, 5]);
         setFormTimeOfDay(habit.timeOfDay || 'morning');
@@ -127,7 +143,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         formType,
         setFormType,
         formMeasure,
-        setFormMeasure,
+        setFormMeasure: handleSetFormMeasure,
         formUnit,
         setFormUnit,
         formTargetValue,

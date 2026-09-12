@@ -79,6 +79,7 @@ interface HabitsModalsContainerProps {
     onSaveNote: (habitId: number, dateStr: string, noteText: string) => void;
     onSubmitSingleHabit: (e: React.FormEvent) => void;
     onExecuteDelete: () => void;
+    onEditHabit?: (habit: HabitItem) => void;
 }
 
 export default function HabitsModalsContainer({
@@ -150,7 +151,8 @@ export default function HabitsModalsContainer({
     onToggleStatus,
     onSaveNote,
     onSubmitSingleHabit,
-    onExecuteDelete
+    onExecuteDelete,
+    onEditHabit
 }: HabitsModalsContainerProps) {
     return (
         <>
@@ -160,6 +162,7 @@ export default function HabitsModalsContainer({
                 isOpen={Boolean(detailModalHabit)}
                 onClose={() => setDetailModalHabit(null)}
                 locale={locale}
+                onEditHabit={onEditHabit}
             />
 
             {/* MODAL: NOTE */}

@@ -21,7 +21,8 @@ import {
     Coffee,
     Check,
     AlertCircle,
-    BookOpen
+    BookOpen,
+    Edit3
 } from 'lucide-react';
 import { HabitItem } from '../types';
 
@@ -32,9 +33,10 @@ interface HabitDetailModalProps {
     isOpen: boolean;
     onClose: () => void;
     locale: string;
+    onEditHabit?: (habit: HabitItem) => void;
 }
 
-export default function HabitDetailModal({ habit, isOpen, onClose, locale }: HabitDetailModalProps) {
+export default function HabitDetailModal({ habit, isOpen, onClose, locale, onEditHabit }: HabitDetailModalProps) {
     if (!isOpen || !habit) return null;
 
     const isIndo = locale === 'id';
@@ -398,12 +400,27 @@ export default function HabitDetailModal({ habit, isOpen, onClose, locale }: Hab
                             </div>
                         </div>
 
-                        <button 
-                            onClick={onClose} 
-                            className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition shadow-sm border border-slate-200 dark:border-slate-700"
-                        >
-                            <X size={18} strokeWidth={2.5} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            {onEditHabit && (
+                                <button 
+                                    type="button"
+                                    onClick={() => {
+                                        onClose();
+                                        onEditHabit(habit);
+                                    }} 
+                                    className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-center transition shadow-sm border border-slate-200 dark:border-slate-700"
+                                    title={isIndo ? 'Ubah Kebiasaan' : 'Edit Habit'}
+                                >
+                                    <Edit3 size={17} strokeWidth={2.5} />
+                                </button>
+                            )}
+                            <button 
+                                onClick={onClose} 
+                                className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition shadow-sm border border-slate-200 dark:border-slate-700"
+                            >
+                                <X size={18} strokeWidth={2.5} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Navigation Tabs */}

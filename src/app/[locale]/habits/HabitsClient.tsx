@@ -206,6 +206,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                                 onOpenNumericPopover={form.setNumericPopover}
                                 onToggleStatus={actions.toggleStatus}
                                 onOpenNoteModal={form.setNoteModalData}
+                                onEditHabit={form.editHabit}
                             />
                         </>
                     ) : (
@@ -312,6 +313,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     onSaveNote={actions.handleSaveNote}
                     onSubmitSingleHabit={actions.submitSingleHabit}
                     onExecuteDelete={actions.executeDelete}
+                    onEditHabit={form.editHabit}
                 />
 
                 {/* EXPORT DATA MODAL */}

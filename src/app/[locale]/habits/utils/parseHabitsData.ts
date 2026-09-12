@@ -19,11 +19,21 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
             ? 'positive'
             : (h.name && (h.name.toLowerCase().startsWith('berhenti ') || h.name.toLowerCase().startsWith('stop ') || h.name.toLowerCase().startsWith('quit ')) ? 'negative' : 'positive');
 
-        const measurementType = extraMeta.measurementType === 'numeric' || extraMeta.targetValue ? 'numeric' : 'boolean';
-        const unit = extraMeta.unit || (measurementType === 'numeric' ? 'ml' : 'x');
-        const targetValue = typeof extraMeta.targetValue === 'number'
-            ? extraMeta.targetValue
-            : (extraMeta.targetValue && !isNaN(Number(extraMeta.targetValue)) ? Number(extraMeta.targetValue) : (measurementType === 'numeric' ? 10 : 1));
+        const measurementType = extraMeta.measurementType === 'boolean'
+            ? 'boolean'
+            : extraMeta.measurementType === 'numeric'
+            ? 'numeric'
+            : (extraMeta.unit && extraMeta.unit !== 'x' && extraMeta.targetValue && Number(extraMeta.targetValue) > 1 ? 'numeric' : 'boolean');
+
+        const unit = measurementType === 'boolean'
+            ? 'x'
+            : (extraMeta.unit && extraMeta.unit !== 'x' ? extraMeta.unit : 'ml');
+
+        const targetValue = measurementType === 'boolean'
+            ? 1
+            : (typeof extraMeta.targetValue === 'number'
+                ? extraMeta.targetValue
+                : (extraMeta.targetValue && !isNaN(Number(extraMeta.targetValue)) ? Number(extraMeta.targetValue) : 10));
         const frequencyType = extraMeta.frequencyType || 'daily';
         const frequencyDays = Array.isArray(extraMeta.frequencyDays) ? extraMeta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
         const frequencyCount = extraMeta.frequencyCount || frequencyDays.length;
