@@ -1,13 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import useSWR from 'swr';
 import { useLocale } from 'next-intl';
 import { 
     Briefcase, Send, Target, Award, CheckCircle2, 
     Calendar, TrendingUp, DollarSign, Clock, AlertCircle,
-    ChevronDown, ChevronUp, Sparkles, BarChart2
+    ChevronDown, ChevronUp, Sparkles, BarChart2, Leaf
 } from 'lucide-react';
 import { JobFunnelStats } from '../lib/jobAnalytics';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 interface JobStatsProps {
     stats: JobFunnelStats;
@@ -19,6 +22,34 @@ export default function JobStats({ stats, onOpenOfferComparison }: JobStatsProps
     const isIndo = locale === 'id';
 
     const [isExpanded, setIsExpanded] = useState(false);
+
+    // Cross-Module Life OS: Job Search Habit Consistency
+    const { data: rawHabits } = useSWR('/api/habits', fetcher);
+    const jobHabitStats = useMemo(() => {
+        if (!rawHabits || !Array.isArray(rawHabits)) return null;
+        const jobHabits = rawHabits.filter((h: any) => {
+            const name = (h.name || '').toLowerCase();
+            return name.includes('lamar') || name.includes('apply') || name.includes('job') || 
+                   name.includes('karir') || name.includes('career') || name.includes('kerja');
+        });
+        if (jobHabits.length === 0) return null;
+
+        let totalTarget = 0;
+        let totalCompleted = 0;
+        jobHabits.forEach((h: any) => {
+            const target = h.monthlyTarget || 30;
+            const completed = (h.logs || []).filter((l: any) => l.status === 'completed').length;
+            totalTarget += target;
+            totalCompleted += completed;
+        });
+
+        const percent = totalTarget > 0 ? Math.min(100, Math.round((totalCompleted / totalTarget) * 100)) : 0;
+        return {
+            percent,
+            completed: totalCompleted,
+            target: totalTarget
+        };
+    }, [rawHabits]);
 
     const formatNextInterviewTime = (dateStr?: string) => {
         if (!dateStr) return null;
@@ -113,16 +144,28 @@ export default function JobStats({ stats, onOpenOfferComparison }: JobStatsProps
                     </div>
                 </div>
 
-                {/* Expand / Collapse Full Funnel Toggle */}
-                <button
-                    type="button"
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-600 dark:text-slate-300 hover:text-indigo-600 text-xs font-bold transition flex items-center gap-1.5 shrink-0"
-                >
-                    <BarChart2 size={13} />
-                    <span className="text-[11px]">{isExpanded ? (isIndo ? 'Tutup Detail' : 'Collapse') : (isIndo ? 'Detail Metrik' : 'Expand Stats')}</span>
-                    {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                </button>
+                <div className="flex items-center gap-2">
+                    {jobHabitStats && (
+                        <div 
+                            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-black"
+                            title={isIndo ? 'Konsistensi kebiasaan melamar kerja bulan ini' : 'Job application habit consistency'}
+                        >
+                            <Leaf size={11} className="text-emerald-500" />
+                            <span>Habit Melamar: {jobHabitStats.percent}% ({jobHabitStats.completed}/{jobHabitStats.target}d)</span>
+                        </div>
+                    )}
+
+                    {/* Expand / Collapse Full Funnel Toggle */}
+                    <button
+                        type="button"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-600 dark:text-slate-300 hover:text-indigo-600 text-xs font-bold transition flex items-center gap-1.5 shrink-0"
+                    >
+                        <BarChart2 size={13} />
+                        <span className="text-[11px]">{isExpanded ? (isIndo ? 'Tutup Detail' : 'Collapse') : (isIndo ? 'Detail Metrik' : 'Expand Stats')}</span>
+                        {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                    </button>
+                </div>
             </div>
 
             {/* 2. EXPANDED FUNNEL CARDS (OPTIONAL VIEW) */}

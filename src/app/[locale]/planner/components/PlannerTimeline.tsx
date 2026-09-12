@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
-import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X, Leaf } from 'lucide-react';
 import { TaskItem } from '../types';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const VIEW_LIMIT = 24;
 const TIME_COL_WIDTH = 76;
@@ -51,6 +54,72 @@ export default function PlannerTimeline({
     const [density, setDensity] = useState<'compact' | 'normal'>('compact');
     const [isMobile, setIsMobile] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    // Unified Habits Integration (One Data, Two Views)
+    const currentPeriod = selectedDate.substring(0, 7);
+    const { data: rawHabits, mutate: mutateHabits } = useSWR(`/api/habits?period=${currentPeriod}`, fetcher);
+
+    const todayHabits = useMemo(() => {
+        if (!rawHabits || !Array.isArray(rawHabits)) return [];
+        const dateObj = new Date(selectedDate);
+        const dayOfWeek = isNaN(dateObj.getTime()) ? new Date().getDay() : dateObj.getDay();
+
+        return rawHabits.map((h: any) => {
+            let meta: any = {};
+            if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                try { meta = JSON.parse(h.status); } catch {}
+            } else if (h.status && typeof h.status === 'object') {
+                meta = h.status;
+            }
+
+            const frequencyType = meta.frequencyType || 'daily';
+            const frequencyDays = Array.isArray(meta.frequencyDays) ? meta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
+            const isScheduledToday = frequencyType === 'daily' || frequencyDays.includes(dayOfWeek);
+
+            if (!isScheduledToday) return null;
+
+            const isDone = (h.logs || []).some((l: any) => l.date?.startsWith(selectedDate) && l.status === 'completed');
+
+            return {
+                id: h.id,
+                name: h.name,
+                icon: h.icon || '🌱',
+                color: h.color || '#10b981',
+                isCompleted: isDone
+            };
+        }).filter(Boolean) as { id: number; name: string; icon: string; color: string; isCompleted: boolean }[];
+    }, [rawHabits, selectedDate]);
+
+    const handleToggleHabit = async (habitId: number, isCurrentlyCompleted: boolean) => {
+        const nextStatus = isCurrentlyCompleted ? 'empty' : 'completed';
+        mutateHabits((prev: any) => {
+            if (!Array.isArray(prev)) return prev;
+            return prev.map((h: any) => {
+                if (h.id === habitId) {
+                    const filteredLogs = (h.logs || []).filter((l: any) => !l.date?.startsWith(selectedDate));
+                    if (nextStatus === 'completed') {
+                        filteredLogs.push({ date: selectedDate, status: 'completed' });
+                    }
+                    return { ...h, logs: filteredLogs };
+                }
+                return h;
+            });
+        }, false);
+
+        try {
+            await fetch(`/api/habits/${habitId}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: selectedDate,
+                    status: nextStatus
+                })
+            });
+            mutateHabits();
+        } catch (e) {
+            console.error('Failed to toggle habit from planner:', e);
+        }
+    };
 
     const hourHeight = density === 'compact' ? 52 : 72;
     const timeColWidth = isMobile ? 56 : 74;
@@ -367,6 +436,45 @@ export default function PlannerTimeline({
                     </div>
                 </div>
             </div>
+
+            {/* DAILY HABITS ACTION STREAM (Satu Data, Dua Tampilan) */}
+            {todayHabits.length > 0 && (
+                <div className="mx-3 sm:mx-6 mt-3 p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-emerald-50/80 via-teal-50/40 to-slate-50 dark:from-emerald-950/30 dark:via-teal-950/20 dark:to-slate-900 border border-emerald-200/70 dark:border-emerald-800/40 flex flex-col gap-2 shadow-xs">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xs">🌱</span>
+                            <span className="text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">
+                                {isIndo ? 'Daily Action Habit (Auto-Synced)' : 'Daily Action Habit (Auto-Synced)'}
+                            </span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-400">
+                            {todayHabits.filter(h => h.isCompleted).length}/{todayHabits.length} {isIndo ? 'Tuntas' : 'Completed'}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-0.5">
+                        {todayHabits.map((h) => (
+                            <button
+                                key={h.id}
+                                type="button"
+                                onClick={() => handleToggleHabit(h.id, h.isCompleted)}
+                                className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 shrink-0 transition-all active:scale-95 ${
+                                    h.isCompleted
+                                        ? 'bg-emerald-100/90 dark:bg-emerald-900/40 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 shadow-xs'
+                                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-emerald-400'
+                                }`}
+                            >
+                                <span className={`w-4 h-4 rounded-md flex items-center justify-center text-[10px] font-black transition-all ${
+                                    h.isCompleted ? 'bg-emerald-600 text-white' : 'border border-slate-300 dark:border-slate-600'
+                                }`}>
+                                    {h.isCompleted ? '✓' : ''}
+                                </span>
+                                <span>{h.icon || '🌱'}</span>
+                                <span className={h.isCompleted ? 'line-through opacity-70' : ''}>{h.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* UNFINISHED TASKS ROLLOVER BANNER */}
             {showRolloverBanner && unfinishedYesterdayTasks.length > 0 && (

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { HabitItem } from '../types';
 import HabitFormModal from './HabitFormModal';
 import HabitDeleteModal from './HabitDeleteModal';
+import WorkoutQuickLoggerModal from './WorkoutQuickLoggerModal';
 
 const HabitDetailModal = dynamic(() => import('./HabitDetailModal'), { ssr: false });
 const HabitNoteModal = dynamic(() => import('./HabitNoteModal'), { ssr: false });
@@ -16,6 +17,9 @@ interface HabitsModalsContainerProps {
     setNoteModalData: (d: { habit: HabitItem; dateStr: string; notes: string } | null) => void;
     showCreateModal: boolean;
     setShowCreateModal: (v: boolean) => void;
+    showWorkoutModal?: boolean;
+    setShowWorkoutModal?: (v: boolean) => void;
+    onWorkoutSuccess?: () => void;
     editingHabitId: number | null;
     showDeleteModal: boolean;
     setShowDeleteModal: (v: boolean) => void;
@@ -77,6 +81,9 @@ export default function HabitsModalsContainer({
     setNoteModalData,
     showCreateModal,
     setShowCreateModal,
+    showWorkoutModal = false,
+    setShowWorkoutModal,
+    onWorkoutSuccess,
     editingHabitId,
     showDeleteModal,
     setShowDeleteModal,
@@ -210,6 +217,16 @@ export default function HabitsModalsContainer({
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={onExecuteDelete}
             />
+
+            {/* MODAL: WORKOUT QUICK LOGGER (LIFE OS SYNERGY) */}
+            {showWorkoutModal && (
+                <WorkoutQuickLoggerModal
+                    isOpen={showWorkoutModal}
+                    isIndo={isIndo}
+                    onClose={() => setShowWorkoutModal?.(false)}
+                    onSuccess={onWorkoutSuccess}
+                />
+            )}
         </>
     );
 }

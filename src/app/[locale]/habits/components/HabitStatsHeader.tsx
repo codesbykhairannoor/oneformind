@@ -34,6 +34,7 @@ interface HabitStatsHeaderProps {
     showHint: boolean;
     setShowHint: (show: boolean) => void;
     openCreateModal: () => void;
+    onOpenWorkoutModal?: () => void;
     openExportModal?: () => void;
 }
 
@@ -58,6 +59,7 @@ export default function HabitStatsHeader({
     showHint,
     setShowHint,
     openCreateModal,
+    onOpenWorkoutModal,
     openExportModal
 }: HabitStatsHeaderProps) {
     return (
@@ -279,6 +281,19 @@ export default function HabitStatsHeader({
                             >
                                 <Download size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
                                 <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
+                            </button>
+                        )}
+
+                        {/* Quick Workout / Gym Logger Button */}
+                        {onOpenWorkoutModal && (
+                            <button
+                                type="button"
+                                onClick={onOpenWorkoutModal}
+                                title={isIndo ? 'Catat sesi gym & auto-centang habit' : 'Log gym workout & auto-check habit'}
+                                className="px-3 sm:px-3.5 py-2 sm:py-2.5 flex items-center gap-1.5 text-amber-900 dark:text-amber-200 rounded-xl font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/50 dark:hover:bg-amber-900/60 border border-amber-300 dark:border-amber-700/60 shadow-xs transition-all active:scale-95 text-xs"
+                            >
+                                <span className="text-sm">🏋️</span>
+                                <span className="font-black hidden sm:inline">{isIndo ? 'Log Gym' : 'Log Workout'}</span>
                             </button>
                         )}
 

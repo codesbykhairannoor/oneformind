@@ -10,6 +10,17 @@ import {
 import ModalPortal from '@/components/ModalPortal';
 import { UnifiedCalendarEvent, detectMeetingPlatform } from '../lib/calendarAnalytics';
 
+export interface CalendarScheduledHabit {
+    id: number;
+    name: string;
+    icon: string;
+    color: string;
+    isCompleted: boolean;
+    timeOfDay?: string;
+    anchorCue?: string;
+    reminderTime?: string;
+}
+
 interface CalendarDayDetailProps {
     date: string;
     events: UnifiedCalendarEvent[];
@@ -18,12 +29,14 @@ interface CalendarDayDetailProps {
     plannerTasks: any[];
     habitCount: number;
     completedHabits?: any[];
+    scheduledHabits?: CalendarScheduledHabit[];
     financeExpense: number;
     onClose: () => void;
     onAddEvent: () => void;
     onEditEvent: (event: UnifiedCalendarEvent) => void;
     onDeleteEvent: (id: string | number) => void;
     onTogglePlannerTask?: (taskId: string | number) => void;
+    onToggleHabit?: (habitId: number, isCompleted: boolean) => void;
 }
 
 export default function CalendarDayDetail({
@@ -34,12 +47,14 @@ export default function CalendarDayDetail({
     plannerTasks,
     habitCount,
     completedHabits = [],
+    scheduledHabits = [],
     financeExpense,
     onClose,
     onAddEvent,
     onEditEvent,
     onDeleteEvent,
-    onTogglePlannerTask
+    onTogglePlannerTask,
+    onToggleHabit
 }: CalendarDayDetailProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -268,8 +283,73 @@ export default function CalendarDayDetail({
                             </div>
                         </div>
 
-                        {/* Section 5: List of Completed Habits */}
-                        {completedHabits && completedHabits.length > 0 && (
+                        {/* Section 5: Interactive Scheduled Habit Occurrences (One Data, Two Views) */}
+                        {scheduledHabits && scheduledHabits.length > 0 ? (
+                            <div className="space-y-2.5 pt-1">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                        <Leaf size={13} className="text-emerald-500" />
+                                        <span>{isIndo ? 'Jadwal Kebiasaan (Satu Data Life OS)' : 'Scheduled Habits (Unified Life OS)'}</span>
+                                    </span>
+                                    <span className="text-[10px] font-bold text-slate-400">
+                                        {scheduledHabits.filter(h => h.isCompleted).length}/{scheduledHabits.length} {isIndo ? 'tuntas' : 'done'}
+                                    </span>
+                                </div>
+                                <div className="space-y-2">
+                                    {scheduledHabits.map((h) => (
+                                        <div 
+                                            key={h.id}
+                                            className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                                                h.isCompleted 
+                                                    ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-800/40' 
+                                                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-800 hover:border-indigo-300'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onToggleHabit && onToggleHabit(h.id, h.isCompleted)}
+                                                    className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
+                                                        h.isCompleted
+                                                            ? 'bg-emerald-600 text-white shadow-sm scale-105'
+                                                            : 'border-2 border-slate-300 dark:border-slate-600 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/30'
+                                                    }`}
+                                                >
+                                                    {h.isCompleted ? <span className="text-xs font-black">✓</span> : <span className="text-[10px] text-transparent hover:text-emerald-600">✓</span>}
+                                                </button>
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm shrink-0">{h.icon || '🌱'}</span>
+                                                        <span className={`text-xs font-bold truncate ${
+                                                            h.isCompleted ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-white'
+                                                        }`}>
+                                                            {h.name}
+                                                        </span>
+                                                    </div>
+                                                    {(h.reminderTime || h.anchorCue || h.timeOfDay) && (
+                                                        <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                                                            {h.reminderTime ? `⏰ ${h.reminderTime}` : (h.anchorCue ? `⚓ ${h.anchorCue}` : (h.timeOfDay === 'morning' ? '🌅 Pagi' : h.timeOfDay === 'afternoon' ? '☀️ Siang' : h.timeOfDay === 'evening' ? '🌙 Malam' : ''))}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => onToggleHabit && onToggleHabit(h.id, h.isCompleted)}
+                                                className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all shrink-0 ${
+                                                    h.isCompleted
+                                                        ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
+                                                        : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600'
+                                                }`}
+                                            >
+                                                {h.isCompleted ? (isIndo ? '✓ Selesai' : '✓ Done') : (isIndo ? '○ Belum Selesai' : '○ Pending')}
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : completedHabits && completedHabits.length > 0 ? (
                             <div className="space-y-2 pt-1">
                                 <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                                     <Leaf size={13} className="text-emerald-500" />
@@ -294,7 +374,7 @@ export default function CalendarDayDetail({
                                     ))}
                                 </div>
                             </div>
-                        )}
+                        ) : null}
 
                     </div>
                 </div>

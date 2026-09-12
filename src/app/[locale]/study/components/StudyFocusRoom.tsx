@@ -58,6 +58,42 @@ export default function StudyFocusRoom({
         setIsRunning(false);
     };
 
+    // Auto-completed habit feedback notice
+    const [completedHabitNotice, setCompletedHabitNotice] = useState<string | null>(null);
+
+    const triggerHabitAutoCompletion = async () => {
+        try {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const periodStr = todayStr.substring(0, 7);
+            const res = await fetch(`/api/habits?period=${periodStr}`);
+            if (!res.ok) return;
+            const habits = await res.json();
+            if (!Array.isArray(habits)) return;
+
+            const studyHabit = habits.find((h: any) => {
+                const name = (h.name || '').toLowerCase();
+                return name.includes('belajar') || name.includes('study') || name.includes('baca') || 
+                       name.includes('read') || name.includes('kuliah') || name.includes('fokus') || 
+                       name.includes('coding') || name.includes('matkul');
+            });
+
+            if (studyHabit) {
+                await fetch(`/api/habits/${studyHabit.id}/logs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: todayStr,
+                        status: 'completed'
+                    })
+                });
+                setCompletedHabitNotice(studyHabit.name);
+                setTimeout(() => setCompletedHabitNotice(null), 7000);
+            }
+        } catch (e) {
+            console.error('Failed to auto-complete study habit:', e);
+        }
+    };
+
     // Timer Countdown logic
     useEffect(() => {
         let interval: any = null;
@@ -75,6 +111,7 @@ export default function StudyFocusRoom({
                     totalFocusMinutes: totalFocusMinutes + 25
                 };
                 onSaveFocusStats?.(updated);
+                triggerHabitAutoCompletion();
                 setMode('short_break');
                 setTimeLeft(durations.short_break);
             } else {
@@ -261,6 +298,23 @@ export default function StudyFocusRoom({
                         </button>
                     </div>
 
+                    {/* Cross-Module Life OS: Habit Auto-Completion Celebration */}
+                    {completedHabitNotice && (
+                        <div className="relative z-10 mb-4 px-4 py-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-between gap-3 text-emerald-700 dark:text-emerald-300 animate-in fade-in slide-in-from-top-2 shadow-sm">
+                            <div className="flex items-center gap-2.5">
+                                <span className="text-base">🎉</span>
+                                <p className="text-xs font-bold text-left">
+                                    {isIndo 
+                                        ? `Sesi fokus tuntas! Kebiasaan "${completedHabitNotice}" otomatis tercatat selesai hari ini.` 
+                                        : `Focus session finished! Habit "${completedHabitNotice}" marked completed today.`}
+                                </p>
+                            </div>
+                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-600 text-white shrink-0">
+                                {isIndo ? 'Satu Data OS' : 'Unified OS'}
+                            </span>
+                        </div>
+                    )}
+
                     {/* Active Subject Pill */}
                     <div className="relative z-10 mb-6 flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/80 px-4 py-1.5 rounded-full text-xs font-bold text-indigo-700 dark:text-indigo-300">
                         <BookOpen size={13} className="text-indigo-500" />
@@ -294,7 +348,7 @@ export default function StudyFocusRoom({
                     </div>
 
                     {/* Control Buttons */}
-                    <div className="relative z-10 flex items-center gap-4">
+                    <div className="relative z-10 flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
                         <button
                             type="button"
                             onClick={() => {
@@ -310,7 +364,7 @@ export default function StudyFocusRoom({
                         <button
                             type="button"
                             onClick={() => setIsRunning(!isRunning)}
-                            className={`px-10 py-4 rounded-[2rem] font-black text-sm tracking-widest uppercase transition-all shadow-xl active:scale-95 flex items-center gap-3 ${
+                            className={`px-8 sm:px-10 py-4 rounded-[2rem] font-black text-sm tracking-widest uppercase transition-all shadow-xl active:scale-95 flex items-center gap-3 ${
                                 isRunning
                                     ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/30'
                                     : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30'
@@ -328,6 +382,29 @@ export default function StudyFocusRoom({
                                 </>
                             )}
                         </button>
+
+                        {mode === 'focus' && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsRunning(false);
+                                    playBeep();
+                                    const updated = {
+                                        completedSessions: completedSessions + 1,
+                                        totalFocusMinutes: totalFocusMinutes + 25
+                                    };
+                                    onSaveFocusStats?.(updated);
+                                    triggerHabitAutoCompletion();
+                                    setMode('short_break');
+                                    setTimeLeft(durations.short_break);
+                                }}
+                                className="px-4 py-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 font-black text-xs transition active:scale-95 flex items-center gap-1.5"
+                                title={isIndo ? 'Tuntaskan Sesi & Simpan Habit' : 'Finish Session & Mark Habit'}
+                            >
+                                <CheckCircle2 size={16} />
+                                <span className="hidden sm:inline">{isIndo ? 'Tuntas & Sync' : 'Finish & Sync'}</span>
+                            </button>
+                        )}
                     </div>
 
                 </div>

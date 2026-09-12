@@ -13,7 +13,7 @@ import CalendarWeekView from './components/CalendarWeekView';
 import CalendarDayView from './components/CalendarDayView';
 import CalendarAgendaView from './components/CalendarAgendaView';
 import CalendarEventModal from './components/CalendarEventModal';
-import CalendarDayDetail from './components/CalendarDayDetail';
+import CalendarDayDetail, { CalendarScheduledHabit } from './components/CalendarDayDetail';
 import CalendarTaskDrawer from './components/CalendarTaskDrawer';
 
 import { 
@@ -61,6 +61,7 @@ export default function CalendarPage() {
     const [plannerTasks, setPlannerTasks] = useState<any[]>([]);
     const [financeTransactions, setFinanceTransactions] = useState<any[]>([]);
     const [habitLogs, setHabitLogs] = useState<any[]>([]);
+    const [rawHabits, setRawHabits] = useState<any[]>([]);
     const [jobInterviews, setJobInterviews] = useState<any[]>([]);
     const [milestones, setMilestones] = useState<any[]>([]);
 
@@ -100,7 +101,7 @@ export default function CalendarPage() {
         }
     };
 
-    // Fetch Job interviews & Goal Milestones for 360° Life OS
+    // Fetch Job interviews, Goal Milestones, and Active Habits for 360° Life OS
     const fetchExtraLifeOsData = async () => {
         try {
             // Fetch Jobs
@@ -140,6 +141,13 @@ export default function CalendarPage() {
                     }
                 });
                 setMilestones(msList);
+            }
+
+            // Fetch Active Habits for Scheduled Projections
+            const habitsRes = await fetch(`/api/habits?period=${currentMonthKey}`);
+            if (habitsRes.ok) {
+                const habitsData = await habitsRes.json();
+                setRawHabits(Array.isArray(habitsData) ? habitsData : []);
             }
         } catch (err) {
             console.error('Failed to fetch extra life OS data:', err);
@@ -381,6 +389,82 @@ export default function CalendarPage() {
         .filter(f => f.date?.startsWith(selectedDate) && f.type === 'expense')
         .reduce((sum, f) => sum + Number(f.amount || 0), 0);
 
+    // Projected Scheduled Habits for selectedDate
+    const selectedDayScheduledHabits = useMemo(() => {
+        if (!rawHabits || rawHabits.length === 0) return [];
+        const dateObj = new Date(selectedDate);
+        const dayOfWeek = isNaN(dateObj.getTime()) ? new Date().getDay() : dateObj.getDay();
+
+        return rawHabits.map((h: any) => {
+            let meta: any = {};
+            if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
+                try { meta = JSON.parse(h.status); } catch {}
+            } else if (h.status && typeof h.status === 'object') {
+                meta = h.status;
+            }
+
+            const frequencyType = meta.frequencyType || 'daily';
+            const frequencyDays = Array.isArray(meta.frequencyDays) ? meta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
+            const isScheduledToday = frequencyType === 'daily' || frequencyDays.includes(dayOfWeek);
+
+            if (!isScheduledToday) return null;
+
+            const isCompleted = (habitLogs || []).some(
+                (hl: any) => (hl.habit_id === h.id || hl.habitId === h.id) && hl.date?.startsWith(selectedDate) && hl.status === 'completed'
+            ) || (h.logs || []).some(
+                (l: any) => l.date?.startsWith(selectedDate) && l.status === 'completed'
+            );
+
+            return {
+                id: h.id,
+                name: h.name,
+                icon: h.icon || '🌱',
+                color: h.color || '#10b981',
+                isCompleted,
+                timeOfDay: meta.timeOfDay,
+                anchorCue: meta.anchorCue,
+                reminderTime: meta.reminderTime
+            };
+        }).filter(Boolean) as CalendarScheduledHabit[];
+    }, [rawHabits, selectedDate, habitLogs]);
+
+    const handleToggleHabitOccurrence = async (habitId: number, isCurrentlyCompleted: boolean) => {
+        const nextStatus = isCurrentlyCompleted ? 'empty' : 'completed';
+        
+        // Optimistic state mutation
+        if (nextStatus === 'completed') {
+            const matchingHabit = rawHabits.find(h => h.id === habitId);
+            setHabitLogs(prev => [
+                ...prev,
+                {
+                    id: Date.now(),
+                    habit_id: habitId,
+                    habitId: habitId,
+                    date: selectedDate,
+                    status: 'completed',
+                    name: matchingHabit?.name || 'Habit',
+                    icon: matchingHabit?.icon || '🌱',
+                    color: matchingHabit?.color || '#10b981'
+                }
+            ]);
+        } else {
+            setHabitLogs(prev => prev.filter(hl => !((hl.habit_id === habitId || hl.habitId === habitId) && hl.date?.startsWith(selectedDate))));
+        }
+
+        try {
+            await fetch(`/api/habits/${habitId}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: selectedDate,
+                    status: nextStatus
+                })
+            });
+        } catch (err) {
+            console.error('Failed to toggle habit from calendar:', err);
+        }
+    };
+
     return (
         <AuthenticatedLayout>
             <GatedPage feature="calendar">
@@ -483,6 +567,8 @@ export default function CalendarPage() {
                             plannerTasks={selectedDayPlanner}
                             habitCount={selectedDayHabits}
                             completedHabits={selectedDayHabitLogs}
+                            scheduledHabits={selectedDayScheduledHabits}
+                            onToggleHabit={handleToggleHabitOccurrence}
                             financeExpense={selectedDayFinance}
                             onClose={() => setIsDetailModalOpen(false)}
                             onAddEvent={() => handleOpenEventModal(selectedDate)}

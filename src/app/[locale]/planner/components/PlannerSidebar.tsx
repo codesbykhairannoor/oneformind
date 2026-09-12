@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, Leaf, Zap, Anchor } from 'lucide-react';
 import { InboxTask } from '../types';
+import WorkoutQuickLoggerModal from '@/app/[locale]/habits/components/WorkoutQuickLoggerModal';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -54,6 +55,7 @@ export default function PlannerSidebar({
     const [dailyHubTab, setDailyHubTab] = useState<'habits' | 'notes' | 'meals' | 'water'>('habits');
     const [elasticMode, setElasticMode] = useState(false);
     const [anchorFilter, setAnchorFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
+    const [showWorkoutModal, setShowWorkoutModal] = useState(false);
 
     // Cross-Module Synergy: Real-time Today's Habits
     const activeDate = selectedDate || new Date().toISOString().split('T')[0];
@@ -422,9 +424,21 @@ export default function PlannerSidebar({
                                     <span>{elasticMode ? (isIndo ? '⚡ Mode Elastis AKTIF' : '⚡ 2-Min Mode ACTIVE') : (isIndo ? '⚡ Mode Elastis (2 Menit)' : '⚡ 2-Min Elastic Mode')}</span>
                                 </button>
 
-                                <span className="text-[10px] font-bold text-slate-400 font-mono">
-                                    {completedHabitsCount}/{todayHabits.length}
-                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowWorkoutModal(true)}
+                                        className="px-2 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 text-[10px] font-black flex items-center gap-1 hover:bg-amber-100 transition active:scale-95"
+                                        title={isIndo ? 'Catat sesi gym & auto-centang habit' : 'Log gym workout & auto-check habit'}
+                                    >
+                                        <span>🏋️</span>
+                                        <span className="hidden sm:inline">{isIndo ? 'Log Gym' : 'Workout'}</span>
+                                    </button>
+
+                                    <span className="text-[10px] font-bold text-slate-400 font-mono">
+                                        {completedHabitsCount}/{todayHabits.length}
+                                    </span>
+                                </div>
                             </div>
 
                             {/* Anchor Moment / Time-of-Day Filter Pills */}
@@ -595,6 +609,16 @@ export default function PlannerSidebar({
                 )}
 
             </div>
+
+            {/* MODAL: WORKOUT QUICK LOGGER (LIFE OS SYNERGY) */}
+            {showWorkoutModal && (
+                <WorkoutQuickLoggerModal
+                    isOpen={showWorkoutModal}
+                    isIndo={isIndo}
+                    onClose={() => setShowWorkoutModal(false)}
+                    onSuccess={() => mutateHabits()}
+                />
+            )}
 
         </div>
     );

@@ -208,6 +208,41 @@ export default function JobsPage() {
         setIsJobModalOpen(true);
     };
 
+    // Cross-Module Life OS: Auto-Complete Job Application Habit
+    const [jobHabitNotice, setJobHabitNotice] = useState<string | null>(null);
+
+    const triggerJobHabitAutoCompletion = async () => {
+        try {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const periodStr = todayStr.substring(0, 7);
+            const res = await fetch(`/api/habits?period=${periodStr}`);
+            if (!res.ok) return;
+            const habits = await res.json();
+            if (!Array.isArray(habits)) return;
+
+            const jobHabit = habits.find((h: any) => {
+                const name = (h.name || '').toLowerCase();
+                return name.includes('lamar') || name.includes('apply') || name.includes('job') || 
+                       name.includes('karir') || name.includes('career') || name.includes('kerja');
+            });
+
+            if (jobHabit) {
+                await fetch(`/api/habits/${jobHabit.id}/logs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: todayStr,
+                        status: 'completed'
+                    })
+                });
+                setJobHabitNotice(jobHabit.name);
+                setTimeout(() => setJobHabitNotice(null), 7000);
+            }
+        } catch (e) {
+            console.error('Failed to auto-complete job habit:', e);
+        }
+    };
+
     // FAST INSTANT OPTIMISTIC QUICK ADD (NO MODAL!)
     const handleQuickAddJob = async (company: string, title: string, status: string = 'applied', workModel: string = 'remote', linkUrl?: string) => {
         const tempId = 'temp_' + Date.now();
@@ -241,6 +276,10 @@ export default function JobsPage() {
         // Instant optimistic update to state
         setJobs(prev => [newJob, ...prev]);
 
+        if (status === 'applied') {
+            triggerJobHabitAutoCompletion();
+        }
+
         // Post payload to backend API
         try {
             const payload = serializeJobPayload(newJob);
@@ -271,6 +310,10 @@ export default function JobsPage() {
             const tempId = 'temp_' + Date.now();
             const optimisticJob: JobRowItem = { ...jobForm, id: tempId };
             setJobs(prev => [optimisticJob, ...prev]);
+
+            if (jobForm.status === 'applied') {
+                triggerJobHabitAutoCompletion();
+            }
 
             try {
                 const res = await fetch('/api/jobs', {
@@ -437,6 +480,23 @@ export default function JobsPage() {
                     {/* MAIN CONTAINER */}
                     <div className="w-full max-w-[98%] mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-4 space-y-3 min-w-0 transition-all duration-500">
                         
+                        {/* Cross-Module Life OS: Habit Auto-Completion Banner */}
+                        {jobHabitNotice && (
+                            <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-between gap-3 text-emerald-700 dark:text-emerald-300 animate-in fade-in slide-in-from-top-2 shadow-xs">
+                                <div className="flex items-center gap-2.5">
+                                    <span className="text-base">🎯</span>
+                                    <p className="text-xs font-bold">
+                                        {isIndo 
+                                            ? `Lamaran berhasil dicatat! Kebiasaan "${jobHabitNotice}" otomatis tersinkronisasi dan tuntas hari ini.` 
+                                            : `Application logged! Habit "${jobHabitNotice}" marked completed today automatically.`}
+                                    </p>
+                                </div>
+                                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-600 text-white shrink-0">
+                                    {isIndo ? 'Satu Data OS' : 'Unified OS'}
+                                </span>
+                            </div>
+                        )}
+
                         {/* Recruitment Funnel Stats & Velocity Cards */}
                         <JobStats 
                             stats={funnelStats} 
