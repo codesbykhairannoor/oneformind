@@ -12,6 +12,7 @@ import AuthSidebar from './layout/AuthSidebar';
 import AuthLogoutModal from './layout/AuthLogoutModal';
 import AuthCoachFloatingButton from './layout/AuthCoachFloatingButton';
 import AuthMobileBottomNav from './layout/AuthMobileBottomNav';
+import ActiveModulesSetupModal from './ActiveModulesSetupModal';
 
 interface AuthenticatedLayoutProps {
     children: React.ReactNode;
@@ -61,6 +62,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         habit: true,
         planner: true,
         finance: true,
+        study: true,
         journal: true,
         calendar: true,
         job: true,
@@ -277,6 +279,9 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                 onClose={() => setShowLogoutModal(false)}
                 onLogout={handleLogout}
             />
+
+            {/* INITIAL 3-TAB SETUP MODAL */}
+            <ActiveModulesSetupModal />
 
             {/* FLOATING AI COACH BUTTON */}
             <AuthCoachFloatingButton
