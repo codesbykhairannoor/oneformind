@@ -48,7 +48,7 @@ export default function HabitDeleteModal({
                         </button>
                         <button
                             type="button"
-                            onClick={onConfirm}
+                            onClick={() => onConfirm()}
                             className="flex-1 py-3 rounded-xl text-xs font-black bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-100 dark:shadow-none transition"
                         >
                             {isIndo ? 'Ya, Hapus' : 'Yes, Delete'}

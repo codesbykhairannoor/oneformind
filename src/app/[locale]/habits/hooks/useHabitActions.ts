@@ -409,26 +409,39 @@ export function useHabitActions({
     };
 
     // Confirm & Execute Delete
-    const executeDelete = async (explicitId?: number) => {
-        const targetId = explicitId || habitToDelete?.id || editingHabitId;
-        if (targetId) {
-            setHabits(prev => prev.filter(h => h.id !== targetId));
-            setShowDeleteModal(false);
-            setHabitToDelete(null);
-            setShowCreateModal(false);
+    const executeDelete = async (explicitId?: any) => {
+        let targetId: number | null = null;
+        if (typeof explicitId === 'number' && !isNaN(explicitId) && explicitId > 0) {
+            targetId = explicitId;
+        } else if (typeof explicitId === 'string' && !isNaN(Number(explicitId)) && Number(explicitId) > 0) {
+            targetId = Number(explicitId);
+        } else if (habitToDelete && typeof habitToDelete.id === 'number' && habitToDelete.id > 0) {
+            targetId = habitToDelete.id;
+        } else if (editingHabitId && typeof editingHabitId === 'number' && editingHabitId > 0) {
+            targetId = editingHabitId;
+        }
 
-            try {
-                const res = await fetch(`/api/habits/${targetId}`, { method: 'DELETE' });
-                if (!res.ok) {
-                    console.error('Failed to delete habit on server');
-                }
-                if (mutateHabits) {
-                    await mutateHabits();
-                }
-                globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
-            } catch (error) {
-                console.error('Failed to delete habit', error);
+        if (!targetId) {
+            console.error('No valid habit ID found to delete:', { explicitId, habitToDelete, editingHabitId });
+            return;
+        }
+
+        setHabits(prev => prev.filter(h => h.id !== targetId));
+        setShowDeleteModal(false);
+        setHabitToDelete(null);
+        setShowCreateModal(false);
+
+        try {
+            const res = await fetch(`/api/habits/${targetId}`, { method: 'DELETE' });
+            if (!res.ok) {
+                console.error('Failed to delete habit on server, status:', res.status);
             }
+            if (mutateHabits) {
+                await mutateHabits();
+            }
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+        } catch (error) {
+            console.error('Failed to delete habit', error);
         }
     };
 

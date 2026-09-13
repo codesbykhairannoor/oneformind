@@ -248,7 +248,7 @@ export default function HabitsModalsContainer({
                 habit={habitToDelete}
                 isIndo={isIndo}
                 onClose={() => setShowDeleteModal(false)}
-                onConfirm={onExecuteDelete}
+                onConfirm={() => onExecuteDelete()}
             />
         </>
     );

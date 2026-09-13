@@ -9,8 +9,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const token = await getAuthToken(req);
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const id = resolvedParams.id;
+  if (!id || id === '[object Object]' || isNaN(Number(id))) {
+    return NextResponse.json({ error: 'Invalid habit ID' }, { status: 400 });
+  }
+
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('habitId', resolvedParams.id);
+  searchParams.set('habitId', id);
   
   return proxyToGo(req as any, 'habits', searchParams.toString(), token.accessToken);
 }
@@ -20,8 +25,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const token = await getAuthToken(req);
   if (!token?.sub) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const id = resolvedParams.id;
+  if (!id || id === '[object Object]' || isNaN(Number(id))) {
+    return NextResponse.json({ error: 'Invalid habit ID' }, { status: 400 });
+  }
+
   const searchParams = req.nextUrl.searchParams;
-  searchParams.set('habitId', resolvedParams.id);
+  searchParams.set('habitId', id);
   
   return proxyToGo(req as any, 'habits', searchParams.toString(), token.accessToken);
 }
