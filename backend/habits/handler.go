@@ -382,6 +382,9 @@ func handleDeleteHabit(w http.ResponseWriter, r *http.Request, userID int, habit
 		return
 	}
 
+	// Clean up entity_relations if any
+	_, _ = db.Exec(`DELETE FROM entity_relations WHERE user_id = $1 AND ((source_type = 'habit' AND source_id = $2) OR (target_type = 'habit' AND target_id = $2))`, userID, habitID)
+
 	_, err = db.Exec(`DELETE FROM habits WHERE id = $1`, habitID)
 	if err != nil {
 		fmt.Printf("Error deleting habit: %v\n", err)

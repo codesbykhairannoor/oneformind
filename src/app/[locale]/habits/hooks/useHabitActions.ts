@@ -409,12 +409,13 @@ export function useHabitActions({
     };
 
     // Confirm & Execute Delete
-    const executeDelete = async () => {
-        if (habitToDelete) {
-            const targetId = habitToDelete.id;
+    const executeDelete = async (explicitId?: number) => {
+        const targetId = explicitId || habitToDelete?.id || editingHabitId;
+        if (targetId) {
             setHabits(prev => prev.filter(h => h.id !== targetId));
             setShowDeleteModal(false);
             setHabitToDelete(null);
+            setShowCreateModal(false);
 
             try {
                 const res = await fetch(`/api/habits/${targetId}`, { method: 'DELETE' });

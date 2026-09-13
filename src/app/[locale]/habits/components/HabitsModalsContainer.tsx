@@ -234,7 +234,11 @@ export default function HabitsModalsContainer({
                 formSyncedTabs={formSyncedTabs}
                 setFormSyncedTabs={setFormSyncedTabs}
                 onClose={() => setShowCreateModal(false)}
-                onDelete={onExecuteDelete}
+                onDelete={() => {
+                    if (window.confirm(isIndo ? 'Apakah Anda yakin ingin menghapus kebiasaan ini?' : 'Are you sure you want to delete this habit?')) {
+                        onExecuteDelete();
+                    }
+                }}
                 onSubmit={onSubmitSingleHabit}
             />
 

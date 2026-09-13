@@ -7,11 +7,15 @@ import PlannerHeader from './components/PlannerHeader';
 import PlannerSidebar from './components/PlannerSidebar';
 import PlannerTimeline from './components/PlannerTimeline';
 import PlannerModalsContainer from './components/PlannerModalsContainer';
+import PlannerHabitModal from './components/PlannerHabitModal';
 import ExportModal from '@/components/export/ExportModal';
 import { usePlannerState } from './hooks/usePlannerState';
+import { useLocale } from 'next-intl';
 
 export default function PlannerPage() {
     usePageTitle('Planner');
+    const locale = useLocale();
+    const isIndo = locale === 'id';
     const planner = usePlannerState();
     const [mobileTab, setMobileTab] = useState<'timeline' | 'sidebar'>('timeline');
     const [isExportOpen, setIsExportOpen] = useState(false);
@@ -156,6 +160,7 @@ export default function PlannerPage() {
                                  tasks={planner.tasks}
                                  scheduledHabits={planner.scheduledHabits}
                                  onToggleHabit={planner.toggleHabitStatus}
+                                 onHabitClick={planner.setSelectedHabitForModal}
                                  selectedDate={planner.selectedDate}
                                  now={planner.now}
                                  startHour={planner.startHour}
@@ -174,6 +179,18 @@ export default function PlannerPage() {
                         </div>
                     </div>
                 </div>
+
+                <PlannerHabitModal
+                    isOpen={Boolean(planner.selectedHabitForModal)}
+                    habit={planner.selectedHabitForModal}
+                    selectedDate={planner.selectedDate}
+                    isIndo={isIndo}
+                    locale={locale}
+                    onClose={() => planner.setSelectedHabitForModal(null)}
+                    onToggleCompleted={planner.toggleHabitStatus}
+                    onUnlinkFromPlanner={planner.unlinkHabitFromPlanner}
+                    onDeletePermanently={planner.deleteHabitPermanently}
+                />
 
                 <PlannerModalsContainer 
                     showTaskModal={planner.showTaskModal}

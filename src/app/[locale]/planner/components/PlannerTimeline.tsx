@@ -39,6 +39,7 @@ interface PlannerTimelineProps {
     tasks: any[];
     scheduledHabits?: ScheduledHabitItem[];
     onToggleHabit?: (habitId: number) => void;
+    onHabitClick?: (habit: ScheduledHabitItem) => void;
     selectedDate: string;
     now: Date;
     startHour: number;
@@ -59,6 +60,7 @@ export default function PlannerTimeline({
     tasks,
     scheduledHabits = [],
     onToggleHabit,
+    onHabitClick,
     selectedDate,
     now,
     startHour,
@@ -594,7 +596,7 @@ export default function PlannerTimeline({
                         return (
                             <div
                                 key={`habit-${habit.id}`}
-                                onClick={() => onToggleHabit && onToggleHabit(habit.id)}
+                                onClick={() => onHabitClick ? onHabitClick(habit) : (onToggleHabit && onToggleHabit(habit.id))}
                                 className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
                                     habit.completed
                                         ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'

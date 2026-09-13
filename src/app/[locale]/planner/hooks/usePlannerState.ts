@@ -3,12 +3,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
+import useSWR, { mutate as globalMutate } from 'swr';
 import { normalizeTime, normalizeDate } from '../utils/plannerMath';
 import { usePlannerTimer } from './usePlannerTimer';
 import { usePlannerDailyData } from './usePlannerDailyData';
 import { usePlannerTaskCrud } from './usePlannerTaskCrud';
 import { TaskItem, InboxTask, ScheduledHabitItem } from '../types';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
+
+const habitsFetcher = (url: string) => fetch(url).then(res => res.json());
 
 export function usePlannerState() {
     const router = useRouter();
@@ -34,7 +37,11 @@ export function usePlannerState() {
     const daily = usePlannerDailyData(selectedDate);
     const taskCrud = usePlannerTaskCrud(selectedDate);
 
+    // Habits SWR sync
+    const { data: rawHabits, mutate: mutateHabits } = useSWR('/api/habits', habitsFetcher);
     const [scheduledHabits, setScheduledHabits] = useState<ScheduledHabitItem[]>([]);
+    const [selectedHabitForModal, setSelectedHabitForModal] = useState<ScheduledHabitItem | null>(null);
+
     const [startHour, setStartHour] = useState(6);
     const [now, setNow] = useState(new Date());
     const [isLoaded, setIsLoaded] = useState(false);
@@ -66,11 +73,10 @@ export function usePlannerState() {
 
         const loadAll = async () => {
             try {
-                const [tasksRes, dailyRes, yesterdayRes, habitsRes] = await Promise.all([
+                const [tasksRes, dailyRes, yesterdayRes] = await Promise.all([
                     fetch(`/api/planner/tasks?date=${selectedDate}`, { cache: 'no-store' }),
                     fetch(`/api/planner/daily?date=${selectedDate}`, { cache: 'no-store' }),
                     fetch(`/api/planner/tasks?date=${yesterdayStr}`, { cache: 'no-store' }),
-                    fetch('/api/habits', { cache: 'no-store' }),
                 ]);
 
                 if (tasksRes.ok) {
@@ -115,79 +121,6 @@ export function usePlannerState() {
                         }
                     }
                 }
-
-                // Parse time-scheduled habits for selectedDate (e.g. Makan Tahu at 12:00)
-                if (habitsRes.ok) {
-                    const rawHabits = await habitsRes.json();
-                    if (Array.isArray(rawHabits)) {
-                        const [sYear, sMonth, sDay] = selectedDate.split('-').map(Number);
-                        const currentDayOfWeek = new Date(sYear, sMonth - 1, sDay).getDay(); // 0: Sun, 1: Mon...
-
-                        const matched: ScheduledHabitItem[] = [];
-
-                        rawHabits.forEach((h: any) => {
-                            let meta: any = {};
-                            if (typeof h.status === 'string' && h.status.startsWith('{')) {
-                                try { meta = JSON.parse(h.status); } catch {}
-                            } else if (typeof h.status === 'object' && h.status !== null) {
-                                meta = h.status;
-                            }
-
-                            const startTime = meta.startTime;
-                            if (!startTime) return; // Only time-scheduled habits appear on timeline
-
-                            // Date bounds check
-                            if (meta.startDate && selectedDate < meta.startDate) return;
-                            if (meta.endDate && selectedDate > meta.endDate) return;
-
-                            // Frequency check
-                            const freqType = meta.frequencyType || 'daily';
-                            if (freqType === 'weekly_days' && Array.isArray(meta.frequencyDays)) {
-                                if (!meta.frequencyDays.includes(currentDayOfWeek)) {
-                                    return;
-                                }
-                            }
-
-                            // Compute end time (+30 mins default)
-                            let endTime = meta.endTime;
-                            if (!endTime) {
-                                const [sH, sM] = startTime.split(':').map(Number);
-                                const total = (isNaN(sH) ? 8 : sH) * 60 + (isNaN(sM) ? 0 : sM) + 30;
-                                const endH = String(Math.floor(total / 60) % 24).padStart(2, '0');
-                                const endM = String(total % 60).padStart(2, '0');
-                                endTime = `${endH}:${endM}`;
-                            }
-
-                            // Status on selectedDate
-                            let isDone = false;
-                            let streakCount = 0;
-                            if (Array.isArray(h.logs)) {
-                                const logToday = h.logs.find((l: any) => {
-                                    const lDate = typeof l.date === 'string' ? l.date.split('T')[0] : '';
-                                    return lDate === selectedDate;
-                                });
-                                if (logToday && (logToday.status === 'completed' || Number(logToday.value) > 0)) {
-                                    isDone = true;
-                                }
-                                streakCount = h.logs.filter((l: any) => l.status === 'completed' || Number(l.value) > 0).length;
-                            }
-
-                            matched.push({
-                                id: h.id,
-                                name: h.name,
-                                icon: h.icon || '🌱',
-                                color: h.color || '#10b981',
-                                startTime,
-                                endTime,
-                                completed: isDone,
-                                streak: streakCount,
-                                notes: meta.notes || ''
-                            });
-                        });
-
-                        setScheduledHabits(matched);
-                    }
-                }
             } catch (error) {
                 console.error('Failed to load planner data:', error);
             } finally {
@@ -200,6 +133,88 @@ export function usePlannerState() {
         const clockInterval = setInterval(() => setNow(new Date()), 60000);
         return () => clearInterval(clockInterval);
     }, [selectedDate]);
+
+    // Reactively compute scheduled habits from rawHabits (SWR-powered)
+    useEffect(() => {
+        if (!rawHabits || !Array.isArray(rawHabits)) {
+            setScheduledHabits([]);
+            return;
+        }
+
+        const [sYear, sMonth, sDay] = selectedDate.split('-').map(Number);
+        const currentDayOfWeek = new Date(sYear, sMonth - 1, sDay).getDay(); // 0: Sun, 1: Mon...
+
+        const matched: ScheduledHabitItem[] = [];
+
+        rawHabits.forEach((h: any) => {
+            // Must not be archived
+            if (h.isArchived || h.is_archived) return;
+
+            let meta: any = {};
+            if (typeof h.status === 'string' && h.status.startsWith('{')) {
+                try { meta = JSON.parse(h.status); } catch {}
+            } else if (typeof h.status === 'object' && h.status !== null) {
+                meta = h.status;
+            }
+
+            const startTime = meta.startTime;
+            if (!startTime) return; // Only time-scheduled habits appear on timeline
+
+            // Explicit check: Must be synced to planner!
+            const isPlannerSynced = Array.isArray(meta.syncedTabs) ? meta.syncedTabs.includes('planner') : true;
+            if (!isPlannerSynced) return;
+
+            // Date bounds check
+            if (meta.startDate && selectedDate < meta.startDate) return;
+            if (meta.endDate && selectedDate > meta.endDate) return;
+
+            // Frequency check
+            const freqType = meta.frequencyType || 'daily';
+            if (freqType === 'weekly_days' && Array.isArray(meta.frequencyDays)) {
+                if (!meta.frequencyDays.includes(currentDayOfWeek)) {
+                    return;
+                }
+            }
+
+            // Compute end time (+30 mins default)
+            let endTime = meta.endTime;
+            if (!endTime) {
+                const [sH, sM] = startTime.split(':').map(Number);
+                const total = (isNaN(sH) ? 8 : sH) * 60 + (isNaN(sM) ? 0 : sM) + 30;
+                const endH = String(Math.floor(total / 60) % 24).padStart(2, '0');
+                const endM = String(total % 60).padStart(2, '0');
+                endTime = `${endH}:${endM}`;
+            }
+
+            // Status on selectedDate
+            let isDone = false;
+            let streakCount = 0;
+            if (Array.isArray(h.logs)) {
+                const logToday = h.logs.find((l: any) => {
+                    const lDate = typeof l.date === 'string' ? l.date.split('T')[0] : '';
+                    return lDate === selectedDate;
+                });
+                if (logToday && (logToday.status === 'completed' || Number(logToday.value) > 0)) {
+                    isDone = true;
+                }
+                streakCount = h.logs.filter((l: any) => l.status === 'completed' || Number(l.value) > 0).length;
+            }
+
+            matched.push({
+                id: h.id,
+                name: h.name,
+                icon: h.icon || '🌱',
+                color: h.color || '#10b981',
+                startTime,
+                endTime,
+                completed: isDone,
+                streak: streakCount,
+                notes: meta.notes || ''
+            });
+        });
+
+        setScheduledHabits(matched);
+    }, [rawHabits, selectedDate]);
 
     // Combined Tasks + Scheduled Habits metrics
     const activeTasks = taskCrud.tasks.filter(t => normalizeDate(t.date) === normalizeDate(selectedDate));
@@ -246,8 +261,66 @@ export function usePlannerState() {
                     value: nextCompleted ? 1 : 0
                 })
             });
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
         } catch (err) {
             console.error('Failed to sync habit log from planner:', err);
+        }
+    };
+
+    // Unlink habit from Planner schedule
+    const unlinkHabitFromPlanner = async (habitId: number) => {
+        if (!rawHabits || !Array.isArray(rawHabits)) return;
+        const habit = rawHabits.find((h: any) => h.id === habitId);
+        if (!habit) return;
+
+        let meta: any = {};
+        if (typeof habit.status === 'string' && habit.status.startsWith('{')) {
+            try { meta = JSON.parse(habit.status); } catch {}
+        } else if (typeof habit.status === 'object' && habit.status !== null) {
+            meta = { ...habit.status };
+        }
+
+        const updatedSyncedTabs = Array.isArray(meta.syncedTabs)
+            ? meta.syncedTabs.filter((tab: string) => tab !== 'planner')
+            : [];
+
+        meta.syncedTabs = updatedSyncedTabs;
+
+        // Optimistic update
+        setScheduledHabits(prev => prev.filter(h => h.id !== habitId));
+        setSelectedHabitForModal(null);
+
+        try {
+            await fetch(`/api/habits/${habitId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: habit.name,
+                    icon: habit.icon,
+                    color: habit.color,
+                    monthlyTarget: habit.monthlyTarget || habit.monthly_target || 30,
+                    status: JSON.stringify(meta)
+                })
+            });
+            await mutateHabits();
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+        } catch (err) {
+            console.error('Failed to unlink habit from planner:', err);
+        }
+    };
+
+    // Permanently delete habit from database
+    const deleteHabitPermanently = async (habitId: number) => {
+        // Optimistic update
+        setScheduledHabits(prev => prev.filter(h => h.id !== habitId));
+        setSelectedHabitForModal(null);
+
+        try {
+            await fetch(`/api/habits/${habitId}`, { method: 'DELETE' });
+            await mutateHabits();
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+        } catch (err) {
+            console.error('Failed to delete habit permanently:', err);
         }
     };
 
@@ -352,6 +425,10 @@ export function usePlannerState() {
         handleAcceptRollover,
         handleDismissRollover,
         scheduledHabits,
-        toggleHabitStatus
+        toggleHabitStatus,
+        selectedHabitForModal,
+        setSelectedHabitForModal,
+        unlinkHabitFromPlanner,
+        deleteHabitPermanently
     };
 }
