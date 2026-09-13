@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations, useLocale } from 'next-intl';
-import { Wallet, Sliders, Calendar, Sparkles, AlertCircle, CheckCircle2, ChevronRight, X } from 'lucide-react';
+import { Wallet, Sliders, X } from 'lucide-react';
 
 interface FinanceStatsProps {
     totalIncome: number;
@@ -37,8 +38,24 @@ export default function FinanceStats({
     const locale = useLocale();
     const isIndo = locale === 'id';
 
+    const [mounted, setMounted] = useState(false);
     const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
-    const [budgetInput, setBudgetInput] = useState(monthlyBudget > 0 ? String(monthlyBudget) : '');
+    const [budgetInput, setBudgetInput] = useState('');
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Prevent body scrolling and screen shifting when modal is open
+    useEffect(() => {
+        if (isBudgetModalOpen) {
+            const originalStyle = window.getComputedStyle(document.body).overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = originalStyle;
+            };
+        }
+    }, [isBudgetModalOpen]);
 
     const needsDecimal = ['USD', 'GBP', 'EUR'].includes(activeCurrency);
 
@@ -82,8 +99,18 @@ export default function FinanceStats({
     // Arus Kas Bersih (Net Cashflow) = Pemasukan - Pengeluaran
     const netCashflow = totalIncome - totalExpense;
 
+    // Input handlers with auto dot formatting (e.g. 1000 -> 1.000)
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const clean = e.target.value.replace(/[^0-9]/g, '');
+        if (!clean) {
+            setBudgetInput('');
+        } else {
+            setBudgetInput(Number(clean).toLocaleString('id-ID'));
+        }
+    };
+
     const handleSaveBudget = () => {
-        const num = parseFloat(budgetInput.replace(/[^0-9.]/g, '')) || 0;
+        const num = Number(budgetInput.replace(/[^0-9]/g, '')) || 0;
         if (onUpdateMonthlyBudget) {
             onUpdateMonthlyBudget(num);
         }
@@ -91,13 +118,13 @@ export default function FinanceStats({
     };
 
     const handleOpenModal = () => {
-        setBudgetInput(monthlyBudget > 0 ? String(monthlyBudget) : '');
+        setBudgetInput(monthlyBudget > 0 ? Number(monthlyBudget).toLocaleString('id-ID') : '');
         setIsBudgetModalOpen(true);
     };
 
     return (
         <>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch w-full">
                 
                 {/* Left Big Card: JATAH BULANAN & ANGGARAN BELANJA (Safe-to-Spend) */}
                 <div className="lg:col-span-7 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-600 dark:from-indigo-700 dark:via-indigo-600 dark:to-violet-700 p-6 md:p-8 text-white shadow-2xl dark:shadow-none shadow-indigo-200/50 dark:shadow-indigo-900/20 flex flex-col justify-between min-h-[220px] transition-all duration-500">
@@ -145,7 +172,7 @@ export default function FinanceStats({
                                                 {formatMoney(remainingBudget)}
                                             </h3>
                                         </div>
-                                        <p className="text-xs text-white/80 font-medium mt-1.5 flex items-center gap-1.5">
+                                        <p className="text-xs text-white/80 font-medium mt-1.5 flex items-center gap-1.5 flex-wrap">
                                             <span>{isIndo ? 'Sisa uang belanja aman dari plafon' : 'Remaining safe budget of'}</span>
                                             <span className="font-mono font-bold text-white underline decoration-white/40 cursor-pointer" onClick={handleOpenModal}>
                                                 {formatMoney(monthlyBudget)}
@@ -338,10 +365,20 @@ export default function FinanceStats({
                 </div>
             </div>
 
-            {/* Modal Input Jatah Bulanan (Monthly Spending Allowance) */}
-            {isBudgetModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl relative animate-in zoom-in-95 duration-200">
+            {/* Modal Input Jatah Bulanan Portal: Guaranteed Centered, No Screen Shifting */}
+            {mounted && isBudgetModalOpen && createPortal(
+                <div 
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+                    style={{ margin: 0, top: 0, left: 0, right: 0, bottom: 0 }}
+                >
+                    {/* Background dismiss click layer */}
+                    <div 
+                        className="fixed inset-0"
+                        onClick={() => setIsBudgetModalOpen(false)}
+                    />
+
+                    {/* Modal Dialog Card */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl relative z-10 animate-in zoom-in-95 duration-200 mx-auto my-auto">
                         
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2.5">
@@ -365,7 +402,7 @@ export default function FinanceStats({
                             </button>
                         </div>
 
-                        {/* Input Field */}
+                        {/* Input Field with Auto Thousands Dots (e.g. 1.000.000) */}
                         <div className="space-y-4 my-5">
                             <div>
                                 <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
@@ -376,17 +413,21 @@ export default function FinanceStats({
                                         Rp
                                     </span>
                                     <input 
-                                        type="number"
+                                        type="text"
+                                        inputMode="numeric"
                                         autoFocus
                                         value={budgetInput}
-                                        onChange={(e) => setBudgetInput(e.target.value)}
-                                        placeholder="5000000"
+                                        onChange={handleInputChange}
+                                        placeholder="5.000.000"
                                         className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl font-mono text-xl font-black text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
+                                <p className="text-[11px] text-slate-400 mt-1 font-medium">
+                                    {isIndo ? 'Ketik angka, titik ribuan terformat otomatis (contoh: 1000 jadi 1.000)' : 'Type digits, thousand dots format automatically'}
+                                </p>
                             </div>
 
-                            {/* Quick Presets */}
+                            {/* Quick Presets with Formatted Dots */}
                             <div>
                                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
                                     {isIndo ? 'Pilihan Cepat:' : 'Quick Presets:'}
@@ -396,7 +437,7 @@ export default function FinanceStats({
                                         <button
                                             key={amt}
                                             type="button"
-                                            onClick={() => setBudgetInput(String(amt))}
+                                            onClick={() => setBudgetInput(Number(amt).toLocaleString('id-ID'))}
                                             className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition"
                                         >
                                             {formatMoney(amt)}
@@ -419,7 +460,7 @@ export default function FinanceStats({
                                         </div>
                                         <button
                                             type="button"
-                                            onClick={() => setBudgetInput(String(totalCategoryBudget))}
+                                            onClick={() => setBudgetInput(Number(totalCategoryBudget).toLocaleString('id-ID'))}
                                             className="px-2.5 py-1 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition active:scale-95 shadow-xs"
                                         >
                                             {isIndo ? 'Gunakan' : 'Apply'}
@@ -461,7 +502,8 @@ export default function FinanceStats({
                         </div>
 
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
