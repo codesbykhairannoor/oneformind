@@ -1,7 +1,6 @@
 'use client';
 
 import PlannerTaskModal from './PlannerTaskModal';
-import PlannerRoutineModal from './PlannerRoutineModal';
 import ModalPortal from '@/components/ModalPortal';
 import { TaskItem } from '../types';
 import { AlertTriangle, Trash2 } from 'lucide-react';
@@ -10,9 +9,6 @@ import { useLocale } from 'next-intl';
 interface PlannerModalsContainerProps {
     showTaskModal: boolean;
     setShowTaskModal: (show: boolean) => void;
-    showRoutineModal?: boolean;
-    setShowRoutineModal?: (show: boolean) => void;
-    onRoutineSuccess?: () => void;
     editingTaskId: number | null;
     selectedDate: string;
     tasks: TaskItem[];
@@ -36,9 +32,6 @@ interface PlannerModalsContainerProps {
 export default function PlannerModalsContainer({
     showTaskModal,
     setShowTaskModal,
-    showRoutineModal = false,
-    setShowRoutineModal,
-    onRoutineSuccess,
     editingTaskId,
     selectedDate,
     tasks,
@@ -86,15 +79,6 @@ export default function PlannerModalsContainer({
                 setTaskNotes={setTaskNotes}
                 onSave={submitSingleTask}
                 onDelete={deleteTask}
-            />
-
-            <PlannerRoutineModal
-                show={showRoutineModal}
-                onClose={() => setShowRoutineModal?.(false)}
-                selectedDate={selectedDate}
-                onSuccess={() => {
-                    if (onRoutineSuccess) onRoutineSuccess();
-                }}
             />
 
             {/* Reset Confirmation Dialog */}

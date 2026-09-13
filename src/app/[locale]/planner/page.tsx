@@ -9,14 +9,12 @@ import PlannerTimeline from './components/PlannerTimeline';
 import PlannerModalsContainer from './components/PlannerModalsContainer';
 import ExportModal from '@/components/export/ExportModal';
 import { usePlannerState } from './hooks/usePlannerState';
-import { mutate } from 'swr';
 
 export default function PlannerPage() {
     usePageTitle('Planner');
     const planner = usePlannerState();
     const [mobileTab, setMobileTab] = useState<'timeline' | 'sidebar'>('timeline');
     const [isExportOpen, setIsExportOpen] = useState(false);
-    const [showRoutineModal, setShowRoutineModal] = useState(false);
 
     // Global keyboard shortcuts (T: today, N: new task, ArrowLeft/Right: date navigation)
     useEffect(() => {
@@ -79,7 +77,6 @@ export default function PlannerPage() {
                         pending: planner.pendingCount 
                     }}
                     onOpenTaskModal={() => planner.openNewTaskModal()}
-                    onOpenRoutineModal={() => setShowRoutineModal(true)}
                     onResetBoard={planner.requestResetBoard}
                     onOpenExportModal={() => setIsExportOpen(true)}
                 />
@@ -179,11 +176,6 @@ export default function PlannerPage() {
                 <PlannerModalsContainer 
                     showTaskModal={planner.showTaskModal}
                     setShowTaskModal={planner.setShowTaskModal}
-                    showRoutineModal={showRoutineModal}
-                    setShowRoutineModal={setShowRoutineModal}
-                    onRoutineSuccess={() => {
-                        mutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
-                    }}
                     editingTaskId={planner.editingTaskId}
                     selectedDate={planner.selectedDate}
                     tasks={planner.tasks}

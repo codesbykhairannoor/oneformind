@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/routing';
-import { ChevronLeft, ChevronRight, ChevronDown, Calendar, ArrowLeft, Plus, RotateCcw, Download, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Calendar, ArrowLeft, Plus, RotateCcw, Download } from 'lucide-react';
 import PlannerDatePicker from './PlannerDatePicker';
 
 interface PlannerHeaderProps {
@@ -12,7 +12,6 @@ interface PlannerHeaderProps {
     tasks: any[];
     stats: { percent: number; completed: number; pending: number };
     onOpenTaskModal: () => void;
-    onOpenRoutineModal?: () => void;
     onResetBoard: () => void;
     onOpenExportModal?: () => void;
 }
@@ -23,7 +22,6 @@ export default function PlannerHeader({
     tasks,
     stats,
     onOpenTaskModal,
-    onOpenRoutineModal,
     onResetBoard,
     onOpenExportModal
 }: PlannerHeaderProps) {
@@ -106,13 +104,8 @@ export default function PlannerHeader({
                             </div>
                         </div>
 
-                        {/* Mobile Actions: Routine + Add + Export + Reset */}
+                        {/* Mobile Actions: Add + Export + Reset */}
                         <div className="flex md:hidden items-center gap-1.5 shrink-0">
-                            {onOpenRoutineModal && (
-                                <button onClick={onOpenRoutineModal} title={isIndo ? 'Tambah Rutinitas' : 'Add Routine'} className="w-8 h-8 flex items-center justify-center bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl font-bold border border-emerald-200 dark:border-emerald-500/20 active:scale-95">
-                                    <Sparkles size={14} />
-                                </button>
-                            )}
                             {onOpenExportModal && (
                                 <button onClick={onOpenExportModal} title={isIndo ? 'Ekspor' : 'Export'} className="w-8 h-8 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-bold border border-slate-200 dark:border-slate-700 active:scale-95">
                                     <Download size={14} className="text-indigo-600 dark:text-indigo-400" />
@@ -160,15 +153,6 @@ export default function PlannerHeader({
                             >
                                 <Download size={15} className="text-indigo-600 dark:text-indigo-400" />
                                 <span>{isIndo ? 'Ekspor' : 'Export'}</span>
-                            </button>
-                        )}
-                        {onOpenRoutineModal && (
-                            <button 
-                                onClick={onOpenRoutineModal} 
-                                title={isIndo ? 'Jadwalkan Rutinitas & Habit dengan Jam dan Hari' : 'Schedule Routine with Hours and Days'}
-                                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 text-xs active:scale-95"
-                            >
-                                <Sparkles size={15} /> <span>{isIndo ? 'Jadwal Rutin' : 'Add Routine'}</span>
                             </button>
                         )}
                         <button onClick={onOpenTaskModal} className="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 text-xs active:scale-95">

@@ -1,13 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
-import useSWR from 'swr';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X, Leaf } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X } from 'lucide-react';
 import { TaskItem } from '../types';
 import { normalizeDate } from '../utils/plannerMath';
-
-const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const VIEW_LIMIT = 24;
 const TIME_COL_WIDTH = 76;
@@ -83,61 +80,6 @@ export default function PlannerTimeline({
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const activeTasks = tasks.filter((t: any) => normalizeDate(t.date) === normalizeDate(selectedDate));
-
-    // Unified Habits Integration for Timeline Grid
-    const currentPeriod = selectedDate.substring(0, 7);
-    const { data: rawHabits } = useSWR(`/api/habits?period=${currentPeriod}`, fetcher);
-
-    const timedHabits = useMemo(() => {
-        if (!rawHabits || !Array.isArray(rawHabits)) return [];
-        const dateObj = new Date(selectedDate);
-        const dayOfWeek = isNaN(dateObj.getTime()) ? new Date().getDay() : dateObj.getDay();
-
-        return rawHabits.map((h: any) => {
-            let meta: any = {};
-            if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
-                try { meta = JSON.parse(h.status); } catch {}
-            } else if (h.status && typeof h.status === 'object') {
-                meta = h.status;
-            }
-
-            // Respect chosen synced tabs
-            if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('planner')) {
-                return null;
-            }
-
-            // Check date range
-            if (meta.startDate && selectedDate < meta.startDate) return null;
-            if (meta.endDate && selectedDate > meta.endDate) return null;
-
-            const frequencyType = meta.frequencyType || 'daily';
-            const frequencyDays = Array.isArray(meta.frequencyDays) ? meta.frequencyDays : [0, 1, 2, 3, 4, 5, 6];
-            const isScheduledToday = frequencyType === 'daily' || frequencyDays.includes(dayOfWeek);
-
-            if (!isScheduledToday) return null;
-            if (!meta.startTime) return null;
-
-            return {
-                id: h.id,
-                name: h.name,
-                icon: h.icon || '🌱',
-                color: h.color || '#10b981',
-                startTime: meta.startTime,
-                endTime: meta.endTime || undefined,
-                startDate: meta.startDate || undefined,
-                endDate: meta.endDate || undefined
-            };
-        }).filter(Boolean) as { 
-            id: number; 
-            name: string; 
-            icon: string; 
-            color: string; 
-            startTime: string;
-            endTime?: string;
-            startDate?: string;
-            endDate?: string;
-        }[];
-    }, [rawHabits, selectedDate]);
 
     const hourHeight = density === 'compact' ? 52 : 72;
     const timeColWidth = isMobile ? 56 : 74;
@@ -598,54 +540,7 @@ export default function PlannerTimeline({
                         );
                     })}
 
-                    {/* Timed Habits & Routines Plotted on Timeline Grid */}
-                    {timedHabits.map((habit) => {
-                        const style = getTaskStyle({ startTime: habit.startTime, endTime: habit.endTime });
-                        const duration = getDurationMinutes({ startTime: habit.startTime, endTime: habit.endTime });
-                        const cardHeight = typeof style.height === 'string' ? parseFloat(style.height) : 60;
-                        const viewMode = (cardHeight < 46 || duration < 40) ? 'MICRO' : 'NORMAL';
 
-                        return (
-                            <div 
-                                key={`habit-${habit.id}`}
-                                className="group absolute rounded-2xl border-2 px-0 py-0 shadow-sm overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-emerald-50/80 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-slate-900 border-emerald-400 dark:border-emerald-600/80"
-                                style={style}
-                            >
-                                <div className="w-full h-full relative">
-                                    {viewMode === 'MICRO' ? (
-                                        <div className="flex items-center justify-between h-full px-3 gap-2">
-                                            <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
-                                                <span className="text-xs shrink-0">{habit.icon}</span>
-                                                <span className="font-bold text-xs truncate leading-none text-emerald-900 dark:text-emerald-100">
-                                                    {habit.name}
-                                                </span>
-                                            </div>
-                                            <span className="text-[10px] font-mono opacity-75 whitespace-nowrap shrink-0 text-emerald-700 dark:text-emerald-300 font-bold">
-                                                {formatDisplayTime(habit.startTime)} - {formatDisplayTime(habit.endTime) || '??'}
-                                            </span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col justify-between h-full px-3.5 py-2.5 gap-1">
-                                            <div className="flex justify-between items-center shrink-0 gap-2">
-                                                <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg border flex items-center gap-1 shadow-xs shrink-0 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700">
-                                                        <span>{habit.icon}</span>
-                                                        <span>{isIndo ? 'Rutinitas' : 'Routine'}</span>
-                                                    </span>
-                                                    <h4 className="font-black text-sm leading-tight truncate flex-1 min-w-0 text-emerald-950 dark:text-emerald-100">
-                                                        {habit.name}
-                                                    </h4>
-                                                </div>
-                                                <span className="text-[10px] font-mono font-bold opacity-75 shrink-0 text-emerald-800 dark:text-emerald-300">
-                                                    {formatDisplayTime(habit.startTime)} - {formatDisplayTime(habit.endTime) || '??'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
                 </div>
             </div>
         </div>
