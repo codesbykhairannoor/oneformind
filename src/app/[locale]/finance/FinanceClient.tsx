@@ -187,68 +187,7 @@ export default function FinanceClient({
         date: t.date?.split('T')[0] || t.date
     }));
 
-    // Behavioral Spending Correlation: Habit vs Spending
-    const behavioralSpendingStats = useMemo(() => {
-        if (!habitsRawData || !Array.isArray(habitsRawData) || transactions.length === 0) return null;
-        
-        // Find all dates with at least 1 completed habit
-        const habitCompletedDates = new Set<string>();
-        habitsRawData.forEach((h: any) => {
-            (h.logs || []).forEach((l: any) => {
-                if (l.status === 'completed' && l.date) {
-                    habitCompletedDates.add(String(l.date).split('T')[0]);
-                }
-            });
-        });
 
-        // Group expenses by date
-        const expensesByDate: Record<string, number> = {};
-        transactions.forEach(t => {
-            if (t.type === 'expense' && t.date) {
-                const d = String(t.date).split('T')[0];
-                expensesByDate[d] = (expensesByDate[d] || 0) + Number(t.amount || 0);
-            }
-        });
-
-        const dates = Object.keys(expensesByDate);
-        if (dates.length < 2) {
-            return {
-                diff: 28000,
-                habitDaysCount: habitCompletedDates.size,
-                hasRealDiff: false
-            };
-        }
-
-        const habitDayExpenses: number[] = [];
-        const nonHabitDayExpenses: number[] = [];
-
-        dates.forEach(d => {
-            if (habitCompletedDates.has(d)) {
-                habitDayExpenses.push(expensesByDate[d]);
-            } else {
-                nonHabitDayExpenses.push(expensesByDate[d]);
-            }
-        });
-
-        if (habitDayExpenses.length > 0 && nonHabitDayExpenses.length > 0) {
-            const avgHabit = habitDayExpenses.reduce((a, b) => a + b, 0) / habitDayExpenses.length;
-            const avgNonHabit = nonHabitDayExpenses.reduce((a, b) => a + b, 0) / nonHabitDayExpenses.length;
-            const diff = avgNonHabit - avgHabit;
-            return {
-                diff: Math.abs(Math.round(diff)) || 28000,
-                isLower: diff >= 0,
-                habitDaysCount: habitDayExpenses.length,
-                hasRealDiff: true
-            };
-        }
-
-        return {
-            diff: 28000,
-            isLower: true,
-            habitDaysCount: habitCompletedDates.size,
-            hasRealDiff: false
-        };
-    }, [habitsRawData, transactions]);
 
     const categories: CategoryOption[] = catRawData || initialCategories;
 
@@ -723,31 +662,6 @@ export default function FinanceClient({
                                     </div>
                                 </div>
                             )}
-
-                            {/* Behavioral Spending Correlation Insight */}
-                            {behavioralSpendingStats && (
-                                <div className="mt-3 p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-indigo-200 animate-in fade-in duration-300">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-base shadow-sm shrink-0">
-                                            🧠
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300 block">
-                                                {isIndo ? 'Behavioral Spending Correlation' : 'Behavioral Spending Correlation'}
-                                            </span>
-                                            <p className="text-xs text-slate-200 font-medium">
-                                                {isIndo 
-                                                    ? `Pada hari minimal 1 kebiasaan berhasil dijalankan, rata-rata pengeluaran harianmu ${formatMoney(behavioralSpendingStats.diff)} lebih rendah dan disiplin!`
-                                                    : `On days with completed habits, average daily spending is ${formatMoney(behavioralSpendingStats.diff)} lower and more disciplined!`}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span className="text-[9px] font-black uppercase px-2.5 py-1 rounded-lg bg-indigo-600/60 text-white border border-indigo-500/30 shrink-0 font-mono">
-                                        Habit ↔ Finance Sync
-                                    </span>
-                                </div>
-                            )}
-
                         </div>
                     </div>
 
