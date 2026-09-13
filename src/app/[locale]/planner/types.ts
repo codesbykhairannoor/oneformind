@@ -22,3 +22,15 @@ export interface BatchTaskInput {
     end_time: string;
     type: number;
 }
+
+export interface ScheduledHabitItem {
+    id: number;
+    name: string;
+    icon: string;
+    color: string;
+    startTime: string;
+    endTime: string;
+    completed: boolean;
+    streak: number;
+    notes?: string;
+}

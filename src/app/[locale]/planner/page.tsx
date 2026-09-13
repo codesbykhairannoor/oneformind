@@ -154,6 +154,8 @@ export default function PlannerPage() {
                         } lg:h-[calc(100vh-140px)] lg:min-h-[640px]`}>
                              <PlannerTimeline 
                                  tasks={planner.tasks}
+                                 scheduledHabits={planner.scheduledHabits}
+                                 onToggleHabit={planner.toggleHabitStatus}
                                  selectedDate={planner.selectedDate}
                                  now={planner.now}
                                  startHour={planner.startHour}

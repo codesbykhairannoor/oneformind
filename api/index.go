@@ -30,6 +30,7 @@ import (
 	"tranvas-api/backend/paymentupgrade"
 	"tranvas-api/backend/plannerdaily"
 	"tranvas-api/backend/plannertasks"
+	"tranvas-api/backend/relations"
 	"tranvas-api/backend/studyarchives"
 	"tranvas-api/backend/studycourses"
 	"tranvas-api/backend/user"
@@ -170,6 +171,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		plannerdaily.PlannerDailyHandler(w, r)
 	case "planner-tasks":
 		plannertasks.PlannerTasksHandler(w, r)
+	case "relations":
+		relations.RelationsHandler(w, r)
 	case "study-archives":
 		studyarchives.StudyArchivesHandler(w, r)
 	case "study-courses":

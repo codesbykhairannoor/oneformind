@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X } from 'lucide-react';
-import { TaskItem } from '../types';
+import { TaskItem, ScheduledHabitItem } from '../types';
 import { normalizeDate } from '../utils/plannerMath';
 
 const VIEW_LIMIT = 24;
@@ -37,6 +37,8 @@ const formatDisplayTime = (timeStr: any): string => {
 
 interface PlannerTimelineProps {
     tasks: any[];
+    scheduledHabits?: ScheduledHabitItem[];
+    onToggleHabit?: (habitId: number) => void;
     selectedDate: string;
     now: Date;
     startHour: number;
@@ -55,6 +57,8 @@ interface PlannerTimelineProps {
 
 export default function PlannerTimeline({
     tasks,
+    scheduledHabits = [],
+    onToggleHabit,
     selectedDate,
     now,
     startHour,
@@ -250,6 +254,44 @@ export default function PlannerTimeline({
         };
     };
 
+    const getHabitStyle = (habit: ScheduledHabitItem) => {
+        const rawStart = habit.startTime;
+        const rawEnd = habit.endTime;
+        if (!rawStart) return { display: 'none' };
+        
+        const startM = parseTimeMinutes(rawStart);
+        let endM = rawEnd ? parseTimeMinutes(rawEnd) : startM + 30;
+        let duration = endM - startM;
+        if (duration < 0) duration += 1440;
+        if (duration === 0) duration = 30;
+
+        const viewStartMinutes = startHour * 60;
+        let relStart = startM - viewStartMinutes;
+        if (relStart < 0) relStart += 1440;
+
+        if (relStart >= VIEW_LIMIT * 60) return { display: 'none' };
+
+        const renderStart = Math.max(0, relStart);
+        const renderEnd = Math.min(VIEW_LIMIT * 60, relStart + duration);
+        const renderDuration = renderEnd - renderStart;
+
+        if (renderDuration <= 0) return { display: 'none' };
+
+        const topPx = (renderStart / 60) * hourHeight;
+        const heightPx = (renderDuration / 60) * hourHeight;
+        const padding = density === 'compact' ? 4 : 8;
+        const minH = density === 'compact' ? 26 : 32;
+        const finalHeight = Math.max(heightPx - padding, minH);
+
+        return {
+            top: `${topPx}px`,
+            height: `${finalHeight}px`,
+            left: `${timeColWidth + 6}px`,  
+            right: '8px', 
+            zIndex: 15
+        };
+    };
+
     const isToday = (() => {
         const today = new Date();
         const m = String(today.getMonth() + 1).padStart(2, '0');
@@ -288,7 +330,12 @@ export default function PlannerTimeline({
                             {t('timeline_title') || 'Timeline'}
                         </h3>
                         <p className="text-[10px] text-slate-400 font-bold mt-0.5 truncate">
-                            {activeTasks.length} {isIndo ? 'kegiatan' : 'tasks'}
+                            {activeTasks.length + scheduledHabits.length} {isIndo ? 'kegiatan' : 'items'}
+                            {scheduledHabits.length > 0 && (
+                                <span className="text-emerald-600 dark:text-emerald-400 ml-1 font-semibold">
+                                    ({scheduledHabits.length} habit)
+                                </span>
+                            )}
                         </p>
                     </div>
                 </div>
@@ -540,6 +587,71 @@ export default function PlannerTimeline({
                         );
                     })}
 
+                    {/* Scheduled Habits from Habits Domain (Virtual Projection - Zero Duplicate DB Tasks!) */}
+                    {scheduledHabits.map((habit) => {
+                        const style = getHabitStyle(habit);
+
+                        return (
+                            <div
+                                key={`habit-${habit.id}`}
+                                onClick={() => onToggleHabit && onToggleHabit(habit.id)}
+                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
+                                    habit.completed
+                                        ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'
+                                        : 'bg-emerald-50/85 dark:bg-emerald-950/25 border-emerald-300/80 dark:border-emerald-800/60 hover:border-emerald-400 dark:hover:border-emerald-700'
+                                }`}
+                                style={style}
+                                title={habit.notes ? `🌱 ${habit.name}: ${habit.notes}` : `🌱 Rutinitas Habit: ${habit.name}`}
+                            >
+                                <div className="w-full h-full flex items-center justify-between gap-2">
+                                    {/* Left side: Icon, Badge, Name, Streak, Time */}
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                        {/* Badge */}
+                                        <span className="px-1.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300/50 dark:border-emerald-700/50 flex items-center gap-1 shrink-0">
+                                            <span>{habit.icon || '🌱'}</span>
+                                            <span className="hidden xs:inline">HABIT</span>
+                                        </span>
+
+                                        {/* Name */}
+                                        <span className={`font-black text-xs sm:text-sm truncate ${
+                                            habit.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
+                                        }`}>
+                                            {habit.name}
+                                        </span>
+
+                                        {/* Streak */}
+                                        {habit.streak > 0 && (
+                                            <span className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/40 text-[9px] font-black shrink-0">
+                                                🔥 {habit.streak}d
+                                            </span>
+                                        )}
+
+                                        {/* Time */}
+                                        <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 shrink-0 ml-auto hidden md:inline">
+                                            {habit.startTime} - {habit.endTime}
+                                        </span>
+                                    </div>
+
+                                    {/* Right side: Checkbox */}
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (onToggleHabit) onToggleHabit(habit.id);
+                                        }}
+                                        className="p-1 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition shrink-0"
+                                        title={habit.completed ? (isIndo ? 'Batalkan selesai' : 'Mark uncompleted') : (isIndo ? 'Tandai selesai' : 'Mark completed')}
+                                    >
+                                        {habit.completed ? (
+                                            <CheckCircle2 size={19} className="text-emerald-500 transition-transform active:scale-90" />
+                                        ) : (
+                                            <Circle size={19} className="text-slate-300 dark:text-slate-600 hover:text-emerald-500 transition-transform active:scale-90" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })}
 
                 </div>
             </div>

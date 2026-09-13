@@ -7,7 +7,8 @@ import { normalizeTime, normalizeDate } from '../utils/plannerMath';
 import { usePlannerTimer } from './usePlannerTimer';
 import { usePlannerDailyData } from './usePlannerDailyData';
 import { usePlannerTaskCrud } from './usePlannerTaskCrud';
-import { TaskItem, InboxTask } from '../types';
+import { TaskItem, InboxTask, ScheduledHabitItem } from '../types';
+import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 
 export function usePlannerState() {
     const router = useRouter();
@@ -33,6 +34,7 @@ export function usePlannerState() {
     const daily = usePlannerDailyData(selectedDate);
     const taskCrud = usePlannerTaskCrud(selectedDate);
 
+    const [scheduledHabits, setScheduledHabits] = useState<ScheduledHabitItem[]>([]);
     const [startHour, setStartHour] = useState(6);
     const [now, setNow] = useState(new Date());
     const [isLoaded, setIsLoaded] = useState(false);
@@ -64,10 +66,11 @@ export function usePlannerState() {
 
         const loadAll = async () => {
             try {
-                const [tasksRes, dailyRes, yesterdayRes] = await Promise.all([
+                const [tasksRes, dailyRes, yesterdayRes, habitsRes] = await Promise.all([
                     fetch(`/api/planner/tasks?date=${selectedDate}`, { cache: 'no-store' }),
                     fetch(`/api/planner/daily?date=${selectedDate}`, { cache: 'no-store' }),
                     fetch(`/api/planner/tasks?date=${yesterdayStr}`, { cache: 'no-store' }),
+                    fetch('/api/habits', { cache: 'no-store' }),
                 ]);
 
                 if (tasksRes.ok) {
@@ -112,6 +115,79 @@ export function usePlannerState() {
                         }
                     }
                 }
+
+                // Parse time-scheduled habits for selectedDate (e.g. Makan Tahu at 12:00)
+                if (habitsRes.ok) {
+                    const rawHabits = await habitsRes.json();
+                    if (Array.isArray(rawHabits)) {
+                        const [sYear, sMonth, sDay] = selectedDate.split('-').map(Number);
+                        const currentDayOfWeek = new Date(sYear, sMonth - 1, sDay).getDay(); // 0: Sun, 1: Mon...
+
+                        const matched: ScheduledHabitItem[] = [];
+
+                        rawHabits.forEach((h: any) => {
+                            let meta: any = {};
+                            if (typeof h.status === 'string' && h.status.startsWith('{')) {
+                                try { meta = JSON.parse(h.status); } catch {}
+                            } else if (typeof h.status === 'object' && h.status !== null) {
+                                meta = h.status;
+                            }
+
+                            const startTime = meta.startTime;
+                            if (!startTime) return; // Only time-scheduled habits appear on timeline
+
+                            // Date bounds check
+                            if (meta.startDate && selectedDate < meta.startDate) return;
+                            if (meta.endDate && selectedDate > meta.endDate) return;
+
+                            // Frequency check
+                            const freqType = meta.frequencyType || 'daily';
+                            if (freqType === 'weekly_days' && Array.isArray(meta.frequencyDays)) {
+                                if (!meta.frequencyDays.includes(currentDayOfWeek)) {
+                                    return;
+                                }
+                            }
+
+                            // Compute end time (+30 mins default)
+                            let endTime = meta.endTime;
+                            if (!endTime) {
+                                const [sH, sM] = startTime.split(':').map(Number);
+                                const total = (isNaN(sH) ? 8 : sH) * 60 + (isNaN(sM) ? 0 : sM) + 30;
+                                const endH = String(Math.floor(total / 60) % 24).padStart(2, '0');
+                                const endM = String(total % 60).padStart(2, '0');
+                                endTime = `${endH}:${endM}`;
+                            }
+
+                            // Status on selectedDate
+                            let isDone = false;
+                            let streakCount = 0;
+                            if (Array.isArray(h.logs)) {
+                                const logToday = h.logs.find((l: any) => {
+                                    const lDate = typeof l.date === 'string' ? l.date.split('T')[0] : '';
+                                    return lDate === selectedDate;
+                                });
+                                if (logToday && (logToday.status === 'completed' || Number(logToday.value) > 0)) {
+                                    isDone = true;
+                                }
+                                streakCount = h.logs.filter((l: any) => l.status === 'completed' || Number(l.value) > 0).length;
+                            }
+
+                            matched.push({
+                                id: h.id,
+                                name: h.name,
+                                icon: h.icon || '🌱',
+                                color: h.color || '#10b981',
+                                startTime,
+                                endTime,
+                                completed: isDone,
+                                streak: streakCount,
+                                notes: meta.notes || ''
+                            });
+                        });
+
+                        setScheduledHabits(matched);
+                    }
+                }
             } catch (error) {
                 console.error('Failed to load planner data:', error);
             } finally {
@@ -125,10 +201,55 @@ export function usePlannerState() {
         return () => clearInterval(clockInterval);
     }, [selectedDate]);
 
+    // Combined Tasks + Scheduled Habits metrics
     const activeTasks = taskCrud.tasks.filter(t => normalizeDate(t.date) === normalizeDate(selectedDate));
-    const completedCount = activeTasks.filter(t => t.completed).length;
-    const pendingCount = activeTasks.length - completedCount;
-    const progressPercent = activeTasks.length > 0 ? Math.round((completedCount / activeTasks.length) * 100) : 0;
+    const totalItems = activeTasks.length + scheduledHabits.length;
+    const completedTasksCount = activeTasks.filter(t => t.completed).length;
+    const completedHabitsCount = scheduledHabits.filter(h => h.completed).length;
+    const completedCount = completedTasksCount + completedHabitsCount;
+    const pendingCount = Math.max(0, totalItems - completedCount);
+    const progressPercent = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
+
+    // Toggle Habit completion directly from Planner
+    const toggleHabitStatus = async (habitId: number) => {
+        const target = scheduledHabits.find(h => h.id === habitId);
+        if (!target) return;
+
+        const nextCompleted = !target.completed;
+        const nextStatus = nextCompleted ? 'completed' : 'empty';
+
+        // Optimistic UI update
+        setScheduledHabits(prev => prev.map(h => {
+            if (h.id === habitId) {
+                return {
+                    ...h,
+                    completed: nextCompleted,
+                    streak: nextCompleted ? h.streak + 1 : Math.max(0, h.streak - 1)
+                };
+            }
+            return h;
+        }));
+
+        if (nextCompleted) {
+            playCheckSound();
+        } else {
+            playUncheckSound();
+        }
+
+        try {
+            await fetch(`/api/habits/${habitId}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: selectedDate,
+                    status: nextStatus,
+                    value: nextCompleted ? 1 : 0
+                })
+            });
+        } catch (err) {
+            console.error('Failed to sync habit log from planner:', err);
+        }
+    };
 
     // Trigger reset confirmation modal
     const requestResetBoard = () => {
@@ -229,6 +350,8 @@ export function usePlannerState() {
         unfinishedYesterdayTasks,
         showRolloverBanner,
         handleAcceptRollover,
-        handleDismissRollover
+        handleDismissRollover,
+        scheduledHabits,
+        toggleHabitStatus
     };
 }
