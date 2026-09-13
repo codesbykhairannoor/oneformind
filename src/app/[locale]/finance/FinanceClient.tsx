@@ -218,6 +218,33 @@ export default function FinanceClient({
         saveUserConfig({ [`finance_income_target_${selectedMonthKey}`]: val });
     };
 
+    // ===== 5B. MONTHLY SPENDING ALLOWANCE (JATAH BULANAN) =====
+    const [monthlyBudget, setMonthlyBudget] = useState(0);
+    
+    useEffect(() => {
+        const budget = userSettings[`finance_monthly_budget_${selectedMonthKey}`] 
+                    || userSettings[`finance_monthly_budget`] 
+                    || 0;
+        setMonthlyBudget(Number(budget));
+    }, [selectedMonthKey, userSettings]);
+
+    const handleUpdateMonthlyBudget = (val: number) => {
+        setMonthlyBudget(val);
+        saveUserConfig({ 
+            [`finance_monthly_budget_${selectedMonthKey}`]: val,
+            finance_monthly_budget: val 
+        });
+    };
+
+    // Total category budgets limit sum
+    const totalCategoryBudget = useMemo(() => {
+        const expenseBudgets = budgets.filter((b: any) => {
+            const found = categories.find((c: any) => c.slug === b.category);
+            return !found || found.type === 'expense';
+        });
+        return expenseBudgets.reduce((sum: number, b: any) => sum + Number(b.limit || 0), 0);
+    }, [budgets, categories]);
+
     // ===== 6. MULTI-WALLET =====
     const wallets: WalletItem[] = useMemo(() => {
         return userSettings.finance_wallets || [];
@@ -748,6 +775,10 @@ export default function FinanceClient({
                                     totalIncome={totalIncome}
                                     totalExpense={totalExpense}
                                     balance={balance}
+                                    monthlyBudget={monthlyBudget}
+                                    onUpdateMonthlyBudget={handleUpdateMonthlyBudget}
+                                    totalCategoryBudget={totalCategoryBudget}
+                                    selectedMonthKey={selectedMonthKey}
                                     incomeTarget={incomeTarget}
                                     onUpdateTarget={handleUpdateTarget}
                                     activeCurrency={activeCurrency}
