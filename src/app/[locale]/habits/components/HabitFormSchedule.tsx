@@ -4,6 +4,7 @@ import React from 'react';
 import { calculateScheduledDays } from '../utils/habitMath';
 import { Calendar, Clock, Check, ChevronRight } from 'lucide-react';
 import { LifeOSTab } from '../types';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 interface HabitFormScheduleProps {
     isIndo: boolean;
@@ -70,6 +71,8 @@ export default function HabitFormSchedule({
     formSyncedTabs = [],
     setFormSyncedTabs
 }: HabitFormScheduleProps) {
+    const { isTabActive } = useActiveModules();
+    const isPlannerModuleActive = isTabActive('planner');
     const isPlannerActive = formSyncedTabs.includes('planner');
 
     const togglePlannerSync = () => {
@@ -142,7 +145,8 @@ export default function HabitFormSchedule({
                 </div>
             </div>
 
-            {/* SECTION 6: INTEGRASI KE TAB PLANNER (HANYA MUNCUL OPSI KETIKA AKTIF) */}
+            {/* SECTION 6: INTEGRASI KE TAB PLANNER (HANYA MUNCUL JIKA MODUL PLANNER DIAKTIFKAN USER) */}
+            {isPlannerModuleActive && (
             <div className={`rounded-3xl border-2 transition-all duration-300 overflow-hidden ${
                 isPlannerActive 
                     ? 'bg-gradient-to-b from-indigo-50/70 to-white dark:from-indigo-950/20 dark:to-slate-900 border-indigo-500/60 shadow-lg shadow-indigo-500/5' 
@@ -437,6 +441,7 @@ export default function HabitFormSchedule({
                     </div>
                 )}
             </div>
+            )}
         </div>
     );
 }

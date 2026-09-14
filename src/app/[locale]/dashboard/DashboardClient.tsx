@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { useGating } from '@/hooks/useGating';
+import { useActiveModules } from '@/hooks/useActiveModules';
 import DashboardHero from '@/app/[locale]/dashboard/components/DashboardHero';
 import DashboardQuickToolbar from '@/app/[locale]/dashboard/components/DashboardQuickToolbar';
 import DashboardTodayTasks from '@/app/[locale]/dashboard/components/DashboardTodayTasks';
@@ -21,20 +22,39 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
     });
 
     const { isExplorer, isAiEnabled, trial, isTrialActive } = useGating();
+    const { isTabActive } = useActiveModules();
+
+    const isHabitActive = isTabActive('habit');
+    const isPlannerActive = isTabActive('planner');
+    const isStudyActive = isTabActive('study');
+    const isFinanceActive = isTabActive('finance');
+    const isGoalActive = isTabActive('goal');
+    const isJournalActive = isTabActive('journal');
 
     const plannerData = synergy.planner;
     const trend = synergy.trend || [];
     const trendMax = Math.max(...trend.map((d: any) => d.score), 1);
 
-    // Calculate integrated Life Synergy score
-    const habitScore = synergy.habits.percent;
-    const plannerScore = synergy.planner.total > 0
-        ? Math.round((synergy.planner.completed / synergy.planner.total) * 100)
-        : 100;
-    const goalScore = synergy.goals.top_goal ? synergy.goals.top_goal.percent : 70;
-    const journalScore = synergy.journal.is_written ? 100 : 50;
+    // Calculate integrated Life Synergy score adaptively based on active modules
+    const activeScores: number[] = [];
+    if (isHabitActive && synergy.habits) {
+        activeScores.push(synergy.habits.percent || 0);
+    }
+    if (isPlannerActive && synergy.planner) {
+        activeScores.push(synergy.planner.total > 0
+            ? Math.round((synergy.planner.completed / synergy.planner.total) * 100)
+            : 100);
+    }
+    if (isGoalActive && synergy.goals) {
+        activeScores.push(synergy.goals.top_goal ? synergy.goals.top_goal.percent : 70);
+    }
+    if (isJournalActive && synergy.journal) {
+        activeScores.push(synergy.journal.is_written ? 100 : 50);
+    }
 
-    const overallScore = Math.round((habitScore + plannerScore + goalScore + journalScore) / 4);
+    const overallScore = activeScores.length > 0
+        ? Math.round(activeScores.reduce((a, b) => a + b, 0) / activeScores.length)
+        : 100;
 
     return (
         <AuthenticatedLayout user={user}>
@@ -62,8 +82,8 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
                                 t={t}
                             />
 
-                            {/* Academic Radar & Knowledge / Book Tracker */}
-                            {synergy.study && (
+                            {/* Academic Radar & Knowledge / Book Tracker (Only if Study module active) */}
+                            {isStudyActive && synergy.study && (
                                 <DashboardStudyRadar
                                     studyData={synergy.study}
                                     t={t}

@@ -113,9 +113,9 @@ export default function PlannerPage() {
                             }`}
                         >
                             <span>📥 Hub & Timer</span>
-                            {(planner.taskInbox.length > 0 || (planner.pendingStudyAssignments?.length || 0) > 0) && (
+                            {((planner.taskInbox.length > 0) || (planner.isStudyActive && (planner.pendingStudyAssignments?.length || 0) > 0)) && (
                                 <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-mono font-bold">
-                                    {planner.taskInbox.length + (planner.pendingStudyAssignments?.length || 0)}
+                                    {planner.taskInbox.length + (planner.isStudyActive ? (planner.pendingStudyAssignments?.length || 0) : 0)}
                                 </span>
                             )}
                         </button>
@@ -138,6 +138,7 @@ export default function PlannerPage() {
                                 setWaterGlasses={planner.handleSetWaterGlasses}
                                 taskInbox={planner.taskInbox} 
                                 setTaskInbox={planner.handleSetTaskInbox}
+                                isStudyActive={planner.isStudyActive}
                                 pendingStudyAssignments={planner.pendingStudyAssignments}
                                 onStudyClick={(study) => planner.setSelectedStudyForModal(study)}
                                 onToggleStudyCompleted={planner.toggleStudyAssignmentCompleted}

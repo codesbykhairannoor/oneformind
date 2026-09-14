@@ -31,6 +31,7 @@ interface PlannerSidebarProps {
     formatTimer: () => string;
     clearFocusedTask?: () => void;
     onScheduleInboxTaskModal?: (task: InboxTask) => void;
+    isStudyActive?: boolean;
 }
 
 export default function PlannerSidebar({
@@ -42,6 +43,7 @@ export default function PlannerSidebar({
     onStudyClick,
     onToggleStudyCompleted,
     onScheduleStudyModal,
+    isStudyActive = true,
     selectedDate,
     saveStatus = 'idle',
     durationMinutes = 25,
@@ -201,42 +203,53 @@ export default function PlannerSidebar({
             {/* 2. PERSISTENT TRAY: INBOX & TUGAS KULIAH (DRAG-TO-TIMELINE) */}
             <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-[2rem] shadow-sm border border-slate-200/80 dark:border-slate-800 transition-colors">
                 
-                {/* Segmented Switcher: Inbox vs Tugas Kuliah */}
-                <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3">
-                    <button
-                        type="button"
-                        onClick={() => setSidebarTrayTab('inbox')}
-                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
-                            sidebarTrayTab === 'inbox'
-                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                        }`}
-                    >
-                        <span>📥 {isIndo ? 'Kotak Masuk' : 'Inbox'}</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-mono">
-                            {taskInbox.length}
-                        </span>
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() => setSidebarTrayTab('study')}
-                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
-                            sidebarTrayTab === 'study'
-                                ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                        }`}
-                    >
-                        <span>📚 {isIndo ? 'Tugas Kuliah' : 'Study'}</span>
-                        {pendingStudyAssignments.length > 0 && (
-                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-mono font-bold">
-                                {pendingStudyAssignments.length}
+                {/* Segmented Switcher: Inbox vs Tugas Kuliah (Only if Study module is active) */}
+                {isStudyActive ? (
+                    <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3">
+                        <button
+                            type="button"
+                            onClick={() => setSidebarTrayTab('inbox')}
+                            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+                                sidebarTrayTab === 'inbox'
+                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                            }`}
+                        >
+                            <span>📥 {isIndo ? 'Kotak Masuk' : 'Inbox'}</span>
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-mono">
+                                {taskInbox.length}
                             </span>
-                        )}
-                    </button>
-                </div>
+                        </button>
 
-                {sidebarTrayTab === 'inbox' ? (
+                        <button
+                            type="button"
+                            onClick={() => setSidebarTrayTab('study')}
+                            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+                                sidebarTrayTab === 'study'
+                                    ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                            }`}
+                        >
+                            <span>📚 {isIndo ? 'Tugas Kuliah' : 'Study'}</span>
+                            {pendingStudyAssignments.length > 0 && (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-mono font-bold">
+                                    {pendingStudyAssignments.length}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-between mb-3 px-1">
+                        <span className="text-xs font-black text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                            <span>📥 {isIndo ? 'Kotak Masuk' : 'Quick Inbox'}</span>
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono font-bold">
+                            {taskInbox.length} {isIndo ? 'tugas' : 'tasks'}
+                        </span>
+                    </div>
+                )}
+
+                {(!isStudyActive || sidebarTrayTab === 'inbox') ? (
                     <>
                         {/* Quick Add Form */}
                         <form onSubmit={handleAddQuickInbox} className="mb-2.5">

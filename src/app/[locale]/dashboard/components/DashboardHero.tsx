@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Sparkles, Zap, Calendar, GraduationCap, CheckCircle2 } from 'lucide-react';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 interface DashboardHeroProps {
     user: any;
@@ -11,6 +12,18 @@ interface DashboardHeroProps {
 }
 
 export default function DashboardHero({ user, synergy, t, overallScore }: DashboardHeroProps) {
+    const { isTabActive } = useActiveModules();
+    const isHabitActive = isTabActive('habit');
+    const isPlannerActive = isTabActive('planner');
+
+    const summaryParts: string[] = [];
+    if (isHabitActive && synergy.habits) {
+        summaryParts.push(`${synergy.habits.completed}/${synergy.habits.total} Habit`);
+    }
+    if (isPlannerActive && synergy.planner) {
+        summaryParts.push(`${synergy.planner.completed}/${synergy.planner.total} Tugas`);
+    }
+
     const getGreetingKey = () => {
         const hour = new Date().getHours();
         if (hour < 11) return 'dash_greet_morning';
@@ -83,9 +96,15 @@ export default function DashboardHero({ user, synergy, t, overallScore }: Dashbo
                     <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
                         {overallScore >= 80 ? 'Keseimbangan Prima' : overallScore >= 50 ? 'Irama Stabil' : 'Perlu Dorongan'}
                     </p>
-                    <p className="text-[11px] text-slate-400">
-                        {synergy.habits.completed}/{synergy.habits.total} Habit &bull; {synergy.planner.completed}/{synergy.planner.total} Tugas
-                    </p>
+                    {summaryParts.length > 0 ? (
+                        <p className="text-[11px] text-slate-400">
+                            {summaryParts.join(' • ')}
+                        </p>
+                    ) : (
+                        <p className="text-[11px] text-slate-400">
+                            {t('dash_focus_today') || 'Fokus Hari Ini'}
+                        </p>
+                    )}
                 </div>
             </div>
         </header>

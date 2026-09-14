@@ -13,6 +13,7 @@ import AuthLogoutModal from './layout/AuthLogoutModal';
 import AuthCoachFloatingButton from './layout/AuthCoachFloatingButton';
 import AuthMobileBottomNav from './layout/AuthMobileBottomNav';
 import ActiveModulesSetupModal from './ActiveModulesSetupModal';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 interface AuthenticatedLayoutProps {
     children: React.ReactNode;
@@ -58,21 +59,11 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [workingStatus, setWorkingStatus] = useState('active');
     const [isDesktop, setIsDesktop] = useState(true);
-
-    const [moduleSettings, setModuleSettings] = useState<Record<string, boolean>>({
-        habit: true,
-        planner: true,
-        finance: true,
-        study: true,
-        journal: true,
-        calendar: true,
-        job: true,
-        goal: true,
-    });
+    const { modules: activeModuleState, isUnlimited: isModulesUnlimited } = useActiveModules();
 
     // If unlimited (Architect / Quantum / 14-day credit card trial), all 8 modules are unlocked
     const effectiveModuleSettings = useMemo(() => {
-        if (isUnlimited) {
+        if (isUnlimited || isModulesUnlimited) {
             return {
                 habit: true,
                 planner: true,
@@ -84,33 +75,23 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                 goal: true,
             };
         }
-        return moduleSettings;
-    }, [isUnlimited, moduleSettings]);
+        return {
+            habit: Boolean(activeModuleState.habit),
+            planner: Boolean(activeModuleState.planner),
+            finance: Boolean(activeModuleState.finance),
+            study: Boolean(activeModuleState.study),
+            journal: Boolean(activeModuleState.journal),
+            calendar: Boolean(activeModuleState.calendar),
+            job: Boolean(activeModuleState.job),
+            goal: Boolean(activeModuleState.goal),
+        };
+    }, [isUnlimited, isModulesUnlimited, activeModuleState]);
 
     useEffect(() => {
         const handleResize = () => setIsDesktop(window.innerWidth >= 768);
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    useEffect(() => {
-        const handleStorage = () => {
-            const saved = localStorage.getItem('tranvas_user_settings');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (parsed && parsed.modules) {
-                        setModuleSettings(prev => ({ ...prev, ...parsed.modules }));
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-        };
-        window.addEventListener('storage', handleStorage);
-        handleStorage();
-        return () => window.removeEventListener('storage', handleStorage);
     }, []);
 
     useEffect(() => {

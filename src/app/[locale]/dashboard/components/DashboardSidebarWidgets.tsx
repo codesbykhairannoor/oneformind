@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Link } from '@/i18n/routing';
-import { HelpCircle, Wallet, TrendingUp, Target, ChevronRight, BookOpen, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { HelpCircle, Wallet, TrendingUp, Target, ChevronRight, BookOpen, ArrowUpRight, ArrowDownRight, Layers } from 'lucide-react';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 interface DashboardSidebarWidgetsProps {
     trend: { day: string; fullDate: string; score: number }[];
@@ -17,6 +18,13 @@ export default function DashboardSidebarWidgets({
     synergy,
     t
 }: DashboardSidebarWidgetsProps) {
+    const { isTabActive } = useActiveModules();
+
+    const isHabitActive = isTabActive('habit');
+    const isFinanceActive = isTabActive('finance');
+    const isGoalActive = isTabActive('goal');
+    const isJournalActive = isTabActive('journal');
+
     const formatRupiah = (number: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -27,9 +35,12 @@ export default function DashboardSidebarWidgets({
 
     const netCashflow = (synergy.finance?.income || 0) - (synergy.finance?.expense || 0);
 
+    const hasAnyWidget = isHabitActive || isFinanceActive || isGoalActive || isJournalActive;
+
     return (
         <aside className="space-y-4 lg:col-span-4">
-            {/* Widget 1: Weekly Rhythm Chart */}
+            {/* Widget 1: Weekly Rhythm Chart (Only if Habit active) */}
+            {isHabitActive && (
             <div className="bento-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
@@ -75,8 +86,10 @@ export default function DashboardSidebarWidgets({
                     </div>
                 </div>
             </div>
+            )}
 
-            {/* Widget 2: Finance Pulse */}
+            {/* Widget 2: Finance Pulse (Only if Finance active) */}
+            {isFinanceActive && synergy.finance && (
             <Link
                 href="/finance"
                 className="bento-card bento-card-hover block rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
@@ -121,8 +134,10 @@ export default function DashboardSidebarWidgets({
                     </div>
                 </div>
             </Link>
+            )}
 
-            {/* Widget 3: Top Goal Progress */}
+            {/* Widget 3: Top Goal Progress (Only if Goal active) */}
+            {isGoalActive && synergy.goals && (
             <Link
                 href="/goals"
                 className="bento-card bento-card-hover block rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
@@ -158,8 +173,10 @@ export default function DashboardSidebarWidgets({
                     </p>
                 )}
             </Link>
+            )}
 
-            {/* Widget 4: Journal Pulse */}
+            {/* Widget 4: Journal Pulse (Only if Journal active) */}
+            {isJournalActive && synergy.journal && (
             <div className="bento-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
@@ -192,6 +209,23 @@ export default function DashboardSidebarWidgets({
                         : (t('dash_journal_start') || 'Tulis Refleksi Sekarang')} &rarr;
                 </Link>
             </div>
+            )}
+
+            {/* Empty State Fallback if all sidebar widgets modules are inactive */}
+            {!hasAnyWidget && (
+                <div className="bento-card rounded-2xl border border-dashed border-slate-200 bg-white/60 p-5 text-center dark:border-slate-800 dark:bg-slate-900/60">
+                    <Layers className="mx-auto text-slate-400 mb-2" size={24} />
+                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        {t('dash_active_modules_clean') || 'Tampilan sidebar disesuaikan dengan modul aktif Anda.'}
+                    </p>
+                    <Link
+                        href="/settings"
+                        className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:underline dark:text-indigo-400"
+                    >
+                        {t('settings_manage_tabs') || 'Kelola Tab Aktif'} &rarr;
+                    </Link>
+                </div>
+            )}
         </aside>
     );
 }

@@ -11,6 +11,7 @@ import { usePlannerTaskCrud } from './usePlannerTaskCrud';
 import { TaskItem, InboxTask, ScheduledHabitItem, ScheduledInterviewItem, ScheduledStudyItem } from '../types';
 import { deserializeJobPayload, serializeJobPayload } from '@/app/[locale]/jobs/lib/jobAnalytics';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 const habitsFetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -37,9 +38,15 @@ export function usePlannerState() {
     const timer = usePlannerTimer();
     const daily = usePlannerDailyData(selectedDate);
     const taskCrud = usePlannerTaskCrud(selectedDate);
+    // Active modules checks
+    const { isTabActive } = useActiveModules();
+    const isHabitActive = isTabActive('habit');
+    const isStudyActive = isTabActive('study');
+    const isJobActive = isTabActive('job');
+    const isJournalActive = isTabActive('journal');
 
     // Habits SWR sync
-    const { data: rawHabits, mutate: mutateHabits } = useSWR('/api/habits', habitsFetcher);
+    const { data: rawHabits, mutate: mutateHabits } = useSWR(isHabitActive ? '/api/habits' : null, habitsFetcher);
     const [scheduledHabits, setScheduledHabits] = useState<ScheduledHabitItem[]>([]);
     const [selectedHabitForModal, setSelectedHabitForModal] = useState<ScheduledHabitItem | null>(null);
 
@@ -49,7 +56,7 @@ export function usePlannerState() {
     const [selectedStudyForModal, setSelectedStudyForModal] = useState<ScheduledStudyItem | null>(null);
 
     // Jobs SWR sync (Multi-round interviews)
-    const { data: rawJobs, mutate: mutateJobs } = useSWR('/api/jobs', habitsFetcher);
+    const { data: rawJobs, mutate: mutateJobs } = useSWR(isJobActive ? '/api/jobs' : null, habitsFetcher);
     const [scheduledInterviews, setScheduledInterviews] = useState<ScheduledInterviewItem[]>([]);
     const [selectedInterviewForModal, setSelectedInterviewForModal] = useState<ScheduledInterviewItem | null>(null);
 
@@ -147,7 +154,7 @@ export function usePlannerState() {
 
     // Reactively compute scheduled habits from rawHabits (Virtual Projection)
     useEffect(() => {
-        if (!rawHabits || !Array.isArray(rawHabits)) {
+        if (!isHabitActive || !rawHabits || !Array.isArray(rawHabits)) {
             setScheduledHabits([]);
             return;
         }
@@ -229,7 +236,7 @@ export function usePlannerState() {
 
     // Reactively compute scheduled interviews from rawJobs (Virtual Projection)
     useEffect(() => {
-        if (!rawJobs || !Array.isArray(rawJobs)) {
+        if (!isJobActive || !rawJobs || !Array.isArray(rawJobs)) {
             setScheduledInterviews([]);
             return;
         }
@@ -291,17 +298,19 @@ export function usePlannerState() {
         });
 
         setScheduledInterviews(matched);
-    }, [rawJobs, selectedDate]);
+    }, [isJobActive, rawJobs, selectedDate]);
 
     // Study assignments from user.settings.study_assignments (Virtual Projection)
-    const allStudyAssignments: any[] = Array.isArray(rawUserData?.settings?.study_assignments)
+    const allStudyAssignments: any[] = (isStudyActive && Array.isArray(rawUserData?.settings?.study_assignments))
         ? rawUserData.settings.study_assignments
         : [];
 
-    const pendingStudyAssignments = allStudyAssignments.filter((a: any) => a.status !== 'completed');
+    const pendingStudyAssignments = isStudyActive
+        ? allStudyAssignments.filter((a: any) => a.status !== 'completed')
+        : [];
 
     useEffect(() => {
-        if (!Array.isArray(allStudyAssignments) || allStudyAssignments.length === 0) {
+        if (!isStudyActive || !Array.isArray(allStudyAssignments) || allStudyAssignments.length === 0) {
             setScheduledStudyTasks([]);
             return;
         }
@@ -328,7 +337,7 @@ export function usePlannerState() {
         });
 
         setScheduledStudyTasks(matched);
-    }, [rawUserData, selectedDate]);
+    }, [isStudyActive, rawUserData, selectedDate]);
 
     // Combined Tasks + Habits + Interviews + Study metrics
     const activeTasks = taskCrud.tasks.filter(t => normalizeDate(t.date) === normalizeDate(selectedDate));
@@ -666,7 +675,11 @@ export function usePlannerState() {
         scheduledInterviews,
         selectedInterviewForModal,
         setSelectedInterviewForModal,
-        toggleInterviewCompleted
+        toggleInterviewCompleted,
+        isHabitActive,
+        isStudyActive,
+        isJobActive,
+        isJournalActive
     };
 }
 

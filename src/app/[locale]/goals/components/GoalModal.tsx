@@ -14,6 +14,7 @@ import ModalPortal from '@/components/ModalPortal';
 import GoalModalHeader from './GoalModalHeader';
 import GoalArchetypesGrid, { archetypes } from './GoalArchetypesGrid';
 import GoalMilestonesSection from './GoalMilestonesSection';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -33,23 +34,27 @@ export default function GoalModal({
     onClose,
     onSave,
     onUploadImage,
-    processing,
+    processing = false,
     errors = {}
 }: GoalModalProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const { isTabActive } = useActiveModules();
+    const isHabitActive = isTabActive('habit');
+    const isFinanceActive = isTabActive('finance');
+
     const currentMonthKey = useMemo(() => {
         const now = new Date();
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     }, []);
 
-    const { data: fetchedSavings } = useSWR(show ? '/api/finance/savings' : null, fetcher);
-    const { data: fetchedHabitsRaw } = useSWR(show ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
+    const { data: fetchedSavings } = useSWR(show && isFinanceActive ? '/api/finance/savings' : null, fetcher);
+    const { data: fetchedHabitsRaw } = useSWR(show && isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
 
     const uniqueHabits = useMemo(() => {
-        if (!fetchedHabitsRaw || !Array.isArray(fetchedHabitsRaw)) return [];
+        if (!isHabitActive || !fetchedHabitsRaw || !Array.isArray(fetchedHabitsRaw)) return [];
         const seen = new Set<string>();
         const list: any[] = [];
         fetchedHabitsRaw.forEach((h: any) => {
@@ -470,7 +475,8 @@ export default function GoalModal({
                                                 </select>
                                             </div>
 
-                                            {/* Link to Finance Savings Account */}
+                                            {/* Link to Finance Savings Account (Only if Finance module active) */}
+                                            {isFinanceActive && (
                                             <div className="sm:col-span-3 pt-2.5 border-t border-emerald-200/50 dark:border-emerald-800/50 space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <label className="text-[11px] font-black uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
@@ -529,11 +535,13 @@ export default function GoalModal({
                                                     </p>
                                                 )}
                                             </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}
 
-                                {/* 5. Habit Engine (Leading Measures) Selector */}
+                                {/* 5. Habit Engine (Leading Measures) Selector (Only if Habit module active) */}
+                                {isHabitActive && (
                                 <div className="p-4 rounded-3xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-2.5">
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
@@ -589,6 +597,7 @@ export default function GoalModal({
                                         </div>
                                     )}
                                 </div>
+                                )}
 
                                 {/* 6. Color Theme Selector */}
                                 <div className="space-y-1.5">

@@ -22,12 +22,17 @@ import {
 } from './lib/goalPaceCalculator';
 import { Target, Sparkles, Plus } from 'lucide-react';
 import ExportModal from '@/components/export/ExportModal';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function GoalsPage() {
     const locale = useLocale();
     const isIndo = locale === 'id';
+    const { isTabActive } = useActiveModules();
+    const isHabitActive = isTabActive('habit');
+    const isFinanceActive = isTabActive('finance');
+
     const [isExportOpen, setIsExportOpen] = useState(false);
 
     const [currentTab, setCurrentTab] = useState<'active' | 'completed'>('active');
@@ -52,8 +57,8 @@ export default function GoalsPage() {
     }, []);
 
     const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
-    const { data: fetchedHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher);
-    const { data: fetchedSavings } = useSWR('/api/finance/savings', fetcher);
+    const { data: fetchedHabits } = useSWR(isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
+    const { data: fetchedSavings } = useSWR(isFinanceActive ? '/api/finance/savings' : null, fetcher);
 
     const parsedGoals = useMemo(() => {
         if (!fetchedGoals || !Array.isArray(fetchedGoals)) return null;
@@ -74,9 +79,9 @@ export default function GoalsPage() {
                 ? g.linked_habit_ids
                 : (Array.isArray(meta.linked_habit_ids) ? meta.linked_habit_ids : []);
 
-            // Dynamic live balance sync from Finance savings
+            // Dynamic live balance sync from Finance savings (Only if Finance module active)
             let dynamicCurrentValue = Number(g.current_value ?? g.currentValue ?? 0);
-            if (linkedSource === 'finance_savings' && linkedAccountId && Array.isArray(fetchedSavings)) {
+            if (isFinanceActive && linkedSource === 'finance_savings' && linkedAccountId && Array.isArray(fetchedSavings)) {
                 const matchedSaving = fetchedSavings.find((s: any) => String(s.id) === String(linkedAccountId));
                 if (matchedSaving) {
                     dynamicCurrentValue = Number(matchedSaving.currentAmount ?? dynamicCurrentValue);
@@ -86,7 +91,7 @@ export default function GoalsPage() {
 
             const linkedHabits: any[] = [];
             const seenHabitNames = new Set<string>();
-            if (fetchedHabits && Array.isArray(fetchedHabits)) {
+            if (isHabitActive && fetchedHabits && Array.isArray(fetchedHabits)) {
                 fetchedHabits.forEach((h: any) => {
                     if (h.isArchived || h.is_archived || h.archived) return;
 

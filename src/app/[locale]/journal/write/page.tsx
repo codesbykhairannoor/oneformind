@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import JournalEditorHeader from './components/JournalEditorHeader';
 import JournalEditorBody from './components/JournalEditorBody';
 import { analyzeJournalCognitive } from '../lib/journalAi';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 interface JournalWritePageProps {
     params?: Promise<{
@@ -20,9 +21,13 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     const isIndo = locale === 'id';
     const router = useRouter();
     const searchParams = useSearchParams();
-    const habitFriction = searchParams ? searchParams.get('habitFriction') : null;
+    const { isTabActive } = useActiveModules();
+    const isHabitActive = isTabActive('habit');
+    const isPlannerActive = isTabActive('planner');
+
+    const habitFriction = (searchParams && isHabitActive) ? searchParams.get('habitFriction') : null;
     const habitIcon = (searchParams ? searchParams.get('habitIcon') : null) || '🌱';
-    const plannerSource = searchParams ? searchParams.get('source') : null;
+    const plannerSource = (searchParams && isPlannerActive) ? searchParams.get('source') : null;
     const plannerDate = searchParams ? searchParams.get('date') : null;
 
     const resolvedParams = params ? React.use(params) : null;
@@ -70,11 +75,11 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                 });
             } catch {}
 
-            // Fetch planner tasks, daily metadata, and habits
+            // Fetch planner tasks, daily metadata, and habits only if modules are active
             const [tasksRes, dailyRes, habitsRes] = await Promise.all([
-                fetch(`/api/planner/tasks?date=${targetDate}`, { cache: 'no-store' }).catch(() => null),
-                fetch(`/api/planner/daily?date=${targetDate}`, { cache: 'no-store' }).catch(() => null),
-                fetch('/api/habits', { cache: 'no-store' }).catch(() => null)
+                isPlannerActive ? fetch(`/api/planner/tasks?date=${targetDate}`, { cache: 'no-store' }).catch(() => null) : Promise.resolve(null),
+                isPlannerActive ? fetch(`/api/planner/daily?date=${targetDate}`, { cache: 'no-store' }).catch(() => null) : Promise.resolve(null),
+                isHabitActive ? fetch('/api/habits', { cache: 'no-store' }).catch(() => null) : Promise.resolve(null)
             ]);
 
             let tasks: any[] = [];
@@ -141,23 +146,39 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
 
             const plannerNotes = daily?.notes?.trim() || '';
 
-            const generatedDebrief = isIndo ? `# 🌙 Refleksi Harian: ${displayDate}
-
-> "Evaluasi tanpa menghakimi, syukuri kemenangan kecil, dan siapkan arah untuk esok hari."
-
-### 🎯 Eksekusi Tugas & Timeblock
+            const taskSection = isPlannerActive ? (isIndo ? `### 🎯 Eksekusi Tugas & Timeblock
 - **Tugas Selesai (${completedTasks.length}/${tasks.length}):**
 ${completedTaskLines}
 - **Tugas Tertunda / Cadangan:**
 ${pendingTaskLines}
 
-### 🌱 Konsistensi Habit Hari Ini
+` : `### 🎯 Timeblock & Task Execution
+- **Completed Tasks (${completedTasks.length}/${tasks.length}):**
+${completedTaskLines}
+- **Pending / Backlog:**
+${pendingTaskLines}
+
+`) : '';
+
+            const habitSection = isHabitActive ? (isIndo ? `### 🌱 Konsistensi Habit Hari Ini
 ${habitLines}
 
-### 🥗 Metrik Tubuh & Energi
+` : `### 🌱 Habit Consistency Today
+${habitLines}
+
+`) : '';
+
+            const healthSection = isPlannerActive ? (isIndo ? `### 🥗 Metrik Tubuh & Energi
 - 💧 **Hidrasi:** ${daily?.waterGlasses || 0} gelas air
-${mealSummary ? `- 🍽️ **Nutrisi:** ${mealSummary}\n` : ''}${plannerNotes ? `- 📝 **Catatan Harian:** ${plannerNotes}\n` : ''}
-### 💡 Refleksi & Insight Malam
+${mealSummary ? `- 🍽️ **Nutrisi:** ${mealSummary}\n` : ''}${plannerNotes ? `- 📝 **Catatan Harian:** ${plannerNotes}\n` : ''}` : `### 🥗 Body & Energy Metrics
+- 💧 **Hydration:** ${daily?.waterGlasses || 0} glasses of water
+${mealSummary ? `- 🍽️ **Nutrition:** ${mealSummary}\n` : ''}${plannerNotes ? `- 📝 **Planner Notes:** ${plannerNotes}\n` : ''}`) : '';
+
+            const generatedDebrief = isIndo ? `# 🌙 Refleksi Harian: ${displayDate}
+
+> "Evaluasi tanpa menghakimi, syukuri kemenangan kecil, dan siapkan arah untuk esok hari."
+
+${taskSection}${habitSection}${healthSection}### 💡 Refleksi & Insight Malam
 1. **Kemenangan Terbesar Hari Ini:**
    - 
 2. **Hambatan / Pelajaran Berharga:**
@@ -168,19 +189,7 @@ ${mealSummary ? `- 🍽️ **Nutrisi:** ${mealSummary}\n` : ''}${plannerNotes ? 
 
 > "Evaluate without judgment, celebrate micro-wins, and calibrate clarity for tomorrow."
 
-### 🎯 Timeblock & Task Execution
-- **Completed Tasks (${completedTasks.length}/${tasks.length}):**
-${completedTaskLines}
-- **Pending / Backlog:**
-${pendingTaskLines}
-
-### 🌱 Habit Consistency Today
-${habitLines}
-
-### 🥗 Body & Energy Metrics
-- 💧 **Hydration:** ${daily?.waterGlasses || 0} glasses of water
-${mealSummary ? `- 🍽️ **Nutrition:** ${mealSummary}\n` : ''}${plannerNotes ? `- 📝 **Planner Notes:** ${plannerNotes}\n` : ''}
-### 💡 Evening Insights & Takeaways
+${taskSection}${habitSection}${healthSection}### 💡 Evening Insights & Takeaways
 1. **Biggest Win Today:**
    - 
 2. **Main Obstacle / Takeaway:**

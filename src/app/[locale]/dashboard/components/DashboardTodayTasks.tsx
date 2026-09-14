@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { ArrowRight, Plus, Zap, CheckCircle2, Circle, Sparkles } from 'lucide-react';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 interface DashboardTodayTasksProps {
     plannerData: any;
@@ -12,9 +13,13 @@ interface DashboardTodayTasksProps {
 }
 
 export default function DashboardTodayTasks({ plannerData, synergy, t }: DashboardTodayTasksProps) {
+    const { isTabActive } = useActiveModules();
+    const isHabitActive = isTabActive('habit');
+    const isPlannerActive = isTabActive('planner');
+
     const [tasks, setTasks] = useState<any[]>(plannerData.upcoming || []);
-    const [habitsList, setHabitsList] = useState<any[]>(synergy.habits.todayList || []);
-    const [completedHabitCount, setCompletedHabitCount] = useState<number>(synergy.habits.completed || 0);
+    const [habitsList, setHabitsList] = useState<any[]>(synergy.habits?.todayList || []);
+    const [completedHabitCount, setCompletedHabitCount] = useState<number>(synergy.habits?.completed || 0);
 
     const totalHabits = habitsList.length;
     const habitPercent = totalHabits > 0 ? Math.round((completedHabitCount / totalHabits) * 100) : 0;
@@ -171,7 +176,8 @@ export default function DashboardTodayTasks({ plannerData, synergy, t }: Dashboa
                 </div>
             )}
 
-            {/* Quick Habits Strip */}
+            {/* Quick Habits Strip (Only if Habit module active) */}
+            {isHabitActive && (
             <div className="pt-4 border-t border-slate-100 dark:border-white/5 space-y-3">
                 <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
@@ -213,6 +219,7 @@ export default function DashboardTodayTasks({ plannerData, synergy, t }: Dashboa
                     </div>
                 )}
             </div>
+            )}
         </section>
     );
 }

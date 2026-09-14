@@ -16,12 +16,15 @@ import GatedPage from '@/components/GatedPage';
 import { Plus, Trash2, BookOpen, Sparkles, AlertTriangle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import ExportModal from '@/components/export/ExportModal';
+import { useActiveModules } from '@/hooks/useActiveModules';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function JournalIndexPage() {
     const locale = useLocale();
     const isIndo = locale === 'id';
+    const { isTabActive } = useActiveModules();
+    const isHabitActive = isTabActive('habit');
 
     const [journals, setJournals] = useState<JournalItem[]>([]);
     const [synergy, setSynergy] = useState({
@@ -93,14 +96,14 @@ export default function JournalIndexPage() {
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     }, []);
 
-    // Habits Cross-Domain Metacognitive Friction Detection (Scoped to current month)
-    const { data: rawHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher);
+    // Habits Cross-Domain Metacognitive Friction Detection (Only if Habit active)
+    const { data: rawHabits } = useSWR(isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
 
     const [isDiagnosticDismissed, setIsDiagnosticDismissed] = useState(false);
     const [showAllFrictions, setShowAllFrictions] = useState(false);
 
     const habitFrictions = useMemo(() => {
-        if (!rawHabits || !Array.isArray(rawHabits)) return [];
+        if (!isHabitActive || !rawHabits || !Array.isArray(rawHabits)) return [];
         const today = new Date();
         const pastDays: string[] = [];
         for (let i = 1; i <= 3; i++) {
@@ -152,7 +155,7 @@ export default function JournalIndexPage() {
 
         // Urutkan dari yang paling sering missed
         return frictions.sort((a, b) => b.missedDays - a.missedDays);
-    }, [rawHabits]);
+    }, [rawHabits, isHabitActive]);
 
     // Calculate Writing Streak
     const streakDays = useMemo(() => {
@@ -308,8 +311,8 @@ export default function JournalIndexPage() {
                     />
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-                        {/* Habits Friction Diagnostic (Metacognition) - Ultra-Clean & Dismissible */}
-                        {habitFrictions.length > 0 && !isDiagnosticDismissed && (
+                        {/* Habits Friction Diagnostic (Metacognition) - Only if Habit active */}
+                        {isHabitActive && habitFrictions.length > 0 && !isDiagnosticDismissed && (
                             <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/40 dark:bg-amber-950/15 border border-amber-200/70 dark:border-amber-900/30 backdrop-blur-sm space-y-3 transition-all duration-300 shadow-xs">
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-2.5 min-w-0">
