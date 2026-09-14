@@ -12,7 +12,6 @@ import JournalCalendarView from './components/JournalCalendarView';
 import JournalTimelineView from './components/JournalTimelineView';
 import JournalMemoriesView from './components/JournalMemoriesView';
 import JournalDetailModal from './components/JournalDetailModal';
-import NeuralBridge from '@/components/NeuralBridge';
 import GatedPage from '@/components/GatedPage';
 import { Plus, Trash2, BookOpen, Sparkles, AlertTriangle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
@@ -309,8 +308,6 @@ export default function JournalIndexPage() {
                     />
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-                        <NeuralBridge module="Journal" />
-
                         {/* Habits Friction Diagnostic (Metacognition) - Ultra-Clean & Dismissible */}
                         {habitFrictions.length > 0 && !isDiagnosticDismissed && (
                             <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/40 dark:bg-amber-950/15 border border-amber-200/70 dark:border-amber-900/30 backdrop-blur-sm space-y-3 transition-all duration-300 shadow-xs">

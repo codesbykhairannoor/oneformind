@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import GatedPage from '@/components/GatedPage';
-import NeuralBridge from '@/components/NeuralBridge';
 
 import CalendarHeader from './components/CalendarHeader';
 import CalendarFilterBar, { CalendarViewMode, CalendarLayerFilters } from './components/CalendarFilterBar';
@@ -487,8 +486,6 @@ export default function CalendarPage() {
 
                     {/* Main Container */}
                     <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 min-w-0">
-                        <NeuralBridge module="Calendar" />
-
                         {/* Filter Bar & View Switcher */}
                         <CalendarFilterBar
                             activeView={viewMode}
