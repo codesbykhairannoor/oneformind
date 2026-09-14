@@ -22,6 +22,8 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     const searchParams = useSearchParams();
     const habitFriction = searchParams ? searchParams.get('habitFriction') : null;
     const habitIcon = (searchParams ? searchParams.get('habitIcon') : null) || '🌱';
+    const plannerSource = searchParams ? searchParams.get('source') : null;
+    const plannerDate = searchParams ? searchParams.get('date') : null;
 
     const resolvedParams = params ? React.use(params) : null;
     const journalId = resolvedParams?.id;
@@ -32,6 +34,7 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isInsertingBrief, setIsInsertingBrief] = useState(false);
+    const [isImportingPlanner, setIsImportingPlanner] = useState(false);
     const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
 
     // Styling & Tools State
@@ -48,6 +51,158 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const recognitionRef = useRef<any>(null);
+
+    // Planner Debrief Fetcher
+    const fetchPlannerDebrief = async (dateStr?: string | null) => {
+        setIsImportingPlanner(true);
+        try {
+            const targetDate = dateStr || new Date().toISOString().split('T')[0];
+            
+            // Format readable date
+            let displayDate = targetDate;
+            try {
+                const dateObj = new Date(`${targetDate}T12:00:00`);
+                displayDate = dateObj.toLocaleDateString(isIndo ? 'id-ID' : 'en-US', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            } catch {}
+
+            // Fetch planner tasks, daily metadata, and habits
+            const [tasksRes, dailyRes, habitsRes] = await Promise.all([
+                fetch(`/api/planner/tasks?date=${targetDate}`, { cache: 'no-store' }).catch(() => null),
+                fetch(`/api/planner/daily?date=${targetDate}`, { cache: 'no-store' }).catch(() => null),
+                fetch('/api/habits', { cache: 'no-store' }).catch(() => null)
+            ]);
+
+            let tasks: any[] = [];
+            if (tasksRes && tasksRes.ok) {
+                const d = await tasksRes.json();
+                tasks = Array.isArray(d) ? d : [];
+            }
+
+            let daily: any = null;
+            if (dailyRes && dailyRes.ok) {
+                daily = await dailyRes.json();
+            }
+
+            let habits: any[] = [];
+            if (habitsRes && habitsRes.ok) {
+                const h = await habitsRes.json();
+                habits = Array.isArray(h) ? h : [];
+            }
+
+            // Parse daily data
+            let mealsObj: { breakfast?: string; lunch?: string; dinner?: string } = {};
+            if (daily?.meals) {
+                if (typeof daily.meals === 'string') {
+                    try { mealsObj = JSON.parse(daily.meals); } catch {}
+                } else if (typeof daily.meals === 'object') {
+                    mealsObj = daily.meals;
+                }
+            }
+
+            const completedTasks = tasks.filter((t: any) => t.isCompleted);
+            const pendingTasks = tasks.filter((t: any) => !t.isCompleted);
+
+            // Habit completions for today
+            const habitCompletions = habits.map((h: any) => {
+                const isDone = (h.logs || []).some((l: any) => {
+                    const lDate = l.date ? l.date.split('T')[0] : '';
+                    return lDate === targetDate && (l.status === 'completed' || l.completed || l.value === 1);
+                });
+                return {
+                    name: h.name,
+                    icon: h.icon || '🌱',
+                    isDone
+                };
+            });
+
+            // Build Markdown
+            const completedTaskLines = completedTasks.length > 0
+                ? completedTasks.map((t: any) => `  - [x] ${t.title}${t.startTime ? ` (${t.startTime}${t.endTime ? ' - ' + t.endTime : ''})` : ''}`).join('\n')
+                : (isIndo ? '  *(Belum ada tugas selesai)*' : '  *(No completed tasks)*');
+
+            const pendingTaskLines = pendingTasks.length > 0
+                ? pendingTasks.map((t: any) => `  - [ ] ${t.title}${t.startTime ? ` (${t.startTime}${t.endTime ? ' - ' + t.endTime : ''})` : ''}`).join('\n')
+                : (isIndo ? '  *(Semua tugas hari ini selesai! 🎉)*' : '  *(All tasks completed! 🎉)*');
+
+            const habitLines = habitCompletions.length > 0
+                ? habitCompletions.map((h: any) => `  - [${h.isDone ? 'x' : ' '}] ${h.icon} ${h.name} ${h.isDone ? (isIndo ? '(Selesai)' : '(Done)') : (isIndo ? '(Belum)' : '(Pending)')}`).join('\n')
+                : (isIndo ? '  *(Belum ada kebiasaan terdaftar)*' : '  *(No habits tracked)*');
+
+            const mealSummary = [
+                mealsObj.breakfast ? `${isIndo ? 'Sarapan' : 'Breakfast'}: ${mealsObj.breakfast}` : null,
+                mealsObj.lunch ? `${isIndo ? 'Siang' : 'Lunch'}: ${mealsObj.lunch}` : null,
+                mealsObj.dinner ? `${isIndo ? 'Malam' : 'Dinner'}: ${mealsObj.dinner}` : null
+            ].filter(Boolean).join(' | ');
+
+            const plannerNotes = daily?.notes?.trim() || '';
+
+            const generatedDebrief = isIndo ? `# 🌙 Refleksi Harian: ${displayDate}
+
+> "Evaluasi tanpa menghakimi, syukuri kemenangan kecil, dan siapkan arah untuk esok hari."
+
+### 🎯 Eksekusi Tugas & Timeblock
+- **Tugas Selesai (${completedTasks.length}/${tasks.length}):**
+${completedTaskLines}
+- **Tugas Tertunda / Cadangan:**
+${pendingTaskLines}
+
+### 🌱 Konsistensi Habit Hari Ini
+${habitLines}
+
+### 🥗 Metrik Tubuh & Energi
+- 💧 **Hidrasi:** ${daily?.waterGlasses || 0} gelas air
+${mealSummary ? `- 🍽️ **Nutrisi:** ${mealSummary}\n` : ''}${plannerNotes ? `- 📝 **Catatan Harian:** ${plannerNotes}\n` : ''}
+### 💡 Refleksi & Insight Malam
+1. **Kemenangan Terbesar Hari Ini:**
+   - 
+2. **Hambatan / Pelajaran Berharga:**
+   - 
+3. **Prioritas Utama untuk Esok Hari:**
+   - 
+` : `# 🌙 Evening Reflection: ${displayDate}
+
+> "Evaluate without judgment, celebrate micro-wins, and calibrate clarity for tomorrow."
+
+### 🎯 Timeblock & Task Execution
+- **Completed Tasks (${completedTasks.length}/${tasks.length}):**
+${completedTaskLines}
+- **Pending / Backlog:**
+${pendingTaskLines}
+
+### 🌱 Habit Consistency Today
+${habitLines}
+
+### 🥗 Body & Energy Metrics
+- 💧 **Hydration:** ${daily?.waterGlasses || 0} glasses of water
+${mealSummary ? `- 🍽️ **Nutrition:** ${mealSummary}\n` : ''}${plannerNotes ? `- 📝 **Planner Notes:** ${plannerNotes}\n` : ''}
+### 💡 Evening Insights & Takeaways
+1. **Biggest Win Today:**
+   - 
+2. **Main Obstacle / Takeaway:**
+   - 
+3. **Top Priority for Tomorrow:**
+   - 
+`;
+
+            const defaultTitle = isIndo ? `🌙 Refleksi Harian - ${displayDate}` : `🌙 Evening Reflection - ${displayDate}`;
+            
+            return {
+                title: defaultTitle,
+                content: generatedDebrief,
+                mood: completedTasks.length > 0 ? 'good' : 'okay'
+            };
+        } catch (err) {
+            console.error('Failed to compile planner debrief:', err);
+            return null;
+        } finally {
+            setIsImportingPlanner(false);
+        }
+    };
 
     // 1. Fetch Existing Journal (Edit Mode) or Load Local Draft (New Mode)
     useEffect(() => {
@@ -85,6 +240,15 @@ export default function JournalWritePage({ params }: JournalWritePageProps) {
                 }
             };
             fetchJournal();
+        } else if (plannerSource === 'planner') {
+            // Auto-populate with Planner Daily Debrief
+            fetchPlannerDebrief(plannerDate).then(result => {
+                if (result) {
+                    setTitle(result.title);
+                    setContent(result.content);
+                    setMood(result.mood);
+                }
+            });
         } else if (habitFriction) {
             // Guided Habit Friction Audit template
             setTitle(isIndo ? `🔍 Diagnostik Friksi: ${habitIcon} ${habitFriction}` : `🔍 Habit Friction Audit: ${habitIcon} ${habitFriction}`);
@@ -138,7 +302,7 @@ What actually happened during the scheduled habit window over the last few days?
                 console.error('Draft restore error', e);
             }
         }
-    }, [journalId, habitFriction, isIndo, habitIcon]);
+    }, [journalId, plannerSource, plannerDate, habitFriction, isIndo, habitIcon]);
 
     // 2. Auto-save Draft to LocalStorage every 5s if creating new
     useEffect(() => {
@@ -280,6 +444,26 @@ What actually happened during the scheduled habit window over the last few days?
         }
     };
 
+    // Handle 1-Click Planner Log Import
+    const handleImportPlanner = async () => {
+        const result = await fetchPlannerDebrief(plannerDate);
+        if (!result) return;
+
+        if (content.trim().length > 0) {
+            const confirmAppend = window.confirm(
+                isIndo 
+                    ? 'Tambahkan rangkuman log Planner ke draf tulisan Anda saat ini?' 
+                    : 'Append Planner log summary to your current draft?'
+            );
+            if (!confirmAppend) return;
+            setContent(prev => `${prev.trim()}\n\n---\n\n${result.content}`);
+        } else {
+            setTitle(result.title);
+            setContent(result.content);
+            setMood(result.mood);
+        }
+    };
+
     // Save Action
     const handleSave = async () => {
         if (!title && !content) return;
@@ -409,6 +593,8 @@ What actually happened during the scheduled habit window over the last few days?
                 lastSavedTime={lastSavedTime}
                 fontFamilies={fontFamilies}
                 fontSizes={fontSizes}
+                onImportPlanner={handleImportPlanner}
+                isImportingPlanner={isImportingPlanner}
             />
 
             <JournalEditorBody
@@ -433,6 +619,8 @@ What actually happened during the scheduled habit window over the last few days?
                 isItalic={isItalic}
                 onInsertLifeOSBrief={handleInsertLifeOSBrief}
                 isInsertingBrief={isInsertingBrief}
+                onImportPlanner={handleImportPlanner}
+                isImportingPlanner={isImportingPlanner}
             />
         </div>
     );

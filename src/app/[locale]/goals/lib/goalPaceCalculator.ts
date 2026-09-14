@@ -47,8 +47,13 @@ export interface GoalItem {
     milestones?: GoalMilestone[];
     is_saving?: boolean;
 
-    // Cross-Domain Habit Engine (Leading Measures)
+    // Cross-Domain Habit & Finance Engine (Leading Measures & Integrations)
+    linked_source?: 'manual' | 'finance_savings' | 'habits' | string;
+    linked_account_id?: number | string | null;
+    linked_account_title?: string | null;
+    linked_habit_ids?: (number | string)[];
     linked_habits?: LinkedHabitEngine[];
+    specific_days?: string | null;
 }
 
 export interface LinkedHabitEngine {

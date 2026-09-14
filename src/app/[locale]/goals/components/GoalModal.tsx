@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocale } from 'next-intl';
+import useSWR from 'swr';
 import { 
     Target, Calendar, Award, Zap, CheckCircle2, Star, 
     Hash, DollarSign, ListTodo, CheckSquare, Compass, 
-    ShieldAlert, Sparkles, Flag
+    ShieldAlert, Sparkles, Flag, Link2
 } from 'lucide-react';
 import GoalDatePicker from './GoalDatePicker';
 import { GoalItem } from './GoalCard';
@@ -13,6 +14,8 @@ import ModalPortal from '@/components/ModalPortal';
 import GoalModalHeader from './GoalModalHeader';
 import GoalArchetypesGrid, { archetypes } from './GoalArchetypesGrid';
 import GoalMilestonesSection from './GoalMilestonesSection';
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 interface GoalModalProps {
     show: boolean;
@@ -37,6 +40,9 @@ export default function GoalModal({
     const isIndo = locale === 'id';
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const { data: fetchedSavings } = useSWR(show ? '/api/finance/savings' : null, fetcher);
+    const { data: fetchedHabits } = useSWR(show ? '/api/habits' : null, fetcher);
+
     const [form, setForm] = useState<GoalItem>({
         id: '',
         title: '',
@@ -59,7 +65,11 @@ export default function GoalModal({
         start_date: new Date().toISOString().split('T')[0],
         end_date: null,
         cover_image_url: '',
-        milestones: []
+        milestones: [],
+        linked_source: 'manual',
+        linked_account_id: null,
+        linked_account_title: null,
+        linked_habit_ids: []
     });
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -70,7 +80,20 @@ export default function GoalModal({
 
     useEffect(() => {
         if (goal) {
-            setForm(JSON.parse(JSON.stringify(goal)));
+            const parsedGoal = JSON.parse(JSON.stringify(goal));
+            if (goal.specific_days && typeof goal.specific_days === 'string') {
+                try {
+                    const meta = JSON.parse(goal.specific_days);
+                    if (meta.linked_source && !parsedGoal.linked_source) parsedGoal.linked_source = meta.linked_source;
+                    if (meta.linked_account_id && !parsedGoal.linked_account_id) parsedGoal.linked_account_id = meta.linked_account_id;
+                    if (meta.linked_account_title && !parsedGoal.linked_account_title) parsedGoal.linked_account_title = meta.linked_account_title;
+                    if (Array.isArray(meta.linked_habit_ids) && (!parsedGoal.linked_habit_ids || parsedGoal.linked_habit_ids.length === 0)) {
+                        parsedGoal.linked_habit_ids = meta.linked_habit_ids;
+                    }
+                } catch {}
+            }
+            if (!parsedGoal.linked_habit_ids) parsedGoal.linked_habit_ids = [];
+            setForm(parsedGoal);
             setImagePreview(goal.cover_image_url || null);
             setSelectedArchetype(goal.category || 'other');
         } else {
@@ -96,7 +119,11 @@ export default function GoalModal({
                 start_date: new Date().toISOString().split('T')[0],
                 end_date: null,
                 cover_image_url: '',
-                milestones: []
+                milestones: [],
+                linked_source: 'manual',
+                linked_account_id: null,
+                linked_account_title: null,
+                linked_habit_ids: []
             });
             setImagePreview(null);
             setSelectedArchetype('other');
@@ -355,9 +382,124 @@ export default function GoalModal({
                                             <option value="USD">USD ($ - Dollar)</option>
                                         </select>
                                     </div>
+
+                                    {/* Link to Finance Savings Account */}
+                                    <div className="sm:col-span-3 pt-3 border-t border-emerald-200/50 dark:border-emerald-800/50 space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-[11px] font-black uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                                <Link2 size={13} />
+                                                {isIndo ? 'Sinkronisasi Tabungan Finansial (Auto-Sync Saldo)' : 'Link to Finance Savings (Auto-Sync Balance)'}
+                                            </label>
+                                            {form.linked_source === 'finance_savings' && (
+                                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                                                    {isIndo ? '🟢 Terhubung Langsung' : '🟢 Live Linked'}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <select
+                                            value={form.linked_account_id ? String(form.linked_account_id) : 'manual'}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val === 'manual') {
+                                                    setForm(prev => ({
+                                                        ...prev,
+                                                        linked_source: 'manual',
+                                                        linked_account_id: null,
+                                                        linked_account_title: null
+                                                    }));
+                                                } else {
+                                                    const savingsList: any[] = Array.isArray(fetchedSavings) ? fetchedSavings : [];
+                                                    const matched = savingsList.find((s: any) => String(s.id) === val);
+                                                    if (matched) {
+                                                        setForm(prev => ({
+                                                            ...prev,
+                                                            linked_source: 'finance_savings',
+                                                            linked_account_id: matched.id,
+                                                            linked_account_title: matched.title,
+                                                            current_value: matched.currentAmount ?? prev.current_value,
+                                                            target_value: (prev.target_value === 50000000 && matched.targetAmount) ? matched.targetAmount : prev.target_value
+                                                        }));
+                                                    }
+                                                }
+                                            }}
+                                            className="w-full bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800/80 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 dark:text-white shadow-sm"
+                                        >
+                                            <option value="manual">
+                                                {isIndo ? '✏️ Input Manual (Tidak terhubung ke tabungan)' : '✏️ Manual Input (Not linked)'}
+                                            </option>
+                                            {(Array.isArray(fetchedSavings) ? fetchedSavings : []).map((sav: any) => (
+                                                <option key={sav.id} value={sav.id}>
+                                                    {sav.icon || '💰'} {sav.title} — {new Intl.NumberFormat(isIndo ? 'id-ID' : 'en-US', { style: 'currency', currency: form.currency || 'IDR', maximumFractionDigits: 0 }).format(sav.currentAmount || 0)}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {form.linked_source === 'finance_savings' && (
+                                            <p className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 leading-tight">
+                                                {isIndo 
+                                                    ? 'Saldo target ini akan selalu disinkronkan secara otomatis dari saldo tabungan Anda di modul Finansial.' 
+                                                    : 'This goal will automatically synchronize its progress with your savings account in the Finance module.'}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}
+
+                        {/* Habit Engine (Leading Measures) Selector */}
+                        <div className="p-4 rounded-3xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                    <Sparkles size={14} />
+                                    {isIndo ? '🌱 Mesin Kebiasaan Pendorong (Leading Measures)' : '🌱 Supporting Habit Engine'}
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-400">
+                                    {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'linked'}
+                                </span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                {isIndo 
+                                    ? 'Hubungkan kebiasaan harian yang menjadi mesin eksekusi utama (leading measures) untuk mewujudkan visi target ini.' 
+                                    : 'Link daily atomic habits that act as the leading measures directly powering this goal.'}
+                            </p>
+
+                            {(!fetchedHabits || !Array.isArray(fetchedHabits) || fetchedHabits.length === 0) ? (
+                                <div className="text-xs text-slate-400 italic py-1">
+                                    {isIndo ? 'Belum ada kebiasaan yang dibuat di modul Habits.' : 'No habits found in the Habits module.'}
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2 pt-1">
+                                    {fetchedHabits.map((h: any) => {
+                                        const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
+                                        return (
+                                            <button
+                                                key={h.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setForm(prev => {
+                                                        const currentIds = prev.linked_habit_ids || [];
+                                                        const exists = currentIds.some(id => String(id) === String(h.id));
+                                                        const nextIds = exists 
+                                                            ? currentIds.filter(id => String(id) !== String(h.id))
+                                                            : [...currentIds, h.id];
+                                                        return { ...prev, linked_habit_ids: nextIds };
+                                                    });
+                                                }}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 ${
+                                                    isSelected
+                                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20 ring-2 ring-indigo-400'
+                                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                                                }`}
+                                            >
+                                                <span>{h.icon || '🌱'}</span>
+                                                <span>{h.name}</span>
+                                                {isSelected && <CheckCircle2 size={12} className="ml-0.5" />}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
 
                         {/* 5. Archetype Template Selection */}
                         <GoalArchetypesGrid

@@ -294,6 +294,7 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		CurrentValue  *float64 `json:"currentValue"`
 		StartDate     *string  `json:"startDate"`
 		EndDate       *string  `json:"endDate"`
+		SpecificDays  *string  `json:"specificDays"`
 		Status        *string  `json:"status"`
 		CoverImageUrl *string  `json:"coverImageUrl"`
 		Reward        *string  `json:"reward"`
@@ -395,6 +396,11 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		} else {
 			args = append(args, nil)
 		}
+		argId++
+	}
+	if body.SpecificDays != nil {
+		query += `, specific_days = $` + strconv.Itoa(argId)
+		args = append(args, *body.SpecificDays)
 		argId++
 	}
 

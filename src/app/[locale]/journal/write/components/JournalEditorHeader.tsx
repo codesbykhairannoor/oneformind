@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import { 
     ArrowLeft, Save, Bold, Italic, List, ListOrdered, Quote, 
     CheckSquare, Type, ChevronDown, Mic, MicOff, Sparkles, 
-    Eye, EyeOff, CheckCircle2, Clock
+    Eye, EyeOff, CheckCircle2, Clock, CalendarCheck2
 } from 'lucide-react';
 
 interface JournalEditorHeaderProps {
@@ -36,6 +36,8 @@ interface JournalEditorHeaderProps {
     lastSavedTime?: string | null;
     fontFamilies: { name: string; value: string }[];
     fontSizes: { label: string; value: string }[];
+    onImportPlanner?: () => void;
+    isImportingPlanner?: boolean;
 }
 
 export default function JournalEditorHeader({
@@ -64,7 +66,9 @@ export default function JournalEditorHeader({
     isSaving,
     lastSavedTime,
     fontFamilies,
-    fontSizes
+    fontSizes,
+    onImportPlanner,
+    isImportingPlanner = false
 }: JournalEditorHeaderProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -277,6 +281,20 @@ export default function JournalEditorHeader({
                 >
                     <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
                 </button>
+
+                {/* Import Planner Log Button */}
+                {onImportPlanner && (
+                    <button
+                        type="button"
+                        onClick={onImportPlanner}
+                        disabled={isImportingPlanner}
+                        className="h-8 sm:h-9 px-2.5 rounded-xl flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200/50 dark:border-indigo-800/50 transition-all text-xs font-bold active:scale-95 disabled:opacity-50 shrink-0"
+                        title={isIndo ? 'Impor Log & Refleksi Planner Hari Ini' : "Import Today's Planner Log"}
+                    >
+                        <CalendarCheck2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span className="hidden lg:inline">{isIndo ? 'Log Planner' : 'Planner Log'}</span>
+                    </button>
+                )}
             </div>
 
             {/* Right: Save Button */}

@@ -4,7 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { useLocale } from 'next-intl';
 import { 
     Camera, Trash2, Sparkles, LayoutTemplate, Zap, ShieldCheck, 
-    Tag, HelpCircle, Lightbulb, AlertTriangle, CheckCircle2, ChevronRight, X
+    Tag, HelpCircle, Lightbulb, AlertTriangle, CheckCircle2, ChevronRight, X,
+    CalendarCheck2
 } from 'lucide-react';
 import { JOURNAL_TEMPLATES, JournalTemplate } from '../../lib/journalTemplates';
 import { analyzeJournalCognitive } from '../../lib/journalAi';
@@ -31,6 +32,8 @@ interface JournalEditorBodyProps {
     isItalic: boolean;
     onInsertLifeOSBrief: () => void;
     isInsertingBrief?: boolean;
+    onImportPlanner?: () => void;
+    isImportingPlanner?: boolean;
 }
 
 export default function JournalEditorBody({
@@ -54,7 +57,9 @@ export default function JournalEditorBody({
     isBold,
     isItalic,
     onInsertLifeOSBrief,
-    isInsertingBrief = false
+    isInsertingBrief = false,
+    onImportPlanner,
+    isImportingPlanner = false
 }: JournalEditorBodyProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -136,16 +141,31 @@ export default function JournalEditorBody({
                         </div>
                     </div>
 
-                    {/* 1-Click Life OS Brief Button */}
-                    <button
-                        type="button"
-                        onClick={onInsertLifeOSBrief}
-                        disabled={isInsertingBrief}
-                        className="group flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black transition-all active:scale-95 disabled:opacity-50 shadow-sm"
-                    >
-                        <Zap className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
-                        <span>{isInsertingBrief ? (isIndo ? 'Menyisipkan...' : 'Injecting...') : (isIndo ? '+ Sisipkan Rekap Hari Ini' : '+ Insert Today\'s OS Brief')}</span>
-                    </button>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        {/* 1-Click Life OS Brief Button */}
+                        <button
+                            type="button"
+                            onClick={onInsertLifeOSBrief}
+                            disabled={isInsertingBrief}
+                            className="group flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black transition-all active:scale-95 disabled:opacity-50 shadow-sm"
+                        >
+                            <Zap className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
+                            <span>{isInsertingBrief ? (isIndo ? 'Menyisipkan...' : 'Injecting...') : (isIndo ? '+ Rekap Cepat OS' : '+ Quick OS Brief')}</span>
+                        </button>
+
+                        {/* Import Planner Log Button */}
+                        {onImportPlanner && (
+                            <button
+                                type="button"
+                                onClick={onImportPlanner}
+                                disabled={isImportingPlanner}
+                                className="group flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 hover:from-indigo-500/20 hover:to-purple-500/20 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400 text-xs font-black transition-all active:scale-95 disabled:opacity-50 shadow-sm"
+                            >
+                                <CalendarCheck2 className="w-3.5 h-3.5 text-indigo-500 group-hover:scale-110 transition-transform" />
+                                <span>{isImportingPlanner ? (isIndo ? 'Mengimpor Log...' : 'Importing...') : (isIndo ? '🌙 Impor Log Planner' : '🌙 Import Planner Log')}</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Template Chips */}

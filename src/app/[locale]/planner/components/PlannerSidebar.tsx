@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, BookOpen, AlertCircle } from 'lucide-react';
 import { InboxTask } from '../types';
+import { Link } from '@/i18n/routing';
 
 interface PlannerSidebarProps {
     notes: string;
@@ -520,6 +521,29 @@ export default function PlannerSidebar({
                 )}
 
             </div>
+
+            {/* 4. EVENING REFLECTION SHORTCUT TO JOURNAL */}
+            <Link
+                href={`/journal/write?source=planner&date=${selectedDate || ''}`}
+                className="group p-3.5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 hover:from-indigo-500/20 hover:via-purple-500/20 hover:to-pink-500/20 border border-indigo-200/60 dark:border-indigo-800/50 flex items-center justify-between transition-all shadow-sm active:scale-[0.98]"
+            >
+                <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center text-sm shadow-md shadow-indigo-500/20 shrink-0">
+                        🌙
+                    </div>
+                    <div className="min-w-0">
+                        <h4 className="font-black text-xs text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            {isIndo ? 'Refleksi Hari Ini di Jurnal' : 'Evening Reflection in Journal'}
+                        </h4>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                            {isIndo ? 'Impor otomatis rekap task, habit & fokus' : 'Auto-import tasks, habits & focus logs'}
+                        </p>
+                    </div>
+                </div>
+                <span className="text-slate-400 group-hover:text-indigo-500 transition-transform group-hover:translate-x-0.5 text-xs font-bold">
+                    ➔
+                </span>
+            </Link>
 
         </div>
     );

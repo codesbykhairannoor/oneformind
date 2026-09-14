@@ -213,6 +213,13 @@ export default function GoalCard({
                                 {formatDateDisplay(goal.end_date)}
                             </span>
                         )}
+
+                        {goal.linked_source === 'finance_savings' && (
+                            <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-emerald-500/90 text-white border border-emerald-400/40 flex items-center gap-1 shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                                <span>💰 Live Sync</span>
+                            </span>
+                        )}
                     </div>
 
                     <h3 className={`text-lg sm:text-xl font-black truncate drop-shadow-sm transition-colors ${
@@ -383,6 +390,18 @@ export default function GoalCard({
                             <span>{isIndo ? 'Target Akhir' : 'Target Goal'}:</span>
                             <span>{formatCurrency(goal.target_value, goal.currency)}</span>
                         </div>
+
+                        {goal.linked_source === 'finance_savings' && (
+                            <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
+                                <span className="flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>{isIndo ? 'Tabungan Terhubung:' : 'Synced Savings:'}</span>
+                                </span>
+                                <span className="font-black truncate max-w-[140px] text-emerald-800 dark:text-emerald-300">
+                                    {goal.linked_account_title || (isIndo ? 'Tabungan Finansial' : 'Finance Savings')}
+                                </span>
+                            </div>
+                        )}
 
                         {onQuickIncrement && goal.status !== 'completed' && (
                             <div className="flex items-center gap-2 pt-1">

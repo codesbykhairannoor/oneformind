@@ -49,26 +49,55 @@ export default function GoalsPage() {
 
     const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
     const { data: fetchedHabits } = useSWR('/api/habits', fetcher);
+    const { data: fetchedSavings } = useSWR('/api/finance/savings', fetcher);
 
     const parsedGoals = useMemo(() => {
         if (!fetchedGoals || !Array.isArray(fetchedGoals)) return null;
         return fetchedGoals.map((g: any) => {
+            // Parse specific_days / metadata
+            let meta: any = {};
+            const rawSpecific = g.specific_days || g.specificDays;
+            if (rawSpecific && typeof rawSpecific === 'string') {
+                try { meta = JSON.parse(rawSpecific); } catch {}
+            } else if (rawSpecific && typeof rawSpecific === 'object') {
+                meta = rawSpecific;
+            }
+
+            const linkedSource = g.linked_source || meta.linked_source || 'manual';
+            const linkedAccountId = g.linked_account_id ?? meta.linked_account_id ?? null;
+            let linkedAccountTitle = g.linked_account_title || meta.linked_account_title || null;
+            const linkedHabitIds: (number | string)[] = Array.isArray(g.linked_habit_ids)
+                ? g.linked_habit_ids
+                : (Array.isArray(meta.linked_habit_ids) ? meta.linked_habit_ids : []);
+
+            // Dynamic live balance sync from Finance savings
+            let dynamicCurrentValue = Number(g.current_value ?? g.currentValue ?? 0);
+            if (linkedSource === 'finance_savings' && linkedAccountId && Array.isArray(fetchedSavings)) {
+                const matchedSaving = fetchedSavings.find((s: any) => String(s.id) === String(linkedAccountId));
+                if (matchedSaving) {
+                    dynamicCurrentValue = Number(matchedSaving.currentAmount ?? dynamicCurrentValue);
+                    linkedAccountTitle = matchedSaving.title || linkedAccountTitle;
+                }
+            }
+
             const linkedHabits: any[] = [];
             if (fetchedHabits && Array.isArray(fetchedHabits)) {
                 fetchedHabits.forEach((h: any) => {
-                    let meta: any = {};
+                    let hMeta: any = {};
                     if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
-                        try { meta = JSON.parse(h.status); } catch {}
+                        try { hMeta = JSON.parse(h.status); } catch {}
                     } else if (h.status && typeof h.status === 'object') {
-                        meta = h.status;
+                        hMeta = h.status;
                     }
-                    if (meta.syncedTabs && Array.isArray(meta.syncedTabs) && !meta.syncedTabs.includes('goal')) {
+                    if (hMeta.syncedTabs && Array.isArray(hMeta.syncedTabs) && !hMeta.syncedTabs.includes('goal')) {
                         return;
                     }
-                    const isMatched = (meta.goalId && String(meta.goalId) === String(g.id)) ||
-                                      (meta.goalTitle && meta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
+                    const isExplicitlyLinked = linkedHabitIds.some(id => String(id) === String(h.id));
+                    const isMatched = isExplicitlyLinked ||
+                                      (hMeta.goalId && String(hMeta.goalId) === String(g.id)) ||
+                                      (hMeta.goalTitle && hMeta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
                     if (isMatched) {
-                        const completedDays = (h.logs || []).filter((l: any) => l.status === 'completed').length;
+                        const completedDays = (h.logs || []).filter((l: any) => l.status === 'completed' || l.completed || l.value === 1).length;
                         const target = Number(h.monthlyTarget) || 30;
                         const consistency = Math.min(100, Math.round((completedDays / target) * 100));
                         linkedHabits.push({
@@ -91,21 +120,26 @@ export default function GoalsPage() {
                 status: g.status || 'active',
                 priority: g.priority || 'important',
                 category: g.category || 'other',
-                time_horizon: g.time_horizon || g.timeHorizon || 'yearly',
-                is_north_star: Boolean(g.is_north_star || g.isNorthStar),
+                time_horizon: g.time_horizon || g.timeHorizon || meta.time_horizon || 'yearly',
+                is_north_star: Boolean(g.is_north_star || g.isNorthStar || meta.is_north_star),
                 start_value: Number(g.start_value ?? g.startValue ?? 0),
-                current_value: Number(g.current_value ?? g.currentValue ?? 0),
+                current_value: dynamicCurrentValue,
                 target_value: Number(g.target_value ?? g.targetValue ?? 10),
                 unit: g.unit || (isIndo ? 'buku' : 'books'),
                 currency: g.currency || 'IDR',
-                core_why: g.core_why || g.coreWhy || '',
-                obstacle: g.obstacle || '',
-                obstacle_plan: g.obstacle_plan || g.obstaclePlan || '',
-                reward: g.reward || '',
+                core_why: g.core_why || g.coreWhy || meta.core_why || '',
+                obstacle: g.obstacle || meta.obstacle || '',
+                obstacle_plan: g.obstacle_plan || g.obstaclePlan || meta.obstacle_plan || '',
+                reward: g.reward || meta.reward || '',
                 start_date: g.startDate ? g.startDate.split('T')[0] : (g.start_date || ''),
                 end_date: g.endDate ? g.endDate.split('T')[0] : (g.end_date || ''),
                 cover_image_url: g.cover_image_url || g.coverImageUrl || '',
+                linked_source: linkedSource,
+                linked_account_id: linkedAccountId,
+                linked_account_title: linkedAccountTitle,
+                linked_habit_ids: linkedHabitIds,
                 linked_habits: linkedHabits,
+                specific_days: rawSpecific,
                 milestones: (g.milestones || []).map((m: any) => ({
                     id: m.id,
                     title: m.title,
@@ -116,7 +150,7 @@ export default function GoalsPage() {
                 })),
             };
         });
-    }, [fetchedGoals, fetchedHabits, isIndo]);
+    }, [fetchedGoals, fetchedHabits, fetchedSavings, isIndo]);
 
     const [goals, setGoals] = useState<GoalItem[]>(parsedGoals || []);
 
@@ -217,10 +251,23 @@ export default function GoalsPage() {
 
     const handleSaveGoal = async (form: GoalItem) => {
         setIsModalOpen(false);
+        const specificMetadata = JSON.stringify({
+            linked_source: form.linked_source || 'manual',
+            linked_account_id: form.linked_account_id || null,
+            linked_account_title: form.linked_account_title || null,
+            linked_habit_ids: form.linked_habit_ids || [],
+            time_horizon: form.time_horizon || 'yearly',
+            is_north_star: Boolean(form.is_north_star),
+            core_why: form.core_why || '',
+            obstacle: form.obstacle || '',
+            obstacle_plan: form.obstacle_plan || '',
+            reward: form.reward || ''
+        });
+
         try {
             if (editingGoal) {
                 // Optimistic update
-                setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form } : g));
+                setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form, specific_days: specificMetadata } : g));
                 const res = await fetch(`/api/goals/${editingGoal.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -244,14 +291,16 @@ export default function GoalsPage() {
                         startDate: form.start_date, 
                         endDate: form.end_date,
                         coverImageUrl: form.cover_image_url,
-                        cover_image_url: form.cover_image_url
+                        cover_image_url: form.cover_image_url,
+                        specificDays: specificMetadata,
+                        specific_days: specificMetadata
                     })
                 });
                 if (res.ok) mutateGoals();
             } else {
                 // Optimistic update
                 const tempId = Date.now();
-                setGoals(prev => [{ ...form, id: tempId, milestones: [], status: 'active' }, ...prev]);
+                setGoals(prev => [{ ...form, id: tempId, milestones: [], status: 'active', specific_days: specificMetadata }, ...prev]);
                 const res = await fetch('/api/goals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -276,7 +325,9 @@ export default function GoalsPage() {
                         startDate: form.start_date, 
                         endDate: form.end_date,
                         coverImageUrl: form.cover_image_url,
-                        cover_image_url: form.cover_image_url
+                        cover_image_url: form.cover_image_url,
+                        specificDays: specificMetadata,
+                        specific_days: specificMetadata
                     })
                 });
                 if (res.ok) mutateGoals();
