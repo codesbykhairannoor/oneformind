@@ -57,21 +57,24 @@ export function useStudyData(t: any) {
                 
                 if (coursesRes.ok) {
                     const coursesData = await coursesRes.json();
-                    setAcademicRecords(coursesData.map((c: any) => ({
-                        id: c.id,
-                        course_name: c.courseName,
-                        semester: c.semester,
-                        sks: c.sks,
-                        grade: c.grade,
-                        archives: (c.archives || []).map((a: any) => ({
-                            id: a.id,
-                            meeting_tag: a.meetingTag,
-                            type: a.type,
-                            file_name: a.fileName,
-                            file_path: a.filePath,
-                            link_url: a.linkUrl
-                        }))
-                    })));
+                    if (Array.isArray(coursesData)) {
+                        setAcademicRecords(coursesData.map((c: any) => ({
+                            id: c.id,
+                            course_name: c.courseName || c.course_name || c.name || '',
+                            semester: c.semester ?? 1,
+                            sks: c.sks ?? c.credits ?? 3,
+                            grade: c.grade || '',
+                            archives: (c.archives || []).map((a: any) => ({
+                                id: a.id,
+                                academic_record_id: c.id,
+                                meeting_tag: a.meetingTag || a.meeting_tag || '',
+                                type: a.type || 'Modul',
+                                file_name: a.fileName || a.file_name,
+                                file_path: a.filePath || a.file_path,
+                                link_url: a.linkUrl || a.link_url
+                            }))
+                        })));
+                    }
                 }
             } catch (error) {
                 console.error("Failed to load study data from Supabase", error);
@@ -245,15 +248,20 @@ export function useStudyData(t: any) {
                 const newCourse = await res.json();
                 setAcademicRecords(prev => [...prev, {
                     id: newCourse.id,
-                    course_name: newCourse.courseName,
-                    semester: newCourse.semester,
-                    sks: newCourse.sks,
-                    grade: newCourse.grade,
+                    course_name: newCourse.courseName || newCourse.course_name || data.course_name,
+                    semester: newCourse.semester ?? Number(selectedSemester),
+                    sks: newCourse.sks ?? data.sks,
+                    grade: newCourse.grade || data.grade,
                     archives: []
                 }]);
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                console.error("Gagal menambah mata kuliah:", errData);
+                alert(errData.error || "Gagal menambahkan mata kuliah. Silakan coba lagi.");
             }
         } catch(e) {
             console.error("Failed to add course to Supabase", e);
+            alert("Terjadi kesalahan koneksi saat menambahkan mata kuliah.");
         }
     };
 
@@ -277,9 +285,13 @@ export function useStudyData(t: any) {
                     sks: data.sks,
                     grade: data.grade
                 } : r));
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                alert(errData.error || "Gagal memperbarui mata kuliah.");
             }
         } catch(e) {
             console.error("Failed to update course in Supabase", e);
+            alert("Terjadi kesalahan koneksi saat memperbarui mata kuliah.");
         }
     };
 
@@ -343,19 +355,24 @@ export function useStudyData(t: any) {
                             ...r,
                             archives: [...(r.archives || []), {
                                 id: newArchive.id,
-                                meeting_tag: newArchive.meetingTag,
-                                type: newArchive.type,
-                                file_name: newArchive.fileName,
-                                file_path: newArchive.filePath,
-                                link_url: newArchive.linkUrl
+                                academic_record_id: activeCourseReactive.id,
+                                meeting_tag: newArchive.meetingTag || newArchive.meeting_tag || archive.meeting_tag,
+                                type: newArchive.type || archive.type,
+                                file_name: newArchive.fileName || newArchive.file_name || archive.file_name,
+                                file_path: newArchive.filePath || newArchive.file_path || archive.file_path,
+                                link_url: newArchive.linkUrl || newArchive.link_url || archive.link_url
                             }]
                         };
                     }
                     return r;
                 }));
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                alert(errData.error || "Gagal menambahkan berkas/materi.");
             }
         } catch(e) {
             console.error("Failed to add archive to Supabase", e);
+            alert("Terjadi kesalahan koneksi saat menyimpan berkas.");
         }
     };
 

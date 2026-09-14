@@ -76,14 +76,17 @@ func StudyCoursesHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		// Fetch Courses
 		courses := []StudyCourse{}
-		cRows, err := db.Query(`SELECT id, user_id, course_name, semester, sks, grade, created_at, updated_at FROM study_courses WHERE user_id = $1 ORDER BY created_at DESC`, userID)
-		if err == nil {
+		cRows, err := db.Query(`SELECT id, user_id, COALESCE(course_name, name, ''), COALESCE(semester, 1), COALESCE(sks, credits, 3), grade, created_at, updated_at FROM study_courses WHERE user_id = $1 ORDER BY created_at DESC`, userID)
+		if err != nil {
+			fmt.Printf("Error querying study_courses: %v\n", err)
+		} else {
 			defer cRows.Close()
 			for cRows.Next() {
 				var c StudyCourse
-				cRows.Scan(&c.ID, &c.UserID, &c.CourseName, &c.Semester, &c.SKS, &c.Grade, &c.CreatedAt, &c.UpdatedAt)
-				c.Archives = []StudyArchive{}
-				courses = append(courses, c)
+				if errScan := cRows.Scan(&c.ID, &c.UserID, &c.CourseName, &c.Semester, &c.SKS, &c.Grade, &c.CreatedAt, &c.UpdatedAt); errScan == nil {
+					c.Archives = []StudyArchive{}
+					courses = append(courses, c)
+				}
 			}
 		}
 
@@ -123,8 +126,15 @@ func StudyCoursesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		query := `INSERT INTO study_courses (user_id, course_name, semester, sks, grade, updated_at) 
-		VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, created_at, updated_at`
+		if req.Semester <= 0 {
+			req.Semester = 1
+		}
+		if req.SKS <= 0 {
+			req.SKS = 3
+		}
+
+		query := `INSERT INTO study_courses (user_id, course_name, name, semester, sks, credits, grade, updated_at) 
+		VALUES ($1, $2, $2, $3, $4, $4, $5, NOW()) RETURNING id, created_at, updated_at`
 		
 		var id int
 		var ca, ua *time.Time
@@ -163,7 +173,14 @@ func StudyCoursesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		query := `UPDATE study_courses SET course_name = $1, semester = $2, sks = $3, grade = $4, updated_at = NOW() WHERE user_id = $5 AND id = $6 RETURNING created_at, updated_at`
+		if req.Semester <= 0 {
+			req.Semester = 1
+		}
+		if req.SKS <= 0 {
+			req.SKS = 3
+		}
+
+		query := `UPDATE study_courses SET course_name = $1, name = $1, semester = $2, sks = $3, credits = $3, grade = $4, updated_at = NOW() WHERE user_id = $5 AND id = $6 RETURNING created_at, updated_at`
 		
 		var ca, ua *time.Time
 		err := db.QueryRow(query, req.CourseName, req.Semester, req.SKS, req.Grade, userID, req.ID).Scan(&ca, &ua)

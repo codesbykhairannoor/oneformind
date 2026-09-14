@@ -65,6 +65,8 @@ func StudyArchivesHandler(w http.ResponseWriter, r *http.Request) {
 			CourseID   int     `json:"courseId"`
 			MeetingTag string  `json:"meetingTag"`
 			Type       string  `json:"type"`
+			FileName   *string `json:"fileName"`
+			FilePath   *string `json:"filePath"`
 			LinkUrl    *string `json:"linkUrl"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -80,13 +82,13 @@ func StudyArchivesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Generate random CUID-like ID or UUID
-		query := `INSERT INTO study_archives (course_id, meeting_tag, type, link_url, updated_at) 
-		VALUES ($1, $2, $3, $4, NOW()) RETURNING id, created_at, updated_at`
+		// Insert study archive (id is auto-generated UUID in database)
+		query := `INSERT INTO study_archives (course_id, meeting_tag, type, file_name, file_path, link_url, updated_at) 
+		VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id, created_at, updated_at`
 		
 		var id string
 		var ca, ua *time.Time
-		err = db.QueryRow(query, req.CourseID, req.MeetingTag, req.Type, req.LinkUrl).Scan(&id, &ca, &ua)
+		err = db.QueryRow(query, req.CourseID, req.MeetingTag, req.Type, req.FileName, req.FilePath, req.LinkUrl).Scan(&id, &ca, &ua)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(`{"error": "Failed to create: %v"}`, err), http.StatusInternalServerError)
 			return
@@ -97,6 +99,8 @@ func StudyArchivesHandler(w http.ResponseWriter, r *http.Request) {
 			CourseID: req.CourseID,
 			MeetingTag: req.MeetingTag,
 			Type: req.Type,
+			FileName: req.FileName,
+			FilePath: req.FilePath,
 			LinkUrl: req.LinkUrl,
 			CreatedAt: ca,
 			UpdatedAt: ua,
