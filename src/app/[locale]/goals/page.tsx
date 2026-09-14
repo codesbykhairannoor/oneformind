@@ -47,8 +47,13 @@ export default function GoalsPage() {
 
     const [hasMounted, setHasMounted] = useState(false);
 
+    const currentMonthKey = useMemo(() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }, []);
+
     const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
-    const { data: fetchedHabits } = useSWR('/api/habits', fetcher);
+    const { data: fetchedHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher);
     const { data: fetchedSavings } = useSWR('/api/finance/savings', fetcher);
 
     const parsedGoals = useMemo(() => {
@@ -81,8 +86,11 @@ export default function GoalsPage() {
             }
 
             const linkedHabits: any[] = [];
+            const seenHabitNames = new Set<string>();
             if (fetchedHabits && Array.isArray(fetchedHabits)) {
                 fetchedHabits.forEach((h: any) => {
+                    if (h.isArchived || h.is_archived || h.archived) return;
+
                     let hMeta: any = {};
                     if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
                         try { hMeta = JSON.parse(h.status); } catch {}
@@ -96,7 +104,9 @@ export default function GoalsPage() {
                     const isMatched = isExplicitlyLinked ||
                                       (hMeta.goalId && String(hMeta.goalId) === String(g.id)) ||
                                       (hMeta.goalTitle && hMeta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
-                    if (isMatched) {
+                    const norm = (h.name || '').trim().toLowerCase();
+                    if (isMatched && !seenHabitNames.has(norm)) {
+                        seenHabitNames.add(norm);
                         const completedDays = (h.logs || []).filter((l: any) => l.status === 'completed' || l.completed || l.value === 1).length;
                         const target = Number(h.monthlyTarget) || 30;
                         const consistency = Math.min(100, Math.round((completedDays / target) * 100));

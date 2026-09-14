@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocale } from 'next-intl';
 import useSWR from 'swr';
 import { 
@@ -40,8 +40,27 @@ export default function GoalModal({
     const isIndo = locale === 'id';
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const currentMonthKey = useMemo(() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }, []);
+
     const { data: fetchedSavings } = useSWR(show ? '/api/finance/savings' : null, fetcher);
-    const { data: fetchedHabits } = useSWR(show ? '/api/habits' : null, fetcher);
+    const { data: fetchedHabitsRaw } = useSWR(show ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
+
+    const uniqueHabits = useMemo(() => {
+        if (!fetchedHabitsRaw || !Array.isArray(fetchedHabitsRaw)) return [];
+        const seen = new Set<string>();
+        const list: any[] = [];
+        fetchedHabitsRaw.forEach((h: any) => {
+            if (h.isArchived || h.is_archived || h.archived) return;
+            const norm = (h.name || '').trim().toLowerCase();
+            if (!norm || seen.has(norm)) return;
+            seen.add(norm);
+            list.push(h);
+        });
+        return list;
+    }, [fetchedHabitsRaw]);
 
     const [form, setForm] = useState<GoalItem>({
         id: '',
@@ -458,30 +477,30 @@ export default function GoalModal({
                             </div>
                         )}
 
-                        {/* Habit Engine (Leading Measures) Selector */}
-                        <div className="p-4 rounded-3xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
+                        {/* Habit Engine (Leading Measures) Selector - Clean & Compact Grid */}
+                        <div className="p-4 sm:p-5 rounded-3xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                                     <Sparkles size={14} />
                                     {isIndo ? '🌱 Mesin Kebiasaan Pendorong (Leading Measures)' : '🌱 Supporting Habit Engine'}
                                 </span>
-                                <span className="text-[10px] font-bold text-slate-400">
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
                                     {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'linked'}
                                 </span>
                             </div>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                                 {isIndo 
-                                    ? 'Hubungkan kebiasaan harian yang menjadi mesin eksekusi utama (leading measures) untuk mewujudkan visi target ini.' 
-                                    : 'Link daily atomic habits that act as the leading measures directly powering this goal.'}
+                                    ? 'Hubungkan kebiasaan harian aktif di bulan ini yang menjadi penggerak utama untuk mewujudkan target ini.' 
+                                    : 'Link active daily habits for this month that act as the leading measures directly powering this goal.'}
                             </p>
 
-                            {(!fetchedHabits || !Array.isArray(fetchedHabits) || fetchedHabits.length === 0) ? (
-                                <div className="text-xs text-slate-400 italic py-1">
-                                    {isIndo ? 'Belum ada kebiasaan yang dibuat di modul Habits.' : 'No habits found in the Habits module.'}
+                            {uniqueHabits.length === 0 ? (
+                                <div className="text-xs text-slate-400 italic py-2">
+                                    {isIndo ? 'Belum ada kebiasaan aktif di bulan ini.' : 'No active habits found for this month.'}
                                 </div>
                             ) : (
-                                <div className="flex flex-wrap gap-2 pt-1">
-                                    {fetchedHabits.map((h: any) => {
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
+                                    {uniqueHabits.map((h: any) => {
                                         const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
                                         return (
                                             <button
@@ -497,15 +516,17 @@ export default function GoalModal({
                                                         return { ...prev, linked_habit_ids: nextIds };
                                                     });
                                                 }}
-                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 ${
+                                                className={`p-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
                                                     isSelected
-                                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20 ring-2 ring-indigo-400'
-                                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-400/40'
+                                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700/80 hover:border-indigo-300 hover:bg-indigo-50/30'
                                                 }`}
                                             >
-                                                <span>{h.icon || '🌱'}</span>
-                                                <span>{h.name}</span>
-                                                {isSelected && <CheckCircle2 size={12} className="ml-0.5" />}
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
+                                                    <span className="truncate text-[11px] font-bold">{h.name}</span>
+                                                </div>
+                                                {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
                                             </button>
                                         );
                                     })}
