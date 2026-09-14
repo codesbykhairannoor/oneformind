@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, ListTodo } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import MilestoneItem, { Milestone } from './MilestoneItem';
 import { GoalItem } from './GoalCard';
 
@@ -16,18 +17,22 @@ export default function GoalMilestonesSection({
     setForm,
     t
 }: GoalMilestonesSectionProps) {
+    const locale = useLocale();
+    const isIndo = locale === 'id';
+
     return (
-        <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800 transition-colors duration-500">
+        <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between px-1">
-                <label className="text-[11px] font-black text-slate-400 dark:text-slate-600 tracking-tight">
-                    {t('goal_milestones_title') || 'Mastery steps'}
+                <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
+                    <ListTodo size={14} className="text-indigo-500" />
+                    <span>{isIndo ? 'Daftar Tahapan Langkah (Milestones / OKR)' : 'Milestone Steps & Checkpoints'}</span>
                 </label>
-                <span className="text-[10px] font-bold text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-lg">
-                    {form.milestones?.length || 0} Steps
+                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-800/50 font-mono">
+                    {form.milestones?.length || 0} {isIndo ? 'Langkah' : 'Steps'}
                 </span>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
                 {form.milestones?.map((m, idx) => (
                     <MilestoneItem 
                         key={m.id || idx} 
@@ -72,7 +77,7 @@ export default function GoalMilestonesSection({
                                 ...(prev.milestones || []),
                                 {
                                     id: null,
-                                    title: t('goal_untitled_step') || 'Untitled Step',
+                                    title: isIndo ? 'Langkah Baru' : (t('goal_untitled_step') || 'Untitled Step'),
                                     is_completed: false,
                                     completed: false,
                                     target_date: null
@@ -80,10 +85,10 @@ export default function GoalMilestonesSection({
                             ]
                         }));
                     }} 
-                    className="w-full py-4 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-600 hover:border-indigo-100 dark:hover:border-indigo-500/30 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all flex items-center justify-center gap-2 group/add shadow-sm"
+                    className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/20 dark:hover:bg-indigo-950/20 transition-all flex items-center justify-center gap-2 group/add shadow-sm"
                 >
                     <Plus className="w-4 h-4 group-hover/add:rotate-90 transition-transform" />
-                    <span className="text-[11px] font-black tracking-tight">{t('goal_btn_add_milestone') || 'Add Step'}</span>
+                    <span className="text-xs font-black tracking-tight">{isIndo ? '+ Tambah Langkah Target' : (t('goal_btn_add_milestone') || '+ Add Step')}</span>
                 </button>
             </div>
         </div>

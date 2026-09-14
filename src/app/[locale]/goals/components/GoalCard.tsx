@@ -457,7 +457,7 @@ export default function GoalCard({
                     <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between px-1">
                             <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                                {isIndo ? 'Langkah Pencapaian' : 'Mastery Steps'}
+                                {isIndo ? 'Tahapan Target (Milestones)' : 'Milestone Steps'}
                             </h4>
                             <button 
                                 type="button"
@@ -485,11 +485,15 @@ export default function GoalCard({
                             ))}
                             
                             {milestones.length === 0 && (
-                                <div className="py-6 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl flex flex-col items-center">
-                                    <p className="text-[10px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest">
-                                        {isIndo ? 'Belum ada langkah terdaftar' : 'No active steps'}
-                                    </p>
-                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => !isSavingOrTemp && onAddMilestone?.(goal)}
+                                    disabled={isSavingOrTemp}
+                                    className="w-full py-3 px-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700/60 bg-slate-50/50 dark:bg-slate-800/30 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                                >
+                                    <Plus size={13} />
+                                    <span>{isIndo ? 'Tambah Checklist Langkah' : 'Add First Milestone Step'}</span>
+                                </button>
                             )}
                         </div>
                     </div>

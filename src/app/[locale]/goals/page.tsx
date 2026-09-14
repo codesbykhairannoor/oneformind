@@ -298,6 +298,7 @@ export default function GoalsPage() {
                         obstacle: form.obstacle,
                         obstacle_plan: form.obstacle_plan,
                         reward: form.reward,
+                        color: form.color,
                         startDate: form.start_date, 
                         endDate: form.end_date,
                         coverImageUrl: form.cover_image_url,
