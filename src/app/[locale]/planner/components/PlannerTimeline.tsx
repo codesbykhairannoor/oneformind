@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X } from 'lucide-react';
-import { TaskItem, ScheduledHabitItem } from '../types';
+import { ChevronDown, CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, ArrowRight, X, Video, BookOpen } from 'lucide-react';
+import { TaskItem, ScheduledHabitItem, ScheduledInterviewItem, ScheduledStudyItem } from '../types';
 import { normalizeDate } from '../utils/plannerMath';
 
 const VIEW_LIMIT = 24;
@@ -40,6 +40,13 @@ interface PlannerTimelineProps {
     scheduledHabits?: ScheduledHabitItem[];
     onToggleHabit?: (habitId: number) => void;
     onHabitClick?: (habit: ScheduledHabitItem) => void;
+    scheduledInterviews?: ScheduledInterviewItem[];
+    onInterviewClick?: (interview: ScheduledInterviewItem) => void;
+    onToggleInterviewCompleted?: (jobId: string | number, roundId: string | number) => void;
+    scheduledStudyTasks?: ScheduledStudyItem[];
+    onStudyClick?: (study: ScheduledStudyItem) => void;
+    onToggleStudyCompleted?: (assignmentId: string) => void;
+    onScheduleStudyAssignment?: (assignmentId: string, startTime: string) => void;
     selectedDate: string;
     now: Date;
     startHour: number;
@@ -61,6 +68,13 @@ export default function PlannerTimeline({
     scheduledHabits = [],
     onToggleHabit,
     onHabitClick,
+    scheduledInterviews = [],
+    onInterviewClick,
+    onToggleInterviewCompleted,
+    scheduledStudyTasks = [],
+    onStudyClick,
+    onToggleStudyCompleted,
+    onScheduleStudyAssignment,
     selectedDate,
     now,
     startHour,
@@ -140,13 +154,17 @@ export default function PlannerTimeline({
     const handleDrop = (e: React.DragEvent, newStartTime: string) => {
         e.preventDefault();
         
-        // Check if dragged from Inbox
+        // Check if dragged from Inbox or Study Tray
         const jsonStr = e.dataTransfer.getData('application/json');
         if (jsonStr) {
             try {
                 const parsed = JSON.parse(jsonStr);
                 if (parsed && parsed.type === 'INBOX_TASK' && onScheduleInboxTask) {
                     onScheduleInboxTask(parsed.id, newStartTime);
+                    return;
+                }
+                if (parsed && parsed.type === 'STUDY_ASSIGNMENT' && onScheduleStudyAssignment) {
+                    onScheduleStudyAssignment(parsed.id, newStartTime);
                     return;
                 }
             } catch (err) {}
@@ -256,9 +274,7 @@ export default function PlannerTimeline({
         };
     };
 
-    const getHabitStyle = (habit: ScheduledHabitItem) => {
-        const rawStart = habit.startTime;
-        const rawEnd = habit.endTime;
+    const getTimelineSlotStyle = (rawStart: string, rawEnd?: string, zIndex = 15) => {
         if (!rawStart) return { display: 'none' };
         
         const startM = parseTimeMinutes(rawStart);
@@ -290,9 +306,13 @@ export default function PlannerTimeline({
             height: `${finalHeight}px`,
             left: `${timeColWidth + 6}px`,  
             right: '8px', 
-            zIndex: 15
+            zIndex
         };
     };
+
+    const getHabitStyle = (habit: ScheduledHabitItem) => getTimelineSlotStyle(habit.startTime, habit.endTime, 15);
+    const getInterviewStyle = (interview: ScheduledInterviewItem) => getTimelineSlotStyle(interview.startTime, interview.endTime, 16);
+    const getStudyStyle = (study: ScheduledStudyItem) => getTimelineSlotStyle(study.startTime, study.endTime, 15);
 
     const isToday = (() => {
         const today = new Date();
@@ -648,6 +668,128 @@ export default function PlannerTimeline({
                                             <CheckCircle2 size={19} className="text-emerald-500 transition-transform active:scale-90" />
                                         ) : (
                                             <Circle size={19} className="text-slate-300 dark:text-slate-600 hover:text-emerald-500 transition-transform active:scale-90" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    {/* Scheduled Job Interviews (Virtual Projection) */}
+                    {scheduledInterviews.map((interview) => {
+                        const style = getInterviewStyle(interview);
+                        const isDone = interview.status === 'completed' || interview.status === 'passed';
+
+                        return (
+                            <div
+                                key={`interview-${interview.id}`}
+                                onClick={() => onInterviewClick && onInterviewClick(interview)}
+                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
+                                    isDone
+                                        ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'
+                                        : 'bg-blue-50/90 dark:bg-blue-950/30 border-blue-300/80 dark:border-blue-800/60 hover:border-blue-400 dark:hover:border-blue-700'
+                                }`}
+                                style={style}
+                                title={`💼 ${interview.company} • ${interview.roundTitle}`}
+                            >
+                                <div className="w-full h-full flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                        <span className="px-1.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-300/50 dark:border-blue-700/50 flex items-center gap-1 shrink-0">
+                                            <Briefcase size={10} strokeWidth={2.5} />
+                                            <span>INTERVIEW</span>
+                                        </span>
+
+                                        <span className={`font-black text-xs sm:text-sm truncate ${
+                                            isDone ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
+                                        }`}>
+                                            {interview.company} • {interview.roundTitle}
+                                        </span>
+
+                                        {interview.meetingLink && (
+                                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-100/70 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[9px] font-bold shrink-0">
+                                                <Video size={10} />
+                                                <span className="hidden sm:inline">Online</span>
+                                            </span>
+                                        )}
+
+                                        <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 shrink-0 ml-auto hidden md:inline">
+                                            {interview.startTime} - {interview.endTime}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (onToggleInterviewCompleted) onToggleInterviewCompleted(interview.jobId, interview.id);
+                                        }}
+                                        className="p-1 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition shrink-0"
+                                        title={isDone ? (isIndo ? 'Batalkan selesai' : 'Mark uncompleted') : (isIndo ? 'Tandai selesai' : 'Mark completed')}
+                                    >
+                                        {isDone ? (
+                                            <CheckCircle2 size={19} className="text-blue-500 transition-transform active:scale-90" />
+                                        ) : (
+                                            <Circle size={19} className="text-slate-300 dark:text-slate-600 hover:text-blue-500 transition-transform active:scale-90" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    {/* Scheduled Study Assignments (Virtual Projection) */}
+                    {scheduledStudyTasks.map((study) => {
+                        const style = getStudyStyle(study);
+
+                        return (
+                            <div
+                                key={`study-${study.id}`}
+                                onClick={() => onStudyClick && onStudyClick(study)}
+                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
+                                    study.completed
+                                        ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'
+                                        : 'bg-purple-50/90 dark:bg-purple-950/30 border-purple-300/80 dark:border-purple-800/60 hover:border-purple-400 dark:hover:border-purple-700'
+                                }`}
+                                style={style}
+                                title={`📚 ${study.courseName}: ${study.title}`}
+                            >
+                                <div className="w-full h-full flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                        <span className="px-1.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-300/50 dark:border-purple-700/50 flex items-center gap-1 shrink-0">
+                                            <BookOpen size={10} strokeWidth={2.5} />
+                                            <span>STUDY</span>
+                                        </span>
+
+                                        <span className={`font-black text-xs sm:text-sm truncate ${
+                                            study.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
+                                        }`}>
+                                            {study.courseName}: {study.title}
+                                        </span>
+
+                                        {study.priority === 'urgent' && (
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 text-[9px] font-black shrink-0">
+                                                🚨 Urgent
+                                            </span>
+                                        )}
+
+                                        <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 shrink-0 ml-auto hidden md:inline">
+                                            {study.startTime} - {study.endTime}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (onToggleStudyCompleted) onToggleStudyCompleted(study.id);
+                                        }}
+                                        className="p-1 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition shrink-0"
+                                        title={study.completed ? (isIndo ? 'Batalkan selesai' : 'Mark uncompleted') : (isIndo ? 'Tandai selesai' : 'Mark completed')}
+                                    >
+                                        {study.completed ? (
+                                            <CheckCircle2 size={19} className="text-purple-500 transition-transform active:scale-90" />
+                                        ) : (
+                                            <Circle size={19} className="text-slate-300 dark:text-slate-600 hover:text-purple-500 transition-transform active:scale-90" />
                                         )}
                                     </button>
                                 </div>

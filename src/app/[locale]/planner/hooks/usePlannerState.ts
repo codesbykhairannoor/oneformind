@@ -8,7 +8,8 @@ import { normalizeTime, normalizeDate } from '../utils/plannerMath';
 import { usePlannerTimer } from './usePlannerTimer';
 import { usePlannerDailyData } from './usePlannerDailyData';
 import { usePlannerTaskCrud } from './usePlannerTaskCrud';
-import { TaskItem, InboxTask, ScheduledHabitItem } from '../types';
+import { TaskItem, InboxTask, ScheduledHabitItem, ScheduledInterviewItem, ScheduledStudyItem } from '../types';
+import { deserializeJobPayload, serializeJobPayload } from '@/app/[locale]/jobs/lib/jobAnalytics';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 
 const habitsFetcher = (url: string) => fetch(url).then(res => res.json());
@@ -41,6 +42,16 @@ export function usePlannerState() {
     const { data: rawHabits, mutate: mutateHabits } = useSWR('/api/habits', habitsFetcher);
     const [scheduledHabits, setScheduledHabits] = useState<ScheduledHabitItem[]>([]);
     const [selectedHabitForModal, setSelectedHabitForModal] = useState<ScheduledHabitItem | null>(null);
+
+    // User SWR sync (Study module assignments)
+    const { data: rawUserData, mutate: mutateUser } = useSWR('/api/user', habitsFetcher);
+    const [scheduledStudyTasks, setScheduledStudyTasks] = useState<ScheduledStudyItem[]>([]);
+    const [selectedStudyForModal, setSelectedStudyForModal] = useState<ScheduledStudyItem | null>(null);
+
+    // Jobs SWR sync (Multi-round interviews)
+    const { data: rawJobs, mutate: mutateJobs } = useSWR('/api/jobs', habitsFetcher);
+    const [scheduledInterviews, setScheduledInterviews] = useState<ScheduledInterviewItem[]>([]);
+    const [selectedInterviewForModal, setSelectedInterviewForModal] = useState<ScheduledInterviewItem | null>(null);
 
     const [startHour, setStartHour] = useState(6);
     const [now, setNow] = useState(new Date());
@@ -134,7 +145,7 @@ export function usePlannerState() {
         return () => clearInterval(clockInterval);
     }, [selectedDate]);
 
-    // Reactively compute scheduled habits from rawHabits (SWR-powered)
+    // Reactively compute scheduled habits from rawHabits (Virtual Projection)
     useEffect(() => {
         if (!rawHabits || !Array.isArray(rawHabits)) {
             setScheduledHabits([]);
@@ -216,12 +227,117 @@ export function usePlannerState() {
         setScheduledHabits(matched);
     }, [rawHabits, selectedDate]);
 
-    // Combined Tasks + Scheduled Habits metrics
+    // Reactively compute scheduled interviews from rawJobs (Virtual Projection)
+    useEffect(() => {
+        if (!rawJobs || !Array.isArray(rawJobs)) {
+            setScheduledInterviews([]);
+            return;
+        }
+
+        const matched: ScheduledInterviewItem[] = [];
+
+        rawJobs.forEach((rawJ: any) => {
+            const job = deserializeJobPayload(rawJ);
+            if (!job.interview_rounds || !Array.isArray(job.interview_rounds)) return;
+
+            job.interview_rounds.forEach((round) => {
+                if (!round.scheduled_at) return;
+
+                let roundDateStr = '';
+                let startH = '10';
+                let startM = '00';
+                let endH = '11';
+                let endM = '00';
+
+                try {
+                    const d = new Date(round.scheduled_at);
+                    if (!isNaN(d.getTime())) {
+                        const y = d.getFullYear();
+                        const m = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        roundDateStr = `${y}-${m}-${day}`;
+                        startH = String(d.getHours()).padStart(2, '0');
+                        startM = String(d.getMinutes()).padStart(2, '0');
+                        const endD = new Date(d.getTime() + 60 * 60000);
+                        endH = String(endD.getHours()).padStart(2, '0');
+                        endM = String(endD.getMinutes()).padStart(2, '0');
+                    } else if (typeof round.scheduled_at === 'string') {
+                        roundDateStr = round.scheduled_at.split('T')[0].split(' ')[0];
+                    }
+                } catch {
+                    if (typeof round.scheduled_at === 'string') {
+                        roundDateStr = round.scheduled_at.split('T')[0].split(' ')[0];
+                    }
+                }
+
+                if (normalizeDate(roundDateStr) !== normalizeDate(selectedDate)) return;
+
+                matched.push({
+                    id: round.id,
+                    jobId: job.id,
+                    company: job.company || 'Perusahaan',
+                    jobTitle: job.title || 'Posisi Pekerjaan',
+                    roundTitle: round.round_title || round.round_type || 'Interview',
+                    roundType: round.round_type || 'user_interview',
+                    scheduledAt: round.scheduled_at,
+                    startTime: `${startH}:${startM}`,
+                    endTime: `${endH}:${endM}`,
+                    interviewerName: round.interviewer_name || '',
+                    meetingLink: round.meeting_link || '',
+                    status: round.status || 'upcoming',
+                    notes: round.notes || ''
+                });
+            });
+        });
+
+        setScheduledInterviews(matched);
+    }, [rawJobs, selectedDate]);
+
+    // Study assignments from user.settings.study_assignments (Virtual Projection)
+    const allStudyAssignments: any[] = Array.isArray(rawUserData?.settings?.study_assignments)
+        ? rawUserData.settings.study_assignments
+        : [];
+
+    const pendingStudyAssignments = allStudyAssignments.filter((a: any) => a.status !== 'completed');
+
+    useEffect(() => {
+        if (!Array.isArray(allStudyAssignments) || allStudyAssignments.length === 0) {
+            setScheduledStudyTasks([]);
+            return;
+        }
+
+        const matched: ScheduledStudyItem[] = [];
+
+        allStudyAssignments.forEach((a: any) => {
+            if (!a.due_date) return;
+            const dueDateStr = String(a.due_date).split('T')[0].split(' ')[0];
+            if (normalizeDate(dueDateStr) !== normalizeDate(selectedDate)) return;
+
+            matched.push({
+                id: String(a.id),
+                courseName: a.course_name || 'Kuliah',
+                title: a.title || 'Tugas Kuliah',
+                dueDate: a.due_date,
+                startTime: a.startTime || '19:00',
+                endTime: a.endTime || '20:00',
+                type: a.type || 'assignment',
+                priority: a.priority || 'normal',
+                completed: a.status === 'completed',
+                description: a.description || ''
+            });
+        });
+
+        setScheduledStudyTasks(matched);
+    }, [rawUserData, selectedDate]);
+
+    // Combined Tasks + Habits + Interviews + Study metrics
     const activeTasks = taskCrud.tasks.filter(t => normalizeDate(t.date) === normalizeDate(selectedDate));
-    const totalItems = activeTasks.length + scheduledHabits.length;
+    const totalItems = activeTasks.length + scheduledHabits.length + scheduledInterviews.length + scheduledStudyTasks.length;
     const completedTasksCount = activeTasks.filter(t => t.completed).length;
     const completedHabitsCount = scheduledHabits.filter(h => h.completed).length;
-    const completedCount = completedTasksCount + completedHabitsCount;
+    const completedInterviewsCount = scheduledInterviews.filter(i => i.status === 'completed' || i.status === 'passed').length;
+    const completedStudyCount = scheduledStudyTasks.filter(s => s.completed).length;
+    const completedCount = completedTasksCount + completedHabitsCount + completedInterviewsCount + completedStudyCount;
     const pendingCount = Math.max(0, totalItems - completedCount);
     const progressPercent = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
 
@@ -265,6 +381,117 @@ export function usePlannerState() {
         } catch (err) {
             console.error('Failed to sync habit log from planner:', err);
         }
+    };
+
+    // Toggle Study Assignment completion directly from Planner
+    const toggleStudyAssignmentCompleted = async (assignmentId: string) => {
+        const target = scheduledStudyTasks.find(s => s.id === assignmentId) || allStudyAssignments.find((a: any) => String(a.id) === String(assignmentId));
+        if (!target) return;
+
+        const nextCompleted = !(target.completed || target.status === 'completed');
+        const nextStatus = nextCompleted ? 'completed' : 'todo';
+
+        // Optimistic UI update
+        setScheduledStudyTasks(prev => prev.map(s => {
+            if (s.id === assignmentId) {
+                return { ...s, completed: nextCompleted };
+            }
+            return s;
+        }));
+
+        if (nextCompleted) {
+            playCheckSound();
+        } else {
+            playUncheckSound();
+        }
+
+        try {
+            const currentList = Array.isArray(rawUserData?.settings?.study_assignments) ? [...rawUserData.settings.study_assignments] : [];
+            const updatedList = currentList.map((a: any) => {
+                if (String(a.id) === String(assignmentId)) {
+                    return { ...a, status: nextStatus };
+                }
+                return a;
+            });
+
+            const newSettings = {
+                ...(rawUserData?.settings || {}),
+                study_assignments: updatedList
+            };
+
+            await fetch('/api/user', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ settings: newSettings })
+            });
+
+            await mutateUser();
+            globalMutate('/api/user');
+        } catch (err) {
+            console.error('Failed to update study assignment status:', err);
+        }
+    };
+
+    // Toggle Interview completion directly from Planner
+    const toggleInterviewCompleted = async (jobId: string | number, roundId: string | number) => {
+        if (!rawJobs || !Array.isArray(rawJobs)) return;
+        const rawJ = rawJobs.find((j: any) => String(j.id) === String(jobId));
+        if (!rawJ) return;
+
+        const job = deserializeJobPayload(rawJ);
+        const round = (job.interview_rounds || []).find((r: any) => String(r.id) === String(roundId));
+        if (!round) return;
+
+        const nextStatus = (round.status === 'completed' || round.status === 'passed') ? 'upcoming' : 'completed';
+
+        // Optimistic UI update
+        setScheduledInterviews(prev => prev.map(item => {
+            if (String(item.id) === String(roundId)) {
+                return { ...item, status: nextStatus };
+            }
+            return item;
+        }));
+
+        if (nextStatus === 'completed') {
+            playCheckSound();
+        } else {
+            playUncheckSound();
+        }
+
+        try {
+            const updatedRounds = (job.interview_rounds || []).map((r: any) => {
+                if (String(r.id) === String(roundId)) {
+                    return { ...r, status: nextStatus };
+                }
+                return r;
+            });
+
+            const updatedJob = { ...job, interview_rounds: updatedRounds };
+            const payload = serializeJobPayload(updatedJob);
+
+            await fetch(`/api/jobs/${jobId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            await mutateJobs();
+            globalMutate('/api/jobs');
+        } catch (err) {
+            console.error('Failed to update interview status:', err);
+        }
+    };
+
+    // Handle scheduling a study assignment onto timeline
+    const handleScheduleStudyAssignment = async (assignmentId: string, startTime: string) => {
+        const found = allStudyAssignments.find((a: any) => String(a.id) === String(assignmentId));
+        if (!found) return;
+
+        await taskCrud.scheduleInboxTask({
+            id: Date.now(),
+            title: `[📚 Kuliah] ${found.course_name ? `${found.course_name}: ` : ''}${found.title}`,
+            type: 2
+        }, startTime, 60);
     };
 
     // Unlink habit from Planner schedule
@@ -419,6 +646,7 @@ export function usePlannerState() {
         submitSingleTask: taskCrud.submitSingleTask,
         handleMoveTask: taskCrud.handleMoveTask,
         handleScheduleInboxTask,
+        handleScheduleStudyAssignment,
         deleteTask: taskCrud.deleteTask,
         unfinishedYesterdayTasks,
         showRolloverBanner,
@@ -429,6 +657,16 @@ export function usePlannerState() {
         selectedHabitForModal,
         setSelectedHabitForModal,
         unlinkHabitFromPlanner,
-        deleteHabitPermanently
+        deleteHabitPermanently,
+        scheduledStudyTasks,
+        pendingStudyAssignments,
+        selectedStudyForModal,
+        setSelectedStudyForModal,
+        toggleStudyAssignmentCompleted,
+        scheduledInterviews,
+        selectedInterviewForModal,
+        setSelectedInterviewForModal,
+        toggleInterviewCompleted
     };
 }
+

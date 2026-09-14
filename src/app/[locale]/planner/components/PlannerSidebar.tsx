@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, BookOpen, AlertCircle } from 'lucide-react';
 import { InboxTask } from '../types';
 
 interface PlannerSidebarProps {
@@ -14,6 +14,10 @@ interface PlannerSidebarProps {
     setWaterGlasses: (val: number) => void;
     taskInbox: InboxTask[];
     setTaskInbox: (val: InboxTask[]) => void;
+    pendingStudyAssignments?: any[];
+    onStudyClick?: (assignment: any) => void;
+    onToggleStudyCompleted?: (id: string) => void;
+    onScheduleStudyModal?: (assignment: any) => void;
     selectedDate?: string;
     saveStatus?: 'idle' | 'saving' | 'saved';
     durationMinutes?: number;
@@ -33,6 +37,10 @@ export default function PlannerSidebar({
     meals, setMeals,
     waterGlasses, setWaterGlasses,
     taskInbox, setTaskInbox,
+    pendingStudyAssignments = [],
+    onStudyClick,
+    onToggleStudyCompleted,
+    onScheduleStudyModal,
     selectedDate,
     saveStatus = 'idle',
     durationMinutes = 25,
@@ -49,6 +57,7 @@ export default function PlannerSidebar({
 
     const [newInboxTitle, setNewInboxTitle] = useState('');
     const [dailyHubTab, setDailyHubTab] = useState<'notes' | 'meals' | 'water'>('notes');
+    const [sidebarTrayTab, setSidebarTrayTab] = useState<'inbox' | 'study'>('inbox');
 
     // Inbox Themes
     const getInboxTaskTheme = (type: number) => {
@@ -88,6 +97,17 @@ export default function PlannerSidebar({
             taskType: task.type
         }));
         e.dataTransfer.setData('text/plain', task.title);
+    };
+
+    const handleStudyDragStart = (e: React.DragEvent, assignment: any) => {
+        e.dataTransfer.dropEffect = 'copy';
+        e.dataTransfer.effectAllowed = 'copyMove';
+        e.dataTransfer.setData('application/json', JSON.stringify({
+            type: 'STUDY_ASSIGNMENT',
+            id: String(assignment.id),
+            title: `[📚 Kuliah] ${assignment.course_name || assignment.courseName || ''}: ${assignment.title}`
+        }));
+        e.dataTransfer.setData('text/plain', assignment.title);
     };
 
     // Calculate filled meals count
@@ -177,105 +197,227 @@ export default function PlannerSidebar({
                 </div>
             </div>
 
-            {/* 2. KOTAK MASUK (PERSISTENT BACKLOG & DRAG-TO-TIMELINE) */}
+            {/* 2. PERSISTENT TRAY: INBOX & TUGAS KULIAH (DRAG-TO-TIMELINE) */}
             <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-[2rem] shadow-sm border border-slate-200/80 dark:border-slate-800 transition-colors">
-                <div className="flex min-w-0 justify-between items-center gap-2 mb-2.5">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-base">📥</span>
-                        <h3 className="font-black text-slate-800 dark:text-white text-xs tracking-tight truncate">
-                            {isIndo ? 'Kotak Masuk' : 'Inbox & Backlog'}
-                        </h3>
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                
+                {/* Segmented Switcher: Inbox vs Tugas Kuliah */}
+                <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3">
+                    <button
+                        type="button"
+                        onClick={() => setSidebarTrayTab('inbox')}
+                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+                            sidebarTrayTab === 'inbox'
+                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                    >
+                        <span>📥 {isIndo ? 'Kotak Masuk' : 'Inbox'}</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-mono">
                             {taskInbox.length}
                         </span>
-                    </div>
-                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold">
-                        {isIndo ? 'Tarik ke jam di timeline' : 'Drag to timeline'}
-                    </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setSidebarTrayTab('study')}
+                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+                            sidebarTrayTab === 'study'
+                                ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                    >
+                        <span>📚 {isIndo ? 'Tugas Kuliah' : 'Study'}</span>
+                        {pendingStudyAssignments.length > 0 && (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-mono font-bold">
+                                {pendingStudyAssignments.length}
+                            </span>
+                        )}
+                    </button>
                 </div>
 
-                {/* Quick Add Form */}
-                <form onSubmit={handleAddQuickInbox} className="mb-2.5">
-                    <div className="relative flex items-center">
-                        <input
-                            type="text"
-                            value={newInboxTitle}
-                            onChange={(e) => setNewInboxTitle(e.target.value)}
-                            placeholder={isIndo ? "Ketik tugas & Enter..." : "Type task & press Enter..."}
-                            className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/70 rounded-xl px-3.5 py-2 pr-9 text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                        />
-                        <button
-                            type="submit"
-                            disabled={!newInboxTitle.trim()}
-                            className={`absolute right-1 w-6 h-6 rounded-lg flex items-center justify-center transition-all ${newInboxTitle.trim() ? 'bg-indigo-600 text-white shadow-sm active:scale-90' : 'bg-transparent text-slate-300 dark:text-slate-600 cursor-not-allowed'}`}
-                        >
-                            <span className="text-xs leading-none font-bold">+</span>
-                        </button>
-                    </div>
-                </form>
-                
-                {taskInbox.length === 0 ? (
-                    <div className="text-center py-5 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl bg-slate-50/40 dark:bg-slate-800/20">
-                        <p className="text-[11px] text-slate-400 font-bold">
-                            {isIndo ? 'Kotak masuk kosong' : 'Inbox is empty'}
-                        </p>
-                    </div>
-                ) : (
-                    <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1 custom-scrollbar">
-                        {taskInbox.map((task) => {
-                            const theme = getInboxTaskTheme(task.type);
-                            return (
-                                <div 
-                                    key={task.id} 
-                                    draggable
-                                    onDragStart={(e) => handleInboxDragStart(e, task)}
-                                    className={`group flex items-center justify-between gap-2 p-2 rounded-xl border bg-white dark:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all cursor-grab active:cursor-grabbing shadow-sm ${task.completed ? 'opacity-50 grayscale-[0.5] bg-slate-50 dark:bg-slate-800/50' : 'border-slate-100 dark:border-slate-800'}`}
-                                    title={isIndo ? 'Tarik ke timeline untuk menjadwalkan' : 'Drag to timeline to schedule'}
+                {sidebarTrayTab === 'inbox' ? (
+                    <>
+                        {/* Quick Add Form */}
+                        <form onSubmit={handleAddQuickInbox} className="mb-2.5">
+                            <div className="relative flex items-center">
+                                <input
+                                    type="text"
+                                    value={newInboxTitle}
+                                    onChange={(e) => setNewInboxTitle(e.target.value)}
+                                    placeholder={isIndo ? "Ketik tugas & Enter..." : "Type task & press Enter..."}
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/70 rounded-xl px-3.5 py-2 pr-9 text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!newInboxTitle.trim()}
+                                    className={`absolute right-1 w-6 h-6 rounded-lg flex items-center justify-center transition-all ${newInboxTitle.trim() ? 'bg-indigo-600 text-white shadow-sm active:scale-90' : 'bg-transparent text-slate-300 dark:text-slate-600 cursor-not-allowed'}`}
                                 >
-                                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                                        <button 
-                                            onClick={() => toggleInboxTask(task.id)} 
-                                            className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-400'}`}
+                                    <span className="text-xs leading-none font-bold">+</span>
+                                </button>
+                            </div>
+                        </form>
+                        
+                        {taskInbox.length === 0 ? (
+                            <div className="text-center py-5 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl bg-slate-50/40 dark:bg-slate-800/20">
+                                <p className="text-[11px] text-slate-400 font-bold">
+                                    {isIndo ? 'Kotak masuk kosong' : 'Inbox is empty'}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1 custom-scrollbar">
+                                {taskInbox.map((task) => {
+                                    const theme = getInboxTaskTheme(task.type);
+                                    return (
+                                        <div 
+                                            key={task.id} 
+                                            draggable
+                                            onDragStart={(e) => handleInboxDragStart(e, task)}
+                                            className={`group flex items-center justify-between gap-2 p-2 rounded-xl border bg-white dark:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all cursor-grab active:cursor-grabbing shadow-sm ${task.completed ? 'opacity-50 grayscale-[0.5] bg-slate-50 dark:bg-slate-800/50' : 'border-slate-100 dark:border-slate-800'}`}
+                                            title={isIndo ? 'Tarik ke timeline untuk menjadwalkan' : 'Drag to timeline to schedule'}
                                         >
-                                            {task.completed && <Check size={10} strokeWidth={4} />}
-                                        </button>
-                                        <button 
-                                            onClick={() => cycleInboxTaskType(task.id)} 
-                                            className={`w-6 h-6 rounded-lg border flex items-center justify-center text-[10px] transition active:scale-90 shrink-0 ${theme.style}`}
-                                            title={isIndo ? 'Ubah Kategori' : 'Change Category'}
+                                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                <button 
+                                                    onClick={() => toggleInboxTask(task.id)} 
+                                                    className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-400'}`}
+                                                >
+                                                    {task.completed && <Check size={10} strokeWidth={4} />}
+                                                </button>
+                                                <button 
+                                                    onClick={() => cycleInboxTaskType(task.id)} 
+                                                    className={`w-6 h-6 rounded-lg border flex items-center justify-center text-[10px] transition active:scale-90 shrink-0 ${theme.style}`}
+                                                    title={isIndo ? 'Ubah Kategori' : 'Change Category'}
+                                                >
+                                                    {theme.icon}
+                                                </button>
+                                                <input 
+                                                    value={task.title} 
+                                                    onChange={(e) => updateInboxTask(task.id, e.target.value)} 
+                                                    className={`flex-1 bg-transparent border-0 focus:ring-0 p-0 text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-300 dark:placeholder-slate-700 truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-600' : ''}`} 
+                                                    placeholder="..." 
+                                                />
+                                            </div>
+                                            <div className="flex items-center gap-1 shrink-0">
+                                                {onScheduleInboxTaskModal && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onScheduleInboxTaskModal(task)}
+                                                        title={isIndo ? 'Jadwalkan ke timeline' : 'Schedule to timeline'}
+                                                        className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-[10px] font-black flex items-center gap-1 transition active:scale-95"
+                                                    >
+                                                        <Clock size={11} strokeWidth={2.5} />
+                                                        <span className="hidden xs:inline">{isIndo ? 'Jadwal' : 'Schedule'}</span>
+                                                    </button>
+                                                )}
+                                                <GripVertical size={12} className="hidden sm:block text-slate-300 dark:text-slate-600 group-hover:text-indigo-400" />
+                                                <button 
+                                                    onClick={() => removeInboxTask(task.id)} 
+                                                    className="opacity-70 sm:opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all p-0.5"
+                                                >
+                                                    <X size={12} strokeWidth={2.5} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    /* Study Assignments Tray */
+                    <div>
+                        {pendingStudyAssignments.length === 0 ? (
+                            <div className="text-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl bg-purple-50/20 dark:bg-purple-950/10">
+                                <span className="text-2xl">🎉</span>
+                                <p className="text-xs font-black text-slate-700 dark:text-slate-300 mt-1">
+                                    {isIndo ? 'Semua tugas kuliah selesai!' : 'All study assignments completed!'}
+                                </p>
+                                <p className="text-[10px] text-slate-400 mt-0.5">
+                                    {isIndo ? 'Tidak ada tugas yang tertunda di modul Study' : 'No pending tasks from Study module'}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
+                                <p className="text-[10px] text-slate-400 font-bold px-1 mb-1">
+                                    {isIndo ? 'Tarik tugas ke timeline untuk membuat sesi belajar:' : 'Drag assignment to timeline to time-block:'}
+                                </p>
+                                {pendingStudyAssignments.map((assignment: any) => {
+                                    const dueDate = assignment.due_date ? String(assignment.due_date).split('T')[0] : '';
+                                    const isUrgent = assignment.priority === 'urgent';
+
+                                    return (
+                                        <div
+                                            key={`tray-study-${assignment.id}`}
+                                            draggable
+                                            onDragStart={(e) => handleStudyDragStart(e, assignment)}
+                                            onClick={() => onStudyClick && onStudyClick({
+                                                id: String(assignment.id),
+                                                courseName: assignment.course_name || 'Kuliah',
+                                                title: assignment.title,
+                                                dueDate: assignment.due_date,
+                                                startTime: assignment.startTime || '19:00',
+                                                endTime: assignment.endTime || '20:00',
+                                                type: assignment.type || 'assignment',
+                                                priority: assignment.priority || 'normal',
+                                                completed: assignment.status === 'completed',
+                                                description: assignment.description || ''
+                                            })}
+                                            className="group p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-700 bg-white dark:bg-slate-900 transition-all cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md"
                                         >
-                                            {theme.icon}
-                                        </button>
-                                        <input 
-                                            value={task.title} 
-                                            onChange={(e) => updateInboxTask(task.id, e.target.value)} 
-                                            className={`flex-1 bg-transparent border-0 focus:ring-0 p-0 text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-300 dark:placeholder-slate-700 truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-600' : ''}`} 
-                                            placeholder="..." 
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-1 shrink-0">
-                                        {onScheduleInboxTaskModal && (
-                                            <button
-                                                type="button"
-                                                onClick={() => onScheduleInboxTaskModal(task)}
-                                                title={isIndo ? 'Jadwalkan ke timeline' : 'Schedule to timeline'}
-                                                className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-[10px] font-black flex items-center gap-1 transition active:scale-95"
-                                            >
-                                                <Clock size={11} strokeWidth={2.5} />
-                                                <span className="hidden xs:inline">{isIndo ? 'Jadwal' : 'Schedule'}</span>
-                                            </button>
-                                        )}
-                                        <GripVertical size={12} className="hidden sm:block text-slate-300 dark:text-slate-600 group-hover:text-indigo-400" />
-                                        <button 
-                                            onClick={() => removeInboxTask(task.id)} 
-                                            className="opacity-70 sm:opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all p-0.5"
-                                        >
-                                            <X size={12} strokeWidth={2.5} />
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                                                        <span className="px-1.5 py-0.2 rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-[9px] font-black uppercase tracking-wider">
+                                                            {assignment.course_name || 'Kuliah'}
+                                                        </span>
+                                                        {isUrgent && (
+                                                            <span className="px-1.5 py-0.2 rounded-md bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 text-[9px] font-black">
+                                                                🚨 Urgent
+                                                            </span>
+                                                        )}
+                                                        {dueDate && (
+                                                            <span className="text-[9px] font-mono text-slate-400">
+                                                                📅 {dueDate}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-1">
+                                                        {assignment.title}
+                                                    </h4>
+                                                </div>
+
+                                                <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                                                    {onScheduleStudyModal && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onScheduleStudyModal(assignment);
+                                                            }}
+                                                            title={isIndo ? 'Jadwalkan ke timeline' : 'Schedule to timeline'}
+                                                            className="px-2 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 hover:bg-purple-100 text-[10px] font-black flex items-center gap-1 transition"
+                                                        >
+                                                            <Clock size={11} strokeWidth={2.5} />
+                                                            <span className="hidden xs:inline">{isIndo ? 'Jadwal' : 'Schedule'}</span>
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (onToggleStudyCompleted) onToggleStudyCompleted(String(assignment.id));
+                                                        }}
+                                                        className="p-1 text-slate-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition"
+                                                        title={isIndo ? 'Tandai selesai' : 'Mark completed'}
+                                                    >
+                                                        <Circle size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

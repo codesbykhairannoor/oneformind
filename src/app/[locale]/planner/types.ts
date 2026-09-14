@@ -34,3 +34,32 @@ export interface ScheduledHabitItem {
     streak: number;
     notes?: string;
 }
+
+export interface ScheduledInterviewItem {
+    id: string | number;
+    jobId: number | string;
+    company: string;
+    jobTitle: string;
+    roundTitle: string;
+    roundType: string;
+    scheduledAt: string;
+    startTime: string;
+    endTime: string;
+    interviewerName?: string;
+    meetingLink?: string;
+    status: string;
+    notes?: string;
+}
+
+export interface ScheduledStudyItem {
+    id: string;
+    courseName: string;
+    title: string;
+    dueDate: string;
+    startTime: string;
+    endTime: string;
+    type: string;
+    priority: string;
+    completed: boolean;
+    description?: string;
+}

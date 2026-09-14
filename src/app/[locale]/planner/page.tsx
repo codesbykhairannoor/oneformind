@@ -8,6 +8,8 @@ import PlannerSidebar from './components/PlannerSidebar';
 import PlannerTimeline from './components/PlannerTimeline';
 import PlannerModalsContainer from './components/PlannerModalsContainer';
 import PlannerHabitModal from './components/PlannerHabitModal';
+import PlannerInterviewModal from './components/PlannerInterviewModal';
+import PlannerStudyModal from './components/PlannerStudyModal';
 import ExportModal from '@/components/export/ExportModal';
 import { usePlannerState } from './hooks/usePlannerState';
 import { useLocale } from 'next-intl';
@@ -111,9 +113,9 @@ export default function PlannerPage() {
                             }`}
                         >
                             <span>📥 Hub & Timer</span>
-                            {planner.taskInbox.length > 0 && (
+                            {(planner.taskInbox.length > 0 || (planner.pendingStudyAssignments?.length || 0) > 0) && (
                                 <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-mono font-bold">
-                                    {planner.taskInbox.length}
+                                    {planner.taskInbox.length + (planner.pendingStudyAssignments?.length || 0)}
                                 </span>
                             )}
                         </button>
@@ -136,6 +138,15 @@ export default function PlannerPage() {
                                 setWaterGlasses={planner.handleSetWaterGlasses}
                                 taskInbox={planner.taskInbox} 
                                 setTaskInbox={planner.handleSetTaskInbox}
+                                pendingStudyAssignments={planner.pendingStudyAssignments}
+                                onStudyClick={(study) => planner.setSelectedStudyForModal(study)}
+                                onToggleStudyCompleted={planner.toggleStudyAssignmentCompleted}
+                                onScheduleStudyModal={(study) => {
+                                    planner.openNewTaskModal(undefined, {
+                                        title: `[📚 Kuliah] ${study.course_name ? `${study.course_name}: ` : ''}${study.title}`,
+                                        type: 2
+                                    });
+                                }}
                                 saveStatus={planner.saveStatus}
                                 durationMinutes={planner.durationMinutes}
                                 pomodoroTime={planner.pomodoroTime} 
@@ -161,6 +172,13 @@ export default function PlannerPage() {
                                  scheduledHabits={planner.scheduledHabits}
                                  onToggleHabit={planner.toggleHabitStatus}
                                  onHabitClick={planner.setSelectedHabitForModal}
+                                 scheduledInterviews={planner.scheduledInterviews}
+                                 onInterviewClick={planner.setSelectedInterviewForModal}
+                                 onToggleInterviewCompleted={planner.toggleInterviewCompleted}
+                                 scheduledStudyTasks={planner.scheduledStudyTasks}
+                                 onStudyClick={planner.setSelectedStudyForModal}
+                                 onToggleStudyCompleted={planner.toggleStudyAssignmentCompleted}
+                                 onScheduleStudyAssignment={planner.handleScheduleStudyAssignment}
                                  selectedDate={planner.selectedDate}
                                  now={planner.now}
                                  startHour={planner.startHour}
@@ -190,6 +208,24 @@ export default function PlannerPage() {
                     onToggleCompleted={planner.toggleHabitStatus}
                     onUnlinkFromPlanner={planner.unlinkHabitFromPlanner}
                     onDeletePermanently={planner.deleteHabitPermanently}
+                />
+
+                <PlannerInterviewModal
+                    isOpen={Boolean(planner.selectedInterviewForModal)}
+                    interview={planner.selectedInterviewForModal}
+                    isIndo={isIndo}
+                    locale={locale}
+                    onClose={() => planner.setSelectedInterviewForModal(null)}
+                    onToggleInterviewCompleted={planner.toggleInterviewCompleted}
+                />
+
+                <PlannerStudyModal
+                    isOpen={Boolean(planner.selectedStudyForModal)}
+                    assignment={planner.selectedStudyForModal}
+                    isIndo={isIndo}
+                    locale={locale}
+                    onClose={() => planner.setSelectedStudyForModal(null)}
+                    onToggleAssignmentCompleted={planner.toggleStudyAssignmentCompleted}
                 />
 
                 <PlannerModalsContainer 
