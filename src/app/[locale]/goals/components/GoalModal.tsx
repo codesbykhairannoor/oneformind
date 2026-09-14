@@ -346,14 +346,26 @@ export default function GoalModal({
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
-                                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                                            {isIndo ? 'Nominal Saat Ini' : 'Current Amount'}
-                                        </label>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="text-[10px] font-bold text-slate-400 block">
+                                                {isIndo ? 'Nominal Saat Ini' : 'Current Amount'}
+                                            </label>
+                                            {form.linked_source === 'finance_savings' && (
+                                                <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase">
+                                                    {isIndo ? '🟢 Auto-Sync' : '🟢 Live Synced'}
+                                                </span>
+                                            )}
+                                        </div>
                                         <input 
                                             type="number"
+                                            disabled={form.linked_source === 'finance_savings'}
                                             value={form.current_value || 0}
                                             onChange={(e) => setForm(prev => ({ ...prev, current_value: Number(e.target.value) }))}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono"
+                                            className={`w-full border rounded-xl px-3 py-2 text-xs font-bold font-mono transition ${
+                                                form.linked_source === 'finance_savings'
+                                                    ? 'bg-emerald-50/60 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-850 text-emerald-700 dark:text-emerald-300 cursor-not-allowed opacity-90'
+                                                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-emerald-600 dark:text-emerald-400'
+                                            }`}
                                             placeholder="0"
                                         />
                                     </div>

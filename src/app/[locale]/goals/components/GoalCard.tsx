@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import useSWR from 'swr';
 import { useLocale } from 'next-intl';
 import { 
@@ -313,7 +314,7 @@ export default function GoalCard({
                 )}
 
                 {/* Linked Habit Chips */}
-                {goal.linked_habits && goal.linked_habits.length > 0 && (
+                {goal.linked_habits && goal.linked_habits.length > 0 ? (
                     <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                             {isIndo ? 'Rutinitas:' : 'Engine:'}
@@ -329,6 +330,17 @@ export default function GoalCard({
                             </span>
                         ))}
                     </div>
+                ) : (
+                    !isSavingOrTemp && onEdit && goal.status !== 'completed' && (
+                        <button
+                            type="button"
+                            onClick={() => onEdit(goal)}
+                            className="w-full py-1.5 px-2.5 rounded-xl border border-dashed border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/40 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-[10px] font-bold flex items-center justify-center gap-1.5 transition group/habit"
+                        >
+                            <Sparkles className="w-3 h-3 group-hover/habit:scale-110 transition-transform text-indigo-500" />
+                            <span>{isIndo ? '+ Hubungkan Habit Pendorong' : '+ Connect Habit Engine'}</span>
+                        </button>
+                    )
                 )}
 
                 {/* 4. DYNAMIC TARGET TYPES */}
@@ -391,19 +403,28 @@ export default function GoalCard({
                             <span>{formatCurrency(goal.target_value, goal.currency)}</span>
                         </div>
 
-                        {goal.linked_source === 'finance_savings' && (
-                            <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
-                                <span className="flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span>{isIndo ? 'Tabungan Terhubung:' : 'Synced Savings:'}</span>
-                                </span>
-                                <span className="font-black truncate max-w-[140px] text-emerald-800 dark:text-emerald-300">
-                                    {goal.linked_account_title || (isIndo ? 'Tabungan Finansial' : 'Finance Savings')}
-                                </span>
+                        {goal.linked_source === 'finance_savings' ? (
+                            <div className="pt-1 flex items-center justify-between gap-2 p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/60">
+                                <div className="space-y-0.5 min-w-0">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                                        <span className="text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-300 tracking-wider truncate">
+                                            {goal.linked_account_title || (isIndo ? 'Tabungan Finansial' : 'Finance Savings')}
+                                        </span>
+                                    </div>
+                                    <span className="text-[9px] text-slate-500 dark:text-slate-400 block truncate">
+                                        {isIndo ? 'Auto-sync dari tabungan Finance' : 'Auto-synced from Finance savings'}
+                                    </span>
+                                </div>
+                                <Link 
+                                    href={`/${locale}/finance`}
+                                    className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black tracking-wider uppercase flex items-center gap-1 shrink-0 transition shadow-sm"
+                                >
+                                    <span>{isIndo ? 'Kelola di Finance' : 'Manage in Finance'}</span>
+                                    <span>↗</span>
+                                </Link>
                             </div>
-                        )}
-
-                        {onQuickIncrement && goal.status !== 'completed' && (
+                        ) : onQuickIncrement && goal.status !== 'completed' && (
                             <div className="flex items-center gap-2 pt-1">
                                 <button
                                     type="button"
