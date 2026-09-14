@@ -14,7 +14,7 @@ import JournalMemoriesView from './components/JournalMemoriesView';
 import JournalDetailModal from './components/JournalDetailModal';
 import NeuralBridge from '@/components/NeuralBridge';
 import GatedPage from '@/components/GatedPage';
-import { Plus, Trash2, BookOpen, Sparkles, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, BookOpen, Sparkles, AlertTriangle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import ExportModal from '@/components/export/ExportModal';
 
@@ -89,8 +89,16 @@ export default function JournalIndexPage() {
         fetchData();
     }, []);
 
-    // Habits Cross-Domain Metacognitive Friction Detection
-    const { data: rawHabits } = useSWR('/api/habits', fetcher);
+    const currentMonthKey = useMemo(() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }, []);
+
+    // Habits Cross-Domain Metacognitive Friction Detection (Scoped to current month)
+    const { data: rawHabits } = useSWR(`/api/habits?period=${currentMonthKey}`, fetcher);
+
+    const [isDiagnosticDismissed, setIsDiagnosticDismissed] = useState(false);
+    const [showAllFrictions, setShowAllFrictions] = useState(false);
 
     const habitFrictions = useMemo(() => {
         if (!rawHabits || !Array.isArray(rawHabits)) return [];
@@ -102,8 +110,16 @@ export default function JournalIndexPage() {
             pastDays.push(d.toISOString().split('T')[0]);
         }
 
+        const seenNames = new Set<string>();
         const frictions: Array<{ id: number; name: string; icon: string; missedDays: number }> = [];
+
         rawHabits.forEach((h: any) => {
+            // Abaikan habit yang diarsipkan atau tidak aktif
+            if (h.isArchived || h.is_archived || h.archived) return;
+
+            const normalizedName = (h.name || '').trim().toLowerCase();
+            if (!normalizedName || seenNames.has(normalizedName)) return;
+
             let meta: any = {};
             if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
                 try { meta = JSON.parse(h.status); } catch {}
@@ -123,7 +139,9 @@ export default function JournalIndexPage() {
                     missedCount++;
                 }
             });
+
             if (missedCount >= 2) {
+                seenNames.add(normalizedName);
                 frictions.push({
                     id: h.id,
                     name: h.name,
@@ -132,7 +150,9 @@ export default function JournalIndexPage() {
                 });
             }
         });
-        return frictions;
+
+        // Urutkan dari yang paling sering missed
+        return frictions.sort((a, b) => b.missedDays - a.missedDays);
     }, [rawHabits]);
 
     // Calculate Writing Streak
@@ -291,49 +311,74 @@ export default function JournalIndexPage() {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                         <NeuralBridge module="Journal" />
 
-                        {/* Habits Friction Diagnostic (Metacognition) */}
-                        {habitFrictions.length > 0 && (
-                            <div className="p-5 sm:p-6 rounded-[2rem] bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent border border-amber-500/30 dark:border-amber-500/20 backdrop-blur-sm space-y-3 shadow-sm">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg shadow-sm">
+                        {/* Habits Friction Diagnostic (Metacognition) - Ultra-Clean & Dismissible */}
+                        {habitFrictions.length > 0 && !isDiagnosticDismissed && (
+                            <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/40 dark:bg-amber-950/15 border border-amber-200/70 dark:border-amber-900/30 backdrop-blur-sm space-y-3 transition-all duration-300 shadow-xs">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm shrink-0 border border-amber-500/20">
                                             🔍
                                         </div>
-                                        <div>
-                                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
-                                                {isIndo ? 'Diagnostik Friksi Kebiasaan (Metakognisi)' : 'Habit Friction Diagnostic (Metacognition)'}
-                                            </span>
-                                            <h4 className="text-sm sm:text-base font-black text-slate-800 dark:text-slate-100">
+                                        <div className="min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h4 className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 truncate">
+                                                    {isIndo ? 'Diagnostik Friksi Kebiasaan' : 'Habit Friction Diagnostic'}
+                                                </h4>
+                                                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-mono">
+                                                    {habitFrictions.length} {isIndo ? 'evaluasi' : 'audits'}
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-xl">
                                                 {isIndo 
-                                                    ? `Terdeteksi hambatan pada ${habitFrictions.length} kebiasaan dalam 3 hari terakhir` 
-                                                    : `Friction detected on ${habitFrictions.length} habits over the last 3 days`}
-                                            </h4>
+                                                    ? 'Streak terputus adalah sinyal friksi lingkungan. Audit penyebabnya dengan refleksi terpandu.' 
+                                                    : 'Broken streaks signal environmental friction. Audit root causes with guided reflection.'}
+                                            </p>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-mono hidden sm:inline">
-                                        Stoic Clarity
-                                    </span>
+                                    
+                                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                                        {habitFrictions.length > 3 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAllFrictions(!showAllFrictions)}
+                                                className="text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-amber-100/50 dark:hover:bg-amber-900/30 transition"
+                                            >
+                                                <span>{showAllFrictions ? (isIndo ? 'Perkecil' : 'Show Less') : (isIndo ? `+${habitFrictions.length - 3} Lainnya` : `+${habitFrictions.length - 3} More`)}</span>
+                                                {showAllFrictions ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                            </button>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsDiagnosticDismissed(true)}
+                                            className="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition"
+                                            title={isIndo ? 'Tutup' : 'Dismiss'}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
-                                    {isIndo 
-                                        ? 'Streak terputus bukan tanda kegagalan kemauan, melainkan sinyal adanya friksi lingkungan atau kelelahan energi. Gunakan template terpandu untuk mengidentifikasi penyebabnya dan merancang penyesuaian sistem.'
-                                        : 'Broken streaks are not willpower failures—they are signals of environmental friction or fatigue. Use guided Stoic reflection to audit root causes and adjust your system.'}
-                                </p>
-
-                                <div className="flex items-center gap-2 flex-wrap pt-1">
-                                    {habitFrictions.map(f => (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-0.5">
+                                    {(showAllFrictions ? habitFrictions : habitFrictions.slice(0, 3)).map(f => (
                                         <Link
                                             key={f.id}
                                             href={`/journal/write?habitFriction=${encodeURIComponent(f.name)}&habitIcon=${encodeURIComponent(f.icon)}`}
-                                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-amber-300/80 dark:border-amber-700/60 hover:border-amber-500 text-slate-800 dark:text-slate-100 text-xs font-black shadow-xs hover:shadow-md transition active:scale-95 group"
+                                            className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900/90 border border-amber-200/60 dark:border-amber-800/40 hover:border-amber-400 dark:hover:border-amber-600 shadow-xs hover:shadow-md transition active:scale-[0.99] group"
                                         >
-                                            <span>{f.icon}</span>
-                                            <span className="group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">{f.name}</span>
-                                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
-                                                {f.missedDays} {isIndo ? 'hari lolos' : 'days missed'}
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <span className="text-base shrink-0">{f.icon}</span>
+                                                <div className="min-w-0">
+                                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition block truncate">
+                                                        {f.name}
+                                                    </span>
+                                                    <span className="text-[10px] text-amber-600/80 dark:text-amber-400/80 font-mono block">
+                                                        {f.missedDays} {isIndo ? 'hari terlewat' : 'days missed'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span className="px-2 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 text-[10px] font-black group-hover:bg-amber-600 group-hover:text-white transition shrink-0 ml-2">
+                                                ✍️ {isIndo ? 'Audit' : 'Audit'}
                                             </span>
-                                            <span className="text-xs text-amber-500 ml-1">✍️ {isIndo ? 'Audit' : 'Audit'}</span>
                                         </Link>
                                     ))}
                                 </div>
