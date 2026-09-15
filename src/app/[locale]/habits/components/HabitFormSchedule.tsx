@@ -145,6 +145,90 @@ export default function HabitFormSchedule({
                 </div>
             </div>
 
+            {/* SECTION: FREKUENSI HARI RUTINITAS (SELALU MUNCUL UNTUK SEMUA HABIT) */}
+            <div className="space-y-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {isIndo ? 'Frekuensi Hari Rutinitas' : 'Routine Frequency Days'}
+                    </label>
+                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                        {formFreqType === 'daily' 
+                            ? (isIndo ? 'Setiap Hari' : 'Every Day') 
+                            : `${formFreqDays.length} ${isIndo ? 'Hari / Minggu' : 'Days / Week'}`}
+                    </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setFormFreqType('daily');
+                            setFormTarget(daysInCurrentMonth);
+                        }}
+                        className={`py-2.5 px-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border-2 ${
+                            formFreqType === 'daily'
+                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
+                        }`}
+                    >
+                        <span>📅</span> {isIndo ? 'Setiap Hari' : 'Every Day'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setFormFreqType('weekly_days');
+                            setFormTarget(calculateScheduledDays(formFreqDays, currentMonthKey));
+                        }}
+                        className={`py-2.5 px-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border-2 ${
+                            formFreqType === 'weekly_days'
+                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
+                        }`}
+                    >
+                        <span>🗓️</span> {isIndo ? 'Hari Tertentu' : 'Specific Days'}
+                    </button>
+                </div>
+
+                {formFreqType === 'weekly_days' && (
+                    <div className="grid grid-cols-7 gap-1.5 pt-1">
+                        {[
+                            { day: 1, label: isIndo ? 'Sen' : 'Mon' },
+                            { day: 2, label: isIndo ? 'Sel' : 'Tue' },
+                            { day: 3, label: isIndo ? 'Rab' : 'Wed' },
+                            { day: 4, label: isIndo ? 'Kam' : 'Thu' },
+                            { day: 5, label: isIndo ? 'Jum' : 'Fri' },
+                            { day: 6, label: isIndo ? 'Sab' : 'Sat' },
+                            { day: 0, label: isIndo ? 'Min' : 'Sun' }
+                        ].map(item => {
+                            const isSelected = formFreqDays.includes(item.day);
+                            return (
+                                <button
+                                    key={item.day}
+                                    type="button"
+                                    onClick={() => {
+                                        let nextDays: number[];
+                                        if (isSelected) {
+                                            nextDays = formFreqDays.filter(d => d !== item.day);
+                                        } else {
+                                            nextDays = [...formFreqDays, item.day];
+                                        }
+                                        setFormFreqDays(nextDays);
+                                        setFormTarget(calculateScheduledDays(nextDays, currentMonthKey));
+                                    }}
+                                    className={`h-10 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center gap-0.5 border-2 ${
+                                        isSelected
+                                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs scale-102'
+                                            : 'bg-white dark:bg-slate-900 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-indigo-300'
+                                    }`}
+                                >
+                                    <span>{item.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
             {/* SECTION 6: INTEGRASI KE TAB PLANNER (HANYA MUNCUL JIKA MODUL PLANNER DIAKTIFKAN USER) */}
             {isPlannerModuleActive && (
             <div className={`rounded-3xl border-2 transition-all duration-300 overflow-hidden ${
@@ -171,8 +255,8 @@ export default function HabitFormSchedule({
                             </h4>
                             <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
                                 {isIndo 
-                                    ? 'Aktifkan untuk mengatur jadwal jam, hari, dan masa aktif rutinitas ini di Timeline Planner.' 
-                                    : 'Enable to schedule hours, days, and active range directly on Planner Timeline.'}
+                                    ? 'Aktifkan untuk mengatur jadwal jam dan masa aktif rutinitas ini di Timeline Planner.' 
+                                    : 'Enable to schedule hours and active range directly on Planner Timeline.'}
                             </p>
                         </div>
                     </div>
@@ -197,7 +281,7 @@ export default function HabitFormSchedule({
                     </button>
                 </div>
 
-                {/* KETIKA TAB PLANNER DIAKTIFKAN: MUNCUL OPSI WAKTU, HARI KAPAN AJA, & SAMPAI KAPAN */}
+                {/* KETIKA TAB PLANNER DIAKTIFKAN: MUNCUL OPSI WAKTU & SAMPAI KAPAN */}
                 {isPlannerActive ? (
                     <div className="p-4 md:p-5 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
                         {/* 1. WAKTU YANG AKAN MUNCUL DI PLANNER */}
@@ -272,91 +356,19 @@ export default function HabitFormSchedule({
                             </div>
                         </div>
 
-                        {/* 2. HARI KAPAN AJA YANG AKAN MUNCUL DI PLANNER */}
-                        <div className="space-y-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
-                            <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-black text-slate-800 dark:text-slate-200">
-                                    {isIndo ? 'Hari Kapan Aja Muncul di Planner:' : 'Scheduled Days in Planner:'}
-                                </span>
-                                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
-                                    {formFreqType === 'daily' 
-                                        ? (isIndo ? 'Setiap Hari' : 'Every Day') 
-                                        : `${formFreqDays.length} ${isIndo ? 'Hari/Minggu' : 'Days/Week'}`}
-                                </span>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setFormFreqType('daily');
-                                        setFormTarget(daysInCurrentMonth);
-                                    }}
-                                    className={`py-2.5 px-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border-2 ${
-                                        formFreqType === 'daily'
-                                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
-                                    }`}
-                                >
-                                    <span>📅</span> {isIndo ? 'Setiap Hari' : 'Every Day'}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setFormFreqType('weekly_days');
-                                        setFormTarget(calculateScheduledDays(formFreqDays, currentMonthKey));
-                                    }}
-                                    className={`py-2.5 px-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border-2 ${
-                                        formFreqType === 'weekly_days'
-                                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
-                                    }`}
-                                >
-                                    <span>🗓️</span> {isIndo ? 'Hari Tertentu' : 'Specific Days'}
-                                </button>
-                            </div>
-
-                            {formFreqType === 'weekly_days' && (
-                                <div className="grid grid-cols-7 gap-1.5 pt-1">
-                                    {[
-                                        { day: 1, label: isIndo ? 'Sen' : 'Mon' },
-                                        { day: 2, label: isIndo ? 'Sel' : 'Tue' },
-                                        { day: 3, label: isIndo ? 'Rab' : 'Wed' },
-                                        { day: 4, label: isIndo ? 'Kam' : 'Thu' },
-                                        { day: 5, label: isIndo ? 'Jum' : 'Fri' },
-                                        { day: 6, label: isIndo ? 'Sab' : 'Sat' },
-                                        { day: 0, label: isIndo ? 'Min' : 'Sun' }
-                                    ].map(item => {
-                                        const isSelected = formFreqDays.includes(item.day);
-                                        return (
-                                            <button
-                                                key={item.day}
-                                                type="button"
-                                                onClick={() => {
-                                                    let nextDays: number[];
-                                                    if (isSelected) {
-                                                        nextDays = formFreqDays.filter(d => d !== item.day);
-                                                    } else {
-                                                        nextDays = [...formFreqDays, item.day];
-                                                    }
-                                                    setFormFreqDays(nextDays);
-                                                    setFormTarget(calculateScheduledDays(nextDays, currentMonthKey));
-                                                }}
-                                                className={`h-10 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center gap-0.5 border-2 ${
-                                                    isSelected
-                                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs scale-102'
-                                                        : 'bg-white dark:bg-slate-900 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-indigo-300'
-                                                }`}
-                                            >
-                                                <span>{item.label}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                        {/* INFORMASI SINKRONISASI HARI TERJADWAL DI PLANNER */}
+                        <div className="p-3 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between text-xs">
+                            <span className="font-bold text-slate-600 dark:text-slate-300 text-[11px]">
+                                {isIndo ? 'Status Hari Sinkronisasi Planner:' : 'Planner Sync Frequency:'}
+                            </span>
+                            <span className="font-black text-indigo-600 dark:text-indigo-400 text-xs">
+                                {formFreqType === 'daily' 
+                                    ? (isIndo ? '📅 Setiap Hari' : '📅 Every Day') 
+                                    : `🗓️ ${formFreqDays.length} ${isIndo ? 'Hari / Minggu' : 'Days / Week'}`}
+                            </span>
                         </div>
 
-                        {/* 3. SAMPAI KAPAN (RENTANG TANGGAL DI PLANNER) */}
+                        {/* 2. SAMPAI KAPAN (RENTANG TANGGAL DI PLANNER) */}
                         <div className="space-y-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
                             <div className="flex items-center justify-between">
                                 <span className="text-[11px] font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5">

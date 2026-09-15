@@ -120,10 +120,10 @@ export default function HabitFormTypeMeasure({
                             </label>
                             <input
                                 type="number"
-                                value={formTargetValue}
-                                onChange={(e) => setFormTargetValue(Number(e.target.value))}
+                                value={formTargetValue || ''}
+                                onChange={(e) => setFormTargetValue(e.target.value === '' ? 0 : Number(e.target.value))}
                                 className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black text-base outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition"
-                                placeholder="2000"
+                                placeholder="10"
                                 min="1"
                             />
                         </div>

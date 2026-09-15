@@ -14,7 +14,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
     const [formType, setFormType] = useState<'positive' | 'negative'>('positive');
     const [formMeasure, setFormMeasure] = useState<'boolean' | 'numeric'>('boolean');
     const [formUnit, setFormUnit] = useState('ml');
-    const [formTargetValue, setFormTargetValue] = useState(2000);
+    const [formTargetValue, setFormTargetValue] = useState(10);
     const [formFreqType, setFormFreqType] = useState<'daily' | 'weekly_days'>('daily');
     const [formFreqDays, setFormFreqDays] = useState<number[]>([1, 2, 3, 4, 5]);
     const [formTimeOfDay, setFormTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'anytime'>('morning');
@@ -61,8 +61,8 @@ export function useHabitFormState(daysInCurrentMonth: number) {
             if (!formUnit || formUnit === 'x') {
                 setFormUnit('ml');
             }
-            if (!formTargetValue || formTargetValue <= 1) {
-                setFormTargetValue(2000);
+            if (!formTargetValue || formTargetValue <= 0) {
+                setFormTargetValue(10);
             }
         }
     };
@@ -104,7 +104,7 @@ export function useHabitFormState(daysInCurrentMonth: number) {
         setFormType(habit.habitType || 'positive');
         setFormMeasure(habit.measurementType || 'boolean');
         setFormUnit(isBool ? 'x' : (habit.unit && habit.unit !== 'x' ? habit.unit : 'ml'));
-        setFormTargetValue(isBool ? 1 : (habit.targetValue && habit.targetValue > 1 ? habit.targetValue : 2000));
+        setFormTargetValue(isBool ? 1 : (habit.targetValue && habit.targetValue >= 1 ? habit.targetValue : 10));
         setFormFreqType((habit.frequencyType as any) || 'daily');
         setFormFreqDays(habit.frequencyDays || [1, 2, 3, 4, 5]);
         setFormTimeOfDay(habit.timeOfDay || 'morning');
