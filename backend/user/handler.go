@@ -88,32 +88,6 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Fetch existing user details from DB to enforce server-side tier limits & grace period lock
-		var currPlanType sql.NullString
-		var currIsPremium bool
-		var currPremiumUntil sql.NullTime
-		var currCreatedAt time.Time
-		var currSettingsStr sql.NullString
-
-		err := db.QueryRow(`SELECT plan_type, is_premium, premium_until, created_at, settings FROM users WHERE id = $1`, userID).
-			Scan(&currPlanType, &currIsPremium, &currPremiumUntil, &currCreatedAt, &currSettingsStr)
-
-		if err != nil {
-			if err == sql.ErrNoRows {
-				http.Error(w, `{"error": "User not found"}`, http.StatusNotFound)
-			} else {
-				http.Error(w, `{"error": "Internal Server Error"}`, http.StatusInternalServerError)
-			}
-			return
-		}
-
-		plan := ""
-		if currPlanType.Valid {
-			plan = strings.ToLower(currPlanType.String)
-		}
-		isPaidTrial := currPremiumUntil.Valid && currPremiumUntil.Time.After(time.Now())
-		isUnlimited := currIsPremium || isPaidTrial || (plan != "" && plan != "explorer")
-
 		// Process settings map cleanly if provided
 		if rawSettings, ok := req["settings"]; ok {
 			var settingsMap map[string]interface{}
@@ -192,7 +166,7 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		var u User
 		var settingsStr sql.NullString
 		var premiumUntil sql.NullTime
-		err = db.QueryRow(query, args...).
+		err := db.QueryRow(query, args...).
 			Scan(&u.ID, &u.Name, &u.Email, &u.PlanType, &u.IsPremium, &premiumUntil, &settingsStr, &u.ResumeText, &u.ResumeFilename)
 
 		if premiumUntil.Valid {
