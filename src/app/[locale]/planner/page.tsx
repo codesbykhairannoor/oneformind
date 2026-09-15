@@ -75,6 +75,7 @@ export default function PlannerPage() {
 
     return (
         <AuthenticatedLayout>
+            <GatedPage feature="planner">
             <div className="flex flex-col min-h-screen">
                 <PlannerHeader 
                     selectedDate={planner.selectedDate}
