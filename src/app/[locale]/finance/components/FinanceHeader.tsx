@@ -44,6 +44,7 @@ export default function FinanceHeader({
     selectedMonthKey,
     onMonthChange,
     onOpenTrxModal,
+    onOpenBatchModal,
     activeCurrency,
     onCurrencyChange,
     transactions = []

@@ -653,6 +653,7 @@ export function usePlannerState() {
         openNewTaskModal: taskCrud.openNewTaskModal,
         editTask: taskCrud.editTask,
         submitSingleTask: taskCrud.submitSingleTask,
+        submitBatchTasks: taskCrud.submitBatchTasks,
         handleMoveTask: taskCrud.handleMoveTask,
         handleScheduleInboxTask,
         handleScheduleStudyAssignment,
