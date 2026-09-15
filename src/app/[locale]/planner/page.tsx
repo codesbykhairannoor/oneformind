@@ -14,14 +14,27 @@ import PlannerStudyModal from './components/PlannerStudyModal';
 import ExportModal from '@/components/export/ExportModal';
 import { usePlannerState } from './hooks/usePlannerState';
 import { useLocale } from 'next-intl';
+import { useGating } from '@/hooks/useGating';
+import { useRouter } from '@/i18n/routing';
 
 export default function PlannerPage() {
     usePageTitle('Planner');
     const locale = useLocale();
+    const router = useRouter();
     const isIndo = locale === 'id';
+    const { isArchitect } = useGating();
     const planner = usePlannerState();
     const [mobileTab, setMobileTab] = useState<'timeline' | 'sidebar'>('timeline');
     const [isExportOpen, setIsExportOpen] = useState(false);
+    const [showBatchModal, setShowBatchModal] = useState(false);
+
+    const handleOpenBatchModal = () => {
+        if (!isArchitect) {
+            router.push('/billing');
+            return;
+        }
+        setShowBatchModal(true);
+    };
 
     // Global keyboard shortcuts (T: today, N: new task, ArrowLeft/Right: date navigation)
     useEffect(() => {
@@ -87,6 +100,7 @@ export default function PlannerPage() {
                         pending: planner.pendingCount 
                     }}
                     onOpenTaskModal={() => planner.openNewTaskModal()}
+                    onOpenBatchModal={handleOpenBatchModal}
                     onResetBoard={planner.requestResetBoard}
                     onOpenExportModal={() => setIsExportOpen(true)}
                 />
@@ -236,6 +250,9 @@ export default function PlannerPage() {
                 <PlannerModalsContainer 
                     showTaskModal={planner.showTaskModal}
                     setShowTaskModal={planner.setShowTaskModal}
+                    showBatchModal={showBatchModal}
+                    setShowBatchModal={setShowBatchModal}
+                    submitBatchTasks={planner.submitBatchTasks}
                     editingTaskId={planner.editingTaskId}
                     selectedDate={planner.selectedDate}
                     tasks={planner.tasks}

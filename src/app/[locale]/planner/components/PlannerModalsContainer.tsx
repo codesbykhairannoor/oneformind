@@ -1,6 +1,7 @@
 'use client';
 
 import PlannerTaskModal from './PlannerTaskModal';
+import PlannerBatchModal, { BatchTaskRow } from './PlannerBatchModal';
 import ModalPortal from '@/components/ModalPortal';
 import { TaskItem } from '../types';
 import { AlertTriangle, Trash2 } from 'lucide-react';
@@ -9,6 +10,9 @@ import { useLocale } from 'next-intl';
 interface PlannerModalsContainerProps {
     showTaskModal: boolean;
     setShowTaskModal: (show: boolean) => void;
+    showBatchModal?: boolean;
+    setShowBatchModal?: (show: boolean) => void;
+    submitBatchTasks?: (rows: BatchTaskRow[]) => Promise<void> | void;
     editingTaskId: number | null;
     selectedDate: string;
     tasks: TaskItem[];
@@ -32,6 +36,9 @@ interface PlannerModalsContainerProps {
 export default function PlannerModalsContainer({
     showTaskModal,
     setShowTaskModal,
+    showBatchModal,
+    setShowBatchModal,
+    submitBatchTasks,
     editingTaskId,
     selectedDate,
     tasks,
@@ -52,6 +59,7 @@ export default function PlannerModalsContainer({
     confirmResetBoard
 }: PlannerModalsContainerProps) {
     const locale = useLocale();
+    const isIndo = locale === 'id';
     const formattedDate = new Date(selectedDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
         weekday: 'long',
         day: 'numeric',
@@ -80,6 +88,17 @@ export default function PlannerModalsContainer({
                 onSave={submitSingleTask}
                 onDelete={deleteTask}
             />
+
+            {/* MODAL: BATCH TASK CREATION (ARCHITECT FEATURE) */}
+            {showBatchModal && setShowBatchModal && submitBatchTasks && (
+                <PlannerBatchModal
+                    isOpen={showBatchModal}
+                    isIndo={isIndo}
+                    selectedDate={selectedDate}
+                    onClose={() => setShowBatchModal(false)}
+                    onSubmit={submitBatchTasks}
+                />
+            )}
 
             {/* Reset Confirmation Dialog */}
             {showResetConfirmModal && (

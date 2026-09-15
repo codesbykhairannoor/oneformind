@@ -47,6 +47,9 @@ import InvestmentPortfolioSection, { InvestmentAssetItem } from './components/In
 import InvestmentAssetModal, { InvestmentFundingOption } from './components/InvestmentAssetModal';
 import InvestmentActionModal, { InvestmentActionMode, InvestmentActionResult } from './components/InvestmentActionModal';
 
+import { useGating } from '@/hooks/useGating';
+import { useRouter } from '@/i18n/routing';
+
 const DailyTrendChart = dynamic(() => import('./components/DailyTrendChart'), { ssr: false });
 
 export type FinanceTab = 'cashflow' | 'wallets_savings' | 'investments' | 'recurring';
@@ -67,7 +70,9 @@ export default function FinanceClient({
     usePageTitle('Finance Workspace');
     const t = useTranslations();
     const locale = useLocale();
+    const router = useRouter();
     const isIndo = locale === 'id';
+    const { isArchitect } = useGating();
 
     const fetcher = async (url: string) => {
         const res = await fetch(url);
@@ -571,7 +576,13 @@ export default function FinanceClient({
                     selectedMonthKey={selectedMonthKey}
                     onMonthChange={changeMonth}
                     onOpenTrxModal={() => { setEditingTransaction(null); setShowTrxModal(true); }}
-                    onOpenBatchModal={() => setShowBatchModal(true)}
+                    onOpenBatchModal={() => {
+                        if (!isArchitect) {
+                            router.push('/billing');
+                            return;
+                        }
+                        setShowBatchModal(true);
+                    }}
                     activeCurrency={activeCurrency}
                     onCurrencyChange={handleCurrencyChange}
                     transactions={transactions}

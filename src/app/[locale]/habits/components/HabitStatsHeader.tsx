@@ -34,6 +34,7 @@ interface HabitStatsHeaderProps {
     showHint: boolean;
     setShowHint: (show: boolean) => void;
     openCreateModal: () => void;
+    openBatchModal?: () => void;
     openExportModal?: () => void;
 }
 
@@ -58,6 +59,7 @@ export default function HabitStatsHeader({
     showHint,
     setShowHint,
     openCreateModal,
+    openBatchModal,
     openExportModal
 }: HabitStatsHeaderProps) {
     return (
@@ -279,6 +281,20 @@ export default function HabitStatsHeader({
                             >
                                 <Download size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
                                 <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
+                            </button>
+                        )}
+
+                        {/* Batch Entry Button (Architect Feature) */}
+                        {openBatchModal && (
+                            <button
+                                type="button"
+                                onClick={openBatchModal}
+                                title={isIndo ? 'Batch Entry (Power Tool Architect)' : 'Batch Entry (Power Tool Architect)'}
+                                className="px-3 sm:px-3.5 py-2 sm:py-2.5 flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 rounded-xl font-black bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/30 shadow-xs transition-all active:scale-95 text-xs"
+                            >
+                                <span className="text-amber-500 font-bold">⚡</span>
+                                <span className="hidden sm:inline">{isIndo ? 'Batch Habit' : 'Batch Habits'}</span>
+                                <span className="text-[8px] font-black uppercase px-1 py-0.2 bg-indigo-600 text-white rounded-md">Pro</span>
                             </button>
                         )}
 

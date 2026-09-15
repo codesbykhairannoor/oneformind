@@ -326,6 +326,52 @@ export function usePlannerTaskCrud(selectedDate: string) {
         }
     };
 
+    // Submit Batch Tasks
+    const submitBatchTasks = async (batchRows: Array<{ title: string; startTime: string; endTime: string; type: number; notes: string }>) => {
+        const validRows = batchRows.filter(r => r.title.trim().length > 0);
+        if (validRows.length === 0) return;
+
+        const cleanDate = normalizeDate(selectedDate);
+        const createdItems: TaskItem[] = [];
+
+        try {
+            for (const row of validRows) {
+                const tempId = Date.now() + Math.floor(Math.random() * 1000);
+                const newTask: TaskItem = {
+                    id: tempId,
+                    date: cleanDate,
+                    title: row.title,
+                    start_time: row.startTime,
+                    end_time: row.endTime,
+                    type: row.type || 2,
+                    notes: row.notes || '',
+                    completed: false
+                };
+                createdItems.push(newTask);
+            }
+
+            updateTasksState(prev => [...prev, ...createdItems]);
+
+            for (const row of validRows) {
+                await fetch('/api/planner/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: cleanDate,
+                        title: row.title,
+                        startTime: row.startTime,
+                        endTime: row.endTime,
+                        type: row.type || 2,
+                        notes: row.notes || ''
+                    })
+                });
+            }
+            window.dispatchEvent(new Event('planner_updated'));
+        } catch (error) {
+            console.error('Failed to submit batch tasks', error);
+        }
+    };
+
     return {
         tasks,
         setTasks,
@@ -347,6 +393,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
         openNewTaskModal,
         editTask,
         submitSingleTask,
+        submitBatchTasks,
         handleMoveTask,
         scheduleInboxTask,
         deleteTask,

@@ -23,6 +23,9 @@ import HabitBottomMetrics from './components/HabitBottomMetrics';
 import HabitsModalsContainer from './components/HabitsModalsContainer';
 import HabitEmptyState from './components/HabitEmptyState';
 import ExportModal from '@/components/export/ExportModal';
+import { BatchRow } from './components/HabitBatchModal';
+import { useGating } from '@/hooks/useGating';
+import { useRouter } from '@/i18n/routing';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -30,7 +33,9 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     usePageTitle('Habits Tracker');
     const t = useTranslations();
     const locale = useLocale();
+    const router = useRouter();
     const isIndo = locale === 'id';
+    const { isArchitect } = useGating();
 
     const period = useHabitPeriod();
 
@@ -46,6 +51,22 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     const monthDates = useMemo(() => calculateMonthDates(period.currentMonthKey, period.todayStr, isIndo), [period.currentMonthKey, period.todayStr, isIndo]);
 
     const form = useHabitFormState(daysInCurrentMonth);
+
+    // Batch Entry State (Architect Gated Feature)
+    const [showBatchModal, setShowBatchModal] = useState(false);
+    const [batchRows, setBatchRows] = useState<BatchRow[]>([
+        { name: isIndo ? 'Minum Air Putih 500ml' : 'Drink 500ml Water', icon: '💧', color: '#06b6d4', target: daysInCurrentMonth, timeOfDay: 'morning' },
+        { name: isIndo ? 'Meditasi Pagi 10 Menit' : 'Morning Meditation 10m', icon: '🧘', color: '#6366f1', target: daysInCurrentMonth, timeOfDay: 'morning' },
+        { name: isIndo ? 'Olahraga Pagi 20 Menit' : 'Morning Workout 20m', icon: '🏃', color: '#10b981', target: daysInCurrentMonth, timeOfDay: 'morning' }
+    ]);
+
+    const handleOpenBatchModal = () => {
+        if (!isArchitect) {
+            router.push('/billing');
+            return;
+        }
+        setShowBatchModal(true);
+    };
 
     // Habits Main State (Fetching & Parsing)
     const { data: fetchedHabits, mutate: mutateHabits } = useSWR(`/api/habits?period=${period.currentMonthKey}`, fetcher, {
@@ -175,6 +196,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     showHint={period.showHint}
                     setShowHint={period.setShowHint}
                     openCreateModal={form.openCreateModal}
+                    openBatchModal={handleOpenBatchModal}
                     openExportModal={() => setIsExportOpen(true)}
                 />
 
@@ -252,6 +274,15 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setNoteModalData={form.setNoteModalData}
                     showCreateModal={form.showCreateModal}
                     setShowCreateModal={form.setShowCreateModal}
+                    showBatchModal={showBatchModal}
+                    setShowBatchModal={setShowBatchModal}
+                    batchRows={batchRows}
+                    setBatchRows={setBatchRows}
+                    onSubmitBatchHabits={() => {
+                        actions.submitBatchHabits(batchRows, () => {
+                            setShowBatchModal(false);
+                        });
+                    }}
                     editingHabitId={form.editingHabitId}
                     showDeleteModal={form.showDeleteModal}
                     setShowDeleteModal={form.setShowDeleteModal}

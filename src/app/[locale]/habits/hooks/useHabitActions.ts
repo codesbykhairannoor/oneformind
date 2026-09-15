@@ -467,8 +467,57 @@ export function useHabitActions({
             } else {
                 alert(data.error || (isIndo ? 'Gagal menyalin habit dari bulan lalu' : 'Failed to copy habits'));
             }
+    // Submit Batch Habits
+    const submitBatchHabits = async (batchRows: Array<{ name: string; icon: string; color: string; target: number; timeOfDay: any }>, onSuccess?: () => void) => {
+        const validRows = batchRows.filter(r => r.name.trim().length > 0);
+        if (validRows.length === 0 || isSubmitting) return;
+
+        setIsSubmitting(true);
+        try {
+            const tempHabits: HabitItem[] = [];
+            const createPromises = validRows.map(async (row, idx) => {
+                const tempId = Date.now() + idx;
+                const metadata = {
+                    habitType: 'positive',
+                    measurementType: 'boolean',
+                    unit: 'x',
+                    targetValue: 1,
+                    frequencyType: 'daily',
+                    frequencyDays: [0, 1, 2, 3, 4, 5, 6],
+                    timeOfDay: row.timeOfDay || 'morning'
+                };
+                const statusPayload = JSON.stringify(metadata);
+
+                const res = await fetch('/api/habits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: row.name,
+                        icon: row.icon || '🎯',
+                        color: row.color || '#6366f1',
+                        period: currentMonthKey,
+                        monthlyTarget: row.target || daysInCurrentMonth,
+                        status: statusPayload
+                    })
+                });
+                if (!res.ok) {
+                    throw new Error('Failed to create habit row');
+                }
+                return res.json();
+            });
+
+            await Promise.all(createPromises);
+
+            if (mutateHabits) {
+                await mutateHabits();
+            }
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+            if (onSuccess) onSuccess();
         } catch (error) {
-            console.error('Copy failed:', error);
+            console.error('Failed to submit batch habits', error);
+            alert(isIndo ? 'Gagal menyimpan beberapa habit.' : 'Failed to save batch habits.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -478,6 +527,7 @@ export function useHabitActions({
         handleSaveNote,
         handleUpdateNumericValue,
         submitSingleHabit,
+        submitBatchHabits,
         executeDelete,
         handleCopyPreviousHabits
     };

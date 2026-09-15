@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { HabitItem, LifeOSTab } from '../types';
 import HabitFormModal from './HabitFormModal';
 import HabitDeleteModal from './HabitDeleteModal';
+import HabitBatchModal, { BatchRow } from './HabitBatchModal';
 
 const HabitDetailModal = dynamic(() => import('./HabitDetailModal'), { ssr: false });
 const HabitNoteModal = dynamic(() => import('./HabitNoteModal'), { ssr: false });
@@ -16,6 +17,11 @@ interface HabitsModalsContainerProps {
     setNoteModalData: (d: { habit: HabitItem; dateStr: string; notes: string } | null) => void;
     showCreateModal: boolean;
     setShowCreateModal: (v: boolean) => void;
+    showBatchModal?: boolean;
+    setShowBatchModal?: (v: boolean) => void;
+    batchRows?: BatchRow[];
+    setBatchRows?: React.Dispatch<React.SetStateAction<BatchRow[]>>;
+    onSubmitBatchHabits?: () => void;
     editingHabitId: number | null;
     showDeleteModal: boolean;
     setShowDeleteModal: (v: boolean) => void;
@@ -250,6 +256,21 @@ export default function HabitsModalsContainer({
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={() => onExecuteDelete()}
             />
+
+            {/* MODAL: BATCH HABIT CREATION (ARCHITECT FEATURE) */}
+            {showBatchModal && setShowBatchModal && batchRows && setBatchRows && onSubmitBatchHabits && (
+                <HabitBatchModal
+                    isOpen={showBatchModal}
+                    isIndo={isIndo}
+                    daysInCurrentMonth={daysInCurrentMonth}
+                    iconList={iconList}
+                    colorPalette={colorPalette}
+                    batchRows={batchRows}
+                    setBatchRows={setBatchRows}
+                    onClose={() => setShowBatchModal(false)}
+                    onSubmit={onSubmitBatchHabits}
+                />
+            )}
         </>
     );
 }
