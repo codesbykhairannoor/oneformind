@@ -118,19 +118,13 @@ export default function BillingPricingCards({
                             <div className="mt-1 flex items-center justify-center shrink-0">
                                 <Check className="text-indigo-500 w-[14px] h-[14px]" strokeWidth={2.5} />
                             </div>
+                            <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_batch_planner')}</span>
+                        </li>
+                        <li className="flex items-start gap-4">
+                            <div className="mt-1 flex items-center justify-center shrink-0">
+                                <Check className="text-indigo-500 w-[14px] h-[14px]" strokeWidth={2.5} />
+                            </div>
                             <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_all_tabs_open')}</span>
-                        </li>
-                        <li className="flex items-start gap-4">
-                            <div className="mt-1 flex items-center justify-center shrink-0">
-                                <Check className="text-indigo-500 w-[14px] h-[14px]" strokeWidth={2.5} />
-                            </div>
-                            <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_unlimited_habit')}</span>
-                        </li>
-                        <li className="flex items-start gap-4">
-                            <div className="mt-1 flex items-center justify-center shrink-0">
-                                <Check className="text-indigo-500 w-[14px] h-[14px]" strokeWidth={2.5} />
-                            </div>
-                            <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_the_vault')}</span>
                         </li>
                         <li className="flex items-start gap-4">
                             <div className="mt-1 flex items-center justify-center shrink-0">
@@ -142,7 +136,13 @@ export default function BillingPricingCards({
                             <div className="mt-1 flex items-center justify-center shrink-0">
                                 <Check className="text-indigo-500 w-[14px] h-[14px]" strokeWidth={2.5} />
                             </div>
-                            <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_batch_planner')}</span>
+                            <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_the_vault')}</span>
+                        </li>
+                        <li className="flex items-start gap-4">
+                            <div className="mt-1 flex items-center justify-center shrink-0">
+                                <Check className="text-indigo-500 w-[14px] h-[14px]" strokeWidth={2.5} />
+                            </div>
+                            <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_planner_recurring')}</span>
                         </li>
                         <li className="flex items-start gap-4">
                             <div className="mt-1 flex items-center justify-center shrink-0">

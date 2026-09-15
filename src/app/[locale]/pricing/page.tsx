@@ -27,8 +27,8 @@ export default function PricingPage() {
 
     const features = [
         [t('pricing_f_active_habits'), t('pricing_v_unlimited'), t('pricing_v_unlimited'), t('pricing_v_unlimited')],
-        [t('pricing_f_planner_engine'), t('pricing_v_batch'), t('pricing_v_batch'), t('pricing_v_ai_powered')],
-        [t('pricing_f_vault_savings'), t('pricing_v_unlimited'), t('pricing_v_unlimited'), t('pricing_v_unlimited')],
+        [t('pricing_f_planner_engine'), t('pricing_v_standard'), t('pricing_v_batch'), t('pricing_v_ai_powered')],
+        [t('pricing_f_vault_savings'), t('pricing_v_standard'), t('pricing_v_unlimited'), t('pricing_v_unlimited')],
         [t('pricing_f_ai_assistant'), '—', '—', t('pricing_v_247_access')],
         [t('pricing_f_life_insights'), t('pricing_v_basic'), t('pricing_v_advanced'), t('pricing_v_predictive')],
         [t('pricing_f_custom_modules'), '—', t('pricing_v_partial'), t('pricing_v_full')],
