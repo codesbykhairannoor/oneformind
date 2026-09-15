@@ -223,28 +223,28 @@ export default function JobTable({
             {/* ==================== DESKTOP TABLE LAYOUT (>=lg) ==================== */}
             <div className="hidden lg:block bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden">
                 <div className="overflow-x-auto custom-scrollbar min-h-[450px]">
-                    <table className="w-full text-left border-collapse min-w-[1150px]">
+                    <table className="w-full text-left border-collapse min-w-[850px]">
                         <thead className="bg-slate-50/90 dark:bg-slate-950/70 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 sticky top-0 z-10 backdrop-blur-md">
                             <tr>
-                                <th className="py-3.5 px-6 min-w-[240px]">
+                                <th className="py-3.5 px-4 sm:px-6 min-w-[180px]">
                                     {isIndo ? 'Perusahaan & Posisi' : 'Company & Title'}
                                 </th>
-                                <th className="py-3.5 px-4 min-w-[150px]">
+                                <th className="py-3.5 px-3 min-w-[110px]">
                                     {isIndo ? 'Lokasi & Model' : 'Location & Model'}
                                 </th>
-                                <th className="py-3.5 px-4 min-w-[180px]">
+                                <th className="py-3.5 px-3 min-w-[120px]">
                                     {isIndo ? 'Kompensasi Gaji' : 'Salary Range'}
                                 </th>
-                                <th className="py-3.5 px-4 min-w-[130px]">
+                                <th className="py-3.5 px-3 min-w-[100px]">
                                     {isIndo ? 'Tgl Melamar' : 'Applied Date'}
                                 </th>
-                                <th className="py-3.5 px-4 min-w-[160px]">
+                                <th className="py-3.5 px-3 min-w-[120px]">
                                     {isIndo ? 'Tahapan Status' : 'Status'}
                                 </th>
-                                <th className="py-3.5 px-4 min-w-[120px] text-center">
+                                <th className="py-3.5 px-2 min-w-[80px] text-center">
                                     {isIndo ? 'Interview' : 'Interviews'}
                                 </th>
-                                <th className="py-3.5 px-6 text-center min-w-[150px] pr-6">
+                                <th className="py-3.5 px-3 text-center min-w-[100px] w-[110px] shrink-0">
                                     {isIndo ? 'Aksi' : 'Actions'}
                                 </th>
                             </tr>
@@ -256,7 +256,7 @@ export default function JobTable({
                             {isAddingRow && (
                                 <tr className="bg-indigo-50/50 dark:bg-indigo-950/30 border-b-2 border-indigo-500 animate-in fade-in duration-200">
                                     {/* Company & Title Inputs */}
-                                    <td className="py-3 px-6">
+                                    <td className="py-3 px-4 sm:px-6">
                                         <div className="space-y-1">
                                             <input
                                                 type="text"
@@ -285,7 +285,7 @@ export default function JobTable({
                                     </td>
 
                                     {/* Model Selector */}
-                                    <td className="py-3 px-4">
+                                    <td className="py-3 px-3">
                                         <select
                                             value={newWorkModel}
                                             onChange={(e) => setNewWorkModel(e.target.value)}
@@ -298,17 +298,17 @@ export default function JobTable({
                                     </td>
 
                                     {/* Salary Placeholder */}
-                                    <td className="py-3 px-4 text-slate-400 italic text-[11px]">
+                                    <td className="py-3 px-3 text-slate-400 italic text-[11px]">
                                         {isIndo ? 'Edit setelah simpan' : 'Set in details'}
                                     </td>
 
                                     {/* Date */}
-                                    <td className="py-3 px-4 font-mono text-slate-500">
+                                    <td className="py-3 px-3 font-mono text-slate-500">
                                         {new Date().toISOString().split('T')[0]}
                                     </td>
 
                                     {/* Status Selector */}
-                                    <td className="py-3 px-4">
+                                    <td className="py-3 px-3">
                                         <select
                                             value={newStatus}
                                             onChange={(e) => setNewStatus(e.target.value)}
@@ -320,27 +320,26 @@ export default function JobTable({
                                         </select>
                                     </td>
 
-                                    <td className="py-3 px-4 text-center text-slate-400">-</td>
+                                    <td className="py-3 px-2 text-center text-slate-400">-</td>
 
                                     {/* Save / Cancel buttons */}
-                                    <td className="py-3 px-6 text-center pr-6 min-w-[150px]">
+                                    <td className="py-3 px-3 text-center min-w-[100px] w-[110px] shrink-0">
                                         <div className="flex items-center justify-center gap-1.5 shrink-0">
                                             <button
                                                 type="button"
                                                 onClick={handleSaveNewRow}
-                                                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition shrink-0"
+                                                className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center shadow-md transition shrink-0"
                                                 title={isIndo ? 'Simpan Lamaran' : 'Save Application'}
                                             >
-                                                <Check size={14} strokeWidth={3} />
-                                                <span>{isIndo ? 'Simpan' : 'Save'}</span>
+                                                <Check size={16} strokeWidth={3} />
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setIsAddingRow(false)}
-                                                className="p-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition shrink-0"
+                                                className="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition shrink-0"
                                                 title={isIndo ? 'Batal' : 'Cancel'}
                                             >
-                                                <X size={14} />
+                                                <X size={16} strokeWidth={2.5} />
                                             </button>
                                         </div>
                                     </td>
@@ -438,7 +437,7 @@ export default function JobTable({
                                         </td>
 
                                         {/* Actions */}
-                                        <td className="py-3.5 px-6 text-center pr-6 min-w-[150px]" onClick={(e) => e.stopPropagation()}>
+                                        <td className="py-3.5 px-3 text-center min-w-[100px] w-[110px] shrink-0" onClick={(e) => e.stopPropagation()}>
                                             <div className="flex items-center justify-center gap-1">
                                                 <button
                                                     type="button"
