@@ -467,6 +467,11 @@ export function useHabitActions({
             } else {
                 alert(data.error || (isIndo ? 'Gagal menyalin habit dari bulan lalu' : 'Failed to copy habits'));
             }
+        } catch (error) {
+            console.error('Copy failed:', error);
+        }
+    };
+
     // Submit Batch Habits
     const submitBatchHabits = async (batchRows: Array<{ name: string; icon: string; color: string; target: number; timeOfDay: any }>, onSuccess?: () => void) => {
         const validRows = batchRows.filter(r => r.name.trim().length > 0);
