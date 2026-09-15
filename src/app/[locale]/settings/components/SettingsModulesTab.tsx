@@ -19,7 +19,9 @@ import {
     ArrowRight, 
     Layers, 
     ShieldAlert, 
-    RefreshCw 
+    RefreshCw,
+    Save,
+    CheckCircle2
 } from 'lucide-react';
 
 interface SettingsModulesTabProps {
@@ -45,7 +47,8 @@ export default function SettingsModulesTab({
         isUnlimited,
         isSaving,
         toggleTab,
-        applyPreset
+        applyPreset,
+        persistModules
     } = useActiveModules();
 
     const [feedbackMessage, setFeedbackMessage] = useState<{
@@ -56,6 +59,16 @@ export default function SettingsModulesTab({
     const showFeedback = (type: 'error' | 'warning' | 'success', text: string) => {
         setFeedbackMessage({ type, text });
         setTimeout(() => setFeedbackMessage(null), 4000);
+    };
+
+    const handleSaveAndApply = async () => {
+        await persistModules(modules);
+        showFeedback(
+            'success',
+            isIndo
+                ? '✓ Layout Navigasi & Sidebar Berhasil Diperbarui!'
+                : '✓ Navigation & Sidebar Layout Successfully Saved & Updated!'
+        );
     };
 
     const emojiMap: Record<string, string> = {
@@ -182,15 +195,15 @@ export default function SettingsModulesTab({
                         {isIndo ? 'Pusat Aktivasi Tab & Modul' : 'Active Modules & Tab Hub'}
                     </h3>
                     
-                    {/* Status Badge */}
-                    <div className="flex items-center gap-2">
+                    {/* Status Badge & Save CTA */}
+                    <div className="flex flex-wrap items-center gap-2">
                         {isSaving && (
                             <span className="flex items-center gap-1.5 text-xs text-slate-400 animate-pulse">
                                 <RefreshCw size={12} className="animate-spin" />
                                 {isIndo ? 'Menyimpan...' : 'Saving...'}
                             </span>
                         )}
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
                             isUnlimited
                                 ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
                                 : activeCount === maxAllowed
@@ -203,6 +216,16 @@ export default function SettingsModulesTab({
                                 : `${activeCount} / ${maxAllowed} ${isIndo ? 'Tab Aktif' : 'Tabs Active'}`
                             }
                         </span>
+
+                        <button
+                            type="button"
+                            disabled={isSaving}
+                            onClick={handleSaveAndApply}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition-all cursor-pointer"
+                        >
+                            <Save size={14} />
+                            <span>{isIndo ? 'Simpan & Terapkan Layout' : 'Save & Apply Layout'}</span>
+                        </button>
                     </div>
                 </div>
 
@@ -419,6 +442,42 @@ export default function SettingsModulesTab({
                             </div>
                         );
                     })}
+                </div>
+            </div>
+
+            {/* STICKY SAVE & APPLY BAR AT THE BOTTOM */}
+            <div className="sticky bottom-4 z-40 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-indigo-100 dark:border-slate-800 shadow-2xl flex flex-wrap items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-2">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                        <Layers size={20} />
+                    </div>
+                    <div>
+                        <h5 className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <span>{isIndo ? 'Status Konfigurasi Tab & Sidebar' : 'Tab & Sidebar Configuration'}</span>
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        </h5>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            {isUnlimited
+                                ? (isIndo ? 'Semua 8 modul aktif (Tier Unlimited)' : 'All 8 modules active (Unlimited Tier)')
+                                : (isIndo
+                                    ? `${activeCount} dari ${maxAllowed} slot tab digunakan (Masa uji coba 30 hari)`
+                                    : `${activeCount} of ${maxAllowed} tab slots in use (30-day trial active)`
+                                )
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        disabled={isSaving}
+                        onClick={handleSaveAndApply}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 active:scale-95 text-white text-xs font-black shadow-lg shadow-indigo-500/25 transition-all cursor-pointer shrink-0"
+                    >
+                        {isSaving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+                        <span>{isIndo ? 'Simpan & Terapkan Layout' : 'Save & Apply Layout'}</span>
+                    </button>
                 </div>
             </div>
 

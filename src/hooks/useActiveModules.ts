@@ -108,23 +108,36 @@ export function useActiveModules() {
     // If user has paid subscription (Architect / Quantum), OR active 14-day credit card trial, all tabs are unlocked!
     const isUnlimited = isPremium || trial.isActive || (user?.plan_type && user.plan_type.toLowerCase() !== 'explorer' && !trial.isExpired);
 
-    // Hydrate state from localStorage
+    // Hydrate state from localStorage & listen for storage or custom events
     useEffect(() => {
-        try {
-            const saved = localStorage.getItem('tranvas_user_settings');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                if (parsed && parsed.modules) {
-                    setModules(prev => ({ ...prev, ...parsed.modules }));
+        const syncFromLocalStorage = () => {
+            try {
+                const saved = localStorage.getItem('tranvas_user_settings');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.modules) {
+                        setModules(prev => ({ ...prev, ...parsed.modules }));
+                    }
+                    if (parsed && parsed.tabs_activated_at) {
+                        setActivatedAt(parsed.tabs_activated_at);
+                    }
                 }
-                if (parsed && parsed.tabs_activated_at) {
-                    setActivatedAt(parsed.tabs_activated_at);
-                }
+            } catch (err) {
+                console.error('Failed to parse local active modules:', err);
             }
-        } catch (err) {
-            console.error('Failed to parse local active modules:', err);
-        }
+        };
+
+        syncFromLocalStorage();
         setHasHydrated(true);
+
+        const handleSync = () => syncFromLocalStorage();
+        window.addEventListener('storage', handleSync);
+        window.addEventListener('tranvas_active_modules_changed', handleSync);
+
+        return () => {
+            window.removeEventListener('storage', handleSync);
+            window.removeEventListener('tranvas_active_modules_changed', handleSync);
+        };
     }, []);
 
     // Sync from API on session ready
@@ -246,6 +259,7 @@ export function useActiveModules() {
             parsed.tabs_activated_at = activationDate;
             localStorage.setItem('tranvas_user_settings', JSON.stringify(parsed));
             window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new CustomEvent('tranvas_active_modules_changed', { detail: nextModules }));
         } catch (e) {
             console.error('Failed to write local modules:', e);
         }
