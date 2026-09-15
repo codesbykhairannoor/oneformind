@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import ModalPortal from '@/components/ModalPortal';
-import { X, Clock, Flame, Briefcase, Sparkles, CheckSquare } from 'lucide-react';
+import { X, Clock, Flame, Briefcase, Sparkles, CheckSquare, AlertTriangle } from 'lucide-react';
 import { TaskItem } from '../types';
-import { checkTimeConflict } from '../utils/plannerMath';
+import { checkTimeConflictDetails } from '../utils/plannerMath';
 
 interface PlannerTaskModalProps {
     show: boolean;
@@ -53,16 +53,15 @@ export default function PlannerTaskModal({
 
     useEffect(() => {
         if (show) {
-            const err = checkTimeConflict(
+            const res = checkTimeConflictDetails(
                 taskStartTime,
                 taskEndTime,
                 tasks,
                 selectedDate,
                 editingTaskId,
-                isIndo ? 'Minimal 5 menit!' : 'Minimum 5 minutes!',
-                isIndo ? 'Jadwal bentrok!' : 'Time conflict with another task!'
+                isIndo
             );
-            setConflictError(err);
+            setConflictError(res.hasConflict ? res.errorMsg : null);
         } else {
             setConflictError(null);
         }
@@ -236,8 +235,12 @@ export default function PlannerTaskModal({
 
                         {/* Conflict Warning */}
                         {conflictError && (
-                            <div className="px-4 py-3 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold flex items-center gap-2 animate-in fade-in">
-                                <span>⚠️ {conflictError}</span>
+                            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs font-bold flex items-start gap-3 shadow-md animate-in fade-in">
+                                <AlertTriangle size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                                <div>
+                                    <h5 className="font-extrabold">{isIndo ? 'Jadwal Bentrok Detected' : 'Time Conflict Detected'}</h5>
+                                    <p className="mt-0.5 leading-relaxed font-semibold opacity-90">{conflictError}</p>
+                                </div>
                             </div>
                         )}
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { TaskItem, InboxTask } from '../types';
-import { normalizeDate, timeToMin, checkTimeConflict } from '../utils/plannerMath';
+import { normalizeDate, timeToMin, checkTimeConflict, checkTimeConflictDetails } from '../utils/plannerMath';
 
 export function usePlannerTaskCrud(selectedDate: string) {
     const t = useTranslations();
@@ -48,13 +48,14 @@ export function usePlannerTaskCrud(selectedDate: string) {
         setEditingTaskId(null);
         setTaskTitle(prefill?.title || '');
         
+        const cleanDate = normalizeDate(selectedDate);
         let start = defaultTime || '09:00';
         if (!defaultTime) {
             const occupied = (timeStr: string) => {
                 const startM = timeToMin(timeStr);
                 const endM = startM + 60;
                 return tasks.some(t => {
-                    if (t.date !== selectedDate || !t.start_time || !t.end_time) return false;
+                    if (normalizeDate(t.date) !== cleanDate || !t.start_time || !t.end_time) return false;
                     const tS = timeToMin(t.start_time);
                     let tE = timeToMin(t.end_time);
                     if (tE < tS) tE += 1440;
@@ -97,16 +98,18 @@ export function usePlannerTaskCrud(selectedDate: string) {
         e.preventDefault();
         if (!taskTitle.trim()) return;
         
-        const err = checkTimeConflict(
+        const conflictRes = checkTimeConflictDetails(
             taskStartTime, 
             taskEndTime, 
             tasks, 
             selectedDate, 
             editingTaskId,
-            t('error_duration_min') || 'Minimal 5 menit!',
-            t('error_conflict') || 'Jadwal bentrok!'
+            true
         );
-        if (err) return;
+        if (conflictRes.hasConflict) {
+            alert(`⚠️ Tidak dapat menyimpan jadwal:\n${conflictRes.errorMsg}`);
+            return;
+        }
 
         try {
             const cleanDate = normalizeDate(selectedDate);
@@ -178,17 +181,16 @@ export function usePlannerTaskCrud(selectedDate: string) {
         const finalEndM = String(newEndMinutes % 60).padStart(2, '0');
         const newEndTime = `${finalEndH}:${finalEndM}`;
 
-        const err = checkTimeConflict(
+        const conflictRes = checkTimeConflictDetails(
             newStartTime, 
             newEndTime, 
             tasks, 
             selectedDate, 
             taskId,
-            t('error_duration_min') || 'Minimal 5 menit!',
-            t('error_conflict') || 'Jadwal bentrok!'
+            true
         );
-        if (err) {
-            alert(`Gagal memindahkan jadwal: ${err}`);
+        if (conflictRes.hasConflict) {
+            alert(`⚠️ Gagal memindahkan jadwal:\n${conflictRes.errorMsg}`);
             return;
         }
 
