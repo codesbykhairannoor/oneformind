@@ -71,7 +71,25 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      setStatus('loading');
+      // CRITICAL FIX: Do NOT set status to 'loading' if we already have an authenticated status/session.
+      // Setting 'loading' on background events (e.g. TOKEN_REFRESHED when switching browser tabs back)
+      // forces GatedPage and layouts to unmount active tab views and flash a full-page loading spinner.
+      setSession(prev => {
+        if (!prev) return newSession;
+        return {
+          ...newSession,
+          user: {
+            ...newSession.user,
+            isPremium: (prev.user as any)?.isPremium,
+            planType: (prev.user as any)?.planType,
+            premiumUntil: (prev.user as any)?.premiumUntil,
+            trialStartedAt: (prev.user as any)?.trialStartedAt,
+            trialEndsAt: (prev.user as any)?.trialEndsAt,
+            hasUsedTrial: (prev.user as any)?.hasUsedTrial,
+          }
+        };
+      });
+
       try {
         const res = await fetch('/api/user');
         if (res.ok) {
