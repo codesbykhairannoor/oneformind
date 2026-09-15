@@ -108,70 +108,84 @@ export default function DashboardTodayTasks({ plannerData, synergy, t }: Dashboa
                 </Link>
             </div>
 
-            {/* Task List */}
-            {tasks.length > 0 ? (
-                <div className="space-y-2">
-                    {tasks.map((task: any) => (
-                        <div
-                            key={task.id}
-                            onClick={() => togglePlannerTask(task.id)}
-                            className={`group flex items-center justify-between gap-3 rounded-xl border p-3 cursor-pointer select-none transition-all duration-200 ${
-                                task.isCompleted
-                                    ? 'border-slate-100 bg-slate-50/50 dark:border-white/5 dark:bg-white/[0.01] opacity-75'
-                                    : 'border-slate-200/80 bg-slate-50/80 dark:border-white/10 dark:bg-white/[0.03] hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:shadow-sm'
-                            }`}
-                        >
-                            <div className="flex min-w-0 items-center gap-3">
-                                <button
-                                    type="button"
-                                    className={`shrink-0 transition-transform active:scale-90 ${
-                                        task.isCompleted ? 'text-emerald-500' : 'text-slate-300 group-hover:text-indigo-500 dark:text-slate-600'
-                                    }`}
-                                >
-                                    {task.isCompleted ? (
-                                        <CheckCircle2 size={20} className="fill-emerald-500/15" />
-                                    ) : (
-                                        <Circle size={20} />
-                                    )}
-                                </button>
-                                
-                                {task.start_time && (
-                                    <span className="shrink-0 rounded-lg bg-white dark:bg-slate-800 px-2 py-1 font-mono text-[11px] font-semibold text-slate-600 dark:text-slate-300 shadow-xs">
-                                        {task.start_time}
-                                    </span>
-                                )}
-
-                                <p className={`truncate text-sm font-semibold transition-all ${
+            {/* Task List (Only if Planner module is active) */}
+            {isPlannerActive ? (
+                tasks.length > 0 ? (
+                    <div className="space-y-2">
+                        {tasks.map((task: any) => (
+                            <div
+                                key={task.id}
+                                onClick={() => togglePlannerTask(task.id)}
+                                className={`group flex items-center justify-between gap-3 rounded-xl border p-3 cursor-pointer select-none transition-all duration-200 ${
                                     task.isCompleted
-                                        ? 'line-through text-slate-400 dark:text-slate-500'
-                                        : 'text-slate-800 dark:text-slate-100'
-                                }`}>
-                                    {task.title}
-                                </p>
-                            </div>
+                                        ? 'border-slate-100 bg-slate-50/50 dark:border-white/5 dark:bg-white/[0.01] opacity-75'
+                                        : 'border-slate-200/80 bg-slate-50/80 dark:border-white/10 dark:bg-white/[0.03] hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:shadow-sm'
+                                }`}
+                            >
+                                <div className="flex min-w-0 items-center gap-3">
+                                    <button
+                                        type="button"
+                                        className={`shrink-0 transition-transform active:scale-90 ${
+                                            task.isCompleted ? 'text-emerald-500' : 'text-slate-300 group-hover:text-indigo-500 dark:text-slate-600'
+                                        }`}
+                                    >
+                                        {task.isCompleted ? (
+                                            <CheckCircle2 size={20} className="fill-emerald-500/15" />
+                                        ) : (
+                                            <Circle size={20} />
+                                        )}
+                                    </button>
+                                    
+                                    {task.start_time && (
+                                        <span className="shrink-0 rounded-lg bg-white dark:bg-slate-800 px-2 py-1 font-mono text-[11px] font-semibold text-slate-600 dark:text-slate-300 shadow-xs">
+                                            {task.start_time}
+                                        </span>
+                                    )}
 
-                            <span className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-                                task.isCompleted
-                                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
-                                    : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200'
-                            }`}>
-                                {task.isCompleted ? (t('dash_task_completed') || 'Selesai') : (t('dash_task_scheduled') || 'Terjadwal')}
-                            </span>
-                        </div>
-                    ))}
-                </div>
+                                    <p className={`truncate text-sm font-semibold transition-all ${
+                                        task.isCompleted
+                                            ? 'line-through text-slate-400 dark:text-slate-500'
+                                            : 'text-slate-800 dark:text-slate-100'
+                                    }`}>
+                                        {task.title}
+                                    </p>
+                                </div>
+
+                                <span className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                                    task.isCompleted
+                                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                                        : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200'
+                                }`}>
+                                    {task.isCompleted ? (t('dash_task_completed') || 'Selesai') : (t('dash_task_scheduled') || 'Terjadwal')}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 px-4 py-8 text-center dark:border-white/10 dark:bg-white/[0.02]">
+                        <Sparkles className="mx-auto text-indigo-500 mb-2" size={24} />
+                        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                            {t('dash_all_tasks_done') || 'Semua tugas hari ini selesai! Bagus sekali.'}
+                        </p>
+                        <Link
+                            href="/planner"
+                            className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 transition"
+                        >
+                            <Plus size={14} />
+                            {t('btn_add_task') || 'Tambah Tugas Baru'}
+                        </Link>
+                    </div>
+                )
             ) : (
-                <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 px-4 py-8 text-center dark:border-white/10 dark:bg-white/[0.02]">
-                    <Sparkles className="mx-auto text-indigo-500 mb-2" size={24} />
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        {t('dash_all_tasks_done') || 'Semua tugas hari ini selesai! Bagus sekali.'}
+                <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 text-center dark:border-white/5 dark:bg-white/[0.02]">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {t('dash_planner_inactive_note') || 'Modul Planner saat ini tidak aktif di 3 tab utama Anda.'}
                     </p>
                     <Link
-                        href="/planner"
-                        className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 transition"
+                        href="/settings"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
                     >
-                        <Plus size={14} />
-                        {t('btn_add_task') || 'Tambah Tugas Baru'}
+                        {t('settings_manage_tabs') || 'Aktifkan di Pengaturan Modul'} &rarr;
                     </Link>
                 </div>
             )}

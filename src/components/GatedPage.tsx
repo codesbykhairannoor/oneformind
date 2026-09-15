@@ -15,7 +15,7 @@ interface GatedPageProps {
 export default function GatedPage({ feature, children }: GatedPageProps) {
     const t = useTranslations();
     const { canUse, isAiEnabled, isLoading: isGatingLoading } = useGating();
-    const { isTabActive, hasHydrated } = useActiveModules();
+    const { isTabActive, hasHydrated, isUnlimited } = useActiveModules();
 
     if (isGatingLoading || !hasHydrated) {
         return (
@@ -37,13 +37,17 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
         return <>{children}</>;
     }
 
+    // Determine access type
     const isQuantumRequired = feature === 'quantum' || feature === 'ai' || feature === 'neural_os' || feature === 'ai_coach';
-    const tierName = isQuantumRequired ? 'Quantum' : 'Architect';
+    const isModuleInactiveOnFreeTier = isCore && !isUnlimited;
+
+    const tierName = isQuantumRequired ? 'Quantum' : (isModuleInactiveOnFreeTier ? 'Explorer (3 Tab)' : 'Architect');
+    
     const bgColors = isQuantumRequired 
         ? 'from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20' 
         : 'from-slate-200/50 via-slate-100/50 to-white dark:from-slate-900 dark:via-slate-900/50 dark:to-black';
-    const iconColor = isQuantumRequired ? 'text-indigo-500 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400';
-    const badgeColor = isQuantumRequired ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+    const iconColor = isQuantumRequired ? 'text-indigo-500 dark:text-indigo-400' : 'text-amber-500 dark:text-amber-400';
+    const badgeColor = isQuantumRequired ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300';
 
     return (
         <div className={`min-h-[80vh] flex items-center justify-center p-6 bg-gradient-to-br ${bgColors} rounded-[3rem] m-4 md:m-8 border border-white/50 dark:border-slate-800/50 relative overflow-hidden`}>
@@ -67,33 +71,55 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
                 
                 <div className="inline-flex items-center gap-2 mb-4">
                     <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${badgeColor}`}>
-                        {tierName} Tier
+                        {tierName}
                     </span>
                 </div>
 
                 <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-4">
-                    {t('dash_upgrade_tier_title') || `Akses ${tierName} Dibutuhkan`}
+                    {isModuleInactiveOnFreeTier
+                        ? (t('dash_tab_not_active_title') || 'Tab Belum Diaktifkan')
+                        : (t('dash_upgrade_tier_title') || `Akses ${tierName} Dibutuhkan`)}
                 </h2>
                 
                 <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-                    {t.rich('dash_upgrade_tier_desc', {
-                        feature: t(`module_${feature}_title`) || feature,
-                        tierName: tierName,
-                        strong: (chunks) => <strong>{chunks}</strong>
-                    })}
+                    {isModuleInactiveOnFreeTier
+                        ? (t('dash_tab_not_active_desc') || `Tab ini belum ada dalam 3 tab aktif Anda. Anda dapat mengaktifkannya di Pengaturan Modul atau upgrade ke paket Architect untuk membuka 8 tab sekaligus.`)
+                        : t.rich('dash_upgrade_tier_desc', {
+                            feature: t(`module_${feature}_title`) || feature,
+                            tierName: tierName,
+                            strong: (chunks) => <strong>{chunks}</strong>
+                        })}
                 </p>
 
                 <div className="space-y-3">
-                    <Link 
-                        href="/billing"
-                        className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-xl dark:shadow-white/10"
-                    >
-                        <span>{t('btn_upgrade') || 'Upgrade Sekarang'}</span>
-                        <ChevronRight className="w-4 h-4 stroke-[3]" />
-                    </Link>
+                    {isModuleInactiveOnFreeTier ? (
+                        <>
+                            <Link 
+                                href="/settings"
+                                className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20"
+                            >
+                                <span>{t('settings_manage_tabs') || 'Atur di Pengaturan Modul'}</span>
+                                <ChevronRight className="w-4 h-4 stroke-[3]" />
+                            </Link>
+                            <Link 
+                                href="/billing"
+                                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-[1.5rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm hover:scale-105 active:scale-95 transition-all"
+                            >
+                                <span>{t('btn_upgrade_architect') || 'Upgrade ke Architect (8 Tab)'}</span>
+                            </Link>
+                        </>
+                    ) : (
+                        <Link 
+                            href="/billing"
+                            className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-xl dark:shadow-white/10"
+                        >
+                            <span>{t('btn_upgrade') || 'Upgrade Sekarang'}</span>
+                            <ChevronRight className="w-4 h-4 stroke-[3]" />
+                        </Link>
+                    )}
                     <Link 
                         href="/dashboard"
-                        className="w-full flex items-center justify-center py-4 rounded-[1.5rem] text-slate-500 dark:text-slate-400 font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="w-full flex items-center justify-center py-3.5 rounded-[1.5rem] text-slate-500 dark:text-slate-400 font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                         {t('btn_back_dashboard') || 'Kembali ke Dashboard'}
                     </Link>

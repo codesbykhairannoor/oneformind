@@ -160,24 +160,24 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 					if rawIncomingModules, ok := settingsMap["modules"].(map[string]interface{}); ok {
 						allKeys := []string{"habit", "planner", "finance", "study", "journal", "calendar", "job", "goal"}
 
-						// 1. Enforce strict 3-tab max limit by clamping
-						activeCount := 0
-						clampedModules := make(map[string]bool)
+						// 1. Enforce strict 3-tab max limit by clamping incoming true choices
+						clampedModules := map[string]bool{
+							"habit": false, "planner": false, "study": false, "finance": false,
+							"journal": false, "calendar": false, "job": false, "goal": false,
+						}
 
+						var activeIncoming []string
 						for _, key := range allKeys {
 							if val, exists := rawIncomingModules[key]; exists {
 								if b, ok := val.(bool); ok && b {
-									if activeCount < 3 {
-										clampedModules[key] = true
-										activeCount++
-									} else {
-										clampedModules[key] = false
-									}
-								} else {
-									clampedModules[key] = false
+									activeIncoming = append(activeIncoming, key)
 								}
-							} else {
-								clampedModules[key] = false
+							}
+						}
+
+						for idx, key := range activeIncoming {
+							if idx < 3 {
+								clampedModules[key] = true
 							}
 						}
 

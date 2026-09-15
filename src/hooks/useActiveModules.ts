@@ -115,8 +115,17 @@ export function useActiveModules() {
                 const saved = localStorage.getItem('tranvas_user_settings');
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    if (parsed && parsed.modules) {
-                        setModules(prev => ({ ...prev, ...parsed.modules }));
+                    if (parsed && parsed.modules && typeof parsed.modules === 'object') {
+                        const updated: Record<string, boolean> = {
+                            habit: false, planner: false, study: false, finance: false,
+                            journal: false, calendar: false, job: false, goal: false
+                        };
+                        ALL_MODULE_KEYS.forEach(k => {
+                            if (typeof parsed.modules[k] === 'boolean') {
+                                updated[k] = parsed.modules[k];
+                            }
+                        });
+                        setModules(updated);
                     }
                     if (parsed && parsed.tabs_activated_at) {
                         setActivatedAt(parsed.tabs_activated_at);
@@ -130,7 +139,21 @@ export function useActiveModules() {
         syncFromLocalStorage();
         setHasHydrated(true);
 
-        const handleSync = () => syncFromLocalStorage();
+        const handleSync = (e?: any) => {
+            if (e?.detail && typeof e.detail === 'object') {
+                const updated: Record<string, boolean> = {
+                    habit: false, planner: false, study: false, finance: false,
+                    journal: false, calendar: false, job: false, goal: false
+                };
+                ALL_MODULE_KEYS.forEach(k => {
+                    updated[k] = Boolean(e.detail[k]);
+                });
+                setModules(updated);
+            } else {
+                syncFromLocalStorage();
+            }
+        };
+
         window.addEventListener('storage', handleSync);
         window.addEventListener('tranvas_active_modules_changed', handleSync);
 
@@ -151,8 +174,17 @@ export function useActiveModules() {
                 if (!res.ok) return;
                 const data = await res.json();
                 if (isMounted && data?.settings) {
-                    if (data.settings.modules) {
-                        setModules(prev => ({ ...prev, ...data.settings.modules }));
+                    if (data.settings.modules && typeof data.settings.modules === 'object') {
+                        const updated: Record<string, boolean> = {
+                            habit: false, planner: false, study: false, finance: false,
+                            journal: false, calendar: false, job: false, goal: false
+                        };
+                        ALL_MODULE_KEYS.forEach(k => {
+                            if (typeof data.settings.modules[k] === 'boolean') {
+                                updated[k] = data.settings.modules[k];
+                            }
+                        });
+                        setModules(updated);
                     }
                     if (data.settings.tabs_activated_at) {
                         setActivatedAt(data.settings.tabs_activated_at);
@@ -189,26 +221,23 @@ export function useActiveModules() {
         };
     }, [activatedAt, isUnlimited, session?.user?.created_at]);
 
-    // Compute strictly clamped modules based on current tier limits
+    // Compute strictly clamped modules based on user active choices (up to 3 on free tier)
     const effectiveModules = useMemo(() => {
         if (isUnlimited) return modules;
         
-        const clamped: Record<string, boolean> = {};
-        let count = 0;
-        
-        // Iterate in consistent order to ensure determinism
-        for (const key of ALL_MODULE_KEYS) {
-            if (modules[key]) {
-                if (count < MAX_FREE_ACTIVE_MODULES) {
-                    clamped[key] = true;
-                    count++;
-                } else {
-                    clamped[key] = false;
-                }
-            } else {
-                clamped[key] = false;
-            }
+        const activeEntries = ALL_MODULE_KEYS.filter(k => Boolean(modules[k]));
+        const clamped: Record<string, boolean> = {
+            habit: false, planner: false, study: false, finance: false,
+            journal: false, calendar: false, job: false, goal: false
+        };
+
+        if (activeEntries.length <= MAX_FREE_ACTIVE_MODULES) {
+            activeEntries.forEach(k => { clamped[k] = true; });
+        } else {
+            // Keep up to MAX_FREE_ACTIVE_MODULES active entries
+            activeEntries.slice(0, MAX_FREE_ACTIVE_MODULES).forEach(k => { clamped[k] = true; });
         }
+
         return clamped;
     }, [modules, isUnlimited]);
 
