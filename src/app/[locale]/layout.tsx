@@ -5,6 +5,7 @@ import {routing} from '@/i18n/routing';
 import { getMessages } from 'next-intl/server';
 import Script from 'next/script';
 import InstantIntlProvider from "@/components/InstantIntlProvider";
+import SwrProvider from "@/components/SwrProvider";
 
 import "../globals.css";
 
@@ -78,7 +79,9 @@ export default async function RootLayout({
           `}
         </Script>
           <InstantIntlProvider initialLocale={locale} initialMessages={messages as any}>
-            {children}
+            <SwrProvider>
+              {children}
+            </SwrProvider>
           </InstantIntlProvider>
       </body>
     </html>
