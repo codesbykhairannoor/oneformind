@@ -223,7 +223,7 @@ export default function JobTable({
             {/* ==================== DESKTOP TABLE LAYOUT (>=lg) ==================== */}
             <div className="hidden lg:block bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden">
                 <div className="overflow-x-auto custom-scrollbar min-h-[450px]">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left border-collapse min-w-[1150px]">
                         <thead className="bg-slate-50/90 dark:bg-slate-950/70 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 sticky top-0 z-10 backdrop-blur-md">
                             <tr>
                                 <th className="py-3.5 px-6 min-w-[240px]">
@@ -244,7 +244,7 @@ export default function JobTable({
                                 <th className="py-3.5 px-4 min-w-[120px] text-center">
                                     {isIndo ? 'Interview' : 'Interviews'}
                                 </th>
-                                <th className="py-3.5 px-4 text-center w-28">
+                                <th className="py-3.5 px-6 text-center min-w-[150px] pr-6">
                                     {isIndo ? 'Aksi' : 'Actions'}
                                 </th>
                             </tr>
@@ -323,21 +323,22 @@ export default function JobTable({
                                     <td className="py-3 px-4 text-center text-slate-400">-</td>
 
                                     {/* Save / Cancel buttons */}
-                                    <td className="py-3 px-4 text-center">
-                                        <div className="flex items-center justify-center gap-1">
+                                    <td className="py-3 px-6 text-center pr-6 min-w-[150px]">
+                                        <div className="flex items-center justify-center gap-1.5 shrink-0">
                                             <button
                                                 type="button"
                                                 onClick={handleSaveNewRow}
-                                                className="p-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
-                                                title="Save"
+                                                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition shrink-0"
+                                                title={isIndo ? 'Simpan Lamaran' : 'Save Application'}
                                             >
-                                                <Check size={14} />
+                                                <Check size={14} strokeWidth={3} />
+                                                <span>{isIndo ? 'Simpan' : 'Save'}</span>
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setIsAddingRow(false)}
-                                                className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition"
-                                                title="Cancel"
+                                                className="p-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition shrink-0"
+                                                title={isIndo ? 'Batal' : 'Cancel'}
                                             >
                                                 <X size={14} />
                                             </button>
@@ -437,7 +438,7 @@ export default function JobTable({
                                         </td>
 
                                         {/* Actions */}
-                                        <td className="py-3.5 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                        <td className="py-3.5 px-6 text-center pr-6 min-w-[150px]" onClick={(e) => e.stopPropagation()}>
                                             <div className="flex items-center justify-center gap-1">
                                                 <button
                                                     type="button"
