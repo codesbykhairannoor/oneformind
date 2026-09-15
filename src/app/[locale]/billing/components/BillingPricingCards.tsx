@@ -77,11 +77,11 @@ export default function BillingPricingCards({
                             </div>
                             <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_standard_dashboards')}</span>
                         </li>
-                        <li className="flex items-start gap-4 opacity-40">
+                        <li className="flex items-start gap-4">
                             <div className="mt-1 flex items-center justify-center shrink-0">
-                                <Lock className="text-slate-500 w-[14px] h-[14px]" strokeWidth={2.5} />
+                                <Check className="text-emerald-500 w-[14px] h-[14px]" strokeWidth={2.5} />
                             </div>
-                            <span className="text-[11px] font-black leading-tight text-slate-500">{t('pricing_f_journal_goals_jobs_locked')}</span>
+                            <span className="text-[11px] font-black leading-tight text-slate-700 dark:text-slate-200">{t('pricing_f_journal_goals_jobs_locked')}</span>
                         </li>
                         <li className="flex items-start gap-4 opacity-40">
                             <div className="mt-1 flex items-center justify-center shrink-0">

@@ -156,9 +156,9 @@ export default function PricingPage() {
                                     <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-[8px] font-black">✓</div>
                                     <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{t('pricing_f_standard_dashboards')}</span>
                                 </li>
-                                <li className="flex items-center gap-3 opacity-40">
-                                    <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 text-[8px] font-black">🔒</div>
-                                    <span className="text-xs font-bold text-slate-500">{t('pricing_f_journal_goals_jobs_locked')}</span>
+                                <li className="flex items-center gap-3">
+                                    <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-[8px] font-black">✓</div>
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{t('pricing_f_journal_goals_jobs_locked')}</span>
                                 </li>
                                 <li className="flex items-center gap-3 opacity-40">
                                     <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 text-[8px] font-black">🔒</div>
