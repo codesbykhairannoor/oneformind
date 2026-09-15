@@ -111,23 +111,33 @@ export function usePlannerTaskCrud(selectedDate: string) {
             return;
         }
 
+        // Close modal first before updating tasks state optimistically to avoid self-conflict trigger
+        setShowTaskModal(false);
+
+        const currentEditingId = editingTaskId;
+        const currentTitle = taskTitle;
+        const currentStart = taskStartTime;
+        const currentEnd = taskEndTime;
+        const currentType = taskType;
+        const currentNotes = taskNotes;
+
         try {
             const cleanDate = normalizeDate(selectedDate);
-            if (editingTaskId) {
-                updateTasksState(prev => prev.map(t => t.id === editingTaskId ? { 
+            if (currentEditingId) {
+                updateTasksState(prev => prev.map(t => t.id === currentEditingId ? { 
                     ...t, 
-                    title: taskTitle, 
-                    start_time: taskStartTime, 
-                    end_time: taskEndTime, 
-                    type: taskType, 
-                    notes: taskNotes 
+                    title: currentTitle, 
+                    start_time: currentStart, 
+                    end_time: currentEnd, 
+                    type: currentType, 
+                    notes: currentNotes 
                 } : t));
 
-                await fetch(`/api/planner/tasks/${editingTaskId}`, {
+                await fetch(`/api/planner/tasks/${currentEditingId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
+                        title: currentTitle, startTime: currentStart, endTime: currentEnd, type: currentType, notes: currentNotes
                     })
                 });
             } else {
@@ -135,11 +145,11 @@ export function usePlannerTaskCrud(selectedDate: string) {
                 const newTaskItem: TaskItem = { 
                     id: tempId, 
                     date: cleanDate, 
-                    title: taskTitle, 
-                    start_time: taskStartTime, 
-                    end_time: taskEndTime, 
-                    type: taskType, 
-                    notes: taskNotes, 
+                    title: currentTitle, 
+                    start_time: currentStart, 
+                    end_time: currentEnd, 
+                    type: currentType, 
+                    notes: currentNotes, 
                     completed: false 
                 };
 
@@ -149,7 +159,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        date: cleanDate, title: taskTitle, startTime: taskStartTime, endTime: taskEndTime, type: taskType, notes: taskNotes
+                        date: cleanDate, title: currentTitle, startTime: currentStart, endTime: currentEnd, type: currentType, notes: currentNotes
                     })
                 });
 
@@ -163,7 +173,6 @@ export function usePlannerTaskCrud(selectedDate: string) {
         } catch (error) {
             console.error('Failed to save task:', error);
         }
-        setShowTaskModal(false);
     };
 
     const handleMoveTask = async (taskId: number, newStartTime: string) => {
