@@ -532,7 +532,7 @@ export default function FullPageOnboarding({
                                     </p>
                                 </div>
                                 <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-black">
-                                    Explorer Free Tier
+                                    {isIndo ? 'Paket Explorer' : 'Explorer Plan'}
                                 </span>
                             </div>
 
@@ -566,7 +566,7 @@ export default function FullPageOnboarding({
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-black text-white">
-                                            {isIndo ? 'Ingin Akses SEMUA 8 Tab + AI Coach?' : 'Want Access to ALL 8 Tabs + AI Coach?'}
+                                            {isIndo ? 'Ingin Akses Fitur Power-User (Batch Entry, PDF/CSV Export) + AI Coach?' : 'Want Power-User Engines (Batch Entry, PDF/CSV Exports) + AI Coach?'}
                                         </h4>
                                         <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
                                             {isIndo 
