@@ -148,14 +148,11 @@ export default function FullPageOnboarding({
     const handleSelectModule = async (key: ModuleKey) => {
         const isSelected = selectedTabKeys.includes(key);
         if (isSelected) {
-            if (selectedTabKeys.length <= 1) return; // Must keep at least 1 module
+            if (selectedTabKeys.length <= 1) return; // Keep at least 1 tab
             const next = selectedTabKeys.filter(k => k !== key);
             setSelectedTabKeys(next);
             await toggleTab(key);
         } else {
-            if (selectedTabKeys.length >= MAX_FREE_ACTIVE_MODULES && !isUnlimited) {
-                return; // Reached free 3-tab limit
-            }
             const next = [...selectedTabKeys, key];
             setSelectedTabKeys(next);
             await toggleTab(key);
@@ -252,7 +249,7 @@ export default function FullPageOnboarding({
                 <div className="max-w-3xl mx-auto px-4 flex items-center justify-between">
                     {[
                         { step: 1, labelId: '1. Persona & Tujuan', labelEn: '1. Persona & Goals' },
-                        { step: 2, labelId: '2. Kustomisasi 3 Tab', labelEn: '2. Custom 3 Tabs' },
+                        { step: 2, labelId: '2. Kustomisasi Modul', labelEn: '2. Custom Workspace Tabs' },
                         { step: 3, labelId: '3. Peluncuran Workspace', labelEn: '3. Launch Workspace' },
                     ].map(s => {
                         const isActiveStep = currentStep === s.step;
@@ -307,8 +304,8 @@ export default function FullPageOnboarding({
                             </h2>
                             <p className="text-sm text-slate-400 leading-relaxed">
                                 {isIndo 
-                                    ? 'Setiap persona dikonfigurasi dengan paket 3 tab produktivitas optimal tanpa memerlukan kartu kredit.' 
-                                    : 'Each persona comes pre-configured with the optimal 3-tab productivity trio, no credit card required.'}
+                                    ? 'Pilih paket awal yang sesuai dengan prioritas hidup Anda saat ini. Anda bebas menambah atau menyembunyikan modul kapan saja.' 
+                                    : 'Select a preset tailored to your current priorities. You can enable or hide any module anytime.'}
                             </p>
                         </div>
 
@@ -352,7 +349,7 @@ export default function FullPageOnboarding({
 
                                         <div className="mt-5 pt-4 border-t border-slate-800/60 flex items-center justify-between">
                                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                                                {isIndo ? 'Trio Tab Aktif:' : 'Active 3 Tabs:'}
+                                                {isIndo ? 'Fokus Utama:' : 'Primary Focus:'}
                                             </span>
                                             <div className="flex items-center gap-1.5">
                                                 {preset.modules.map(m => (
@@ -389,15 +386,15 @@ export default function FullPageOnboarding({
                         <div className="text-center max-w-2xl mx-auto space-y-3">
                             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold">
                                 <SlidersHorizontal size={14} className="text-indigo-400" />
-                                <span>{isIndo ? 'Langkah 2 dari 3: Pilih 3 Tab Bebas Anda' : 'Step 2 of 3: Customize Your 3 Free Tabs'}</span>
+                                <span>{isIndo ? 'Langkah 2 dari 3: Pilih Tab Produktivitas Anda' : 'Step 2 of 3: Customize Workspace Tabs'}</span>
                             </div>
                             <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-                                {isIndo ? 'Pilih 3 Fitur Utama Tanpa Kartu Kredit' : 'Select Any 3 Modules Free Without Credit Card'}
+                                {isIndo ? 'Pilih Modul yang Ingin Ditampilkan' : 'Select Modules to Display on Navigation'}
                             </h2>
                             <p className="text-sm text-slate-400 leading-relaxed">
                                 {isIndo 
-                                    ? 'Anda memiliki fleksibilitas penuh selama 30 hari untuk menukar 3 tab aktif ini kapan saja.' 
-                                    : 'You have full 30-day flexibility to swap your 3 active tabs anytime.'}
+                                    ? 'Aktifkan modul yang Anda butuhkan dan sembunyikan modul yang belum diperlukan agar tampilan tetap terfokus.' 
+                                    : 'Enable the modules you need and hide unused ones to keep your workspace navigation focused.'}
                             </p>
                         </div>
 
@@ -406,17 +403,11 @@ export default function FullPageOnboarding({
                             <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-sm font-black shadow-lg">
                                 <Layers size={16} className="text-indigo-400" />
                                 <span className="text-slate-200">
-                                    {isIndo ? 'Status Slot Tab:' : 'Tab Slots Chosen:'} <strong className="text-indigo-400">{selectedTabKeys.length} / {MAX_FREE_ACTIVE_MODULES}</strong>
+                                    {isIndo ? 'Modul Aktif di Navigasi:' : 'Active Modules on Nav:'} <strong className="text-indigo-400">{selectedTabKeys.length} / 8</strong>
                                 </span>
-                                {selectedTabKeys.length === MAX_FREE_ACTIVE_MODULES ? (
-                                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] uppercase font-black tracking-wider border border-emerald-500/30">
-                                        {isIndo ? 'Slot Penuh' : 'Full Capacity'}
-                                    </span>
-                                ) : (
-                                    <span className="px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] uppercase font-black tracking-wider border border-amber-500/30">
-                                        {isIndo ? `Sisa ${MAX_FREE_ACTIVE_MODULES - selectedTabKeys.length} Slot` : `${MAX_FREE_ACTIVE_MODULES - selectedTabKeys.length} Slot Left`}
-                                    </span>
-                                )}
+                                <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] uppercase font-black tracking-wider border border-emerald-500/30">
+                                    {isIndo ? 'Siap Digunakan' : 'Ready to Use'}
+                                </span>
                             </div>
                         </div>
 
@@ -523,8 +514,8 @@ export default function FullPageOnboarding({
                             </h2>
                             <p className="text-sm text-slate-400 leading-relaxed">
                                 {isIndo 
-                                    ? 'Nikmati 3 tab produktivitas pilihan Anda secara gratis tanpa batasan waktu.' 
-                                    : 'Enjoy your chosen 3 active tabs free of charge.'}
+                                    ? 'Sistem produktivitas Anda telah siap digunakan. Anda bebas menyesuaikan tampilan modul kapan saja.' 
+                                    : 'Your productivity system is ready. You can customize active modules anytime.'}
                             </p>
                         </div>
 
@@ -534,10 +525,10 @@ export default function FullPageOnboarding({
                             <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
                                 <div>
                                     <h3 className="text-base font-black text-white">
-                                        {isIndo ? 'Konfigurasi 3 Tab Aktif Anda:' : 'Your Configured 3 Active Tabs:'}
+                                        {isIndo ? 'Modul Aktif di Navigasi Anda:' : 'Your Configured Workspace Modules:'}
                                     </h3>
                                     <p className="text-xs text-slate-400 mt-0.5">
-                                        {isIndo ? 'Masa ujicoba tukar tab 30 hari aktif' : '30-day active tab swapping trial active'}
+                                        {isIndo ? `${selectedTabKeys.length} modul aktif di navigasi & sidebar` : `${selectedTabKeys.length} modules active on navigation & sidebar`}
                                     </p>
                                 </div>
                                 <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-black">
@@ -559,7 +550,7 @@ export default function FullPageOnboarding({
                                                     {isIndo ? details?.idName : details?.enName}
                                                 </h4>
                                                 <span className="text-[10px] font-bold text-indigo-400">
-                                                    ✓ {isIndo ? 'Terbuka Penuh' : 'Fully Unlocked'}
+                                                    ✓ {isIndo ? 'Aktif' : 'Active'}
                                                 </span>
                                             </div>
                                         </div>

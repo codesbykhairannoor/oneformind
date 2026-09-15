@@ -114,95 +114,18 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		isPaidTrial := currPremiumUntil.Valid && currPremiumUntil.Time.After(time.Now())
 		isUnlimited := currIsPremium || isPaidTrial || (plan != "" && plan != "explorer")
 
-		// If user is on Explorer (Free) plan, validate and clamp settings server-side
-		if !isUnlimited {
-			if rawSettings, ok := req["settings"]; ok {
-				var settingsMap map[string]interface{}
-				switch v := rawSettings.(type) {
-				case map[string]interface{}:
-					settingsMap = v
-				case string:
-					json.Unmarshal([]byte(v), &settingsMap)
-				}
+		// Process settings map cleanly if provided
+		if rawSettings, ok := req["settings"]; ok {
+			var settingsMap map[string]interface{}
+			switch v := rawSettings.(type) {
+			case map[string]interface{}:
+				settingsMap = v
+			case string:
+				json.Unmarshal([]byte(v), &settingsMap)
+			}
 
-				if settingsMap != nil {
-					// Parse existing DB settings
-					var existingSettings map[string]interface{}
-					if currSettingsStr.Valid && currSettingsStr.String != "" {
-						json.Unmarshal([]byte(currSettingsStr.String), &existingSettings)
-					}
-					if existingSettings == nil {
-						existingSettings = make(map[string]interface{})
-					}
-
-					var existingModules map[string]bool
-					if rawExistingModules, hasExisting := existingSettings["modules"].(map[string]interface{}); hasExisting {
-						existingModules = make(map[string]bool)
-						for mk, mv := range rawExistingModules {
-							if b, ok := mv.(bool); ok {
-								existingModules[mk] = b
-							}
-						}
-					}
-
-					// Determine original activation date
-					activationTime := currCreatedAt
-					if rawAct, ok := existingSettings["tabs_activated_at"].(string); ok && rawAct != "" {
-						if parsedAct, pErr := time.Parse(time.RFC3339, rawAct); pErr == nil {
-							activationTime = parsedAct
-						}
-					}
-
-					elapsedDays := time.Since(activationTime).Hours() / 24.0
-					isLocked := elapsedDays >= 30.0
-
-					// Check incoming modules
-					if rawIncomingModules, ok := settingsMap["modules"].(map[string]interface{}); ok {
-						allKeys := []string{"habit", "planner", "finance", "study", "journal", "calendar", "job", "goal"}
-
-						// 1. Enforce strict 3-tab max limit by clamping incoming true choices
-						clampedModules := map[string]bool{
-							"habit": false, "planner": false, "study": false, "finance": false,
-							"journal": false, "calendar": false, "job": false, "goal": false,
-						}
-
-						var activeIncoming []string
-						for _, key := range allKeys {
-							if val, exists := rawIncomingModules[key]; exists {
-								if b, ok := val.(bool); ok && b {
-									activeIncoming = append(activeIncoming, key)
-								}
-							}
-						}
-
-						for idx, key := range activeIncoming {
-							if idx < 3 {
-								clampedModules[key] = true
-							}
-						}
-
-						// 2. Enforce 30-day lock
-						if isLocked && len(existingModules) > 0 {
-							// If locked, reject any attempt to activate a tab that was not previously active in DB
-							for k, isAct := range clampedModules {
-								if isAct && !existingModules[k] {
-									w.WriteHeader(http.StatusForbidden)
-									json.NewEncoder(w).Encode(map[string]string{
-										"error": "Your 30-day grace period has expired. Active module selection is locked. Upgrade your plan to swap or unlock modules.",
-									})
-									return
-								}
-							}
-						}
-
-						settingsMap["modules"] = clampedModules
-					}
-
-					// 3. Prevent date anti-spoofing: force tabs_activated_at to original value
-					settingsMap["tabs_activated_at"] = activationTime.Format(time.RFC3339)
-
-					req["settings"] = settingsMap
-				}
+			if settingsMap != nil {
+				req["settings"] = settingsMap
 			}
 		}
 

@@ -75,18 +75,18 @@ export const MODULE_PRESETS: ModulePreset[] = [
     }
 ];
 
-export const MAX_FREE_ACTIVE_MODULES = 3;
-export const TRIAL_GRACE_DAYS = 30;
+export const MAX_FREE_ACTIVE_MODULES = 8;
+export const TRIAL_GRACE_DAYS = 9999;
 
 const DEFAULT_MODULES: Record<ModuleKey, boolean> = {
     habit: true,
     planner: true,
     study: true,
-    finance: false,
-    journal: false,
-    calendar: false,
-    job: false,
-    goal: false,
+    finance: true,
+    journal: true,
+    calendar: true,
+    job: true,
+    goal: true,
 };
 
 export function useActiveModules() {
@@ -105,7 +105,6 @@ export function useActiveModules() {
 
     const trial = getTrialStatus(user);
     const isPremium = Boolean(user?.is_premium);
-    // If user has paid subscription (Architect / Quantum), OR active 14-day credit card trial, all tabs are unlocked!
     const isUnlimited = isPremium || trial.isActive || (user?.plan_type && user.plan_type.toLowerCase() !== 'explorer' && !trial.isExpired);
 
     // Hydrate state from localStorage & listen for storage or custom events
@@ -116,10 +115,7 @@ export function useActiveModules() {
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && parsed.modules && typeof parsed.modules === 'object') {
-                        const updated: Record<string, boolean> = {
-                            habit: false, planner: false, study: false, finance: false,
-                            journal: false, calendar: false, job: false, goal: false
-                        };
+                        const updated: Record<string, boolean> = { ...DEFAULT_MODULES };
                         ALL_MODULE_KEYS.forEach(k => {
                             if (typeof parsed.modules[k] === 'boolean') {
                                 updated[k] = parsed.modules[k];
@@ -141,12 +137,11 @@ export function useActiveModules() {
 
         const handleSync = (e?: any) => {
             if (e?.detail && typeof e.detail === 'object') {
-                const updated: Record<string, boolean> = {
-                    habit: false, planner: false, study: false, finance: false,
-                    journal: false, calendar: false, job: false, goal: false
-                };
+                const updated: Record<string, boolean> = { ...DEFAULT_MODULES };
                 ALL_MODULE_KEYS.forEach(k => {
-                    updated[k] = Boolean(e.detail[k]);
+                    if (typeof e.detail[k] === 'boolean') {
+                        updated[k] = Boolean(e.detail[k]);
+                    }
                 });
                 setModules(updated);
             } else {
@@ -175,10 +170,7 @@ export function useActiveModules() {
                 const data = await res.json();
                 if (isMounted && data?.settings) {
                     if (data.settings.modules && typeof data.settings.modules === 'object') {
-                        const updated: Record<string, boolean> = {
-                            habit: false, planner: false, study: false, finance: false,
-                            journal: false, calendar: false, job: false, goal: false
-                        };
+                        const updated: Record<string, boolean> = { ...DEFAULT_MODULES };
                         ALL_MODULE_KEYS.forEach(k => {
                             if (typeof data.settings.modules[k] === 'boolean') {
                                 updated[k] = data.settings.modules[k];
@@ -201,45 +193,14 @@ export function useActiveModules() {
         return () => { isMounted = false; };
     }, [status]);
 
-    // Calculate days remaining in 30-day grace period
-    const { daysRemaining, isLocked } = useMemo(() => {
-        if (isUnlimited) {
-            return { daysRemaining: 999, isLocked: false };
-        }
+    // All users have unlimited tab activation access (no 30-day lock)
+    const daysRemaining = 999;
+    const isLocked = false;
 
-        const baseDate = activatedAt ? new Date(activatedAt) : (session?.user?.created_at ? new Date(session.user.created_at) : new Date());
-        const elapsedMs = Date.now() - baseDate.getTime();
-        const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-        const remaining = Math.max(0, TRIAL_GRACE_DAYS - elapsedDays);
-
-        // If 30 days have elapsed and user is not upgraded, tabs are permanently locked
-        const locked = remaining <= 0 && !isUnlimited;
-
-        return {
-            daysRemaining: remaining,
-            isLocked: locked
-        };
-    }, [activatedAt, isUnlimited, session?.user?.created_at]);
-
-    // Compute strictly clamped modules based on user active choices (up to 3 on free tier)
+    // Effective modules are the user's customized active modules
     const effectiveModules = useMemo(() => {
-        if (isUnlimited) return modules;
-        
-        const activeEntries = ALL_MODULE_KEYS.filter(k => Boolean(modules[k]));
-        const clamped: Record<string, boolean> = {
-            habit: false, planner: false, study: false, finance: false,
-            journal: false, calendar: false, job: false, goal: false
-        };
-
-        if (activeEntries.length <= MAX_FREE_ACTIVE_MODULES) {
-            activeEntries.forEach(k => { clamped[k] = true; });
-        } else {
-            // Keep up to MAX_FREE_ACTIVE_MODULES active entries
-            activeEntries.slice(0, MAX_FREE_ACTIVE_MODULES).forEach(k => { clamped[k] = true; });
-        }
-
-        return clamped;
-    }, [modules, isUnlimited]);
+        return modules;
+    }, [modules]);
 
     // Active count
     const activeKeys = useMemo(() => {
@@ -249,12 +210,12 @@ export function useActiveModules() {
     }, [effectiveModules]);
 
     const activeCount = activeKeys.length;
-    const canActivateMore = isUnlimited || activeCount < MAX_FREE_ACTIVE_MODULES;
+    const canActivateMore = true;
 
     // AI Coach is enabled for Quantum plan OR active 14-day credit card trial (Architect + AI)
     const isAiEnabled = useMemo(() => {
         if (!user) return false;
-        if (trial.isActive) return true; // 14-day credit card trial unlocks all tabs & AI
+        if (trial.isActive) return true;
         const plan = (user.plan_type)?.toLowerCase();
         return plan === 'quantum' || plan === 'legendary';
     }, [user, trial.isActive]);
@@ -264,10 +225,8 @@ export function useActiveModules() {
         if (key === 'dashboard') return true;
         // AI Coach requires Quantum tier OR 14-day card trial
         if (key === 'coach') return isAiEnabled;
-        // Unlimited tier (Architect, Quantum, or 14-day card trial) unlocks all 8 tabs
-        if (isUnlimited) return true;
         return Boolean(effectiveModules[key]);
-    }, [effectiveModules, isAiEnabled, isUnlimited]);
+    }, [effectiveModules, isAiEnabled]);
 
     // Persist modules both locally and to server
     const persistModules = useCallback(async (
@@ -313,42 +272,19 @@ export function useActiveModules() {
         }
     }, [activatedAt]);
 
-    // Toggle a module on or off with 3-tab limit and lock validation
+    // Toggle a module on or off without limit or lock
     const toggleTab = useCallback(async (key: ModuleKey): Promise<{ success: boolean; reason?: 'limit_reached' | 'locked' }> => {
         const isCurrentlyActive = Boolean(effectiveModules[key]);
-
-        // If turning off, always allow (frees up a slot)
-        if (isCurrentlyActive) {
-            const next = { ...effectiveModules, [key]: false };
-            await persistModules(next);
-            return { success: true };
-        }
-
-        // If attempting to turn on:
-        // Check if locked
-        if (isLocked) {
-            return { success: false, reason: 'locked' };
-        }
-
-        // Check if 3-tab limit reached
-        if (!isUnlimited && activeCount >= MAX_FREE_ACTIVE_MODULES) {
-            return { success: false, reason: 'limit_reached' };
-        }
-
-        const next = { ...effectiveModules, [key]: true };
+        const next = { ...effectiveModules, [key]: !isCurrentlyActive };
         await persistModules(next);
         return { success: true };
-    }, [effectiveModules, isLocked, isUnlimited, activeCount, persistModules]);
+    }, [effectiveModules, persistModules]);
 
-    // Swap an active tab with an inactive tab
+    // Swap an active tab with another
     const swapTab = useCallback(async (
         deactivateKey: ModuleKey,
         activateKey: ModuleKey
     ): Promise<{ success: boolean; reason?: 'locked' }> => {
-        if (isLocked) {
-            return { success: false, reason: 'locked' };
-        }
-
         const next = {
             ...effectiveModules,
             [deactivateKey]: false,
@@ -356,14 +292,10 @@ export function useActiveModules() {
         };
         await persistModules(next);
         return { success: true };
-    }, [effectiveModules, isLocked, persistModules]);
+    }, [effectiveModules, persistModules]);
 
     // Apply a preset pack (e.g. Scholar, Career, Mindful)
     const applyPreset = useCallback(async (presetId: string): Promise<{ success: boolean; reason?: 'locked' }> => {
-        if (isLocked) {
-            return { success: false, reason: 'locked' };
-        }
-
         const preset = MODULE_PRESETS.find(p => p.id === presetId);
         if (!preset) return { success: false };
 
@@ -374,7 +306,7 @@ export function useActiveModules() {
 
         await persistModules(next);
         return { success: true };
-    }, [isLocked, persistModules]);
+    }, [persistModules]);
 
     return {
         modules: effectiveModules,

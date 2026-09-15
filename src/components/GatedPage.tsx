@@ -39,15 +39,15 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
 
     // Determine access type
     const isQuantumRequired = feature === 'quantum' || feature === 'ai' || feature === 'neural_os' || feature === 'ai_coach';
-    const isModuleInactiveOnFreeTier = isCore && !isUnlimited;
+    const isModuleHiddenByChoice = isCore;
 
-    const tierName = isQuantumRequired ? 'Quantum' : (isModuleInactiveOnFreeTier ? 'Explorer (3 Tab)' : 'Architect');
+    const tierName = isQuantumRequired ? 'Quantum' : 'Explorer';
     
     const bgColors = isQuantumRequired 
         ? 'from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20' 
         : 'from-slate-200/50 via-slate-100/50 to-white dark:from-slate-900 dark:via-slate-900/50 dark:to-black';
-    const iconColor = isQuantumRequired ? 'text-indigo-500 dark:text-indigo-400' : 'text-amber-500 dark:text-amber-400';
-    const badgeColor = isQuantumRequired ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300';
+    const iconColor = isQuantumRequired ? 'text-indigo-500 dark:text-indigo-400' : 'text-indigo-500 dark:text-indigo-400';
+    const badgeColor = isQuantumRequired ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300';
 
     return (
         <div className={`min-h-[80vh] flex items-center justify-center p-6 bg-gradient-to-br ${bgColors} rounded-[3rem] m-4 md:m-8 border border-white/50 dark:border-slate-800/50 relative overflow-hidden`}>
@@ -71,19 +71,19 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
                 
                 <div className="inline-flex items-center gap-2 mb-4">
                     <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${badgeColor}`}>
-                        {tierName}
+                        {isQuantumRequired ? 'Quantum Tier' : 'Workspace Navigation'}
                     </span>
                 </div>
 
                 <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-4">
-                    {isModuleInactiveOnFreeTier
-                        ? (t('dash_tab_not_active_title') || 'Tab Belum Diaktifkan')
+                    {isModuleHiddenByChoice
+                        ? (t('dash_tab_hidden_title') || 'Tab Belum Ditampilkan di Sidebar')
                         : (t('dash_upgrade_tier_title') || `Akses ${tierName} Dibutuhkan`)}
                 </h2>
                 
                 <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-                    {isModuleInactiveOnFreeTier
-                        ? (t('dash_tab_not_active_desc') || `Tab ini belum ada dalam 3 tab aktif Anda. Anda dapat mengaktifkannya di Pengaturan Modul atau upgrade ke paket Architect untuk membuka 8 tab sekaligus.`)
+                    {isModuleHiddenByChoice
+                        ? (t('dash_tab_hidden_desc') || `Anda saat ini menyembunyikan modul ini dari navigasi Anda. Anda dapat mengaktifkannya kembali kapan saja di Pengaturan Modul.`)
                         : t.rich('dash_upgrade_tier_desc', {
                             feature: t(`module_${feature}_title`) || feature,
                             tierName: tierName,
@@ -92,22 +92,14 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
                 </p>
 
                 <div className="space-y-3">
-                    {isModuleInactiveOnFreeTier ? (
-                        <>
-                            <Link 
-                                href="/settings"
-                                className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20"
-                            >
-                                <span>{t('settings_manage_tabs') || 'Atur di Pengaturan Modul'}</span>
-                                <ChevronRight className="w-4 h-4 stroke-[3]" />
-                            </Link>
-                            <Link 
-                                href="/billing"
-                                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-[1.5rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm hover:scale-105 active:scale-95 transition-all"
-                            >
-                                <span>{t('btn_upgrade_architect') || 'Upgrade ke Architect (8 Tab)'}</span>
-                            </Link>
-                        </>
+                    {isModuleHiddenByChoice ? (
+                        <Link 
+                            href="/settings"
+                            className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20"
+                        >
+                            <span>{t('settings_manage_tabs') || 'Aktifkan di Pengaturan Modul'}</span>
+                            <ChevronRight className="w-4 h-4 stroke-[3]" />
+                        </Link>
                     ) : (
                         <Link 
                             href="/billing"

@@ -129,37 +129,8 @@ export default function SettingsModulesTab({
     };
 
     const handleToggle = async (key: ModuleKey) => {
-        const isCurrentlyActive = Boolean(modules[key]);
-
-        // If turning on and already 3 active
-        if (!isCurrentlyActive && !isUnlimited && activeCount >= maxAllowed) {
-            showFeedback(
-                'warning',
-                isIndo
-                    ? 'Batas 3 tab aktif telah tercapai! Matikan salah satu tab yang aktif terlebih dahulu, atau pilih Paket Preset di bawah.'
-                    : '3-Tab limit reached! Turn off one active tab first before activating this one, or select a Preset Trio below.'
-            );
-            return;
-        }
-
         const res = await toggleTab(key);
-        if (!res.success) {
-            if (res.reason === 'locked') {
-                showFeedback(
-                    'error',
-                    isIndo
-                        ? '3 Tab Anda telah terkunci permanen setelah masa percobaan 30 hari. Silakan upgrade untuk membuka kunci modul.'
-                        : 'Your 3 tabs are permanently locked after the 30-day grace period. Please upgrade to unlock all modules.'
-                );
-            } else if (res.reason === 'limit_reached') {
-                showFeedback(
-                    'warning',
-                    isIndo
-                        ? 'Batas 3 tab aktif tercapai. Nonaktifkan salah satu tab terlebih dahulu.'
-                        : 'Limit of 3 active tabs reached. Disable one tab first.'
-                );
-            }
-        } else {
+        if (res.success) {
             if (initialOnToggle) {
                 initialOnToggle(key);
             }
@@ -167,16 +138,6 @@ export default function SettingsModulesTab({
     };
 
     const handleApplyPreset = async (presetId: string) => {
-        if (isLocked) {
-            showFeedback(
-                'error',
-                isIndo
-                    ? 'Tab sudah terkunci. Upgrade ke paket berbayar untuk mengubah modul.'
-                    : 'Tabs are locked. Upgrade to change active modules.'
-            );
-            return;
-        }
-
         const res = await applyPreset(presetId);
         if (res.success) {
             showFeedback(
@@ -192,7 +153,7 @@ export default function SettingsModulesTab({
             <div>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <h3 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-slate-900 dark:text-white tracking-tight">
-                        {isIndo ? 'Pusat Aktivasi Tab & Modul' : 'Active Modules & Tab Hub'}
+                        {isIndo ? 'Pusat Aktivasi & Kustomisasi Modul' : 'Module Activation & Customization Hub'}
                     </h3>
                     
                     {/* Status Badge & Save CTA */}
@@ -203,18 +164,9 @@ export default function SettingsModulesTab({
                                 {isIndo ? 'Menyimpan...' : 'Saving...'}
                             </span>
                         )}
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
-                            isUnlimited
-                                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
-                                : activeCount === maxAllowed
-                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30'
-                                : 'bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30'
-                        }`}>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30">
                             <Layers size={13} />
-                            {isUnlimited
-                                ? (isIndo ? 'Akses Penuh (Unlimited)' : 'Full Access (Unlimited)')
-                                : `${activeCount} / ${maxAllowed} ${isIndo ? 'Tab Aktif' : 'Tabs Active'}`
-                            }
+                            {`${activeCount} / 8 ${isIndo ? 'Tab Aktif di Navigasi' : 'Tabs Active on Nav'}`}
                         </span>
 
                         <button
@@ -231,66 +183,11 @@ export default function SettingsModulesTab({
 
                 <p style={{ fontSize: '1.05rem', lineHeight: 1.7 }} className="text-slate-500 dark:text-slate-400 mt-2 max-w-3xl">
                     {isIndo
-                        ? 'Pilih hingga 3 tab utama untuk membentuk sistem produktivitas terfokus Anda. Selama 30 hari pertama, Anda bebas menukar tab mana saja sebelum pilihan terkunci.'
-                        : 'Choose up to 3 core tabs to build your distraction-free productivity stack. During your first 30 days, you can freely swap tabs before your trio locks.'
+                        ? 'Aktifkan modul yang Anda butuhkan dan sembunyikan modul yang belum diperlukan agar navigasi dan sidebar Anda tetap terfokus, rapi, dan bebas gangguan.'
+                        : 'Enable the modules you need and hide unused ones to keep your sidebar navigation focused, clean, and distraction-free.'
                     }
                 </p>
             </div>
-
-            {/* Banner: Grace Period Countdown or Lock State */}
-            {!isUnlimited && (
-                <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-                    isLocked
-                        ? 'bg-rose-50/70 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200'
-                        : daysRemaining <= 7
-                        ? 'bg-amber-50/80 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200'
-                        : 'bg-indigo-50/70 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/40 text-indigo-950 dark:text-indigo-200'
-                }`}>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded-xl shrink-0 ${
-                                isLocked ? 'bg-rose-100 dark:bg-rose-900/50 text-rose-600' : 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600'
-                            }`}>
-                                {isLocked ? <Lock size={18} /> : <Clock size={18} />}
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold">
-                                    {isLocked
-                                        ? (isIndo ? '3 Tab Anda Telah Terkunci Permanen' : 'Your 3 Tabs Are Permanently Locked')
-                                        : (isIndo ? 'Masa Eksperimen Fleksibel Aktif' : 'Flexible 30-Day Trial Active')
-                                    }
-                                </h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
-                                    {isLocked
-                                        ? (isIndo
-                                            ? 'Masa 30 hari telah usai. 3 tab aktif Anda telah dikunci. Ingin menukar tab atau membuka semua 8 modul?'
-                                            : 'Your 30-day grace period has elapsed. Your 3 tabs are locked. Want to swap tabs or unlock all 8 modules?')
-                                        : (isIndo
-                                            ? `Anda memiliki sisa ${daysRemaining} hari lagi untuk bebas menukar 3 tab aktif ini sebelum dikunci otomatis.`
-                                            : `You have ${daysRemaining} days remaining to freely test and swap your 3 active tabs before they lock.`)
-                                    }
-                                </p>
-                            </div>
-                        </div>
-
-                        {isLocked ? (
-                            <Link
-                                href="/pricing"
-                                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-500/20 transition-all shrink-0"
-                            >
-                                <Sparkles size={14} />
-                                <span>{isIndo ? 'Buka Semua Modul' : 'Unlock All Modules'}</span>
-                            </Link>
-                        ) : (
-                            <div className="text-right shrink-0">
-                                <span className="inline-block px-3 py-1 bg-white dark:bg-slate-900 rounded-lg text-xs font-extrabold text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-slate-800 shadow-sm">
-                                    {daysRemaining} {isIndo ? 'Hari Tersisa' : 'Days Left'}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
 
             {/* Interactive Feedback Toast */}
             {feedbackMessage && (
@@ -370,10 +267,10 @@ export default function SettingsModulesTab({
             <div>
                 <div className="flex items-center justify-between mb-3">
                     <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        {isIndo ? 'Pilihan Kustom Seluruh Modul (Maks. 3 Aktif)' : 'All Available Modules (Max 3 Active)'}
+                        {isIndo ? 'Kustomisasi Tampilan Modul (Aktifkan / Sembunyikan)' : 'Module Display Customization (Enable / Hide)'}
                     </h4>
                     <span className="text-[11px] font-medium text-slate-400">
-                        {activeCount} / {isUnlimited ? '∞' : maxAllowed} {isIndo ? 'Slot Terpakai' : 'Slots Used'}
+                        {activeCount} / 8 {isIndo ? 'Aktif' : 'Active'}
                     </span>
                 </div>
 
@@ -419,25 +316,16 @@ export default function SettingsModulesTab({
                                 </div>
 
                                 <div className="shrink-0 pl-2">
-                                    {isLocked && !isEnabled ? (
-                                        <div 
-                                            title={isIndo ? 'Terkunci permanen setelah 30 hari' : 'Permanently locked after 30 days'}
-                                            className="w-10 h-6 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-400 cursor-not-allowed"
-                                        >
-                                            <Lock size={12} />
-                                        </div>
-                                    ) : (
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input
-                                                id={`module-toggle-${key}`}
-                                                checked={isEnabled}
-                                                type="checkbox"
-                                                className="sr-only peer"
-                                                onChange={() => handleToggle(key)}
-                                            />
-                                            <div className="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:after:border-slate-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 shadow-inner border border-slate-200 dark:border-slate-700" />
-                                        </label>
-                                    )}
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            id={`module-toggle-${key}`}
+                                            checked={isEnabled}
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            onChange={() => handleToggle(key)}
+                                        />
+                                        <div className="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:after:border-slate-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 shadow-inner border border-slate-200 dark:border-slate-700" />
+                                    </label>
                                 </div>
                             </div>
                         );
@@ -457,12 +345,9 @@ export default function SettingsModulesTab({
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         </h5>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                            {isUnlimited
-                                ? (isIndo ? 'Semua 8 modul aktif (Tier Unlimited)' : 'All 8 modules active (Unlimited Tier)')
-                                : (isIndo
-                                    ? `${activeCount} dari ${maxAllowed} slot tab digunakan (Masa uji coba 30 hari)`
-                                    : `${activeCount} of ${maxAllowed} tab slots in use (30-day trial active)`
-                                )
+                            {isIndo
+                                ? `${activeCount} dari 8 modul aktif di navigasi`
+                                : `${activeCount} of 8 modules active on navigation`
                             }
                         </p>
                     </div>
