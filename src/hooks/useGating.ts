@@ -4,32 +4,41 @@ import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { useMemo } from 'react';
 import { getTrialStatus, TrialStatus } from '@/lib/auth/subscription';
 
-// Feature -> tier mapping (1:1 from legacy useGating.js)
+// Feature -> tier mapping
 const FEATURE_TIERS: Record<string, string> = {
-    // Free (Explorer) - Fully Unlocked
-    dashboard:      'explorer',
-    habit:          'explorer',
-    habit_batch:    'explorer',
-    finance:        'explorer',
-    finance_batch:  'explorer',
-    finance_savings:'explorer',
-    planner:        'explorer',
-    planner_batch:  'explorer',
-    planner_recurring: 'explorer',
-    finance_budget: 'explorer',
-    finance_export: 'explorer',
+    // Free (Explorer) - All 8 Core Modules Unlocked
+    dashboard:        'explorer',
+    habit:            'explorer',
+    habit_batch:      'explorer',
+    finance:          'explorer',
+    finance_batch:    'explorer',
+    finance_savings:  'explorer',
+    planner:          'explorer',
+    planner_batch:    'explorer',
+    planner_recurring:'explorer',
+    finance_budget:   'explorer',
+    finance_export:   'explorer',
+    journal:          'explorer',
+    calendar:         'explorer',
+    job:              'explorer',
+    goals:            'explorer',
+    study:            'explorer',
 
-    // Architect
-    journal:       'architect',
-    calendar:      'architect',
-    job:           'architect',
-    goals:         'architect',
+    // Architect - Systems & Power Tools Engine
+    batch_engine_pro: 'architect',
+    infinite_analytics: 'architect',
+    data_export_pdf:  'architect',
+    the_vault_pro:    'architect',
+    cross_sync:       'architect',
+    custom_themes:    'architect',
 
-    // Quantum / AI
+    // Quantum - Neural AI OS Engine
     ai_coach:         'quantum',
     neural_os:        'quantum',
     journal_analyze:  'quantum',
     finance_audit:    'quantum',
+    ai_command:       'quantum',
+    ai_goal_breakdown:'quantum',
 };
 
 const PLAN_LEVELS: Record<string, number> = {

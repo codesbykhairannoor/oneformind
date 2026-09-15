@@ -35,10 +35,14 @@ export default function PricingPage() {
     ];
 
     const modules = [
-        ['Journal Tracker', '—', '✓', '✓'],
-        ['Goal Tracker', '—', '✓', '✓'],
-        ['Job Application', '—', '✓', '✓'],
-        ['Calendar Timeline', '—', '✓', '✓'],
+        ['Habits & Daily Routine', '✓', '✓', '✓'],
+        ['Daily Planner & To-Do', '✓', '✓', '✓'],
+        ['Finance Tracker & Vault', '✓', '✓', '✓'],
+        ['Journal & Mood Tracking', '✓', '✓', '✓'],
+        ['Goal Tracker & Milestones', '✓', '✓', '✓'],
+        ['Job Application CRM', '✓', '✓', '✓'],
+        ['Study Archive & Portfolio', '✓', '✓', '✓'],
+        ['Calendar Timeline', '✓', '✓', '✓'],
     ];
 
     const handleCheckout = (planId: string) => {
@@ -372,14 +376,14 @@ export default function PricingPage() {
                                         </tr>
                                     ))}
                                     <tr className="bg-slate-50 dark:bg-slate-900/50">
-                                        <td colSpan={4} className="p-4 px-8 text-[9px] font-black text-slate-400 uppercase tracking-widest">Premium Modules</td>
+                                        <td colSpan={4} className="p-4 px-8 text-[9px] font-black text-slate-400 uppercase tracking-widest">Core Life OS Ecosystem (8 Modules)</td>
                                     </tr>
                                     {modules.map((row, idx) => (
                                         <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
                                             <td className="p-6 text-sm font-bold text-slate-700 dark:text-slate-200">{row[0]}</td>
-                                            <td className="p-6 text-center text-slate-200 dark:text-slate-800 text-xs">—</td>
-                                            <td className="p-6 text-center text-emerald-500 text-xs font-black">✓</td>
-                                            <td className="p-6 text-center text-emerald-500 text-xs font-black">✓</td>
+                                            <td className="p-6 text-center text-emerald-500 text-xs font-black">{row[1]}</td>
+                                            <td className="p-6 text-center text-emerald-500 text-xs font-black">{row[2]}</td>
+                                            <td className="p-6 text-center text-emerald-500 text-xs font-black">{row[3]}</td>
                                         </tr>
                                     ))}
                                 </tbody>
