@@ -6,6 +6,7 @@ import { getMessages } from 'next-intl/server';
 import Script from 'next/script';
 import InstantIntlProvider from "@/components/InstantIntlProvider";
 import SwrProvider from "@/components/SwrProvider";
+import { SessionProvider } from "@/components/SessionProvider";
 
 import "../globals.css";
 
@@ -79,9 +80,11 @@ export default async function RootLayout({
           `}
         </Script>
           <InstantIntlProvider initialLocale={locale} initialMessages={messages as any}>
-            <SwrProvider>
-              {children}
-            </SwrProvider>
+            <SessionProvider>
+              <SwrProvider>
+                {children}
+              </SwrProvider>
+            </SessionProvider>
           </InstantIntlProvider>
       </body>
     </html>
