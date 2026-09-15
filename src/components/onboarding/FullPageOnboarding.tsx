@@ -465,7 +465,7 @@ export default function FullPageOnboarding({
                                                 </span>
                                             ) : isMaxReached ? (
                                                 <span className="text-[10px] font-bold text-slate-500">
-                                                    {isIndo ? 'Batas 3 Tab Terpakai' : '3 Tab Limit Reached'}
+                                                    {isIndo ? 'Batas Modul Terpakai' : 'Module Limit Reached'}
                                                 </span>
                                             ) : (
                                                 <span className="text-[11px] font-bold text-slate-400 hover:text-white">

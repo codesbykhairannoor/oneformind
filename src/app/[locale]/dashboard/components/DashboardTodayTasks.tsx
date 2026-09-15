@@ -179,7 +179,7 @@ export default function DashboardTodayTasks({ plannerData, synergy, t }: Dashboa
             ) : (
                 <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 text-center dark:border-white/5 dark:bg-white/[0.02]">
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {t('dash_planner_inactive_note') || 'Modul Planner saat ini tidak aktif di 3 tab utama Anda.'}
+                        {t('dash_planner_inactive_note') || 'Modul Planner saat ini disembunyikan di Pengaturan Modul.'}
                     </p>
                     <Link
                         href="/settings"

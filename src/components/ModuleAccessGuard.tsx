@@ -55,8 +55,8 @@ export default function ModuleAccessGuard({ moduleKey, children }: ModuleAccessG
 
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
                 {isIndo
-                    ? `Modul ini tidak termasuk dalam 3 tab aktif pilihan Anda. Untuk mengaksesnya, aktifkan modul di Pengaturan Modul atau upgrade paket Anda.`
-                    : `This module is not currently active in your 3-tab trio. To use it, enable it in Settings or upgrade your plan.`
+                    ? `Modul ini sedang disembunyikan di Pengaturan Modul Anda. Untuk mengaksesnya, Anda dapat mengaktifkannya kapan saja di Pengaturan Modul.`
+                    : `This module is currently hidden in your Module Settings. To use it, you can enable it anytime in Module Settings.`
                 }
             </p>
 
@@ -66,7 +66,7 @@ export default function ModuleAccessGuard({ moduleKey, children }: ModuleAccessG
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-indigo-500/20 transition-all"
                 >
                     <Layers size={14} />
-                    <span>{isIndo ? 'Kelola 3 Tab Aktif' : 'Manage Active 3 Tabs'}</span>
+                    <span>{isIndo ? 'Kelola Tampilan Modul' : 'Manage Module Display'}</span>
                 </Link>
 
                 <Link

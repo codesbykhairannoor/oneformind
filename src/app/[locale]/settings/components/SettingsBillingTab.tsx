@@ -106,8 +106,8 @@ export default function SettingsBillingTab({
 
                 <p className="mt-6 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-600/50 pt-4">
                     {isIndo
-                        ? 'Tersedia 2 jalur: (1) Trial 14 Hari dengan Kartu Kredit yang membuka SEMUA 8 Tab + AI Coach ($0 hari ini, batal kapan saja), atau (2) Free 3-Tab tanpa kartu kredit dengan masa bebas tukar 30 hari.'
-                        : 'Two trial options: (1) 14-Day Card Trial unlocking ALL 8 Tabs + AI Coach ($0 today, cancel anytime), or (2) Free 3-Tab tier with 30-day swap trial without a credit card.'}
+                        ? 'Setiap pengguna mendapatkan akses gratis ke seluruh 8 modul Life OS utama. Anda dapat menyesuaikan tampilan modul di Pengaturan Modul. Upgrade ke Architect/Quantum untuk fitur AI Coach dan analitik mendalam.'
+                        : 'Every user gets free access to all 8 core Life OS modules. Customize module visibility anytime in Module Settings. Upgrade to Architect/Quantum for AI Coach and deep analytics.'}
                 </p>
             </div>
 
@@ -119,8 +119,8 @@ export default function SettingsBillingTab({
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         {isIndo
-                            ? 'Pahami batasan tab dan akses fitur eksklusif antar paket:'
-                            : 'Understand active tab limits and exclusive feature access by tier:'}
+                            ? 'Pahami akses modul dan fitur eksklusif antar paket:'
+                            : 'Understand module access and exclusive feature privileges by tier:'}
                     </p>
                 </div>
 
@@ -134,20 +134,20 @@ export default function SettingsBillingTab({
                             </div>
                             <h5 className="text-lg font-black text-slate-900 dark:text-white mb-2">Explorer</h5>
                             <p className="text-xs text-slate-500 leading-relaxed mb-4">
-                                {isIndo ? 'Pondasi awal gratis tanpa kartu kredit untuk fokus pada 3 tab esensial.' : 'Free foundation without credit card focused on 3 core tabs.'}
+                                {isIndo ? 'Pondasi awal gratis tanpa kartu kredit dengan akses penuh ke seluruh 8 modul utama.' : 'Free foundation without credit card with full access to all 8 core modules.'}
                             </p>
                             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
                                 <li className="flex items-start gap-2">
                                     <Check size={14} className="text-emerald-500 mt-0.5 shrink-0" />
-                                    <span>{isIndo ? 'Pilih 3 Tab Bebas (Tanpa Kartu Kredit)' : 'Pick 3 Free Tabs (No Card Needed)'}</span>
+                                    <span>{isIndo ? 'Akses Gratis Seluruh 8 Modul Life OS' : 'Free Access to All 8 Life OS Modules'}</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check size={14} className="text-emerald-500 mt-0.5 shrink-0" />
-                                    <span>{isIndo ? 'Bebas tukar 3 tab selama 30 hari' : 'Free to swap 3 tabs for 30 days'}</span>
+                                    <span>{isIndo ? 'Bebas atur & tampilkan modul kapan saja' : 'Customize & toggle module display anytime'}</span>
                                 </li>
-                                <li className="flex items-start gap-2 text-slate-400">
-                                    <Lock size={14} className="text-slate-400 mt-0.5 shrink-0" />
-                                    <span>{isIndo ? '3 Tab terkunci permanen setelah 30 hari' : '3 Tabs lock after 30 days'}</span>
+                                <li className="flex items-start gap-2">
+                                    <Check size={14} className="text-emerald-500 mt-0.5 shrink-0" />
+                                    <span>{isIndo ? 'Gratis selamanya tanpa batas waktu' : 'Free forever with no time limits'}</span>
                                 </li>
                                 <li className="flex items-start gap-2 text-slate-400">
                                     <X size={14} className="text-rose-400 mt-0.5 shrink-0" />
@@ -162,16 +162,16 @@ export default function SettingsBillingTab({
                         <div>
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-xs font-black uppercase text-indigo-600 dark:text-indigo-400">POPULER</span>
-                                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Semua Tab</span>
+                                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Advanced</span>
                             </div>
                             <h5 className="text-lg font-black text-slate-900 dark:text-white mb-2">Architect</h5>
                             <p className="text-xs text-slate-500 leading-relaxed mb-4">
-                                {isIndo ? 'Buka seluruh modul tanpa batas kuota tab & tanpa kunci permanen.' : 'Unlock all 8 modules without any tab limit or lock.'}
+                                {isIndo ? 'Akses fitur advanced, sinkronisasi mendalam & opsi trial AI Coach.' : 'Access advanced features, deep sync & AI Coach trial options.'}
                             </p>
                             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
                                 <li className="flex items-start gap-2 font-bold text-indigo-700 dark:text-indigo-300">
                                     <Check size={14} className="text-indigo-600 mt-0.5 shrink-0" />
-                                    <span>{isIndo ? 'Buka SEMUA 8 Tab Tanpa Batas' : 'Unlock ALL 8 Modules Unlimited'}</span>
+                                    <span>{isIndo ? 'Akses Fitur Advanced & Integrasi Lintas Modul' : 'Advanced Features & Cross-Module Integration'}</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Sparkles size={14} className="text-amber-500 mt-0.5 shrink-0" />
