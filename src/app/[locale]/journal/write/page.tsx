@@ -8,6 +8,8 @@ import JournalEditorHeader from './components/JournalEditorHeader';
 import JournalEditorBody from './components/JournalEditorBody';
 import { analyzeJournalCognitive } from '../lib/journalAi';
 import { useActiveModules } from '@/hooks/useActiveModules';
+import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import GatedPage from '@/components/GatedPage';
 
 interface JournalWritePageProps {
     params?: Promise<{
@@ -569,69 +571,72 @@ What actually happened during the scheduled habit window over the last few days?
     };
 
     return (
-        <div className={`min-h-screen relative selection:bg-indigo-100 dark:selection:bg-indigo-900/40 pb-32 transition-colors duration-300 ${
-            isZenMode 
-                ? 'bg-slate-950 text-white' 
-                : 'bg-slate-50/60 dark:bg-slate-950 text-slate-900 dark:text-white'
-        }`}>
-            
-            <JournalEditorHeader
-                isZenMode={isZenMode}
-                setIsZenMode={setIsZenMode}
-                isPrivacyBlur={isPrivacyBlur}
-                setIsPrivacyBlur={setIsPrivacyBlur}
-                wordCount={wordCount}
-                readTimeMinutes={readTimeMinutes}
-                isBold={isBold}
-                setIsBold={setIsBold}
-                isItalic={isItalic}
-                setIsItalic={setIsItalic}
-                selectedFont={selectedFont}
-                setSelectedFont={setSelectedFont}
-                selectedFontSize={selectedFontSize}
-                setSelectedFontSize={setSelectedFontSize}
-                showFontMenu={showFontMenu}
-                setShowFontMenu={setShowFontMenu}
-                showSizeMenu={showSizeMenu}
-                setShowSizeMenu={setShowSizeMenu}
-                isListening={isListening}
-                toggleVoiceRecognition={toggleVoiceRecognition}
-                onInsertMarkdown={handleInsertMarkdown}
-                handleSave={handleSave}
-                isSaving={isSaving}
-                lastSavedTime={lastSavedTime}
-                fontFamilies={fontFamilies}
-                fontSizes={fontSizes}
-                onImportPlanner={handleImportPlanner}
-                isImportingPlanner={isImportingPlanner}
-            />
+        <AuthenticatedLayout>
+            <GatedPage feature="journal">
+                <div className={`min-h-screen relative selection:bg-indigo-100 dark:selection:bg-indigo-900/40 pb-32 transition-colors duration-300 ${
+                    isZenMode 
+                        ? 'bg-slate-950 text-white' 
+                        : 'bg-slate-50/60 dark:bg-slate-950 text-slate-900 dark:text-white'
+                }`}>
+                    
+                    <JournalEditorHeader
+                        isZenMode={isZenMode}
+                        setIsZenMode={setIsZenMode}
+                        isPrivacyBlur={isPrivacyBlur}
+                        setIsPrivacyBlur={setIsPrivacyBlur}
+                        wordCount={wordCount}
+                        readTimeMinutes={readTimeMinutes}
+                        isBold={isBold}
+                        setIsBold={setIsBold}
+                        isItalic={isItalic}
+                        setIsItalic={setIsItalic}
+                        selectedFont={selectedFont}
+                        setSelectedFont={setSelectedFont}
+                        selectedFontSize={selectedFontSize}
+                        setSelectedFontSize={setSelectedFontSize}
+                        showFontMenu={showFontMenu}
+                        setShowFontMenu={setShowFontMenu}
+                        showSizeMenu={showSizeMenu}
+                        setShowSizeMenu={setShowSizeMenu}
+                        isListening={isListening}
+                        toggleVoiceRecognition={toggleVoiceRecognition}
+                        onInsertMarkdown={handleInsertMarkdown}
+                        handleSave={handleSave}
+                        isSaving={isSaving}
+                        lastSavedTime={lastSavedTime}
+                        fontFamilies={fontFamilies}
+                        fontSizes={fontSizes}
+                        onImportPlanner={handleImportPlanner}
+                        isImportingPlanner={isImportingPlanner}
+                    />
 
-            <JournalEditorBody
-                isZenMode={isZenMode}
-                isPrivacyBlur={isPrivacyBlur}
-                dateStr={dateStr}
-                title={title}
-                setTitle={setTitle}
-                mood={mood}
-                setMood={setMood}
-                moods={moods}
-                imageUrl={imageUrl}
-                setImageUrl={setImageUrl}
-                fileInputRef={fileInputRef}
-                handleImageUpload={handleImageUpload}
-                content={content}
-                setContent={setContent}
-                textareaRef={textareaRef}
-                selectedFont={selectedFont}
-                selectedFontSize={selectedFontSize}
-                isBold={isBold}
-                isItalic={isItalic}
-                onInsertLifeOSBrief={handleInsertLifeOSBrief}
-                isInsertingBrief={isInsertingBrief}
-                onImportPlanner={handleImportPlanner}
-                isImportingPlanner={isImportingPlanner}
-            />
-        </div>
+                    <JournalEditorBody
+                        isZenMode={isZenMode}
+                        isPrivacyBlur={isPrivacyBlur}
+                        dateStr={dateStr}
+                        title={title}
+                        setTitle={setTitle}
+                        mood={mood}
+                        setMood={setMood}
+                        moods={moods}
+                        imageUrl={imageUrl}
+                        setImageUrl={setImageUrl}
+                        fileInputRef={fileInputRef}
+                        handleImageUpload={handleImageUpload}
+                        content={content}
+                        setContent={setContent}
+                        textareaRef={textareaRef}
+                        selectedFont={selectedFont}
+                        selectedFontSize={selectedFontSize}
+                        isBold={isBold}
+                        isItalic={isItalic}
+                        onInsertLifeOSBrief={handleInsertLifeOSBrief}
+                        isInsertingBrief={isInsertingBrief}
+                        onImportPlanner={handleImportPlanner}
+                        isImportingPlanner={isImportingPlanner}
+                    />
+                </div>
+            </GatedPage>
+        </AuthenticatedLayout>
     );
 }
-
