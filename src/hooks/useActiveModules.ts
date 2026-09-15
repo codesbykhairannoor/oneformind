@@ -176,12 +176,35 @@ export function useActiveModules() {
         };
     }, [activatedAt, isUnlimited, session?.user?.created_at]);
 
+    // Compute strictly clamped modules based on current tier limits
+    const effectiveModules = useMemo(() => {
+        if (isUnlimited) return modules;
+        
+        const clamped: Record<string, boolean> = {};
+        let count = 0;
+        
+        // Iterate in consistent order to ensure determinism
+        for (const key of ALL_MODULE_KEYS) {
+            if (modules[key]) {
+                if (count < MAX_FREE_ACTIVE_MODULES) {
+                    clamped[key] = true;
+                    count++;
+                } else {
+                    clamped[key] = false;
+                }
+            } else {
+                clamped[key] = false;
+            }
+        }
+        return clamped;
+    }, [modules, isUnlimited]);
+
     // Active count
     const activeKeys = useMemo(() => {
-        return Object.entries(modules)
+        return Object.entries(effectiveModules)
             .filter(([_, isEnabled]) => Boolean(isEnabled))
             .map(([k]) => k as ModuleKey);
-    }, [modules]);
+    }, [effectiveModules]);
 
     const activeCount = activeKeys.length;
     const canActivateMore = isUnlimited || activeCount < MAX_FREE_ACTIVE_MODULES;
@@ -201,8 +224,8 @@ export function useActiveModules() {
         if (key === 'coach') return isAiEnabled;
         // Unlimited tier (Architect, Quantum, or 14-day card trial) unlocks all 8 tabs
         if (isUnlimited) return true;
-        return Boolean(modules[key]);
-    }, [modules, isAiEnabled, isUnlimited]);
+        return Boolean(effectiveModules[key]);
+    }, [effectiveModules, isAiEnabled, isUnlimited]);
 
     // Persist modules both locally and to server
     const persistModules = useCallback(async (
@@ -249,11 +272,11 @@ export function useActiveModules() {
 
     // Toggle a module on or off with 3-tab limit and lock validation
     const toggleTab = useCallback(async (key: ModuleKey): Promise<{ success: boolean; reason?: 'limit_reached' | 'locked' }> => {
-        const isCurrentlyActive = Boolean(modules[key]);
+        const isCurrentlyActive = Boolean(effectiveModules[key]);
 
         // If turning off, always allow (frees up a slot)
         if (isCurrentlyActive) {
-            const next = { ...modules, [key]: false };
+            const next = { ...effectiveModules, [key]: false };
             await persistModules(next);
             return { success: true };
         }
@@ -269,10 +292,10 @@ export function useActiveModules() {
             return { success: false, reason: 'limit_reached' };
         }
 
-        const next = { ...modules, [key]: true };
+        const next = { ...effectiveModules, [key]: true };
         await persistModules(next);
         return { success: true };
-    }, [modules, isLocked, isUnlimited, activeCount, persistModules]);
+    }, [effectiveModules, isLocked, isUnlimited, activeCount, persistModules]);
 
     // Swap an active tab with an inactive tab
     const swapTab = useCallback(async (
@@ -284,13 +307,13 @@ export function useActiveModules() {
         }
 
         const next = {
-            ...modules,
+            ...effectiveModules,
             [deactivateKey]: false,
             [activateKey]: true
         };
         await persistModules(next);
         return { success: true };
-    }, [modules, isLocked, persistModules]);
+    }, [effectiveModules, isLocked, persistModules]);
 
     // Apply a preset pack (e.g. Scholar, Career, Mindful)
     const applyPreset = useCallback(async (presetId: string): Promise<{ success: boolean; reason?: 'locked' }> => {
@@ -311,7 +334,7 @@ export function useActiveModules() {
     }, [isLocked, persistModules]);
 
     return {
-        modules,
+        modules: effectiveModules,
         activeKeys,
         activeCount,
         maxAllowed: MAX_FREE_ACTIVE_MODULES,
