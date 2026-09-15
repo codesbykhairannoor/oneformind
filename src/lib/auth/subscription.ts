@@ -130,7 +130,7 @@ export function isLegendary(user: UserSubscriptionInfo): boolean {
 }
 
 export function hasFeature(user: UserSubscriptionInfo, featureGroup: string): boolean {
-  const freeGroups = ['habits', 'finance', 'planner'];
+  const freeGroups = ['habits', 'finance', 'planner', 'journal', 'goals', 'jobs', 'study', 'calendar'];
   
   if (freeGroups.includes(featureGroup)) {
       return true;

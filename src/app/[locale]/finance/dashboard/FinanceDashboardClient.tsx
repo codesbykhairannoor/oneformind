@@ -22,6 +22,7 @@ import {
     ArrowDownRight,
     FileSpreadsheet
 } from 'lucide-react';
+import { useGating } from '@/hooks/useGating';
 import YearlyCashflowChart from './YearlyCashflowChart';
 
 interface YearlyStat {
@@ -50,6 +51,7 @@ export default function FinanceDashboardClient({
     const locale = useLocale();
     const router = useRouter();
     const isIndo = locale === 'id';
+    const { isArchitect } = useGating();
 
     const [isExporting, setIsExporting] = useState(false);
 
@@ -108,8 +110,12 @@ export default function FinanceDashboardClient({
         router.push(`/finance/dashboard?year=${nextYear}`);
     };
 
-    // Export to CSV Function
+    // Export to CSV Function (Architect Tier Benefit)
     const handleExportCSV = () => {
+        if (!isArchitect) {
+            router.push('/billing');
+            return;
+        }
         setIsExporting(true);
         try {
             const headers = ['Bulan', 'Pemasukan', 'Target_Pemasukan', 'Pengeluaran', 'Net_Surplus'];
