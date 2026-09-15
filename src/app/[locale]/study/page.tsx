@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import GatedPage from '@/components/GatedPage';
 import AcademicHeader, { StudyActiveTab } from './components/AcademicHeader';
 import AcademicSetup from './components/AcademicSetup';
 import ClassroomView from './components/ClassroomView';
@@ -94,6 +95,7 @@ export default function StudyPage() {
 
     return (
         <AuthenticatedLayout>
+            <GatedPage feature="study">
             <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-28 transition-colors font-sans">
                 
                 {/* STATE 1: EMPTY STATE & SETUP */}
@@ -239,6 +241,7 @@ export default function StudyPage() {
                 )}
 
             </div>
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }

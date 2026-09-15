@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import GatedPage from '@/components/GatedPage';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { 
     Wallet, 
@@ -562,7 +563,8 @@ export default function FinanceClient({
 
     return (
         <AuthenticatedLayout>
-            <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500 pb-24">
+            <GatedPage feature="finance">
+                <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500 pb-24">
                 
                 {/* Finance Header (Month Navigation, Quick Actions, Currency) */}
                 <FinanceHeader
@@ -1051,7 +1053,7 @@ export default function FinanceClient({
                 activeCurrency={activeCurrency}
                 currencyLocale={currencyLocale}
             />
-
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import GatedPage from '@/components/GatedPage';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import PlannerHeader from './components/PlannerHeader';
 import PlannerSidebar from './components/PlannerSidebar';
@@ -63,9 +64,11 @@ export default function PlannerPage() {
     if (!planner.isLoaded) {
         return (
             <AuthenticatedLayout>
-                <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
-                </div>
+                <GatedPage feature="planner">
+                    <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-12 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
+                    </div>
+                </GatedPage>
             </AuthenticatedLayout>
         );
     }
@@ -262,6 +265,7 @@ export default function PlannerPage() {
                     currentData={planner.tasks}
                 />
             </div>
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }

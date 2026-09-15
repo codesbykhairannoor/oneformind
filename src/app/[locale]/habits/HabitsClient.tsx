@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
+import GatedPage from '@/components/GatedPage';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 import { HabitItem } from './types';
@@ -149,7 +150,8 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
 
     return (
         <AuthenticatedLayout>
-            <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500">
+            <GatedPage feature="habit">
+                <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 transition-colors duration-500">
                 
                 {/* HABIT HEADER & FILTERS */}
                 <HabitStatsHeader
@@ -326,6 +328,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     currentData={habits}
                 />
             </div>
+            </GatedPage>
         </AuthenticatedLayout>
     );
 }

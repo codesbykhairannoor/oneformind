@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Lock, Sparkles, ChevronRight, Loader2 } from 'lucide-react';
 import { useGating } from '@/hooks/useGating';
+import { useActiveModules } from '@/hooks/useActiveModules';
 import { Link } from '@/i18n/routing';
 
 interface GatedPageProps {
@@ -13,9 +14,10 @@ interface GatedPageProps {
 
 export default function GatedPage({ feature, children }: GatedPageProps) {
     const t = useTranslations();
-    const { canUse, isAiEnabled, isLoading } = useGating();
+    const { canUse, isAiEnabled, isLoading: isGatingLoading } = useGating();
+    const { isTabActive, hasHydrated } = useActiveModules();
 
-    if (isLoading) {
+    if (isGatingLoading || !hasHydrated) {
         return (
             <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 m-4 md:m-8">
                 <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
@@ -24,7 +26,14 @@ export default function GatedPage({ feature, children }: GatedPageProps) {
         );
     }
 
-    if (canUse(feature)) {
+    // Determine if the user has access.
+    // Core modules are managed by isTabActive. Other features are managed by canUse.
+    const normalizedFeature = feature === 'goals' ? 'goal' : feature;
+    const isCore = ['habit', 'planner', 'finance', 'study', 'journal', 'calendar', 'job', 'goal'].includes(normalizedFeature);
+
+    const hasAccess = isCore ? isTabActive(normalizedFeature) : canUse(feature);
+
+    if (hasAccess) {
         return <>{children}</>;
     }
 
