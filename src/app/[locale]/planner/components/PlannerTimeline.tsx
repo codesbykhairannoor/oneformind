@@ -98,6 +98,7 @@ export default function PlannerTimeline({
     const [density, setDensity] = useState<'compact' | 'normal'>('compact');
     const [isMobile, setIsMobile] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [dragIndicator, setDragIndicator] = useState<{ top: number, time: string } | null>(null);
 
     // Desktop / Laptop Pointer Drag-to-Scroll (Panning)
     const [isDraggingMouse, setIsDraggingMouse] = useState(false);
@@ -401,8 +402,37 @@ export default function PlannerTimeline({
         return `${String(h).padStart(2, '0')}:00`;
     });
 
+    const handleTimelineDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        
+        const hoursFromTop = y / hourHeight;
+        let totalHours = startHour + hoursFromTop;
+        
+        let absoluteHours = Math.floor(totalHours);
+        let remainder = totalHours - absoluteHours;
+        let absoluteMinutes = remainder < 0.5 ? 0 : 30;
+        
+        if (absoluteHours >= 24) absoluteHours -= 24;
+        
+        const newStartTime = `${String(absoluteHours).padStart(2, '0')}:${String(absoluteMinutes).padStart(2, '0')}`;
+        
+        let relStart = absoluteHours * 60 + absoluteMinutes - (startHour * 60);
+        if (relStart < 0) relStart += 1440;
+        const topPx = (relStart / 60) * hourHeight;
+        
+        setDragIndicator({ top: topPx, time: newStartTime });
+    };
+
+    const handleTimelineDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        setDragIndicator(null);
+    };
+
     const handleTimelineDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
+        setDragIndicator(null);
+        
         const rect = e.currentTarget.getBoundingClientRect();
         const y = e.clientY - rect.top;
         
@@ -557,10 +587,28 @@ export default function PlannerTimeline({
                 <div 
                     className="relative w-full" 
                     style={{ height: `${VIEW_LIMIT * hourHeight}px` }}
-                    onDragOver={(e) => e.preventDefault()}
+                    onDragOver={handleTimelineDragOver}
+                    onDragLeave={handleTimelineDragLeave}
                     onDrop={handleTimelineDrop}
                 >
                     
+                    {/* Drag Drop Indicator */}
+                    {dragIndicator && (
+                        <div 
+                            className="absolute z-40 rounded-xl border-2 border-dashed border-indigo-400 bg-indigo-50/50 dark:bg-indigo-500/20 flex items-center justify-center pointer-events-none transition-all duration-75"
+                            style={{ 
+                                top: `${dragIndicator.top}px`, 
+                                height: `${density === 'compact' ? 24 : 32}px`,
+                                left: `${timeColWidth + 6}px`,
+                                right: '8px'
+                            }}
+                        >
+                            <span className="text-indigo-600 dark:text-indigo-300 text-[10px] font-black tracking-wider bg-white/90 dark:bg-slate-900/90 px-3 py-1 rounded-full shadow-sm">
+                                {isIndo ? 'Pindahkan ke ' : 'Move to '}{dragIndicator.time}
+                            </span>
+                        </div>
+                    )}
+
                     {/* Grid Lines & Time Slots */}
                     {timeSlots.map((time, i) => (
                         <div key={time} className="absolute w-full flex border-b border-slate-100 dark:border-slate-800" style={{ top: `${i * hourHeight}px`, height: `${hourHeight}px` }}>
