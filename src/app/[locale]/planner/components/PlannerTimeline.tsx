@@ -210,7 +210,7 @@ export default function PlannerTimeline({
 
     const handleDragStart = (e: React.DragEvent, taskId: number) => {
         e.dataTransfer.dropEffect = 'move';
-        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.setData('text/plain', taskId.toString());
     };
 
@@ -401,6 +401,24 @@ export default function PlannerTimeline({
         return `${String(h).padStart(2, '0')}:00`;
     });
 
+    const handleTimelineDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        
+        const hoursFromTop = y / hourHeight;
+        let totalHours = startHour + hoursFromTop;
+        
+        let absoluteHours = Math.floor(totalHours);
+        let remainder = totalHours - absoluteHours;
+        let absoluteMinutes = remainder < 0.5 ? 0 : 30;
+        
+        if (absoluteHours >= 24) absoluteHours -= 24;
+        
+        const newStartTime = `${String(absoluteHours).padStart(2, '0')}:${String(absoluteMinutes).padStart(2, '0')}`;
+        handleDrop(e, newStartTime);
+    };
+
     return (
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden select-none flex flex-col h-full transition-colors duration-500">
             
@@ -536,7 +554,12 @@ export default function PlannerTimeline({
                 onPointerDown={handlePointerDown}
                 className={`flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar select-none touch-pan-y ${isDraggingMouse ? 'cursor-grabbing' : 'cursor-grab'}`}
             >
-                <div className="relative w-full" style={{ height: `${VIEW_LIMIT * hourHeight}px` }}>
+                <div 
+                    className="relative w-full" 
+                    style={{ height: `${VIEW_LIMIT * hourHeight}px` }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={handleTimelineDrop}
+                >
                     
                     {/* Grid Lines & Time Slots */}
                     {timeSlots.map((time, i) => (
@@ -555,11 +578,6 @@ export default function PlannerTimeline({
                                     }
                                     onOpenTaskModal(time);
                                 }}
-                                onDragOver={(e) => {
-                                    e.preventDefault();
-                                    e.dataTransfer.dropEffect = 'copy';
-                                }}
-                                onDrop={(e) => handleDrop(e, time)}
                                 className="flex-1 relative group/slot cursor-pointer hover:bg-indigo-50/15 dark:hover:bg-indigo-500/10 transition-all"
                             >
                                 <div className="absolute inset-x-2 top-0.5 bottom-0.5 rounded-xl border border-transparent group-hover/slot:border-indigo-200/60 dark:group-hover/slot:border-indigo-500/30 flex items-center justify-center transition-all">
