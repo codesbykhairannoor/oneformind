@@ -1,7 +1,7 @@
 'use client';
 
 import PlannerTaskModal from './PlannerTaskModal';
-import PlannerBatchModal, { BatchTaskRow } from './PlannerBatchModal';
+import PlannerBatchModal, { BatchTaskRow, GlobalPlannerDefaults } from './PlannerBatchModal';
 import ModalPortal from '@/components/ModalPortal';
 import { TaskItem } from '../types';
 import { AlertTriangle, Trash2 } from 'lucide-react';
@@ -12,7 +12,9 @@ interface PlannerModalsContainerProps {
     setShowTaskModal: (show: boolean) => void;
     showBatchModal?: boolean;
     setShowBatchModal?: (show: boolean) => void;
-    submitBatchTasks?: (rows: BatchTaskRow[]) => Promise<void> | void;
+    submitBatchTasks?: (rows: BatchTaskRow[], defaults: GlobalPlannerDefaults) => Promise<void> | void;
+    onSwitchToBatch?: () => void;
+    onSwitchToSingle?: () => void;
     editingTaskId: number | null;
     selectedDate: string;
     tasks: TaskItem[];
@@ -39,6 +41,8 @@ export default function PlannerModalsContainer({
     showBatchModal,
     setShowBatchModal,
     submitBatchTasks,
+    onSwitchToBatch,
+    onSwitchToSingle,
     editingTaskId,
     selectedDate,
     tasks,
@@ -87,6 +91,7 @@ export default function PlannerModalsContainer({
                 setTaskNotes={setTaskNotes}
                 onSave={submitSingleTask}
                 onDelete={deleteTask}
+                onSwitchToBatch={onSwitchToBatch}
             />
 
             {/* MODAL: BATCH TASK CREATION (ARCHITECT FEATURE) */}
@@ -97,6 +102,7 @@ export default function PlannerModalsContainer({
                     selectedDate={selectedDate}
                     onClose={() => setShowBatchModal(false)}
                     onSubmit={submitBatchTasks}
+                    onSwitchToSingle={onSwitchToSingle}
                 />
             )}
 

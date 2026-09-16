@@ -25,6 +25,7 @@ interface PlannerTaskModalProps {
     setTaskNotes: (val: string) => void;
     onSave: (e: React.FormEvent) => void;
     onDelete: () => void;
+    onSwitchToBatch?: () => void;
 }
 
 export default function PlannerTaskModal({
@@ -45,6 +46,7 @@ export default function PlannerTaskModal({
     setTaskNotes,
     onSave,
     onDelete,
+    onSwitchToBatch,
 }: PlannerTaskModalProps) {
     const t = useTranslations();
     const locale = useLocale();
@@ -105,9 +107,20 @@ export default function PlannerTaskModal({
                             <h3 className="font-black text-slate-800 dark:text-white text-lg tracking-tight">
                                 {editingTaskId ? (isIndo ? 'Edit Jadwal' : 'Edit Task') : (isIndo ? 'Tambah Jadwal Baru' : 'New Task')}
                             </h3>
-                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-0.5">
-                                {new Date(selectedDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                            </p>
+                            {!editingTaskId && onSwitchToBatch && (
+                                <button 
+                                    onClick={onSwitchToBatch} 
+                                    type="button" 
+                                    className="text-[10px] font-bold tracking-tight px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition duration-300 flex items-center gap-1.5 active:scale-95 w-fit border border-indigo-100 dark:border-indigo-500/20 mt-1.5"
+                                >
+                                    <span>⚡</span> {isIndo ? 'Mode Kolektif' : 'Batch Mode'}
+                                </button>
+                            )}
+                            {editingTaskId && (
+                                <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-0.5">
+                                    {new Date(selectedDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                                </p>
+                            )}
                         </div>
                         <button 
                             onClick={onClose} 

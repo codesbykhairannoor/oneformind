@@ -473,7 +473,7 @@ export function useHabitActions({
     };
 
     // Submit Batch Habits
-    const submitBatchHabits = async (batchRows: Array<{ name: string; icon: string; color: string; target: number; timeOfDay: any }>, onSuccess?: () => void) => {
+    const submitBatchHabits = async (batchRows: any[], defaults: any, onSuccess?: () => void) => {
         const validRows = batchRows.filter(r => r.name.trim().length > 0);
         if (validRows.length === 0 || isSubmitting) return;
 
@@ -482,14 +482,22 @@ export function useHabitActions({
             const tempHabits: HabitItem[] = [];
             const createPromises = validRows.map(async (row, idx) => {
                 const tempId = Date.now() + idx;
+                
+                const hType = row.habitTypeOverride || defaults.habitType || 'positive';
+                const mType = row.measurementTypeOverride || defaults.measurementType || 'boolean';
+                const pInt = row.plannerIntegrationOverride !== undefined ? row.plannerIntegrationOverride : (defaults.plannerIntegration || false);
+                const isBoolean = mType === 'boolean';
+                const mTarget = row.target || defaults.target || daysInCurrentMonth;
+
                 const metadata = {
-                    habitType: 'positive',
-                    measurementType: 'boolean',
-                    unit: 'x',
-                    targetValue: 1,
+                    habitType: hType,
+                    measurementType: mType,
+                    unit: isBoolean ? 'x' : 'ml',
+                    targetValue: isBoolean ? 1 : 10,
                     frequencyType: 'daily',
                     frequencyDays: [0, 1, 2, 3, 4, 5, 6],
-                    timeOfDay: row.timeOfDay || 'morning'
+                    timeOfDay: row.timeOfDay || 'morning',
+                    syncedTabs: pInt ? ['planner'] : []
                 };
                 const statusPayload = JSON.stringify(metadata);
 
@@ -501,7 +509,7 @@ export function useHabitActions({
                         icon: row.icon || '🎯',
                         color: row.color || '#6366f1',
                         period: currentMonthKey,
-                        monthlyTarget: row.target || daysInCurrentMonth,
+                        monthlyTarget: mTarget,
                         status: statusPayload
                     })
                 });

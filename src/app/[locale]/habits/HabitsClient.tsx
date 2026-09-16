@@ -196,7 +196,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     showHint={period.showHint}
                     setShowHint={period.setShowHint}
                     openCreateModal={form.openCreateModal}
-                    openBatchModal={handleOpenBatchModal}
                     openExportModal={() => setIsExportOpen(true)}
                 />
 
@@ -276,10 +275,22 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     setShowCreateModal={form.setShowCreateModal}
                     showBatchModal={showBatchModal}
                     setShowBatchModal={setShowBatchModal}
+                    onSwitchToBatch={() => {
+                        if (!isArchitect) {
+                            router.push('/billing');
+                            return;
+                        }
+                        form.setShowCreateModal(false);
+                        setShowBatchModal(true);
+                    }}
+                    onSwitchToSingle={() => {
+                        setShowBatchModal(false);
+                        form.setShowCreateModal(true);
+                    }}
                     batchRows={batchRows}
                     setBatchRows={setBatchRows}
-                    onSubmitBatchHabits={() => {
-                        actions.submitBatchHabits(batchRows, () => {
+                    onSubmitBatchHabits={(defaults) => {
+                        actions.submitBatchHabits(batchRows, defaults, () => {
                             setShowBatchModal(false);
                         });
                     }}

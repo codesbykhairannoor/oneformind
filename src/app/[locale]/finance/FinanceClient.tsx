@@ -576,13 +576,6 @@ export default function FinanceClient({
                     selectedMonthKey={selectedMonthKey}
                     onMonthChange={changeMonth}
                     onOpenTrxModal={() => { setEditingTransaction(null); setShowTrxModal(true); }}
-                    onOpenBatchModal={() => {
-                        if (!isArchitect) {
-                            router.push('/billing');
-                            return;
-                        }
-                        setShowBatchModal(true);
-                    }}
                     activeCurrency={activeCurrency}
                     onCurrencyChange={handleCurrencyChange}
                     transactions={transactions}
@@ -991,7 +984,14 @@ export default function FinanceClient({
                 transactions={transactions}
                 budgets={budgets}
                 onSaveSingleTrx={handleSaveSingleTrx}
-                onSwitchToBatch={() => { setShowTrxModal(false); setShowBatchModal(true); }}
+                onSwitchToBatch={() => { 
+                    if (!isArchitect) {
+                        router.push('/billing');
+                        return;
+                    }
+                    setShowTrxModal(false); 
+                    setShowBatchModal(true); 
+                }}
                 showBatchModal={showBatchModal}
                 setShowBatchModal={setShowBatchModal}
                 onSaveBatchTrx={handleSaveBatchTrx}

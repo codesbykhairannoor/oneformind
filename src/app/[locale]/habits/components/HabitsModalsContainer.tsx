@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { HabitItem, LifeOSTab } from '../types';
 import HabitFormModal from './HabitFormModal';
 import HabitDeleteModal from './HabitDeleteModal';
-import HabitBatchModal, { BatchRow } from './HabitBatchModal';
+import HabitBatchModal, { BatchRow, GlobalHabitDefaults } from './HabitBatchModal';
 
 const HabitDetailModal = dynamic(() => import('./HabitDetailModal'), { ssr: false });
 const HabitNoteModal = dynamic(() => import('./HabitNoteModal'), { ssr: false });
@@ -21,7 +21,9 @@ interface HabitsModalsContainerProps {
     setShowBatchModal?: (v: boolean) => void;
     batchRows?: BatchRow[];
     setBatchRows?: React.Dispatch<React.SetStateAction<BatchRow[]>>;
-    onSubmitBatchHabits?: () => void;
+    onSubmitBatchHabits?: (defaults: GlobalHabitDefaults) => void;
+    onSwitchToBatch?: () => void;
+    onSwitchToSingle?: () => void;
     editingHabitId: number | null;
     showDeleteModal: boolean;
     setShowDeleteModal: (v: boolean) => void;
@@ -100,6 +102,8 @@ export default function HabitsModalsContainer({
     batchRows,
     setBatchRows,
     onSubmitBatchHabits,
+    onSwitchToBatch,
+    onSwitchToSingle,
     editingHabitId,
     showDeleteModal,
     setShowDeleteModal,
@@ -251,6 +255,7 @@ export default function HabitsModalsContainer({
                     }
                 }}
                 onSubmit={onSubmitSingleHabit}
+                onSwitchToBatch={onSwitchToBatch}
             />
 
             {/* MODAL: DELETE CONFIRMATION */}
@@ -274,6 +279,7 @@ export default function HabitsModalsContainer({
                     setBatchRows={setBatchRows}
                     onClose={() => setShowBatchModal(false)}
                     onSubmit={onSubmitBatchHabits}
+                    onSwitchToSingle={onSwitchToSingle}
                 />
             )}
         </>

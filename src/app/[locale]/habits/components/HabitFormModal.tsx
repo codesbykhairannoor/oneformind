@@ -66,6 +66,7 @@ interface HabitFormModalProps {
     onClose: () => void;
     onDelete: () => void;
     onSubmit: (e: React.FormEvent) => void;
+    onSwitchToBatch?: () => void;
 }
 
 export default function HabitFormModal({
@@ -126,7 +127,8 @@ export default function HabitFormModal({
     isSubmitting = false,
     onClose,
     onDelete,
-    onSubmit
+    onSubmit,
+    onSwitchToBatch
 }: HabitFormModalProps) {
     if (!isOpen) return null;
 
@@ -150,9 +152,20 @@ export default function HabitFormModal({
                                 <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 leading-tight">
                                     {editingHabitId ? (isIndo ? 'Edit Habit' : 'Edit Habit') : (isIndo ? 'Tambah Habit Baru' : 'Create New Habit')}
                                 </h3>
-                                <p className="text-[10px] font-bold text-slate-400">
-                                    {isIndo ? 'Atur target harian dan komitmen bulanan Anda' : 'Set your daily target and monthly commitment'}
-                                </p>
+                                {!editingHabitId && onSwitchToBatch && (
+                                    <button 
+                                        onClick={onSwitchToBatch} 
+                                        type="button" 
+                                        className="text-[10px] font-bold tracking-tight px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition duration-300 flex items-center gap-1.5 active:scale-95 w-fit border border-indigo-100 dark:border-indigo-500/20 mt-1"
+                                    >
+                                        <span>⚡</span> {isIndo ? 'Mode Kolektif' : 'Batch Mode'}
+                                    </button>
+                                )}
+                                {editingHabitId && (
+                                    <p className="text-[10px] font-bold text-slate-400 mt-1">
+                                        {isIndo ? 'Atur target harian dan komitmen bulanan Anda' : 'Set your daily target and monthly commitment'}
+                                    </p>
+                                )}
                             </div>
                         </div>
 

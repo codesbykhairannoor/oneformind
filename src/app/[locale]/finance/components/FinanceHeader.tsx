@@ -34,7 +34,6 @@ interface FinanceHeaderProps {
     onMonthChange: (val: number | string) => void;
     onOpenTrxModal: () => void;
     onOpenBudgetModal?: () => void;
-    onOpenBatchModal?: () => void;
     activeCurrency: string;
     onCurrencyChange: (code: string) => void;
     transactions?: any[];
@@ -44,7 +43,6 @@ export default function FinanceHeader({
     selectedMonthKey,
     onMonthChange,
     onOpenTrxModal,
-    onOpenBatchModal,
     activeCurrency,
     onCurrencyChange,
     transactions = []
@@ -271,18 +269,6 @@ export default function FinanceHeader({
                             currentData={transactions}
                         />
                     </div>
-
-                    {onOpenBatchModal && (
-                        <button 
-                            onClick={onOpenBatchModal}
-                            title={isIndo ? 'Batch Transaction Entry (Power Tool Architect)' : 'Batch Transaction Entry (Power Tool Architect)'}
-                            className="flex items-center justify-center h-11 px-3 md:px-4 transition bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 rounded-xl hover:bg-indigo-100 gap-1.5 active:scale-95 whitespace-nowrap text-xs font-black shrink-0"
-                        >
-                            <span className="text-amber-500 font-bold">⚡</span>
-                            <span className="hidden sm:inline">{isIndo ? 'Batch Transaksi' : 'Batch Entry'}</span>
-                            <span className="text-[8px] font-black uppercase px-1 py-0.2 bg-indigo-600 text-white rounded-md">Pro</span>
-                        </button>
-                    )}
 
                     <button 
                         onClick={onOpenTrxModal}

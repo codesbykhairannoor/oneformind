@@ -327,7 +327,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
     };
 
     // Submit Batch Tasks
-    const submitBatchTasks = async (batchRows: Array<{ title: string; startTime: string; endTime: string; type: number; notes: string }>) => {
+    const submitBatchTasks = async (batchRows: any[], defaults: any) => {
         const validRows = batchRows.filter(r => r.title.trim().length > 0);
         if (validRows.length === 0) return;
 
@@ -337,13 +337,14 @@ export function usePlannerTaskCrud(selectedDate: string) {
         try {
             for (const row of validRows) {
                 const tempId = Date.now() + Math.floor(Math.random() * 1000);
+                const effectiveType = row.typeOverride !== undefined ? row.typeOverride : (defaults?.type || 2);
                 const newTask: TaskItem = {
                     id: tempId,
                     date: cleanDate,
                     title: row.title,
                     start_time: row.startTime,
                     end_time: row.endTime,
-                    type: row.type || 2,
+                    type: effectiveType,
                     notes: row.notes || '',
                     completed: false
                 };
@@ -353,6 +354,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
             updateTasksState(prev => [...prev, ...createdItems]);
 
             for (const row of validRows) {
+                const effectiveType = row.typeOverride !== undefined ? row.typeOverride : (defaults?.type || 2);
                 await fetch('/api/planner/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -361,7 +363,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
                         title: row.title,
                         startTime: row.startTime,
                         endTime: row.endTime,
-                        type: row.type || 2,
+                        type: effectiveType,
                         notes: row.notes || ''
                     })
                 });

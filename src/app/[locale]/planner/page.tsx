@@ -28,12 +28,18 @@ export default function PlannerPage() {
     const [isExportOpen, setIsExportOpen] = useState(false);
     const [showBatchModal, setShowBatchModal] = useState(false);
 
-    const handleOpenBatchModal = () => {
+    const handleSwitchToBatch = () => {
         if (!isArchitect) {
             router.push('/billing');
             return;
         }
+        planner.setShowTaskModal(false);
         setShowBatchModal(true);
+    };
+
+    const handleSwitchToSingle = () => {
+        setShowBatchModal(false);
+        planner.setShowTaskModal(true);
     };
 
     // Global keyboard shortcuts (T: today, N: new task, ArrowLeft/Right: date navigation)
@@ -252,6 +258,8 @@ export default function PlannerPage() {
                     setShowTaskModal={planner.setShowTaskModal}
                     showBatchModal={showBatchModal}
                     setShowBatchModal={setShowBatchModal}
+                    onSwitchToBatch={handleSwitchToBatch}
+                    onSwitchToSingle={handleSwitchToSingle}
                     submitBatchTasks={planner.submitBatchTasks}
                     editingTaskId={planner.editingTaskId}
                     selectedDate={planner.selectedDate}

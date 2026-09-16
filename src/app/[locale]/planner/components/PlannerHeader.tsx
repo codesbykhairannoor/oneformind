@@ -12,7 +12,6 @@ interface PlannerHeaderProps {
     tasks: any[];
     stats: { percent: number; completed: number; pending: number };
     onOpenTaskModal: () => void;
-    onOpenBatchModal?: () => void;
     onResetBoard: () => void;
     onOpenExportModal?: () => void;
 }
@@ -23,7 +22,6 @@ export default function PlannerHeader({
     tasks,
     stats,
     onOpenTaskModal,
-    onOpenBatchModal,
     onResetBoard,
     onOpenExportModal
 }: PlannerHeaderProps) {
@@ -155,17 +153,6 @@ export default function PlannerHeader({
                             >
                                 <Download size={15} className="text-indigo-600 dark:text-indigo-400" />
                                 <span>{isIndo ? 'Ekspor' : 'Export'}</span>
-                            </button>
-                        )}
-                        {onOpenBatchModal && (
-                            <button 
-                                onClick={onOpenBatchModal} 
-                                title={isIndo ? 'Batch Task Entry (Power Tool Architect)' : 'Batch Task Entry (Power Tool Architect)'} 
-                                className="px-3.5 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 rounded-2xl font-black hover:bg-indigo-100 transition flex items-center justify-center gap-1.5 text-xs active:scale-95"
-                            >
-                                <span className="text-amber-500 font-bold">⚡</span>
-                                <span>{isIndo ? 'Batch Tugas' : 'Batch Tasks'}</span>
-                                <span className="text-[8px] font-black uppercase px-1 py-0.2 bg-indigo-600 text-white rounded-md">Pro</span>
                             </button>
                         )}
                         <button onClick={onOpenTaskModal} className="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 text-xs active:scale-95">
