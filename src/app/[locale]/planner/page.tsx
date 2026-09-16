@@ -106,7 +106,6 @@ export default function PlannerPage() {
                         pending: planner.pendingCount 
                     }}
                     onOpenTaskModal={() => planner.openNewTaskModal()}
-                    onOpenBatchModal={handleOpenBatchModal}
                     onResetBoard={planner.requestResetBoard}
                     onOpenExportModal={() => setIsExportOpen(true)}
                 />

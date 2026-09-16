@@ -25,6 +25,7 @@ interface PlannerBatchModalProps {
     selectedDate: string;
     onClose: () => void;
     onSubmit: (rows: BatchTaskRow[], defaults: GlobalPlannerDefaults) => Promise<void> | void;
+    onSwitchToSingle?: () => void;
 }
 
 export default function PlannerBatchModal({

@@ -34,6 +34,7 @@ interface HabitBatchModalProps {
     setBatchRows: React.Dispatch<React.SetStateAction<BatchRow[]>>;
     onClose: () => void;
     onSubmit: (defaults: GlobalHabitDefaults) => void;
+    onSwitchToSingle?: () => void;
 }
 
 export default function HabitBatchModal({
@@ -45,7 +46,8 @@ export default function HabitBatchModal({
     batchRows,
     setBatchRows,
     onClose,
-    onSubmit
+    onSubmit,
+    onSwitchToSingle
 }: HabitBatchModalProps) {
     const [openBatchIconDropdown, setOpenBatchIconDropdown] = useState<number | null>(null);
     const [openSettingsRow, setOpenSettingsRow] = useState<number | null>(null);
