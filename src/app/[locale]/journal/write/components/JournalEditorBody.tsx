@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { 
     Camera, Trash2, Sparkles, LayoutTemplate, Zap, ShieldCheck, 
     Tag, HelpCircle, Lightbulb, AlertTriangle, CheckCircle2, ChevronRight, X,
-    CalendarCheck2
+    CalendarCheck2, Eye, Pencil
 } from 'lucide-react';
 import { JOURNAL_TEMPLATES, JournalTemplate } from '../../lib/journalTemplates';
 import { analyzeJournalCognitive } from '../../lib/journalAi';
@@ -66,6 +66,41 @@ export default function JournalEditorBody({
 
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [customTagInput, setCustomTagInput] = useState('');
+    const [previewMode, setPreviewMode] = useState(false);
+
+    // Lightweight markdown → HTML renderer (no external lib)
+    const renderMarkdown = (md: string): string => {
+        if (!md) return '';
+        let html = md
+            // Escape HTML
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            // Headings
+            .replace(/^### (.+)$/gm, '<h3 class="md-h3">$1</h3>')
+            .replace(/^## (.+)$/gm, '<h2 class="md-h2">$1</h2>')
+            .replace(/^# (.+)$/gm, '<h1 class="md-h1">$1</h1>')
+            // Bold + italic
+            .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            // Blockquote
+            .replace(/^&gt; (.+)$/gm, '<blockquote class="md-bq">$1</blockquote>')
+            // Horizontal rule
+            .replace(/^---$/gm, '<hr class="md-hr" />')
+            // Checklist items
+            .replace(/^- \[x\] (.+)$/gm, '<div class="md-check done"><span class="md-cb">✅</span><span>$1</span></div>')
+            .replace(/^- \[ \] (.+)$/gm, '<div class="md-check"><span class="md-cb">⬜</span><span>$1</span></div>')
+            // List items
+            .replace(/^  - (.+)$/gm, '<div class="md-subli">↳ $1</div>')
+            .replace(/^- (.+)$/gm, '<div class="md-li">• $1</div>')
+            // Numbered list
+            .replace(/^(\d+)\. (.+)$/gm, '<div class="md-oli"><span class="md-num">$1.</span><span>$2</span></div>')
+            // Paragraphs (blank lines → break)
+            .replace(/\n\n/g, '</p><p class="md-p">')
+            .replace(/\n/g, '<br />');
+        return `<p class="md-p">${html}</p>`;
+    };
+
+    const renderedHtml = useMemo(() => renderMarkdown(content), [content]);
 
     // Suggested popular tags
     const quickTags = [
@@ -310,27 +345,67 @@ export default function JournalEditorBody({
                     )}
                 </div>
 
+                {/* Write / Preview Toggle */}
+                <div className="flex items-center justify-end mb-4 gap-2">
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                        <button
+                            type="button"
+                            onClick={() => setPreviewMode(false)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black transition-all ${
+                                !previewMode
+                                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                            }`}
+                        >
+                            <Pencil size={11} />
+                            <span>{isIndo ? 'Tulis' : 'Write'}</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setPreviewMode(true)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black transition-all ${
+                                previewMode
+                                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                            }`}
+                        >
+                            <Eye size={11} />
+                            <span>{isIndo ? 'Preview' : 'Preview'}</span>
+                        </button>
+                    </div>
+                </div>
+
                 {/* Textarea Canvas with Privacy Camouflage */}
                 <div className="relative min-h-[360px] mb-6">
-                    <textarea
-                        ref={textareaRef}
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder={isIndo 
-                            ? 'Tuliskan alur pikiranmu di sini, pilih template di atas, atau ketik bebas...' 
-                            : 'Write your stream of consciousness, select a template above, or express freely...'}
-                        style={{
-                            fontFamily: selectedFont,
-                            fontSize: selectedFontSize,
-                            fontWeight: isBold ? 'bold' : 'normal',
-                            fontStyle: isItalic ? 'italic' : 'normal'
-                        }}
-                        className={`w-full min-h-[380px] p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-950/70 border border-slate-200/70 dark:border-slate-800 text-slate-800 dark:text-slate-100 leading-relaxed focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 focus:outline-none transition-all resize-y ${
-                            isPrivacyBlur 
-                                ? 'filter blur-[5px] select-none hover:blur-none transition-all duration-300' 
-                                : ''
-                        }`}
-                    />
+                    {previewMode ? (
+                        <div
+                            className={`w-full min-h-[380px] p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-950/70 border border-slate-200/70 dark:border-slate-800 text-slate-800 dark:text-slate-100 leading-relaxed overflow-y-auto journal-preview ${
+                                isPrivacyBlur ? 'filter blur-[5px] hover:blur-none transition-all duration-300' : ''
+                            }`}
+                            style={{ fontFamily: selectedFont, fontSize: selectedFontSize }}
+                            dangerouslySetInnerHTML={{ __html: renderedHtml || `<p class="md-empty">${isIndo ? 'Belum ada isi tulisan...' : 'Nothing written yet...'}</p>` }}
+                        />
+                    ) : (
+                        <textarea
+                            ref={textareaRef}
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            placeholder={isIndo 
+                                ? 'Tuliskan alur pikiranmu di sini, pilih template di atas, atau ketik bebas...' 
+                                : 'Write your stream of consciousness, select a template above, or express freely...'}
+                            style={{
+                                fontFamily: selectedFont,
+                                fontSize: selectedFontSize,
+                                fontWeight: isBold ? 'bold' : 'normal',
+                                fontStyle: isItalic ? 'italic' : 'normal'
+                            }}
+                            className={`w-full min-h-[380px] p-6 rounded-3xl bg-slate-50/70 dark:bg-slate-950/70 border border-slate-200/70 dark:border-slate-800 text-slate-800 dark:text-slate-100 leading-relaxed focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 focus:outline-none transition-all resize-y ${
+                                isPrivacyBlur 
+                                    ? 'filter blur-[5px] select-none hover:blur-none transition-all duration-300' 
+                                    : ''
+                            }`}
+                        />
+                    )}
                 </div>
 
                 {/* 3. TAGS MANAGER & QUICK CHIPS */}

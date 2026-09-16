@@ -413,19 +413,35 @@ What actually happened during the scheduled habit window over the last few days?
     const handleInsertLifeOSBrief = async () => {
         setIsInsertingBrief(true);
         try {
-            const dashRes = await fetch('/api/dashboard');
             let tasksCompleted = 0;
             let tasksTotal = 0;
             let habitsCompleted = 0;
             let expenseTotal = 0;
 
-            if (dashRes.ok) {
-                const dashData = await dashRes.json();
-                tasksCompleted = dashData.planner?.completed || 0;
-                tasksTotal = dashData.planner?.total || 0;
-                habitsCompleted = dashData.habits?.completed || 0;
-                expenseTotal = dashData.finance?.expense || 0;
-            }
+            // Try fetching individual APIs that exist (graceful fallback if any fail)
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const [tasksRes, habitsRes] = await Promise.all([
+                    isPlannerActive ? fetch(`/api/planner/tasks?date=${today}`, { cache: 'no-store' }).catch(() => null) : Promise.resolve(null),
+                    isHabitActive ? fetch('/api/habits', { cache: 'no-store' }).catch(() => null) : Promise.resolve(null),
+                ]);
+                if (tasksRes?.ok) {
+                    const tasks = await tasksRes.json().catch(() => []);
+                    const arr = Array.isArray(tasks) ? tasks : [];
+                    tasksTotal = arr.length;
+                    tasksCompleted = arr.filter((t: any) => t.isCompleted).length;
+                }
+                if (habitsRes?.ok) {
+                    const habits = await habitsRes.json().catch(() => []);
+                    const today2 = new Date().toISOString().split('T')[0];
+                    habitsCompleted = (Array.isArray(habits) ? habits : []).filter((h: any) =>
+                        (h.logs || []).some((l: any) => {
+                            const lDate = l.date ? l.date.split('T')[0] : '';
+                            return lDate === today2 && (l.status === 'completed' || l.completed || l.value === 1);
+                        })
+                    ).length;
+                }
+            } catch {}
 
             const formattedExpense = isIndo 
                 ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(expenseTotal)
@@ -481,8 +497,9 @@ What actually happened during the scheduled habit window over the last few days?
         setIsSaving(true);
 
         try {
+            let res: Response;
             if (journalId) {
-                await fetch(`/api/journals/${journalId}`, {
+                res = await fetch(`/api/journals/${journalId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -495,7 +512,7 @@ What actually happened during the scheduled habit window over the last few days?
                     })
                 });
             } else {
-                await fetch('/api/journals', {
+                res = await fetch('/api/journals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -508,19 +525,34 @@ What actually happened during the scheduled habit window over the last few days?
                         aiSentiment: ''
                     })
                 });
-                // Clear local draft upon successful save
-                try {
-                    localStorage.removeItem('tranvas_journal_draft');
-                } catch (e) {}
             }
+
+            if (!res.ok) {
+                const errText = await res.text().catch(() => '');
+                console.error('Save failed:', res.status, errText);
+                alert(isIndo
+                    ? `Gagal menyimpan jurnal (${res.status}). Coba lagi atau periksa koneksimu.`
+                    : `Failed to save journal (${res.status}). Please try again or check your connection.`
+                );
+                setIsSaving(false);
+                return;
+            }
+
+            // Clear local draft upon successful save
+            try { localStorage.removeItem('tranvas_journal_draft'); } catch (e) {}
+
+            setTimeout(() => {
+                setIsSaving(false);
+                router.push('/journal');
+            }, 300);
         } catch (error) {
             console.error('Failed to save journal:', error);
-        }
-
-        setTimeout(() => {
+            alert(isIndo
+                ? 'Terjadi kesalahan jaringan. Jurnal tidak tersimpan. Coba lagi.'
+                : 'Network error. Journal not saved. Please try again.'
+            );
             setIsSaving(false);
-            router.push('/journal');
-        }, 500);
+        }
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
