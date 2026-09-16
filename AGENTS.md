@@ -17,6 +17,7 @@ When deploying code to Coolify or debugging a failed deployment:
 
 ## Git Workflow
 - **Always Commit & Push to GitHub:** Setiap kali selesai melakukan perbaikan, penambahan fitur, atau modifikasi file pada kode, WAJIB langsung lakukan commit dengan pesan yang deskriptif dan push ke remote repository (`git push origin main`).
+- **CRITICAL INVARIANT:** Agent TIDAK BOLEH mengakhiri percakapan/turn setelah melakukan perubahan kode sebelum menjalankan `git add .`, `git commit -m "..."`, dan `git push origin main`. Verifikasi selalu dengan `git status` sebelum membalas user.
 
 ## Core Product Focus Rule
 - **No Free Tier / Tab Limit Discussions:** Seluruh 8 modul/tab utama (Planner, Habits, Finance, Journal, Goals, Jobs, Study, Calendar) terbuka penuh secara default. JANGAN PERNAH membahas lagi skema "Free Tier" atau "3-Tab limit".
