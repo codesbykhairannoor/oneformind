@@ -99,23 +99,31 @@ export default function PlannerTimeline({
     const [isMobile, setIsMobile] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    // Desktop / Laptop Mouse Drag-to-Scroll (Panning)
+    // Desktop / Laptop Pointer Drag-to-Scroll (Panning)
     const [isDraggingMouse, setIsDraggingMouse] = useState(false);
     const startYRef = useRef(0);
     const scrollTopRef = useRef(0);
     const hasDraggedRef = useRef(false);
 
-    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.button !== 0) return;
+    const isInteractiveElement = (el: HTMLElement | null): boolean => {
+        if (!el) return false;
+        return !!(
+            el.closest('button') ||
+            el.closest('input') ||
+            el.closest('a') ||
+            el.closest('[draggable="true"]') ||
+            el.closest('[data-timeline-card="true"]')
+        );
+    };
+
+    const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (e.button !== 0 && e.pointerType === 'mouse') return;
         const target = e.target as HTMLElement;
-        if (
-            target.closest('button') || 
-            target.closest('input') || 
-            target.closest('[draggable="true"]') ||
-            target.closest('.group\\/task') ||
-            target.closest('.group.absolute')
-        ) {
-            return;
+        if (isInteractiveElement(target)) return;
+
+        // Prevent native text selection or ghost dragging
+        if (e.cancelable && e.pointerType === 'mouse') {
+            e.preventDefault();
         }
 
         setIsDraggingMouse(true);
@@ -127,25 +135,30 @@ export default function PlannerTimeline({
     useEffect(() => {
         if (!isDraggingMouse) return;
 
-        const handleWindowMouseMove = (e: MouseEvent) => {
+        const handleWindowPointerMove = (e: PointerEvent) => {
             if (!scrollContainerRef.current) return;
             const dy = e.clientY - startYRef.current;
-            if (Math.abs(dy) > 4) {
+            if (Math.abs(dy) > 3) {
                 hasDraggedRef.current = true;
             }
             scrollContainerRef.current.scrollTop = scrollTopRef.current - dy;
         };
 
-        const handleWindowMouseUp = () => {
+        const handleWindowPointerUp = () => {
             setIsDraggingMouse(false);
+            setTimeout(() => {
+                hasDraggedRef.current = false;
+            }, 80);
         };
 
-        window.addEventListener('mousemove', handleWindowMouseMove);
-        window.addEventListener('mouseup', handleWindowMouseUp);
+        window.addEventListener('pointermove', handleWindowPointerMove);
+        window.addEventListener('pointerup', handleWindowPointerUp);
+        window.addEventListener('pointercancel', handleWindowPointerUp);
 
         return () => {
-            window.removeEventListener('mousemove', handleWindowMouseMove);
-            window.removeEventListener('mouseup', handleWindowMouseUp);
+            window.removeEventListener('pointermove', handleWindowPointerMove);
+            window.removeEventListener('pointerup', handleWindowPointerUp);
+            window.removeEventListener('pointercancel', handleWindowPointerUp);
         };
     }, [isDraggingMouse]);
 
@@ -520,8 +533,8 @@ export default function PlannerTimeline({
             {/* Timeline Body */}
             <div 
                 ref={scrollContainerRef} 
-                onMouseDown={handleMouseDown}
-                className={`flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar ${isDraggingMouse ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                onPointerDown={handlePointerDown}
+                className={`flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar select-none touch-pan-y ${isDraggingMouse ? 'cursor-grabbing' : 'cursor-grab'}`}
             >
                 <div className="relative w-full" style={{ height: `${VIEW_LIMIT * hourHeight}px` }}>
                     
@@ -579,6 +592,7 @@ export default function PlannerTimeline({
                         return (
                             <div 
                                 key={task.id}
+                                data-timeline-card="true"
                                 onClick={() => editTask(task)}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, task.id)}
@@ -676,6 +690,7 @@ export default function PlannerTimeline({
                         return (
                             <div
                                 key={`habit-${habit.id}`}
+                                data-timeline-card="true"
                                 onClick={() => onHabitClick ? onHabitClick(habit) : (onToggleHabit && onToggleHabit(habit.id))}
                                 className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
                                     habit.completed
@@ -743,6 +758,7 @@ export default function PlannerTimeline({
                         return (
                             <div
                                 key={`interview-${interview.id}`}
+                                data-timeline-card="true"
                                 onClick={() => onInterviewClick && onInterviewClick(interview)}
                                 className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
                                     isDone
@@ -804,6 +820,7 @@ export default function PlannerTimeline({
                         return (
                             <div
                                 key={`study-${study.id}`}
+                                data-timeline-card="true"
                                 onClick={() => onStudyClick && onStudyClick(study)}
                                 className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
                                     study.completed
