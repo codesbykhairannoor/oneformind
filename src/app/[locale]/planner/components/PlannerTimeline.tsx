@@ -99,6 +99,56 @@ export default function PlannerTimeline({
     const [isMobile, setIsMobile] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+    // Desktop / Laptop Mouse Drag-to-Scroll (Panning)
+    const [isDraggingMouse, setIsDraggingMouse] = useState(false);
+    const startYRef = useRef(0);
+    const scrollTopRef = useRef(0);
+    const hasDraggedRef = useRef(false);
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.button !== 0) return;
+        const target = e.target as HTMLElement;
+        if (
+            target.closest('button') || 
+            target.closest('input') || 
+            target.closest('[draggable="true"]') ||
+            target.closest('.group\\/task') ||
+            target.closest('.group.absolute')
+        ) {
+            return;
+        }
+
+        setIsDraggingMouse(true);
+        startYRef.current = e.clientY;
+        scrollTopRef.current = scrollContainerRef.current?.scrollTop || 0;
+        hasDraggedRef.current = false;
+    };
+
+    useEffect(() => {
+        if (!isDraggingMouse) return;
+
+        const handleWindowMouseMove = (e: MouseEvent) => {
+            if (!scrollContainerRef.current) return;
+            const dy = e.clientY - startYRef.current;
+            if (Math.abs(dy) > 4) {
+                hasDraggedRef.current = true;
+            }
+            scrollContainerRef.current.scrollTop = scrollTopRef.current - dy;
+        };
+
+        const handleWindowMouseUp = () => {
+            setIsDraggingMouse(false);
+        };
+
+        window.addEventListener('mousemove', handleWindowMouseMove);
+        window.addEventListener('mouseup', handleWindowMouseUp);
+
+        return () => {
+            window.removeEventListener('mousemove', handleWindowMouseMove);
+            window.removeEventListener('mouseup', handleWindowMouseUp);
+        };
+    }, [isDraggingMouse]);
+
     const activeTasks = tasks.filter((t: any) => normalizeDate(t.date) === normalizeDate(selectedDate));
 
     const hourHeight = density === 'compact' ? 52 : 72;
@@ -468,7 +518,11 @@ export default function PlannerTimeline({
             )}
 
             {/* Timeline Body */}
-            <div ref={scrollContainerRef} className="flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar">
+            <div 
+                ref={scrollContainerRef} 
+                onMouseDown={handleMouseDown}
+                className={`flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar ${isDraggingMouse ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+            >
                 <div className="relative w-full" style={{ height: `${VIEW_LIMIT * hourHeight}px` }}>
                     
                     {/* Grid Lines & Time Slots */}
@@ -481,7 +535,13 @@ export default function PlannerTimeline({
                                 <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono transition-colors duration-500">{time}</span>
                             </div>
                             <div 
-                                onClick={() => onOpenTaskModal(time)}
+                                onClick={() => {
+                                    if (hasDraggedRef.current) {
+                                        hasDraggedRef.current = false;
+                                        return;
+                                    }
+                                    onOpenTaskModal(time);
+                                }}
                                 onDragOver={(e) => {
                                     e.preventDefault();
                                     e.dataTransfer.dropEffect = 'copy';

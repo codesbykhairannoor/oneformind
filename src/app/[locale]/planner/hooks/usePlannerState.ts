@@ -118,24 +118,30 @@ export function usePlannerState() {
 
                 // Check for unfinished tasks from yesterday
                 if (yesterdayRes.ok) {
-                    const yData = await yesterdayRes.json();
-                    if (Array.isArray(yData)) {
-                        const unfinished = yData.filter((t: any) => !(t.isCompleted || t.completed));
-                        if (unfinished.length > 0) {
-                            setUnfinishedYesterdayTasks(unfinished.map((t: any) => ({
-                                id: t.id,
-                                date: normalizeDate(t.date),
-                                title: t.title,
-                                start_time: normalizeTime(t.startTime || t.start_time),
-                                end_time: normalizeTime(t.endTime || t.end_time),
-                                type: t.type,
-                                notes: t.notes || '',
-                                completed: false
-                            })));
-                            setShowRolloverBanner(true);
-                        } else {
-                            setUnfinishedYesterdayTasks([]);
-                            setShowRolloverBanner(false);
+                    const isHandled = typeof window !== 'undefined' && localStorage.getItem('planner_rollover_handled_' + yesterdayStr);
+                    if (isHandled) {
+                        setUnfinishedYesterdayTasks([]);
+                        setShowRolloverBanner(false);
+                    } else {
+                        const yData = await yesterdayRes.json();
+                        if (Array.isArray(yData)) {
+                            const unfinished = yData.filter((t: any) => !(t.isCompleted || t.completed));
+                            if (unfinished.length > 0) {
+                                setUnfinishedYesterdayTasks(unfinished.map((t: any) => ({
+                                    id: t.id,
+                                    date: normalizeDate(t.date),
+                                    title: t.title,
+                                    start_time: normalizeTime(t.startTime || t.start_time),
+                                    end_time: normalizeTime(t.endTime || t.end_time),
+                                    type: t.type,
+                                    notes: t.notes || '',
+                                    completed: false
+                                })));
+                                setShowRolloverBanner(true);
+                            } else {
+                                setUnfinishedYesterdayTasks([]);
+                                setShowRolloverBanner(false);
+                            }
                         }
                     }
                 }
@@ -573,6 +579,13 @@ export function usePlannerState() {
 
     // Execute rollover
     const handleAcceptRollover = async () => {
+        const [y, m, d] = selectedDate.split('-').map(Number);
+        const yesterdayObj = new Date(y, m - 1, d - 1);
+        const yesterdayStr = `${yesterdayObj.getFullYear()}-${String(yesterdayObj.getMonth() + 1).padStart(2, '0')}-${String(yesterdayObj.getDate()).padStart(2, '0')}`;
+        try {
+            localStorage.setItem('planner_rollover_handled_' + yesterdayStr, 'true');
+        } catch (e) {}
+
         setShowRolloverBanner(false);
         if (unfinishedYesterdayTasks.length > 0) {
             await taskCrud.rolloverTasks(unfinishedYesterdayTasks, selectedDate);
@@ -581,7 +594,15 @@ export function usePlannerState() {
     };
 
     const handleDismissRollover = () => {
+        const [y, m, d] = selectedDate.split('-').map(Number);
+        const yesterdayObj = new Date(y, m - 1, d - 1);
+        const yesterdayStr = `${yesterdayObj.getFullYear()}-${String(yesterdayObj.getMonth() + 1).padStart(2, '0')}-${String(yesterdayObj.getDate()).padStart(2, '0')}`;
+        try {
+            localStorage.setItem('planner_rollover_handled_' + yesterdayStr, 'true');
+        } catch (e) {}
+
         setShowRolloverBanner(false);
+        setUnfinishedYesterdayTasks([]);
     };
 
     // Handle scheduling an inbox item to timeline
