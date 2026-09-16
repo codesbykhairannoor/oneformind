@@ -55,9 +55,9 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     // Batch Entry State (Architect Gated Feature)
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [batchRows, setBatchRows] = useState<BatchRow[]>([
-        { name: isIndo ? 'Minum Air Putih 500ml' : 'Drink 500ml Water', icon: '💧', color: '#06b6d4', target: daysInCurrentMonth, timeOfDay: 'morning' },
-        { name: isIndo ? 'Meditasi Pagi 10 Menit' : 'Morning Meditation 10m', icon: '🧘', color: '#6366f1', target: daysInCurrentMonth, timeOfDay: 'morning' },
-        { name: isIndo ? 'Olahraga Pagi 20 Menit' : 'Morning Workout 20m', icon: '🏃', color: '#10b981', target: daysInCurrentMonth, timeOfDay: 'morning' }
+        { name: '', icon: '💧', color: '#06b6d4', timeOfDay: 'morning', freqDays: [], plannerStartTime: '07:00', plannerEndTime: '07:30' },
+        { name: '', icon: '🧘', color: '#6366f1', timeOfDay: 'morning', freqDays: [], plannerStartTime: '07:30', plannerEndTime: '08:00' },
+        { name: '', icon: '🏃', color: '#10b981', timeOfDay: 'morning', freqDays: [], plannerStartTime: '08:00', plannerEndTime: '08:30' },
     ]);
 
     const handleOpenBatchModal = () => {
