@@ -3584,6 +3584,8 @@
   "payment_pending_title": "Payment Pending",
   "payment_quantum_praise": "Your potential is now officially expanded.",
   "payment_success_title": "Access Granted!",
+  "payment_verifying_msg": "Connecting to payment gateway and confirming your transaction status...",
+  "payment_verifying_title": "Verifying Payment Status...",
   "payment_welcome_msg": "Welcome to the elite ecosystem,",
   "per_day": "/ day",
   "ph_event_desc": "Write event details here...",
