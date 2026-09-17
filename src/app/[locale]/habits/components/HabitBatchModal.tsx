@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import ModalPortal from '@/components/ModalPortal';
-import { X, Plus, Trash2, Check, Settings2, Target, CalendarDays, Sparkles, Activity, Clock, Hash, Zap, Layers, RefreshCw } from 'lucide-react';
+import { X, Plus, Trash2, Check, Settings2, Target, CalendarDays, Sparkles, Activity, Clock, Hash, Layers } from 'lucide-react';
 import { BatchRow, GlobalHabitDefaults } from '../types';
 
 export { type BatchRow, type GlobalHabitDefaults };
@@ -59,48 +59,6 @@ export default function HabitBatchModal({
     });
 
     if (!isOpen) return null;
-
-    // Preset template packs
-    const presetPacks = [
-        {
-            id: 'wellness',
-            titleId: '🧘 Kesehatan & Kebugaran',
-            titleEn: '🧘 Health & Wellness',
-            color: '#10b981',
-            rows: [
-                { name: isIndo ? 'Minum Air Putih' : 'Drink Water', icon: '💧', color: '#06b6d4', timeOfDay: 'morning' as const, freqDays: [], plannerStartTime: '07:00', plannerEndTime: '07:15', measurementTypeOverride: 'numeric' as const, dailyTargetValue: 2000, unit: 'ml' },
-                { name: isIndo ? 'Jogging / Jalan Pagi' : 'Morning Jog / Walk', icon: '🏃', color: '#10b981', timeOfDay: 'morning' as const, freqDays: [1, 2, 3, 4, 5, 6], plannerStartTime: '06:30', plannerEndTime: '07:00', measurementTypeOverride: 'numeric' as const, dailyTargetValue: 30, unit: 'menit' },
-                { name: isIndo ? 'Meditasi & Pernapasan' : 'Mindfulness Meditation', icon: '🧘', color: '#8b5cf6', timeOfDay: 'morning' as const, freqDays: [], plannerStartTime: '07:15', plannerEndTime: '07:30', measurementTypeOverride: 'boolean' as const, dailyTargetValue: 1, unit: 'x' },
-                { name: isIndo ? 'Tidur Berkualitas 8 Jam' : 'Sleep 8 Hours', icon: '💤', color: '#6366f1', timeOfDay: 'evening' as const, freqDays: [], plannerStartTime: '22:00', plannerEndTime: '22:30', measurementTypeOverride: 'numeric' as const, dailyTargetValue: 8, unit: 'jam' },
-            ]
-        },
-        {
-            id: 'study',
-            titleId: '📚 Akademik & Belajar',
-            titleEn: '📚 Study & Intellect',
-            color: '#3b82f6',
-            rows: [
-                { name: isIndo ? 'Membaca Buku Non-Fiksi' : 'Read Non-Fiction Book', icon: '📖', color: '#3b82f6', timeOfDay: 'afternoon' as const, freqDays: [], plannerStartTime: '16:00', plannerEndTime: '16:30', measurementTypeOverride: 'numeric' as const, dailyTargetValue: 20, unit: 'halaman' },
-                { name: isIndo ? 'Latihan Koding / Soal' : 'Practice Coding / Problems', icon: '💻', color: '#6366f1', timeOfDay: 'afternoon' as const, freqDays: [1, 2, 3, 4, 5], plannerStartTime: '14:00', plannerEndTime: '15:00', measurementTypeOverride: 'numeric' as const, dailyTargetValue: 60, unit: 'menit' },
-                { name: isIndo ? 'Jurnal Refleksi Harian' : 'Daily Reflective Journal', icon: '📓', color: '#ec4899', timeOfDay: 'evening' as const, freqDays: [], plannerStartTime: '21:30', plannerEndTime: '21:45', measurementTypeOverride: 'boolean' as const, dailyTargetValue: 1, unit: 'x' },
-            ]
-        },
-        {
-            id: 'deep_work',
-            titleId: '⚡ Produktivitas & Karier',
-            titleEn: '⚡ Focus & Productivity',
-            color: '#f59e0b',
-            rows: [
-                { name: isIndo ? 'Deep Work Sprint 90 Menit' : 'Deep Work 90min Sprint', icon: '⚡', color: '#f59e0b', timeOfDay: 'morning' as const, freqDays: [1, 2, 3, 4, 5], plannerStartTime: '09:00', plannerEndTime: '10:30', measurementTypeOverride: 'numeric' as const, dailyTargetValue: 90, unit: 'menit' },
-                { name: isIndo ? 'Cek Pipeline & Lamaran Kerja' : 'Job Application Pipeline Review', icon: '💼', color: '#6366f1', timeOfDay: 'morning' as const, freqDays: [1, 2, 3, 4, 5], plannerStartTime: '08:30', plannerEndTime: '09:00', measurementTypeOverride: 'boolean' as const, dailyTargetValue: 1, unit: 'x' },
-                { name: isIndo ? 'Hindari Media Sosial Pagi' : 'No Social Media in Morning', icon: '🛡️', color: '#ef4444', timeOfDay: 'morning' as const, freqDays: [], plannerStartTime: '07:00', plannerEndTime: '12:00', habitTypeOverride: 'negative' as const, measurementTypeOverride: 'boolean' as const, dailyTargetValue: 1, unit: 'x' },
-            ]
-        }
-    ];
-
-    const applyPresetPack = (pack: typeof presetPacks[0]) => {
-        setBatchRows(pack.rows.map(r => ({ ...r })));
-    };
 
     const addBatchRow = () => {
         setBatchRows([
@@ -160,7 +118,7 @@ export default function HabitBatchModal({
                                     </span>
                                 </h3>
                                 <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-0.5">
-                                    {isIndo ? 'Buat beberapa habit sekaligus dengan target kuantitatif & jadwal presisi.' : 'Create multiple habits at once with quantitative targets & schedules.'}
+                                    {isIndo ? 'Input daftar habit yang ingin kamu buat secara efisien dan cepat.' : 'Add your habit list efficiently with custom quantitative targets.'}
                                 </p>
                             </div>
                         </div>
@@ -170,7 +128,7 @@ export default function HabitBatchModal({
                                 <button
                                     type="button"
                                     onClick={onSwitchToSingle}
-                                    className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/[0.08] text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition"
+                                    className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/[0.08] text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition cursor-pointer"
                                 >
                                     {isIndo ? 'Mode Satuan' : 'Single Mode'}
                                 </button>
@@ -178,7 +136,7 @@ export default function HabitBatchModal({
                             <button 
                                 type="button"
                                 onClick={onClose} 
-                                className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition"
+                                className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition cursor-pointer"
                             >
                                 <X size={15} strokeWidth={2.5} />
                             </button>
@@ -188,37 +146,7 @@ export default function HabitBatchModal({
                     {/* Body */}
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4 bg-slate-50/60 dark:bg-[#080b12]/60">
                         
-                        {/* 1. QUICK TEMPLATE PACKS */}
-                        <div className="space-y-2">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                <Sparkles size={12} className="text-amber-500" />
-                                {isIndo ? 'Paket Template Cepat (1-Klik):' : 'Quick Template Packs (1-Click):'}
-                            </span>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                {presetPacks.map(pack => (
-                                    <button
-                                        key={pack.id}
-                                        type="button"
-                                        onClick={() => applyPresetPack(pack)}
-                                        className="p-2.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#0f1117] hover:border-indigo-500/50 hover:shadow-md transition text-left group flex items-center justify-between"
-                                    >
-                                        <div className="min-w-0 flex-1">
-                                            <div className="text-xs font-black text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition truncate">
-                                                {isIndo ? pack.titleId : pack.titleEn}
-                                            </div>
-                                            <div className="text-[10px] text-slate-400 font-semibold mt-0.5">
-                                                {pack.rows.length} {isIndo ? 'habit siap pakai' : 'ready habits'}
-                                            </div>
-                                        </div>
-                                        <span className="text-xs text-indigo-500 group-hover:translate-x-0.5 transition-transform font-bold">
-                                            +
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* 2. GLOBAL DEFAULTS CONFIGURATION */}
+                        {/* 1. GLOBAL DEFAULTS CONFIGURATION */}
                         <div className="bg-white dark:bg-[#0f1117] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -295,7 +223,7 @@ export default function HabitBatchModal({
                                     <button
                                         type="button"
                                         onClick={() => setGlobalDefaults({...globalDefaults, plannerIntegration: !globalDefaults.plannerIntegration})}
-                                        className={`w-full flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl border text-xs font-bold transition ${globalDefaults.plannerIntegration 
+                                        className={`w-full flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl border text-xs font-bold transition cursor-pointer ${globalDefaults.plannerIntegration 
                                             ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/20 dark:border-indigo-500/30 dark:text-indigo-300' 
                                             : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-white/[0.03] dark:border-white/[0.07] dark:text-slate-400'}`}
                                     >
@@ -340,7 +268,7 @@ export default function HabitBatchModal({
                                                     key={u}
                                                     type="button"
                                                     onClick={() => setGlobalDefaults({...globalDefaults, unit: u})}
-                                                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition ${globalDefaults.unit === u ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800'}`}
+                                                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition cursor-pointer ${globalDefaults.unit === u ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800'}`}
                                                 >
                                                     {u}
                                                 </button>
@@ -351,7 +279,7 @@ export default function HabitBatchModal({
                             )}
                         </div>
 
-                        {/* 3. BATCH HABIT ROWS */}
+                        {/* 2. BATCH HABIT ROWS */}
                         <div className="space-y-3">
                             <div className="flex items-center justify-between px-1">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
@@ -384,7 +312,7 @@ export default function HabitBatchModal({
                                                 <button
                                                     type="button"
                                                     onClick={() => setOpenBatchIconDropdown(openBatchIconDropdown === index ? null : index)}
-                                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-lg border-2 border-slate-200 dark:border-white/[0.08] transition hover:scale-105 active:scale-95 shadow-xs"
+                                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-lg border-2 border-slate-200 dark:border-white/[0.08] transition hover:scale-105 active:scale-95 shadow-xs cursor-pointer"
                                                     style={{ backgroundColor: `${row.color}20` }}
                                                 >
                                                     {row.icon}
@@ -397,7 +325,7 @@ export default function HabitBatchModal({
                                                                 key={icon}
                                                                 type="button"
                                                                 onClick={() => { updateBatchRow(index, 'icon', icon); setOpenBatchIconDropdown(null); }}
-                                                                className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-xl text-lg transition flex items-center justify-center"
+                                                                className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-xl text-lg transition flex items-center justify-center cursor-pointer"
                                                             >
                                                                 {icon}
                                                             </button>
@@ -429,7 +357,7 @@ export default function HabitBatchModal({
                                                 type="button"
                                                 onClick={() => setOpenSettingsRow(openSettingsRow === index ? null : index)}
                                                 title={isIndo ? 'Kustomisasi Pengaturan Habit Ini' : 'Customize Habit Settings'}
-                                                className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition ${openSettingsRow === index 
+                                                className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition cursor-pointer ${openSettingsRow === index 
                                                     ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/20 dark:border-indigo-500/30 dark:text-indigo-400 shadow-sm' 
                                                     : 'bg-slate-50 border-slate-200 text-slate-400 dark:bg-white/[0.03] dark:border-white/[0.07] hover:bg-slate-100 hover:text-slate-600'}`}
                                             >
@@ -441,7 +369,7 @@ export default function HabitBatchModal({
                                                 <button
                                                     type="button"
                                                     onClick={() => removeBatchRow(index)}
-                                                    className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-rose-100 bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-600 dark:border-rose-900/30 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 flex items-center justify-center transition"
+                                                    className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-rose-100 bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-600 dark:border-rose-900/30 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 flex items-center justify-center transition cursor-pointer"
                                                 >
                                                     <Trash2 size={13} />
                                                 </button>
@@ -470,7 +398,7 @@ export default function HabitBatchModal({
                                                             key={c}
                                                             type="button"
                                                             onClick={() => updateBatchRow(index, 'color', c)}
-                                                            className={`w-3.5 h-3.5 rounded-full transition ${row.color === c ? 'ring-2 ring-white dark:ring-slate-900 ring-offset-1 ring-offset-indigo-500 scale-110' : 'hover:scale-110'}`}
+                                                            className={`w-3.5 h-3.5 rounded-full transition cursor-pointer ${row.color === c ? 'ring-2 ring-white dark:ring-slate-900 ring-offset-1 ring-offset-indigo-500 scale-110' : 'hover:scale-110'}`}
                                                             style={{ backgroundColor: c }}
                                                         />
                                                     ))}
@@ -494,7 +422,7 @@ export default function HabitBatchModal({
                                                     <button 
                                                         type="button" 
                                                         onClick={() => setOpenSettingsRow(null)}
-                                                        className="text-[10px] font-bold text-slate-400 hover:text-slate-600"
+                                                        className="text-[10px] font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
                                                     >
                                                         {isIndo ? 'Tutup' : 'Close'}
                                                     </button>
@@ -514,7 +442,7 @@ export default function HabitBatchModal({
                                                                     key={day}
                                                                     type="button"
                                                                     onClick={() => toggleDay(index, day)}
-                                                                    className={`w-9 h-8 rounded-xl text-[10px] font-black border transition ${isActive 
+                                                                    className={`w-9 h-8 rounded-xl text-[10px] font-black border transition cursor-pointer ${isActive 
                                                                         ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs' 
                                                                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-300'}`}
                                                                 >
@@ -538,7 +466,7 @@ export default function HabitBatchModal({
                                                                 const val = e.target.value;
                                                                 updateBatchRow(index, 'measurementTypeOverride', val === '' ? undefined : val);
                                                             }}
-                                                            className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none"
+                                                            className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
                                                         >
                                                             <option value="">{isIndo ? 'Ikuti Global' : 'Follow Global'}</option>
                                                             <option value="boolean">✓ {isIndo ? 'Centang' : 'Checkbox'}</option>
