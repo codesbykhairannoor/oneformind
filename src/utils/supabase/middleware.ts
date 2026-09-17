@@ -27,16 +27,18 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  let user = null;
   try {
     const hasAuthCookie = request.cookies.has('sb-access-token') || 
       request.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
 
     if (hasAuthCookie) {
-      await supabase.auth.getUser();
+      const { data } = await supabase.auth.getUser();
+      user = data?.user || null;
     }
   } catch (e) {
     // Non-fatal
   }
 
-  return supabaseResponse
+  return { supabaseResponse, user }
 }

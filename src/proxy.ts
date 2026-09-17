@@ -31,10 +31,25 @@ export const proxy = async (req: any) => {
     return res;
   }
 
-  // Fast-path 2: Public marketing routes & anonymous users -> Skip Supabase network call completely!
   let supabaseResponse = null;
-  if (hasAuthCookie && isProtectedRoute) {
-    supabaseResponse = await updateSession(req);
+  let user = null;
+
+  const isLandingOrAuthPage = pathname === '/' || pathname === '/id' || pathname === '/en' ||
+    pathname.includes('/login') || pathname.includes('/register');
+
+  // Verify session for protected routes OR landing/auth pages if cookies exist
+  if (hasAuthCookie && (isProtectedRoute || isLandingOrAuthPage)) {
+    const sessionResult = await updateSession(req);
+    supabaseResponse = sessionResult.supabaseResponse;
+    user = sessionResult.user;
+  }
+
+  // If user is TRULY authenticated with a valid session and visits landing or auth page -> Redirect to dashboard safely
+  if (isLandingOrAuthPage && user?.email) {
+    const locale = (pathname.startsWith('/en') || pathname === '/en') ? 'en' : 'id';
+    const res = Response.redirect(new URL(`/${locale}/dashboard`, req.url));
+    res.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    return res;
   }
 
   // Run next-intl middleware for locale routing
