@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { loadScript } from '@paypal/paypal-js';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
-import { getTrialStatus } from '@/lib/auth/subscription';
+import { getTrialStatus, isSubscriptionActive } from '@/lib/auth/subscription';
 import BillingPricingCards from './components/BillingPricingCards';
 import BillingComparisonTable from './components/BillingComparisonTable';
 import BillingFaq from './components/BillingFaq';
@@ -25,10 +25,10 @@ export default function BillingPricingPage() {
     }>({ isOpen: false, plan: '', step: 'selection', error: null });
 
     const trial = getTrialStatus(session?.user);
-    const rawPlan = (session?.user as any)?.planType || (session?.user as any)?.plan_type || 'explorer';
-    const isExplicitPaid = session?.user && ((session.user as any).isPremium === true || ['architect', 'quantum', 'legendary', 'lifetime'].includes(rawPlan.toLowerCase()));
+    const rawPlan = ((session?.user as any)?.planType || (session?.user as any)?.plan_type || 'explorer').toLowerCase();
+    const isExplicitPaid = Boolean(session?.user && isSubscriptionActive(session.user) && rawPlan !== 'explorer');
     
-    const userPlan = isExplicitPaid ? rawPlan.toLowerCase() : 'explorer';
+    const userPlan = isExplicitPaid ? rawPlan : 'explorer';
     const planHierarchy = ['explorer', 'architect', 'quantum', 'legendary', 'lifetime'];
     const userPlanIndex = planHierarchy.indexOf(userPlan);
     const isId = locale === 'id';

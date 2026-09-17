@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSupabaseSession as useSession } from '@/hooks/useSupabaseSession';
-import { getTrialStatus } from '@/lib/auth/subscription';
+import { getTrialStatus, hasAiFeature, isSubscriptionActive } from '@/lib/auth/subscription';
 
 export const ALL_MODULE_KEYS = [
     'habit',
@@ -97,15 +97,16 @@ export function useActiveModules() {
     const [hasHydrated, setHasHydrated] = useState(false);
 
     const user = session?.user ? {
-        plan_type: (session.user as any).planType || 'Explorer',
-        trial_started_at: (session.user as any).trialStartedAt,
-        trial_ends_at: (session.user as any).trialEndsAt,
+        plan_type: (session.user as any).planType || (session.user as any).plan_type || 'Explorer',
+        trial_started_at: (session.user as any).trialStartedAt || (session.user as any).trial_started_at,
+        trial_ends_at: (session.user as any).trialEndsAt || (session.user as any).trial_ends_at,
+        premium_until: (session.user as any).premiumUntil || (session.user as any).premium_until,
         is_premium: (session.user as any).isPremium,
+        created_at: session.user.created_at,
     } : null;
 
     const trial = getTrialStatus(user);
-    const isPremium = Boolean(user?.is_premium);
-    const isUnlimited = isPremium || trial.isActive || (user?.plan_type && user.plan_type.toLowerCase() !== 'explorer' && !trial.isExpired);
+    const isUnlimited = isSubscriptionActive(user) || trial.isActive;
 
     // Hydrate state from localStorage & listen for storage or custom events
     useEffect(() => {
@@ -212,13 +213,10 @@ export function useActiveModules() {
     const activeCount = activeKeys.length;
     const canActivateMore = true;
 
-    // AI Coach is enabled for Quantum plan OR active 14-day credit card trial (Architect + AI)
+    // AI Coach is enabled for Quantum plan OR active 14-day credit card trial (Architect + AI) OR Legendary 2-month bonus
     const isAiEnabled = useMemo(() => {
-        if (!user) return false;
-        if (trial.isActive) return true;
-        const plan = (user.plan_type)?.toLowerCase();
-        return plan === 'quantum' || plan === 'legendary';
-    }, [user, trial.isActive]);
+        return hasAiFeature(user);
+    }, [user]);
 
     const isTabActive = useCallback((key: string): boolean => {
         // System Core: Dashboard is always active

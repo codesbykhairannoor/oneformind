@@ -9,7 +9,7 @@ import {
     User, Lock, LayoutGrid, Bell, CreditCard, ShieldCheck, 
     HelpCircle, Check 
 } from 'lucide-react';
-import { getTrialStatus } from '@/lib/auth/subscription';
+import { getTrialStatus, isExplorer as checkIsExplorer, isSubscriptionActive } from '@/lib/auth/subscription';
 import SettingsGeneralTab from './components/SettingsGeneralTab';
 import SettingsSecurityTab from './components/SettingsSecurityTab';
 import SettingsModulesTab from './components/SettingsModulesTab';
@@ -146,10 +146,12 @@ export default function SettingsPage() {
     };
 
     const trial = getTrialStatus(user);
-    const isExplorer = !user.is_premium && !trial.isActive;
+    const isExplorer = checkIsExplorer(user);
     const planLabel = trial.isActive 
         ? (locale === 'id' ? `Free (Trial ${trial.daysRemaining} Hari Tersisa)` : `Free (${trial.daysRemaining}d Trial Left)`)
-        : (user.plan_type || 'Explorer');
+        : isExplorer 
+            ? 'Explorer' 
+            : (user.plan_type || 'Explorer');
 
     const premiumUntilFormatted = (() => {
         const raw = user?.premium_until || (trial.isActive ? trial.trialEndsAt : null);

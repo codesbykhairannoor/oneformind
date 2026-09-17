@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { createClient } from "@/utils/supabase/client";
-import { getTrialStatus } from '@/lib/auth/subscription';
+import { getTrialStatus, isSubscriptionActive, isExplorer as checkIsExplorer } from '@/lib/auth/subscription';
 
 import AuthHeader from './layout/AuthHeader';
 import AuthSidebar from './layout/AuthSidebar';
@@ -32,11 +32,12 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     const user = session?.user ? {
         name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || 'User',
         email: session.user.email || '',
-        plan_type: (session.user as any).planType || 'Explorer',
+        plan_type: (session.user as any).planType || (session.user as any).plan_type || 'Explorer',
         avatar_url: session.user.user_metadata?.avatar_url || null,
         created_at: session.user.created_at,
-        trial_started_at: (session.user as any).trialStartedAt,
-        trial_ends_at: (session.user as any).trialEndsAt,
+        trial_started_at: (session.user as any).trialStartedAt || (session.user as any).trial_started_at,
+        trial_ends_at: (session.user as any).trialEndsAt || (session.user as any).trial_ends_at,
+        premium_until: (session.user as any).premiumUntil || (session.user as any).premium_until,
         is_premium: (session.user as any).isPremium,
     } : initialUser ? initialUser : {
         name: status === 'loading' ? 'Loading...' : 'Guest',
@@ -46,8 +47,8 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     };
 
     const trial = getTrialStatus(session?.user || user);
-    const isExplorer = (!user?.plan_type || user.plan_type.toLowerCase() === 'explorer') && !trial.isActive;
-    const isUnlimited = Boolean(user?.is_premium) || trial.isActive || (user?.plan_type && user.plan_type.toLowerCase() !== 'explorer' && !trial.isExpired);
+    const isExplorer = checkIsExplorer(session?.user || user);
+    const isUnlimited = isSubscriptionActive(session?.user || user) || trial.isActive;
 
     // Layout States
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

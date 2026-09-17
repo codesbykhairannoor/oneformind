@@ -2,7 +2,13 @@
 
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { useMemo } from 'react';
-import { getTrialStatus, TrialStatus } from '@/lib/auth/subscription';
+import { 
+    getTrialStatus, 
+    getEffectiveTier, 
+    hasAiFeature, 
+    isSubscriptionActive,
+    TrialStatus 
+} from '@/lib/auth/subscription';
 
 // Feature -> tier mapping
 const FEATURE_TIERS: Record<string, string> = {
@@ -40,15 +46,6 @@ const FEATURE_TIERS: Record<string, string> = {
     ai_goal_breakdown:'quantum',
 };
 
-const PLAN_LEVELS: Record<string, number> = {
-    'explorer':  1,
-    'architect': 2,
-    'trial':     2, 
-    'quantum':   3,
-    'legendary': 4,
-    'lifetime':  4,
-};
-
 const PLAN_LABELS: Record<string, string> = {
     explorer:  'Explorer',
     architect: 'Architect',
@@ -63,63 +60,33 @@ export const useGating = () => {
     
     const isLoading = status === 'loading';
     
-    // In NextAuth v5 custom adapter or Supabase, we pass planType and isPremium to the token/session
+    // In NextAuth v5 custom adapter or Supabase, user subscription fields are in session.user
     const user = session?.user as any;
 
     const trial: TrialStatus = useMemo(() => {
         return getTrialStatus(user);
     }, [user]);
     
+    // Strictly computed effective tier (1: Explorer, 2: Architect/Trial, 3: Quantum, 4: Legendary/Lifetime)
+    // Automatically downgrades expired subscriptions to 1 (Explorer)
     const tier = useMemo(() => {
-        if (!user) return 1;
+        return getEffectiveTier(user);
+    }, [user]);
 
-        const plan = (user.planType || user.plan_type)?.toLowerCase();
-        const isPrem = user.isPremium === true || user.is_premium === true;
-        
-        if (isPrem) {
-            return PLAN_LEVELS[plan] || 2;
-        }
+    const isSubActive = useMemo(() => {
+        return isSubscriptionActive(user);
+    }, [user]);
 
-        // Active 14-day free trial gives level 2 Architect access
-        if (trial.isActive) {
-            return 2;
-        }
-
-        // If plan is explicit (e.g. legendary, architect, quantum, lifetime)
-        if (plan && PLAN_LEVELS[plan]) {
-            return PLAN_LEVELS[plan];
-        }
-
-        return 1; // Explorer (free forever)
-    }, [user, trial.isActive]);
+    // AI is enabled for active Quantum users, active 14-day card trial users, and Legendary users with active AI bonus
+    const isAiEnabled = useMemo(() => {
+        return hasAiFeature(user);
+    }, [user]);
 
     const isExplorer  = tier === 1;
+    // INVARIANT: Everything Architect can access is 100% accessible to Quantum (tier 3) and Legendary (tier 4)
     const isArchitect = tier >= 2;
     const isQuantum   = tier === 3;
     const isLegendary = tier === 4;
-
-    // AI: quantum + legendary 2 bulan + (14 hari trial kartu kredit membuka semua tab dan AI)
-    const isAiEnabled = useMemo(() => {
-        if (!user) return false;
-        const plan = (user.planType || user.plan_type)?.toLowerCase();
-        if (plan === 'quantum') return true;
-
-        // 14 hari trial kartu kredit membuka semua tab dan AI (paket Architect + AI)
-        if (trial.isActive) return true;
-        
-        if (plan === 'legendary') {
-            const createdAtStr = user.created_at || user.createdAt;
-            if (createdAtStr) {
-                const createdAt = new Date(createdAtStr);
-                const limitDate = new Date(createdAt);
-                limitDate.setMonth(limitDate.getMonth() + 2);
-                
-                return new Date() < limitDate;
-            }
-            return true; // Fallback if no creation date exists
-        }
-        return false;
-    }, [user, trial.isActive]);
 
     const canUse = (feature: string) => {
         const required = FEATURE_TIERS[feature] ?? 'architect';
@@ -130,7 +97,7 @@ export const useGating = () => {
             return isAiEnabled;
         }
 
-        // architect, legendary all included (and trial active users)
+        // Level 2 (Architect), Level 3 (Quantum), Level 4 (Legendary), and active trial users all have full access
         return isArchitect;
     };
 
@@ -142,6 +109,7 @@ export const useGating = () => {
         isArchitect,
         isQuantum,
         isLegendary,
+        isSubscriptionActive: isSubActive,
         trial,
         isTrialActive: trial.isActive,
         trialDaysRemaining: trial.daysRemaining,
