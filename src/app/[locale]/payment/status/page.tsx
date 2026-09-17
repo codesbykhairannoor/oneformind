@@ -15,7 +15,7 @@ interface PaymentStatusPageProps {
 export default function PaymentStatusPage({ searchParams }: PaymentStatusPageProps) {
     const t = useTranslations();
     const { data: session } = useSession();
-    const [status, setStatus] = React.useState<string>('success');
+    const [status, setStatus] = React.useState<'loading' | 'success' | 'pending' | 'failed'>('loading');
     const [plan, setPlan] = React.useState<string>('Architect');
     const [hasUpdatedSession, setHasUpdatedSession] = React.useState(false);
     
@@ -23,31 +23,54 @@ export default function PaymentStatusPage({ searchParams }: PaymentStatusPagePro
 
     useEffect(() => {
         searchParams.then(resolved => {
-            let currentStatus = resolved.status || 'success';
+            const rawStatus = resolved.status?.toLowerCase();
             const currentPlan = resolved.plan || 'Architect';
+            let calculatedStatus: 'success' | 'pending' | 'failed' = 'failed';
             
-            // Handle Duitku resultCode
+            // Handle Duitku resultCode: '00' = success, '01' = pending, others = failed/cancelled
             const resultCode = (resolved as any).resultCode;
             if (resultCode) {
-                if (resultCode === '00') currentStatus = 'success';
-                else if (resultCode === '01') currentStatus = 'pending';
-                else currentStatus = 'failed';
+                if (resultCode === '00') calculatedStatus = 'success';
+                else if (resultCode === '01') calculatedStatus = 'pending';
+                else calculatedStatus = 'failed';
+            } else if (rawStatus === 'success') {
+                calculatedStatus = 'success';
+            } else if (rawStatus === 'pending') {
+                calculatedStatus = 'pending';
+            } else {
+                calculatedStatus = 'failed';
             }
             
-            setStatus(currentStatus);
+            setStatus(calculatedStatus);
             setPlan(currentPlan);
 
-            if (currentStatus === 'success' && !hasUpdatedSession) {
-                
+            if (calculatedStatus === 'success' && !hasUpdatedSession) {
                 setHasUpdatedSession(true);
             }
+        }).catch(() => {
+            setStatus('failed');
         });
     }, [searchParams, hasUpdatedSession]);
+
+    if (status === 'loading') {
+        return (
+            <AuthenticatedLayout>
+                <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-slate-50/30 dark:bg-slate-950/20">
+                    <div className="max-w-xl w-full text-center flex flex-col items-center justify-center">
+                        <div className="w-16 h-16 border-4 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+                        <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
+                            {t('payment_verifying') || 'Verifying payment status...'}
+                        </p>
+                    </div>
+                </div>
+            </AuthenticatedLayout>
+        );
+    }
 
     return (
         <AuthenticatedLayout>
             <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-slate-50/30 dark:bg-slate-950/20">
-                <div className="max-w-xl w-full text-center animate-in fade-in zoom-in-95 duration-1000">
+                <div className="max-w-xl w-full text-center animate-in fade-in zoom-in-95 duration-700">
                     
                     {/* SUCCESS ICON */}
                     {status === 'success' && (
@@ -73,7 +96,7 @@ export default function PaymentStatusPage({ searchParams }: PaymentStatusPagePro
                     )}
 
                     {/* FAILED / CANCELLED ICON */}
-                    {status !== 'success' && status !== 'pending' && (
+                    {status === 'failed' && (
                         <div className="relative inline-block mb-10">
                             <div className="absolute inset-0 bg-rose-500 blur-3xl opacity-20 scale-150 animate-pulse"></div>
                             <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] bg-rose-500 flex items-center justify-center text-white shadow-2xl shadow-rose-200 dark:shadow-none -rotate-6 hover:rotate-0 transition-transform duration-500">
@@ -86,7 +109,7 @@ export default function PaymentStatusPage({ searchParams }: PaymentStatusPagePro
                     <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight leading-tight">
                         {status === 'success' && (t('payment_success_title') || 'Upgrade Complete!')}
                         {status === 'pending' && (t('payment_pending_title') || 'Payment Pending')}
-                        {status !== 'success' && status !== 'pending' && (t('payment_failed_title') || 'Payment Cancelled')}
+                        {status === 'failed' && (t('payment_failed_title') || 'Payment Cancelled')}
                     </h1>
 
                     {status === 'success' && (
@@ -99,7 +122,7 @@ export default function PaymentStatusPage({ searchParams }: PaymentStatusPagePro
                             {t('payment_pending_msg') || 'Your payment is currently being processed. We will notify you once it is confirmed.'}
                         </p>
                     )}
-                    {status !== 'success' && status !== 'pending' && (
+                    {status === 'failed' && (
                         <p className="text-lg md:text-xl font-bold text-slate-500 dark:text-slate-400 mb-10">
                             {t('payment_failed_msg') || 'Your payment was cancelled or failed. You can try again anytime.'}
                         </p>
