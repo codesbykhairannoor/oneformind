@@ -73,7 +73,6 @@ export default function DashboardTodayTasks({ plannerData, synergy, t }: Dashboa
                     status: nextDone ? 'completed' : 'empty'
                 })
             });
-            window.dispatchEvent(new Event('habits_updated'));
         } catch (e) {
             console.error('Failed to toggle habit', e);
             setHabitsList(prev => prev.map(h => h.id === habitId ? { ...h, isCompleted: !nextDone } : h));

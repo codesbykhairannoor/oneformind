@@ -50,7 +50,16 @@ export default function FullPageOnboarding({
         persistModules
     } = useActiveModules();
 
-    const [currentStep, setCurrentStep] = useState<number>(1);
+    const [currentStep, setCurrentStep] = useState<number>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = sessionStorage.getItem('tranvas_onboarding_step');
+            if (saved) {
+                const parsed = parseInt(saved, 10);
+                if (parsed >= 1 && parsed <= 4) return parsed;
+            }
+        }
+        return 1;
+    });
     const [selectedRole, setSelectedRole] = useState<string>('student');
     const [selectedGoals, setSelectedGoals] = useState<string[]>(['habits', 'planner', 'finance']);
     const [selectedTabKeys, setSelectedTabKeys] = useState<ModuleKey[]>([
@@ -61,11 +70,15 @@ export default function FullPageOnboarding({
     const [isSaving, setIsSaving] = useState(false);
     const [isLaunching, setIsLaunching] = useState(false);
 
+    // Ensure entire viewport html/body stays dark to eliminate any white bottom border
     useEffect(() => {
-        if (activeKeys && activeKeys.length > 0) {
-            setSelectedTabKeys(activeKeys);
-        }
-    }, [activeKeys]);
+        document.documentElement.classList.add('dark');
+        const prevBg = document.body.style.backgroundColor;
+        document.body.style.backgroundColor = '#020617';
+        return () => {
+            document.body.style.backgroundColor = prevBg;
+        };
+    }, []);
 
     const handleSwitchLang = (lang: string) => {
         setCurrentLocale(lang);
@@ -236,13 +249,21 @@ export default function FullPageOnboarding({
 
     const handleNextStep = () => {
         if (currentStep < 4) {
-            setCurrentStep(prev => prev + 1);
+            const next = currentStep + 1;
+            setCurrentStep(next);
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('tranvas_onboarding_step', String(next));
+            }
         }
     };
 
     const handlePrevStep = () => {
         if (currentStep > 1) {
-            setCurrentStep(prev => prev - 1);
+            const prev = currentStep - 1;
+            setCurrentStep(prev);
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('tranvas_onboarding_step', String(prev));
+            }
         }
     };
 
@@ -251,6 +272,11 @@ export default function FullPageOnboarding({
         setIsSaving(true);
 
         try {
+            // Clear step storage
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('tranvas_onboarding_step');
+            }
+
             // Build modules map
             const nextModules: Record<string, boolean> = {};
             ALL_MODULE_KEYS.forEach(k => {
@@ -318,14 +344,14 @@ export default function FullPageOnboarding({
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+        <div className="min-h-screen min-h-[100dvh] bg-slate-950 text-white font-sans flex flex-col relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
             
             {/* AMBIENT GLOW EFFECTS */}
             <div className="absolute top-0 left-1/3 w-[600px] h-[500px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none" />
 
             {/* TOP HEADER */}
-            <header className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between relative z-20 border-b border-slate-800/60">
+            <header className="w-full max-w-5xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between relative z-20 border-b border-slate-800/60">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-indigo-500/20">
                         T
@@ -367,7 +393,7 @@ export default function FullPageOnboarding({
 
             {/* PROGRESS STEP BAR */}
             <div className="w-full bg-slate-900/50 border-b border-slate-800/40 py-3.5 relative z-10">
-                <div className="max-w-4xl mx-auto px-4 flex items-center justify-between gap-2">
+                <div className="max-w-5xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-2">
                     {[
                         { step: 1, labelId: 'Peran & Fokus', labelEn: 'Role & Focus' },
                         { step: 2, labelId: 'Prioritas Utama', labelEn: 'Key Priorities' },
@@ -405,7 +431,7 @@ export default function FullPageOnboarding({
             </div>
 
             {/* MAIN INTERACTIVE ONBOARDING BODY */}
-            <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-10 flex flex-col justify-between relative z-10">
+            <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-10 flex flex-col justify-between relative z-10">
                 
                 {/* STEP 1: PERSONA / ROLE */}
                 {currentStep === 1 && (

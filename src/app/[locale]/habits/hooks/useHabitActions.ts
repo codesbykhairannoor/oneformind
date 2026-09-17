@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { mutate as globalMutate } from 'swr';
 import { HabitItem, LifeOSTab } from '../types';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
@@ -40,6 +40,9 @@ interface UseHabitActionsParams {
     setShowDeleteModal: (v: boolean) => void;
     setHabitToDelete: (h: HabitItem | null) => void;
     setNumericPopover: (v: any) => void;
+    setEditingHabitId?: (id: number | null) => void;
+    resetForm?: () => void;
+    activeCategoryFilter?: string;
 }
 
 export function useHabitActions({
@@ -76,9 +79,14 @@ export function useHabitActions({
     habitToDelete,
     setShowDeleteModal,
     setHabitToDelete,
-    setNumericPopover
+    setNumericPopover,
+    setEditingHabitId,
+    resetForm,
+    activeCategoryFilter
 }: UseHabitActionsParams) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const inFlightCountRef = useRef<number>(0);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Toggle Habit Status (Complete / Uncheck / Skip / Relapse)
     const toggleStatus = async (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => {
@@ -141,6 +149,7 @@ export function useHabitActions({
             return h;
         }));
 
+        inFlightCountRef.current += 1;
         try {
             await fetch(`/api/habits/${habitId}/logs`, {
                 method: 'POST',
@@ -154,12 +163,19 @@ export function useHabitActions({
                     notes: numericNotePayload
                 })
             });
-            if (mutateHabits) {
-                mutateHabits();
-            }
-            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
         } catch (error) {
             console.error('Failed to sync habit log', error);
+        } finally {
+            inFlightCountRef.current = Math.max(0, inFlightCountRef.current - 1);
+            if (inFlightCountRef.current === 0) {
+                if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+                debounceTimerRef.current = setTimeout(() => {
+                    if (mutateHabits) {
+                        mutateHabits();
+                    }
+                    globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+                }, 500);
+            }
         }
     };
 
