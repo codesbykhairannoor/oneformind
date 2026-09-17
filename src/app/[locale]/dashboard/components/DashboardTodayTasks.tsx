@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from '@/i18n/routing';
 import { ArrowRight, Plus, Zap, CheckCircle2, Circle, Sparkles } from 'lucide-react';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
@@ -50,9 +50,12 @@ export default function DashboardTodayTasks({ plannerData, synergy, t }: Dashboa
         }
     };
 
+    const habitsListRef = useRef<any[]>(habitsList);
+    habitsListRef.current = habitsList;
+
     // Toggle Habit completion
     const toggleHabitQuick = async (habitId: number) => {
-        const target = habitsList.find(h => h.id === habitId);
+        const target = habitsListRef.current.find((h: any) => h.id === habitId);
         if (!target) return;
         const nextDone = !target.isCompleted;
 

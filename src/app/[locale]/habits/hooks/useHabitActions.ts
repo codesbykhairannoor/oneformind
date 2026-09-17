@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { mutate as globalMutate } from 'swr';
-import { HabitItem, LifeOSTab } from '../types';
+import { HabitItem, LifeOSTab, BatchRow, GlobalHabitDefaults } from '../types';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 
 interface UseHabitActionsParams {
@@ -41,8 +41,7 @@ interface UseHabitActionsParams {
     setHabitToDelete: (h: HabitItem | null) => void;
     setNumericPopover: (v: any) => void;
     setEditingHabitId?: (id: number | null) => void;
-    resetForm?: () => void;
-    activeCategoryFilter?: string;
+    recentTogglesRef?: React.MutableRefObject<Map<string, { status: string; value: number; notes?: string; timestamp: number }>>;
 }
 
 export function useHabitActions({
@@ -81,16 +80,18 @@ export function useHabitActions({
     setHabitToDelete,
     setNumericPopover,
     setEditingHabitId,
-    resetForm,
-    activeCategoryFilter
+    recentTogglesRef
 }: UseHabitActionsParams) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const inFlightCountRef = useRef<number>(0);
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const habitsRef = useRef(habits);
+    habitsRef.current = habits;
 
     // Toggle Habit Status (Complete / Uncheck / Skip / Relapse)
     const toggleStatus = async (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => {
-        const habit = habits.find(h => h.id === habitId);
+        const currentList = habitsRef.current;
+        const habit = currentList.find(h => h.id === habitId);
         if (!habit) return;
 
         const currentLog = habit.logs?.[dateString];
@@ -130,6 +131,20 @@ export function useHabitActions({
             ? JSON.stringify({ val: nextStatus === 'completed' ? targetVal : 0, note: noteText })
             : noteText;
 
+        const calculatedVal = isNumeric 
+            ? (nextStatus === 'completed' ? targetVal : 0)
+            : (nextStatus === 'completed' ? 1 : 0);
+
+        // Record recent toggle timestamp to prevent server overwrite during revalidations
+        if (recentTogglesRef) {
+            recentTogglesRef.current.set(`${habitId}_${dateString}`, {
+                status: nextStatus,
+                value: calculatedVal,
+                notes: noteText,
+                timestamp: Date.now()
+            });
+        }
+
         setHabits(prevHabits => prevHabits.map(h => {
             if (h.id === habitId) {
                 const updatedLogs = { ...h.logs };
@@ -138,9 +153,7 @@ export function useHabitActions({
                 } else {
                     updatedLogs[dateString] = {
                         status: nextStatus,
-                        value: isNumeric 
-                            ? (nextStatus === 'completed' ? targetVal : 0)
-                            : (nextStatus === 'completed' ? 1 : 0),
+                        value: calculatedVal,
                         notes: noteText
                     };
                 }
@@ -157,9 +170,7 @@ export function useHabitActions({
                 body: JSON.stringify({
                     date: dateString,
                     status: nextStatus,
-                    value: isNumeric
-                        ? (nextStatus === 'completed' ? targetVal : 0)
-                        : (nextStatus === 'completed' ? 1 : 0),
+                    value: calculatedVal,
                     notes: numericNotePayload
                 })
             });
@@ -174,7 +185,7 @@ export function useHabitActions({
                         mutateHabits();
                     }
                     globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
-                }, 500);
+                }, 600);
             }
         }
     };
@@ -220,7 +231,7 @@ export function useHabitActions({
 
     // Update Numeric Value (for quantitative habits)
     const handleUpdateNumericValue = async (habitId: number, dateStr: string, val: number, notes?: string) => {
-        const habit = habits.find(h => h.id === habitId);
+        const habit = habitsRef.current.find(h => h.id === habitId);
         if (!habit) return;
 
         const targetVal = habit.targetValue || 10;
@@ -229,19 +240,32 @@ export function useHabitActions({
 
         if (nextStatus === 'completed' && currentLog?.status !== 'completed') {
             playCheckSound();
+        } else if (nextStatus === 'empty' && currentLog?.status === 'completed') {
+            playUncheckSound();
+        }
+
+        const effectiveNotes = notes !== undefined ? notes : (currentLog?.notes || '');
+
+        if (recentTogglesRef) {
+            recentTogglesRef.current.set(`${habitId}_${dateStr}`, {
+                status: nextStatus,
+                value: val,
+                notes: effectiveNotes,
+                timestamp: Date.now()
+            });
         }
 
         // Optimistic UI update
         setHabits(prevHabits => prevHabits.map(h => {
             if (h.id === habitId) {
                 const updatedLogs = { ...h.logs };
-                if (nextStatus === 'empty' && !notes) {
+                if (nextStatus === 'empty' && !effectiveNotes) {
                     delete updatedLogs[dateStr];
                 } else {
                     updatedLogs[dateStr] = {
                         status: nextStatus,
                         value: val,
-                        notes: notes !== undefined ? notes : (currentLog?.notes || '')
+                        notes: effectiveNotes
                     };
                 }
                 return { ...h, logs: updatedLogs };
@@ -257,7 +281,7 @@ export function useHabitActions({
                     date: dateStr,
                     status: nextStatus,
                     value: val,
-                    notes: notes !== undefined ? notes : (currentLog?.notes || '')
+                    notes: effectiveNotes
                 })
             });
             if (mutateHabits) {
@@ -489,30 +513,36 @@ export function useHabitActions({
     };
 
     // Submit Batch Habits
-    const submitBatchHabits = async (batchRows: any[], defaults: any, onSuccess?: () => void) => {
+    const submitBatchHabits = async (batchRows: BatchRow[], defaults: GlobalHabitDefaults, onSuccess?: () => void) => {
         const validRows = batchRows.filter(r => r.name.trim().length > 0);
         if (validRows.length === 0 || isSubmitting) return;
 
         setIsSubmitting(true);
         try {
-            const tempHabits: HabitItem[] = [];
-            const createPromises = validRows.map(async (row, idx) => {
-                const tempId = Date.now() + idx;
-                
+            const createPromises = validRows.map(async (row) => {
                 const hType = row.habitTypeOverride || defaults.habitType || 'positive';
                 const mType = row.measurementTypeOverride || defaults.measurementType || 'boolean';
                 const pInt = row.plannerIntegrationOverride !== undefined ? row.plannerIntegrationOverride : (defaults.plannerIntegration || false);
                 const isBoolean = mType === 'boolean';
                 const mTarget = row.target || defaults.target || daysInCurrentMonth;
+                const freqDays = row.freqDays && row.freqDays.length > 0 && row.freqDays.length < 7 ? row.freqDays : [0, 1, 2, 3, 4, 5, 6];
+                const freqType = row.freqDays && row.freqDays.length > 0 && row.freqDays.length < 7 ? 'weekly_days' : 'daily';
+                
+                const finalUnit = isBoolean ? 'x' : (row.unit || defaults.unit || 'ml');
+                const finalTargetVal = isBoolean ? 1 : (row.dailyTargetValue || defaults.dailyTargetValue || 10);
+                const startTime = pInt ? (row.plannerStartTime || defaults.defaultStartTime || '07:00') : '';
+                const endTime = pInt ? (row.plannerEndTime || defaults.defaultEndTime || '07:30') : '';
 
                 const metadata = {
                     habitType: hType,
                     measurementType: mType,
-                    unit: isBoolean ? 'x' : 'ml',
-                    targetValue: isBoolean ? 1 : 10,
-                    frequencyType: 'daily',
-                    frequencyDays: [0, 1, 2, 3, 4, 5, 6],
+                    unit: finalUnit,
+                    targetValue: finalTargetVal,
+                    frequencyType: freqType,
+                    frequencyDays: freqDays,
                     timeOfDay: row.timeOfDay || 'morning',
+                    startTime,
+                    endTime,
                     syncedTabs: pInt ? ['planner'] : []
                 };
                 const statusPayload = JSON.stringify(metadata);
@@ -521,7 +551,7 @@ export function useHabitActions({
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        name: row.name,
+                        name: row.name.trim(),
                         icon: row.icon || '🎯',
                         color: row.color || '#6366f1',
                         period: currentMonthKey,

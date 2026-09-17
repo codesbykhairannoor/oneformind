@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
@@ -73,6 +73,9 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         keepPreviousData: true,
     });
 
+    // Track recently toggled logs to prevent race-condition overwrite during fast clicking
+    const recentTogglesRef = useRef<Map<string, { status: string; value: number; notes?: string; timestamp: number }>>(new Map());
+
     // Pre-parse initial SSR habits if available
     const initialParsedHabits = useMemo(() => {
         if (initialHabits && Array.isArray(initialHabits) && initialHabits.length > 0) {
@@ -111,7 +114,35 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
 
     useEffect(() => {
         if (parsedHabits !== null) {
-            setHabits(parsedHabits);
+            setHabits(prevHabits => {
+                if (!prevHabits || prevHabits.length === 0) return parsedHabits;
+                const now = Date.now();
+                return parsedHabits.map(serverHabit => {
+                    const mergedLogs = { ...serverHabit.logs };
+                    recentTogglesRef.current.forEach((val, key) => {
+                        const [hIdStr, dateStr] = key.split('_');
+                        if (Number(hIdStr) === serverHabit.id) {
+                            if (now - val.timestamp < 3500) {
+                                if (val.status === 'empty') {
+                                    delete mergedLogs[dateStr];
+                                } else {
+                                    mergedLogs[dateStr] = {
+                                        status: val.status as 'completed' | 'skipped' | 'empty' | 'relapse' | 'rest' | 'in_progress',
+                                        value: val.value,
+                                        notes: val.notes
+                                    };
+                                }
+                            } else {
+                                recentTogglesRef.current.delete(key);
+                            }
+                        }
+                    });
+                    return {
+                        ...serverHabit,
+                        logs: mergedLogs
+                    };
+                });
+            });
             setIsLoaded(true);
         }
     }, [parsedHabits]);
@@ -124,6 +155,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         daysInCurrentMonth,
         isIndo,
         mutateHabits,
+        recentTogglesRef,
         editingHabitId: form.editingHabitId,
         formName: form.formName,
         formIcon: form.formIcon,
@@ -151,7 +183,8 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         habitToDelete: form.habitToDelete,
         setShowDeleteModal: form.setShowDeleteModal,
         setHabitToDelete: form.setHabitToDelete,
-        setNumericPopover: form.setNumericPopover
+        setNumericPopover: form.setNumericPopover,
+        setEditingHabitId: form.setEditingHabitId,
     });
 
     const calc = useHabitsCalculation({

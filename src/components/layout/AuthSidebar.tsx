@@ -49,12 +49,10 @@ export default function AuthSidebar({
 }: AuthSidebarProps) {
     return (
         <aside 
-            className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out ${
-                !isDesktop ? 'fixed top-[72px] sm:top-16 bottom-0 left-0 z-[61]' : 'relative z-[10]'
+            className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out fixed top-[72px] sm:top-16 bottom-0 left-0 z-[61] w-full md:relative md:top-0 md:bottom-auto md:left-auto md:z-[10] ${
+                isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
             } ${
-                !isDesktop 
-                    ? (isMobileDrawerOpen ? 'translate-x-0 w-full' : '-translate-x-full w-full') 
-                    : (isSidebarCollapsed ? 'w-[68px] translate-x-0' : 'w-[232px] translate-x-0')
+                isSidebarCollapsed ? 'md:w-[68px]' : 'md:w-[232px]'
             }`}
         >
             <nav className={`flex-1 overflow-y-auto py-3 custom-scrollbar space-y-0.5 ${isSidebarCollapsed ? 'px-2' : 'px-2.5'}`}>

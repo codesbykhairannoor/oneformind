@@ -70,11 +70,31 @@ export interface DayInfo {
     hasNote: boolean;
 }
 
+export interface GlobalHabitDefaults {
+    habitType: 'positive' | 'negative';
+    measurementType: 'boolean' | 'numeric';
+    dailyTargetValue?: number;
+    unit?: string;
+    target: number;
+    plannerIntegration: boolean;
+    defaultStartTime?: string;
+    defaultEndTime?: string;
+}
+
 export interface BatchRow {
     name: string;
     icon: string;
     color: string;
-    target: number;
     timeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
+    freqDays: number[]; // 0=Sun,1=Mon,...,6=Sat; empty = everyday
+    plannerStartTime: string; // e.g. "07:00"
+    plannerEndTime: string;   // e.g. "07:30"
+    // Overrides
+    target?: number; // monthly target override
+    dailyTargetValue?: number; // per-row daily numeric target (e.g. 8)
+    unit?: string; // per-row unit (e.g. 'gelas', 'menit')
+    habitTypeOverride?: 'positive' | 'negative';
+    measurementTypeOverride?: 'boolean' | 'numeric';
+    plannerIntegrationOverride?: boolean;
 }
 

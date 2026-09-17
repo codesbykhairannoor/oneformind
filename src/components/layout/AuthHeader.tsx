@@ -73,7 +73,7 @@ export default function AuthHeader({
                     <button 
                         type="button"
                         onClick={() => {
-                            if (!isDesktop) {
+                            if (typeof window !== 'undefined' && window.innerWidth < 768) {
                                 setIsMobileDrawerOpen(!isMobileDrawerOpen);
                             } else {
                                 toggleSidebar();
@@ -82,10 +82,17 @@ export default function AuthHeader({
                         className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-900 dark:text-slate-200 transition-all hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 focus:outline-none"
                         aria-label="Toggle Menu"
                     >
-                        <div className="w-5 flex flex-col items-end gap-[5px]">
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${(!isSidebarCollapsed && isDesktop) || (isMobileDrawerOpen && !isDesktop) ? 'rotate-45 translate-y-[7px] w-5' : 'w-5'}`} />
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${(!isSidebarCollapsed && isDesktop) || (isMobileDrawerOpen && !isDesktop) ? 'opacity-0' : 'w-3.5'}`} />
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${(!isSidebarCollapsed && isDesktop) || (isMobileDrawerOpen && !isDesktop) ? '-rotate-45 -translate-y-[7px] w-5' : 'w-4'}`} />
+                        {/* Mobile Hamburger Icon */}
+                        <div className="md:hidden w-5 flex flex-col items-end gap-[5px]">
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? 'rotate-45 translate-y-[7px] w-5' : 'w-5'}`} />
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? 'opacity-0' : 'w-3.5'}`} />
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? '-rotate-45 -translate-y-[7px] w-5' : 'w-4'}`} />
+                        </div>
+                        {/* Desktop Sidebar Toggle Icon */}
+                        <div className="hidden md:flex w-5 flex-col items-end gap-[5px]">
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${!isSidebarCollapsed ? 'rotate-45 translate-y-[7px] w-5' : 'w-5'}`} />
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${!isSidebarCollapsed ? 'opacity-0' : 'w-3.5'}`} />
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${!isSidebarCollapsed ? '-rotate-45 -translate-y-[7px] w-5' : 'w-4'}`} />
                         </div>
                     </button>
 
