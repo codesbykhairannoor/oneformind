@@ -20,6 +20,7 @@ import {
 import ModalPortal from '@/components/ModalPortal';
 import { JournalItem } from './JournalCard';
 import { analyzeJournalEntry } from '../lib/journalAi';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface JournalDetailModalProps {
     journal: JournalItem | null;
@@ -180,11 +181,13 @@ export default function JournalDetailModal({
 
                             if (hasHtml) {
                                 // Normalize HTML tags & strip empty paragraphs
-                                const cleanHtml = rawContent
+                                const normalized = rawContent
                                     .replace(/<\/?P>/g, (m) => m.toLowerCase())
                                     .replace(/<p>\s*<\/p>/gi, '')
                                     .replace(/<p><p>/gi, '<p>')
                                     .replace(/<\/p><\/p>/gi, '</p>');
+                                
+                                const cleanHtml = sanitizeHtml(normalized);
 
                                 return (
                                     <div 

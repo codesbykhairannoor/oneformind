@@ -10,7 +10,10 @@ export async function POST(req: NextRequest) {
         const webhookSecret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET || '';
 
         // Verify webhook signature if secret is configured
-        if (webhookSecret && signature) {
+        if (webhookSecret) {
+            if (!signature) {
+                return NextResponse.json({ error: 'Missing x-signature header' }, { status: 401 });
+            }
             const hmac = crypto.createHmac('sha256', webhookSecret);
             const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8');
             const signatureBuffer = Buffer.from(signature, 'utf8');
