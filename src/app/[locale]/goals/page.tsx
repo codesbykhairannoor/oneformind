@@ -315,7 +315,7 @@ export default function GoalsPage() {
             } else {
                 // Optimistic update
                 const tempId = Date.now();
-                setGoals(prev => [{ ...form, id: tempId, milestones: [], status: 'active', specific_days: specificMetadata }, ...prev]);
+                setGoals(prev => [{ ...form, id: tempId, milestones: form.milestones || [], status: 'active', specific_days: specificMetadata }, ...prev]);
                 const res = await fetch('/api/goals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -342,7 +342,8 @@ export default function GoalsPage() {
                         coverImageUrl: form.cover_image_url,
                         cover_image_url: form.cover_image_url,
                         specificDays: specificMetadata,
-                        specific_days: specificMetadata
+                        specific_days: specificMetadata,
+                        milestones: form.milestones || []
                     })
                 });
                 if (res.ok) mutateGoals();

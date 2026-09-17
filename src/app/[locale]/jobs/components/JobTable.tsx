@@ -95,7 +95,7 @@ export default function JobTable({
                         className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5 active:scale-95"
                     >
                         <Plus size={14} strokeWidth={3} />
-                        <span>{isIndo ? '+ Tambah Lamaran' : '+ Add Application'}</span>
+                        <span>{isIndo ? 'Tambah Lamaran' : 'Add Application'}</span>
                     </button>
                 ) : (
                     <button
@@ -111,6 +111,103 @@ export default function JobTable({
 
             {/* ==================== MOBILE CARDS LAYOUT (<lg) ==================== */}
             <div className="lg:hidden space-y-3">
+
+                {/* MOBILE QUICK ADD APPLICATION FORM (<lg) */}
+                {isAddingRow && (
+                    <div className="bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/40 dark:from-slate-900 dark:via-indigo-950/30 dark:to-slate-900 rounded-3xl p-4 sm:p-5 border-2 border-indigo-500/40 shadow-xl shadow-indigo-500/10 space-y-3.5 animate-in fade-in slide-in-from-top-3 duration-300">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
+                                <Sparkles size={14} className="text-indigo-500" />
+                                <span>{isIndo ? 'Tambah Cepat Lamaran' : 'Quick Add Application'}</span>
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => setIsAddingRow(false)}
+                                className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white transition"
+                                title={isIndo ? 'Tutup' : 'Close'}
+                            >
+                                <X size={14} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-2">
+                            <input
+                                type="text"
+                                autoFocus
+                                placeholder={isIndo ? 'Nama Perusahaan (cth: Google, GoTo)' : 'Company Name (e.g. Google)'}
+                                value={newCompany}
+                                onChange={(e) => setNewCompany(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveNewRow();
+                                    if (e.key === 'Escape') setIsAddingRow(false);
+                                }}
+                                className="w-full px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                            />
+                            <input
+                                type="text"
+                                placeholder={isIndo ? 'Posisi / Role (cth: Frontend Engineer)' : 'Job Title / Role (e.g. Frontend Dev)'}
+                                value={newTitle}
+                                onChange={(e) => setNewTitle(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveNewRow();
+                                    if (e.key === 'Escape') setIsAddingRow(false);
+                                }}
+                                className="w-full px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1">
+                                    {isIndo ? 'Model Kerja' : 'Work Model'}
+                                </label>
+                                <select
+                                    value={newWorkModel}
+                                    onChange={(e) => setNewWorkModel(e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
+                                >
+                                    <option value="remote">Remote 🌐</option>
+                                    <option value="hybrid">Hybrid 🏢</option>
+                                    <option value="onsite">Onsite 📍</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1">
+                                    {isIndo ? 'Status Awal' : 'Initial Status'}
+                                </label>
+                                <select
+                                    value={newStatus}
+                                    onChange={(e) => setNewStatus(e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
+                                >
+                                    <option value="wishlist">💭 Wishlist</option>
+                                    <option value="applied">📤 Applied</option>
+                                    <option value="interview">🎯 Interview</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1">
+                            <button
+                                type="button"
+                                onClick={handleSaveNewRow}
+                                className="flex-1 py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
+                            >
+                                <Check size={15} strokeWidth={3} />
+                                <span>{isIndo ? 'Simpan Lamaran' : 'Save Application'}</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsAddingRow(false)}
+                                className="py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 text-xs font-bold transition"
+                            >
+                                {isIndo ? 'Batal' : 'Cancel'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {jobs.map((job) => {
                     const wmBadge = getWorkModelBadge(job.work_model);
                     const salaryFormatted = formatSalaryDisplay(job.salary_min, job.salary_max, job.salary_currency, job.salary_period, isIndo);

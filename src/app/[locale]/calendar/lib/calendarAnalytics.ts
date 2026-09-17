@@ -264,3 +264,34 @@ export function formatTimeSlot(timeStr: string): string {
     if (!timeStr) return '';
     return timeStr.slice(0, 5);
 }
+
+/**
+ * Checks if a calendar event is active on a specific target date (supports single & multi-day spans)
+ */
+export function isEventActiveOnDate(event: UnifiedCalendarEvent, targetDateStr: string): boolean {
+    const start = event.start_date;
+    const end = event.end_date || event.start_date;
+    if (!start) return false;
+    return targetDateStr >= start && targetDateStr <= end;
+}
+
+/**
+ * Formats human-readable span label for multi-day events
+ */
+export function getEventDateSpanLabel(event: UnifiedCalendarEvent, locale: string = 'id'): string {
+    if (!event.start_date) return '';
+    const start = event.start_date;
+    const end = event.end_date || event.start_date;
+    if (start === end) return '';
+
+    try {
+        const s = new Date(start);
+        const e = new Date(end);
+        const sFormatted = s.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' });
+        const eFormatted = e.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' });
+        return `${sFormatted} - ${eFormatted}`;
+    } catch {
+        return `${start} - ${end}`;
+    }
+}
+

@@ -38,7 +38,7 @@ func GoalsMilestonesHandler(w http.ResponseWriter, r *http.Request) {
 		userIdStr = r.URL.Query().Get("userId")
 	}
 	if userIdStr == "" {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
 	}
 	userId, err := strconv.Atoi(userIdStr)
@@ -61,6 +61,9 @@ func GoalsMilestonesHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleCreateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 	goalIdStr := r.URL.Query().Get("goalId")
+	if goalIdStr == "" {
+		goalIdStr = r.URL.Query().Get("id")
+	}
 	if goalIdStr == "" {
 		http.Error(w, "Missing Goal ID", http.StatusBadRequest)
 		return
@@ -90,6 +93,9 @@ func handleCreateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 		order = *body.Order
 	}
 
+	if dbMilestones == nil {
+		initDB()
+	}
 	if dbMilestones == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
@@ -123,6 +129,9 @@ func handleCreateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 
 func handleUpdateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 	goalIdStr := r.URL.Query().Get("goalId")
+	if goalIdStr == "" {
+		goalIdStr = r.URL.Query().Get("id")
+	}
 	milestoneIdStr := r.URL.Query().Get("milestoneId")
 	if goalIdStr == "" || milestoneIdStr == "" {
 		http.Error(w, "Missing ID", http.StatusBadRequest)
@@ -145,6 +154,9 @@ func handleUpdateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
+	if dbMilestones == nil {
+		initDB()
+	}
 	if dbMilestones == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
@@ -197,6 +209,9 @@ func handleUpdateMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 
 func handleDeleteMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 	goalIdStr := r.URL.Query().Get("goalId")
+	if goalIdStr == "" {
+		goalIdStr = r.URL.Query().Get("id")
+	}
 	milestoneIdStr := r.URL.Query().Get("milestoneId")
 	if goalIdStr == "" || milestoneIdStr == "" {
 		http.Error(w, "Missing ID", http.StatusBadRequest)
@@ -209,6 +224,9 @@ func handleDeleteMilestone(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
+	if dbMilestones == nil {
+		initDB()
+	}
 	if dbMilestones == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return

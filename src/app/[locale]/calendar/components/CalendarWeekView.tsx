@@ -9,7 +9,9 @@ import {
 import { 
     UnifiedCalendarEvent, 
     detectMeetingPlatform, 
-    getEventDurationMinutes 
+    getEventDurationMinutes,
+    isEventActiveOnDate,
+    getEventDateSpanLabel
 } from '../lib/calendarAnalytics';
 import { CalendarLayerFilters } from './CalendarFilterBar';
 
@@ -143,7 +145,7 @@ export default function CalendarWeekView({
 
                     {/* Columns 1-7: Day Time-Block Columns */}
                     {weekDays.map((d) => {
-                        const dayEvents = events.filter(e => e.start_date === d.date);
+                        const dayEvents = events.filter(e => isEventActiveOnDate(e, d.date));
 
                         return (
                             <div 
@@ -187,6 +189,7 @@ export default function CalendarWeekView({
                                     const duration = ev.is_all_day ? 60 : getEventDurationMinutes(ev.start_time, ev.end_time);
                                     const heightPx = Math.max(28, (duration / 60) * HOUR_HEIGHT - 4);
                                     const meeting = detectMeetingPlatform(ev.meeting_url || ev.description);
+                                    const isMulti = ev.end_date && ev.end_date !== ev.start_date;
 
                                     return (
                                         <div
@@ -214,9 +217,16 @@ export default function CalendarWeekView({
                                                         <Video size={12} className="shrink-0 text-purple-600 dark:text-purple-400" />
                                                     )}
                                                 </div>
-                                                <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 mt-0.5">
-                                                    {ev.start_time} - {ev.end_time || ''}
-                                                </p>
+                                                <div className="flex items-center justify-between gap-1 mt-0.5">
+                                                    <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400">
+                                                        {ev.is_all_day ? (isIndo ? 'Sepanjang Hari' : 'All Day') : `${ev.start_time} - ${ev.end_time || ''}`}
+                                                    </p>
+                                                    {isMulti && (
+                                                        <span className="text-[8px] font-black px-1 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                                                            {getEventDateSpanLabel(ev, locale)}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {/* 1-Click Launch Meeting Button if URL present */}

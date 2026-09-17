@@ -10,7 +10,9 @@ import {
 import { 
     UnifiedCalendarEvent, 
     detectMeetingPlatform, 
-    getEventDurationMinutes 
+    getEventDurationMinutes,
+    isEventActiveOnDate,
+    getEventDateSpanLabel
 } from '../lib/calendarAnalytics';
 
 interface CalendarDayViewProps {
@@ -53,7 +55,7 @@ export default function CalendarDayView({
         return list;
     }, []);
 
-    const dayEvents = events.filter(e => e.start_date === date);
+    const dayEvents = events.filter(e => isEventActiveOnDate(e, date));
     const dayTasks = plannerTasks.filter(p => p.date?.startsWith(date));
     const dayHabits = habitLogs.filter(h => h.date?.startsWith(date));
     const dayExpenses = financeTransactions.filter(f => f.date?.startsWith(date) && f.type === 'expense');

@@ -18,7 +18,8 @@ import CalendarTaskDrawer from './components/CalendarTaskDrawer';
 import { 
     UnifiedCalendarEvent, 
     parseEventMetadata, 
-    exportCalendarToIcs 
+    exportCalendarToIcs,
+    isEventActiveOnDate
 } from './lib/calendarAnalytics';
 import ExportModal from '@/components/export/ExportModal';
 
@@ -195,7 +196,7 @@ export default function CalendarPage() {
                 dayNumber: dayNum,
                 isCurrentMonth: false,
                 isToday: dateStr === todayStr,
-                events: events.filter(e => e.start_date === dateStr),
+                events: events.filter(e => isEventActiveOnDate(e, dateStr)),
                 jobInterviews: jobInterviews.filter(j => j.date === dateStr),
                 milestones: milestones.filter(m => m.date === dateStr),
                 plannerTasks: plannerTasks.filter(p => p.date?.startsWith(dateStr)),
@@ -214,7 +215,7 @@ export default function CalendarPage() {
                 dayNumber: day,
                 isCurrentMonth: true,
                 isToday: dateStr === todayStr,
-                events: events.filter(e => e.start_date === dateStr),
+                events: events.filter(e => isEventActiveOnDate(e, dateStr)),
                 jobInterviews: jobInterviews.filter(j => j.date === dateStr),
                 milestones: milestones.filter(m => m.date === dateStr),
                 plannerTasks: plannerTasks.filter(p => p.date?.startsWith(dateStr)),
@@ -237,7 +238,7 @@ export default function CalendarPage() {
                 dayNumber: day,
                 isCurrentMonth: false,
                 isToday: dateStr === todayStr,
-                events: events.filter(e => e.start_date === dateStr),
+                events: events.filter(e => isEventActiveOnDate(e, dateStr)),
                 jobInterviews: jobInterviews.filter(j => j.date === dateStr),
                 milestones: milestones.filter(m => m.date === dateStr),
                 plannerTasks: plannerTasks.filter(p => p.date?.startsWith(dateStr)),
@@ -378,7 +379,7 @@ export default function CalendarPage() {
     };
 
     // Day detail selected items
-    const selectedDayEvents = events.filter(e => e.start_date === selectedDate);
+    const selectedDayEvents = events.filter(e => isEventActiveOnDate(e, selectedDate));
     const selectedDayInterviews = jobInterviews.filter(j => j.date === selectedDate);
     const selectedDayMilestones = milestones.filter(m => m.date === selectedDate);
     const selectedDayPlanner = plannerTasks.filter(p => p.date?.startsWith(selectedDate));

@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { 
     X, Calendar, Clock, AlignLeft, Tag, 
     Palette, Check, Video, MapPin, Repeat, 
-    Sparkles, ExternalLink 
+    Sparkles, ExternalLink, CalendarRange, ArrowRight 
 } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import GoalDatePicker from '../../goals/components/GoalDatePicker';
@@ -34,6 +34,8 @@ export default function CalendarEventModal({
     const defaultDate = initialDate || new Date().toISOString().split('T')[0];
     const defaultStart = initialStartTime || '09:00';
 
+    const [isMultiDay, setIsMultiDay] = useState(false);
+
     const [form, setForm] = useState<UnifiedCalendarEvent>({
         id: '',
         title: '',
@@ -52,9 +54,17 @@ export default function CalendarEventModal({
 
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+    const [showSingleDatePicker, setShowSingleDatePicker] = useState(false);
 
     useEffect(() => {
         if (event) {
+            const hasMultiDay = Boolean(
+                event.start_date && 
+                event.end_date && 
+                event.start_date !== event.end_date
+            );
+            setIsMultiDay(hasMultiDay);
+
             setForm({
                 id: event.id || '',
                 title: event.title || '',
@@ -71,6 +81,7 @@ export default function CalendarEventModal({
                 description: event.description || ''
             });
         } else {
+            setIsMultiDay(false);
             setForm({
                 id: '',
                 title: '',
@@ -90,15 +101,6 @@ export default function CalendarEventModal({
     }, [event, defaultDate, defaultStart, show]);
 
     if (!show) return null;
-
-    const colorOptions = [
-        { value: '#4f46e5', label: 'Indigo / Personal' }, 
-        { value: '#8b5cf6', label: 'Purple / Meeting' }, 
-        { value: '#0ea5e9', label: 'Sky / Focus' },    
-        { value: '#10b981', label: 'Emerald / Health' }, 
-        { value: '#f59e0b', label: 'Amber / Work' },  
-        { value: '#f43f5e', label: 'Rose / Finance' },   
-    ];
 
     const categoryOptions = [
         { value: 'personal', label: isIndo ? 'Pribadi' : 'Personal', color: '#4f46e5' },
@@ -121,13 +123,42 @@ export default function CalendarEventModal({
 
     const detectedMeeting = detectMeetingPlatform(form.meeting_url);
 
+    const handleToggleMultiDay = (enableMulti: boolean) => {
+        setIsMultiDay(enableMulti);
+        if (!enableMulti) {
+            // Revert end date to match start date
+            setForm(prev => ({ ...prev, end_date: prev.start_date }));
+        } else {
+            // Default multi-day to at least start_date
+            if (!form.end_date || form.end_date < form.start_date) {
+                setForm(prev => ({ ...prev, end_date: prev.start_date }));
+            }
+        }
+    };
+
+    const handleSetDurationMinutes = (minutes: number) => {
+        if (!form.start_time) return;
+        const [sh, sm] = form.start_time.split(':').map(Number);
+        const totalMin = sh * 60 + (sm || 0) + minutes;
+        const eh = Math.floor(totalMin / 60) % 24;
+        const em = totalMin % 60;
+        const newEndTime = `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
+        setForm(prev => ({ ...prev, end_time: newEndTime, is_all_day: false }));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.title.trim()) {
             alert(isIndo ? 'Judul agenda tidak boleh kosong!' : 'Event title cannot be empty!');
             return;
         }
-        onSubmit(form);
+
+        const finalEndDate = isMultiDay ? (form.end_date || form.start_date) : form.start_date;
+
+        onSubmit({
+            ...form,
+            end_date: finalEndDate
+        });
     };
 
     return (
@@ -159,7 +190,7 @@ export default function CalendarEventModal({
                     </div>
 
                     {/* Form Fields Body */}
-                    <div className="p-8 overflow-y-auto space-y-5 bg-white dark:bg-slate-900">
+                    <div className="p-8 overflow-y-auto space-y-6 bg-white dark:bg-slate-900">
                         
                         {/* Title Input */}
                         <div>
@@ -170,8 +201,8 @@ export default function CalendarEventModal({
                                 type="text" 
                                 value={form.title}
                                 onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-slate-800 dark:text-white font-black text-base focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" 
-                                placeholder={isIndo ? 'Misal: Sprint Planning & Demo Produk' : 'E.g. Strategy Sync with Team'} 
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 text-slate-800 dark:text-white font-black text-base focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400 transition" 
+                                placeholder={isIndo ? 'Misal: Sprint Planning, Workshop, atau Liburan' : 'E.g. Team Sprint Planning, 3-Day Workshop'} 
                                 required 
                                 autoFocus
                             />
@@ -180,7 +211,7 @@ export default function CalendarEventModal({
                         {/* Category Selector */}
                         <div>
                             <label className="block text-[11px] font-black uppercase text-slate-400 tracking-wider mb-2">
-                                {isIndo ? 'Kategori & Warna' : 'Category & Color'}
+                                {isIndo ? 'Kategori & Label' : 'Category & Label'}
                             </label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 {categoryOptions.map(cat => (
@@ -192,10 +223,10 @@ export default function CalendarEventModal({
                                             category: cat.value as any,
                                             color: cat.color 
                                         }))}
-                                        className={`p-2.5 rounded-xl border text-xs font-black flex items-center gap-2 transition-all ${
+                                        className={`p-2.5 rounded-xl border text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
                                             form.category === cat.value
                                                 ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300'
+                                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300'
                                         }`}
                                     >
                                         <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
@@ -205,59 +236,132 @@ export default function CalendarEventModal({
                             </div>
                         </div>
 
-                        {/* Date Pickers (Start & End) */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="relative">
-                                <label className="block text-[11px] font-black uppercase text-slate-400 tracking-wider mb-2">
-                                    {isIndo ? 'Tanggal Mulai' : 'Start Date'}
-                                </label>
-                                <button 
-                                    type="button" 
-                                    onClick={() => { setShowStartDatePicker(!showStartDatePicker); setShowEndDatePicker(false); }} 
-                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
-                                >
-                                    <span>{form.start_date}</span>
-                                    <Calendar size={14} className="text-slate-400" />
-                                </button>
-                                <GoalDatePicker 
-                                    show={showStartDatePicker}
-                                    teleport={false}
-                                    modelValue={form.start_date}
-                                    onUpdateModelValue={(val) => { 
-                                        setForm(prev => ({ ...prev, start_date: val, end_date: val })); 
-                                        setShowStartDatePicker(false); 
-                                    }}
-                                    onClose={() => setShowStartDatePicker(false)}
-                                />
+                        {/* Event Date Logic: Single Day vs Multi-Day Switcher */}
+                        <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/50 border border-slate-200/80 dark:border-slate-800 space-y-4">
+                            
+                            {/* Segmented Switch */}
+                            <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
+                                    {isIndo ? 'Tipe Rentang Tanggal' : 'Date Range Type'}
+                                </span>
+
+                                <div className="flex bg-slate-200/70 dark:bg-slate-800 p-1 rounded-xl">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleToggleMultiDay(false)}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                                            !isMultiDay
+                                                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
+                                                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400'
+                                        }`}
+                                    >
+                                        <Calendar size={13} />
+                                        <span>{isIndo ? '1 Hari Saja' : 'Single Day'}</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleToggleMultiDay(true)}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                                            isMultiDay
+                                                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
+                                                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400'
+                                        }`}
+                                    >
+                                        <CalendarRange size={13} />
+                                        <span>{isIndo ? 'Beberapa Hari' : 'Multi-Day'}</span>
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className="relative">
-                                <label className="block text-[11px] font-black uppercase text-slate-400 tracking-wider mb-2">
-                                    {isIndo ? 'Tanggal Selesai' : 'End Date'}
-                                </label>
-                                <button 
-                                    type="button" 
-                                    onClick={() => { setShowEndDatePicker(!showEndDatePicker); setShowStartDatePicker(false); }} 
-                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
-                                >
-                                    <span>{form.end_date || form.start_date}</span>
-                                    <Calendar size={14} className="text-slate-400" />
-                                </button>
-                                <GoalDatePicker 
-                                    show={showEndDatePicker}
-                                    teleport={false}
-                                    modelValue={form.end_date || form.start_date}
-                                    onUpdateModelValue={(val) => { 
-                                        setForm(prev => ({ ...prev, end_date: val })); 
-                                        setShowEndDatePicker(false); 
-                                    }}
-                                    onClose={() => setShowEndDatePicker(false)}
-                                />
-                            </div>
+                            {/* Date Pickers */}
+                            {!isMultiDay ? (
+                                /* 1 Single Day Picker (Default Case) */
+                                <div className="relative">
+                                    <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                                        {isIndo ? 'Tanggal Agenda' : 'Event Date'}
+                                    </label>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowSingleDatePicker(!showSingleDatePicker)} 
+                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-black text-slate-800 dark:text-white flex items-center justify-between hover:border-indigo-400 transition"
+                                    >
+                                        <span className="font-mono">{form.start_date}</span>
+                                        <Calendar size={15} className="text-indigo-600 dark:text-indigo-400" />
+                                    </button>
+                                    <GoalDatePicker 
+                                        show={showSingleDatePicker}
+                                        teleport={false}
+                                        modelValue={form.start_date}
+                                        onUpdateModelValue={(val) => { 
+                                            setForm(prev => ({ ...prev, start_date: val, end_date: val })); 
+                                            setShowSingleDatePicker(false); 
+                                        }}
+                                        onClose={() => setShowSingleDatePicker(false)}
+                                    />
+                                </div>
+                            ) : (
+                                /* Multi-Day Span: Start & End Date Pickers */
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div className="relative">
+                                        <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                                            {isIndo ? 'Tanggal Mulai' : 'Start Date'}
+                                        </label>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setShowStartDatePicker(!showStartDatePicker); setShowEndDatePicker(false); }} 
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-black text-slate-800 dark:text-white flex items-center justify-between hover:border-indigo-400 transition"
+                                        >
+                                            <span className="font-mono">{form.start_date}</span>
+                                            <Calendar size={15} className="text-indigo-600" />
+                                        </button>
+                                        <GoalDatePicker 
+                                            show={showStartDatePicker}
+                                            teleport={false}
+                                            modelValue={form.start_date}
+                                            onUpdateModelValue={(val) => { 
+                                                setForm(prev => {
+                                                    const nextEnd = (prev.end_date && prev.end_date < val) ? val : prev.end_date;
+                                                    return { ...prev, start_date: val, end_date: nextEnd || val };
+                                                }); 
+                                                setShowStartDatePicker(false); 
+                                            }}
+                                            onClose={() => setShowStartDatePicker(false)}
+                                        />
+                                    </div>
+
+                                    <div className="relative">
+                                        <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                                            {isIndo ? 'Tanggal Selesai' : 'End Date'}
+                                        </label>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setShowEndDatePicker(!showEndDatePicker); setShowStartDatePicker(false); }} 
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-black text-slate-800 dark:text-white flex items-center justify-between hover:border-indigo-400 transition"
+                                        >
+                                            <span className="font-mono">{form.end_date || form.start_date}</span>
+                                            <Calendar size={15} className="text-purple-600" />
+                                        </button>
+                                        <GoalDatePicker 
+                                            show={showEndDatePicker}
+                                            teleport={false}
+                                            modelValue={form.end_date || form.start_date}
+                                            onUpdateModelValue={(val) => { 
+                                                setForm(prev => {
+                                                    const validEnd = val < prev.start_date ? prev.start_date : val;
+                                                    return { ...prev, end_date: validEnd };
+                                                }); 
+                                                setShowEndDatePicker(false); 
+                                            }}
+                                            onClose={() => setShowEndDatePicker(false)}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
 
                         {/* Time Selectors & All Day Toggle */}
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider">
                                     {isIndo ? 'Waktu & Durasi' : 'Time & Duration'}
@@ -267,30 +371,66 @@ export default function CalendarEventModal({
                                         type="checkbox"
                                         checked={form.is_all_day}
                                         onChange={(e) => setForm(prev => ({ ...prev, is_all_day: e.target.checked }))}
-                                        className="rounded text-indigo-600 focus:ring-indigo-500"
+                                        className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
                                     />
-                                    <span>{isIndo ? 'Sepanjang Hari' : 'All Day'}</span>
+                                    <span>{isIndo ? 'Sepanjang Hari (All Day)' : 'All Day'}</span>
                                 </label>
                             </div>
 
-                            {!form.is_all_day && (
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <input
-                                            type="time"
-                                            value={form.start_time || '09:00'}
-                                            onChange={(e) => setForm(prev => ({ ...prev, start_time: e.target.value }))}
-                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-mono font-bold text-slate-800 dark:text-white"
-                                        />
+                            {!form.is_all_day ? (
+                                <div className="space-y-2">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-400 mb-1">
+                                                {isIndo ? 'Mulai' : 'Start'}
+                                            </label>
+                                            <input
+                                                type="time"
+                                                value={form.start_time || '09:00'}
+                                                onChange={(e) => setForm(prev => ({ ...prev, start_time: e.target.value }))}
+                                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-mono font-bold text-slate-800 dark:text-white"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-400 mb-1">
+                                                {isIndo ? 'Selesai' : 'End'}
+                                            </label>
+                                            <input
+                                                type="time"
+                                                value={form.end_time || '10:00'}
+                                                onChange={(e) => setForm(prev => ({ ...prev, end_time: e.target.value }))}
+                                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-mono font-bold text-slate-800 dark:text-white"
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <input
-                                            type="time"
-                                            value={form.end_time || '10:00'}
-                                            onChange={(e) => setForm(prev => ({ ...prev, end_time: e.target.value }))}
-                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-mono font-bold text-slate-800 dark:text-white"
-                                        />
+
+                                    {/* Quick Durations */}
+                                    <div className="flex items-center gap-1.5 pt-1">
+                                        <span className="text-[10px] font-bold text-slate-400 mr-1">
+                                            {isIndo ? 'Durasi Cepat:' : 'Quick:'}
+                                        </span>
+                                        {[
+                                            { label: '30m', min: 30 },
+                                            { label: '45m', min: 45 },
+                                            { label: '1 Jam', min: 60 },
+                                            { label: '2 Jam', min: 120 },
+                                        ].map(dur => (
+                                            <button
+                                                key={dur.label}
+                                                type="button"
+                                                onClick={() => handleSetDurationMinutes(dur.min)}
+                                                className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition cursor-pointer"
+                                            >
+                                                +{dur.label}
+                                            </button>
+                                        ))}
                                     </div>
+                                </div>
+                            ) : (
+                                <div className="p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-[11px] font-medium text-indigo-700 dark:text-indigo-300">
+                                    {isIndo 
+                                        ? '✨ Agenda ditandai sepanjang hari tanpa pengingat jam spesifik.' 
+                                        : '✨ Event is scheduled for the full day without specific time slots.'}
                                 </div>
                             )}
                         </div>
@@ -372,14 +512,14 @@ export default function CalendarEventModal({
                         <button 
                             type="button" 
                             onClick={onClose} 
-                            className="flex-1 py-3.5 rounded-2xl font-black text-xs text-slate-500 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 transition active:scale-95"
+                            className="flex-1 py-3.5 rounded-2xl font-black text-xs text-slate-500 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 transition active:scale-95 cursor-pointer"
                         >
                             {isIndo ? 'Batal' : 'Cancel'}
                         </button>
                         
                         <button 
                             type="submit" 
-                            className="flex-1 py-3.5 rounded-2xl font-black text-xs text-white transition active:scale-95 shadow-lg shadow-indigo-500/20" 
+                            className="flex-1 py-3.5 rounded-2xl font-black text-xs text-white transition active:scale-95 shadow-lg shadow-indigo-500/20 cursor-pointer" 
                             style={{ backgroundColor: form.color || '#4f46e5' }}
                         >
                             {form.id 

@@ -63,18 +63,6 @@ func GoalsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Server-Side Gating: Goals requires Architect tier
-	var planType string
-	err := dbGoals.QueryRow(`SELECT plan_type FROM users WHERE id = $1`, userIdStr).Scan(&planType)
-	if err != nil {
-		http.Error(w, `{"error": "User not found"}`, http.StatusUnauthorized)
-		return
-	}
-	if planType != "architect" && planType != "quantum" && planType != "legendary" && planType != "trial" {
-		http.Error(w, `{"error": "Forbidden: Goals requires Architect tier"}`, http.StatusForbidden)
-		return
-	}
-
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -96,6 +84,9 @@ func GoalsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
+	if dbGoals == nil {
+		initDB()
+	}
 	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
@@ -211,6 +202,12 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		Reward        *string  `json:"reward"`
 		Priority      *string  `json:"priority"`
 		Color         *string  `json:"color"`
+		Milestones    []struct {
+			Title       string `json:"title"`
+			Completed   *bool  `json:"completed"`
+			IsCompleted *bool  `json:"is_completed"`
+			Order       *int   `json:"order"`
+		} `json:"milestones"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -250,6 +247,9 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	}
 
 	if dbGoals == nil {
+		initDB()
+	}
+	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
@@ -269,6 +269,35 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 	g.Milestones = []GoalMilestone{}
+
+	if len(body.Milestones) > 0 {
+		for i, ms := range body.Milestones {
+			if ms.Title == "" {
+				continue
+			}
+			isComp := false
+			if ms.Completed != nil {
+				isComp = *ms.Completed
+			} else if ms.IsCompleted != nil {
+				isComp = *ms.IsCompleted
+			}
+			ord := i + 1
+			if ms.Order != nil {
+				ord = *ms.Order
+			}
+			var m GoalMilestone
+			err := dbGoals.QueryRow(`
+				INSERT INTO goal_milestones (goal_id, title, completed, "order", created_at, updated_at)
+				VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				RETURNING id, goal_id, title, completed, "order", target_date, created_at, updated_at
+			`, g.ID, ms.Title, isComp, ord).Scan(
+				&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &m.TargetDate, &m.CreatedAt, &m.UpdatedAt,
+			)
+			if err == nil {
+				g.Milestones = append(g.Milestones, m)
+			}
+		}
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(g)
@@ -307,6 +336,9 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
+	if dbGoals == nil {
+		initDB()
+	}
 	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
@@ -451,6 +483,9 @@ func handleDeleteGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
+	if dbGoals == nil {
+		initDB()
+	}
 	if dbGoals == nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return

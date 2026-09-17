@@ -8,7 +8,7 @@ import {
     DollarSign, ExternalLink, MapPin 
 } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
-import { UnifiedCalendarEvent, detectMeetingPlatform } from '../lib/calendarAnalytics';
+import { UnifiedCalendarEvent, detectMeetingPlatform, getEventDateSpanLabel } from '../lib/calendarAnalytics';
 
 export interface CalendarScheduledHabit {
     id: number;
@@ -142,6 +142,11 @@ export default function CalendarDayDetail({
                                                             <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 text-[9px] font-black flex items-center gap-1">
                                                                 <Video size={10} />
                                                                 <span>{meeting.name}</span>
+                                                            </span>
+                                                        )}
+                                                        {ev.end_date && ev.end_date !== ev.start_date && (
+                                                            <span className="px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[9px] font-black">
+                                                                📅 {getEventDateSpanLabel(ev, locale)}
                                                             </span>
                                                         )}
                                                     </div>
