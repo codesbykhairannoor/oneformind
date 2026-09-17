@@ -53,6 +53,18 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
     };
     
     useEffect(() => {
+        let mounted = true;
+        const checkExistingSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session && mounted) {
+                router.push('/dashboard');
+            }
+        };
+        checkExistingSession();
+        return () => { mounted = false; };
+    }, [supabase, router]);
+
+    useEffect(() => {
         if (state?.success) {
             router.push('/dashboard');
         }

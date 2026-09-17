@@ -29,10 +29,11 @@ export const proxy = async (req: any) => {
     return Response.redirect(loginUrl);
   }
 
-  const isAuthPage = pathname.includes('/login') || pathname.includes('/register');
-  
-  // Fast-path 2: Logged-in user visiting landing or auth pages -> Redirect to dashboard
-  if ((pathname === '/' || pathname === '/id' || pathname === '/en' || isAuthPage) && hasAuthCookie) {
+  // Fast-path 2: User visiting root landing page with auth cookie -> Redirect to dashboard
+  // Note: We do NOT redirect auth pages (/login, /register) here based on raw cookies,
+  // because if the session token is expired or invalid, server components will redirect back
+  // to /login, creating an infinite redirect loop (ERR_TOO_MANY_REDIRECTS).
+  if ((pathname === '/' || pathname === '/id' || pathname === '/en') && hasAuthCookie) {
     const locale = (pathname.startsWith('/en') || pathname === '/en') ? 'en' : 'id';
     return Response.redirect(new URL(`/${locale}/dashboard`, req.url));
   }
