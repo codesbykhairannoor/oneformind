@@ -20,28 +20,22 @@ export async function updateSession(request: NextRequest) {
             request,
           })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, { ...options, secure: false })
+            supabaseResponse.cookies.set(name, value, options)
           )
         },
       },
     }
   )
 
-  // Refresh session gracefully without blocking client route transitions
   try {
     const hasAuthCookie = request.cookies.has('sb-access-token') || 
       request.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
 
     if (hasAuthCookie) {
-      // Use a fast 120ms cap so slow network calls to Supabase auth API never freeze tab switching
-      const getUserPromise = supabase.auth.getUser();
-      const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 120));
-      await Promise.race([getUserPromise, timeoutPromise]);
-    } else {
       await supabase.auth.getUser();
     }
   } catch (e) {
-    // Non-fatal: keep tab navigation instant
+    // Non-fatal
   }
 
   return supabaseResponse
