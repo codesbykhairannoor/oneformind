@@ -2,28 +2,33 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { Link, useRouter } from '@/i18n/routing';
+import { useRouter } from '@/i18n/routing';
 import { 
     useActiveModules, 
-    MODULE_PRESETS, 
     ALL_MODULE_KEYS, 
-    ModuleKey,
-    MAX_FREE_ACTIVE_MODULES 
+    ModuleKey 
 } from '@/hooks/useActiveModules';
 import { 
-    Sparkles, 
     Check, 
     ArrowRight, 
-    Layers, 
-    ShieldCheck, 
+    ArrowLeft,
+    Sparkles, 
+    Compass, 
     Zap, 
-    X,
-    Globe,
-    Compass,
-    Rocket,
+    ShieldCheck, 
     SlidersHorizontal,
-    ChevronRight,
-    Star
+    Rocket,
+    Globe,
+    Layers,
+    Clock,
+    Flame,
+    Target,
+    BookOpen,
+    DollarSign,
+    Briefcase,
+    Calendar as CalendarIcon,
+    Smile,
+    Award
 } from 'lucide-react';
 
 interface FullPageOnboardingProps {
@@ -42,22 +47,23 @@ export default function FullPageOnboarding({
 
     const {
         activeKeys,
-        isUnlimited,
-        toggleTab,
-        applyPreset
+        persistModules
     } = useActiveModules();
 
     const [currentStep, setCurrentStep] = useState<number>(1);
-    const [selectedPersona, setSelectedPersona] = useState<string>('scholar');
-    const [selectedTabKeys, setSelectedTabKeys] = useState<ModuleKey[]>([]);
+    const [selectedRole, setSelectedRole] = useState<string>('student');
+    const [selectedGoals, setSelectedGoals] = useState<string[]>(['habits', 'planner', 'finance']);
+    const [selectedTabKeys, setSelectedTabKeys] = useState<ModuleKey[]>([
+        'habit', 'planner', 'finance', 'study', 'journal', 'calendar', 'job', 'goal'
+    ]);
+    const [workspaceName, setWorkspaceName] = useState<string>('Life OS');
+    const [dailyFocusVibe, setDailyFocusVibe] = useState<string>('deep_work');
     const [isSaving, setIsSaving] = useState(false);
+    const [isLaunching, setIsLaunching] = useState(false);
 
     useEffect(() => {
-        if (activeKeys.length > 0) {
+        if (activeKeys && activeKeys.length > 0) {
             setSelectedTabKeys(activeKeys);
-        } else {
-            // Default preset
-            setSelectedTabKeys(['study', 'planner', 'habit']);
         }
     }, [activeKeys]);
 
@@ -66,154 +72,252 @@ export default function FullPageOnboarding({
         window.dispatchEvent(new CustomEvent('switch-locale', { detail: { locale: lang } }));
     };
 
-    const emojiMap: Record<string, string> = {
-        habit: '🌱',
-        planner: '📋',
-        finance: '💸',
-        study: '🎓',
-        journal: '📓',
-        calendar: '📅',
-        job: '💼',
-        goal: '🎯'
-    };
-
-    const moduleDetailsMap: Record<string, { idName: string; enName: string; idDesc: string; enDesc: string; badge: string }> = {
-        habit: {
-            idName: 'Pelacak Kebiasaan',
-            enName: 'Habit Tracker',
-            idDesc: 'Bangun kebiasaan harian kuantitatif (ml, reps, menit) & lacak streak tanpa putus.',
-            enDesc: 'Build daily quantitative habits (ml, reps, mins) & maintain atomic streaks.',
-            badge: 'Daily OS'
+    // Role options (Step 1)
+    const roles = [
+        {
+            id: 'student',
+            icon: '🎓',
+            titleId: 'Pelajar & Akademisi',
+            titleEn: 'Student & Academic',
+            descId: 'Fokus manajemen kuliah, IPK, tugas, dan kebiasaan belajar harian.',
+            descEn: 'Focus on coursework, GPA tracking, assignments, and study routines.',
+            defaultModules: ['study', 'planner', 'habit', 'journal', 'calendar'] as ModuleKey[]
         },
-        planner: {
-            idName: 'Agenda & Timeline',
-            enName: 'Daily Planner',
-            idDesc: 'Jadwalkan jam kerja harian, alokasi waktu (time-blocking), dan daftar prioritas.',
-            enDesc: 'Schedule daily work hours, time-blocking blocks, and task priorities.',
+        {
+            id: 'freelancer',
+            icon: '💻',
+            titleId: 'Freelancer & Kreator',
+            titleEn: 'Freelancer & Creator',
+            descId: 'Atur jadwal proyek, pantau arus kas klien, dan capai target income.',
+            descEn: 'Manage client deliverables, monitor cashflow, and hit revenue goals.',
+            defaultModules: ['planner', 'finance', 'goal', 'habit', 'calendar'] as ModuleKey[]
+        },
+        {
+            id: 'career',
+            icon: '💼',
+            titleId: 'Profesional & Jobseeker',
+            titleEn: 'Professional & Jobseeker',
+            descId: 'Pipeline lamaran kerja, time-blocking jadwal kerja, dan kalender kegiatan.',
+            descEn: 'Job search pipeline, interview prep, work time-blocking, and master calendar.',
+            defaultModules: ['job', 'planner', 'calendar', 'journal', 'goal'] as ModuleKey[]
+        },
+        {
+            id: 'growth',
+            icon: '🌱',
+            titleId: 'Personal Growth & Wellness',
+            titleEn: 'Personal Growth & Wellness',
+            descId: 'Bangun rutinitas atomic habit, refleksi emosional, dan target jangka panjang.',
+            descEn: 'Build atomic habit streaks, reflective journaling, and strategic vision.',
+            defaultModules: ['habit', 'journal', 'goal', 'planner', 'finance'] as ModuleKey[]
+        },
+        {
+            id: 'all_rounder',
+            icon: '⚡',
+            titleId: 'All-Rounder (Life OS Penuh)',
+            titleEn: 'All-Rounder (Full Life OS)',
+            descId: 'Aktifkan seluruh 8 modul terpadu untuk integrasi kehidupan 360 derajat.',
+            descEn: 'Activate all 8 unified modules for a complete 360-degree life operating system.',
+            defaultModules: ['habit', 'planner', 'finance', 'study', 'journal', 'calendar', 'job', 'goal'] as ModuleKey[]
+        }
+    ];
+
+    // Priority goals (Step 2)
+    const goalOptions = [
+        { id: 'habits', emoji: '🌱', labelId: 'Membangun kebiasaan harian konsisten (Streak)', labelEn: 'Build atomic daily habits & unbroken streaks' },
+        { id: 'planner', emoji: '⏱️', labelId: 'Mengatur jadwal & time-blocking prioritas kerja', labelEn: 'Master daily time-blocking & task priorities' },
+        { id: 'finance', emoji: '💰', labelId: 'Mengelola arus kas, tabungan, & anggaran bulanan', labelEn: 'Manage multi-wallet cashflow & savings goals' },
+        { id: 'journal', emoji: '📓', labelId: 'Menjernihkan pikiran dengan refleksi & jurnal harian', labelEn: 'Clear mental clutter with daily reflective journaling' },
+        { id: 'goals', emoji: '🎯', labelId: 'Mencapai target strategis & milestone jangka panjang', labelEn: 'Crush strategic goals & long-term milestones' },
+        { id: 'jobs', emoji: '💼', labelId: 'Melacak lamaran kerja & mempersiapkan karier', labelEn: 'Track job application pipelines & career growth' },
+        { id: 'study', emoji: '🎓', labelId: 'Meningkatkan IPK, tugas kuliah, & ringkasan buku', labelEn: 'Boost GPA, track assignments & library books' },
+        { id: 'calendar', emoji: '📅', labelId: 'Menyatukan seluruh deadline penting dalam kalender', labelEn: 'Consolidate events & critical deadlines in one calendar' },
+    ];
+
+    // Modules catalog (Step 3)
+    const modulesCatalog: { key: ModuleKey; emoji: string; nameId: string; nameEn: string; descId: string; descDesc: string; badge: string }[] = [
+        {
+            key: 'planner',
+            emoji: '📋',
+            nameId: 'Daily Planner',
+            nameEn: 'Daily Planner',
+            descId: 'Timeline jam kerja, time-blocking, dan checklist to-do prioritas.',
+            descDesc: 'Daily time-blocking, task priorities, and schedule management.',
             badge: 'Time OS'
         },
-        finance: {
-            idName: 'Manajemen Keuangan',
-            enName: 'Finance Command',
-            idDesc: 'Pantau arus kas multi-dompet, pos tabungan impian, dan batasan anggaran bulanan.',
-            enDesc: 'Multi-wallet cashflow, savings pots, and monthly budget limits.',
+        {
+            key: 'habit',
+            emoji: '🌱',
+            nameId: 'Habit Tracker',
+            nameEn: 'Habit Tracker',
+            descId: 'Lacak kebiasaan kuantitatif harian dan jaga streak konsistensi.',
+            descDesc: 'Quantitative daily habit metrics and atomic streak tracking.',
+            badge: 'Atomic OS'
+        },
+        {
+            key: 'finance',
+            emoji: '💸',
+            nameId: 'Finance OS',
+            nameEn: 'Finance OS',
+            descId: 'Catat transaksi multi-dompet, pos tabungan, dan batasan budget.',
+            descDesc: 'Multi-wallet cashflow, savings pots, and monthly budget limits.',
             badge: 'Money OS'
         },
-        study: {
-            idName: 'Akademik & Studi',
-            enName: 'Study & Academic',
-            idDesc: 'Simulasi IPK/GPA, jadwalkan kuliah, daftar tugas, dan ringkasan buku.',
-            enDesc: 'GPA simulator, course scheduling, assignment tracker, and book library.',
-            badge: 'Knowledge OS'
-        },
-        journal: {
-            idName: 'Jurnal & Refleksi',
-            enName: 'Reflective Journal',
-            idDesc: 'Catat refleksi emosional harian, evaluasi diri, dan jurnal pemikiran.',
-            enDesc: 'Daily emotional reflections, self-evaluation, and thought archives.',
+        {
+            key: 'journal',
+            emoji: '📓',
+            nameId: 'Digital Journal',
+            nameEn: 'Digital Journal',
+            descId: 'Refleksi emosi harian, mood rating, dan arsip pemikiran penting.',
+            descDesc: 'Daily emotional reflections, mood logs, and thought archives.',
             badge: 'Mind OS'
         },
-        calendar: {
-            idName: 'Kalender Master',
-            enName: 'Master Calendar',
-            idDesc: 'Pusat kalender kegiatan, event mendatang, dan deadline penting.',
-            enDesc: 'Master calendar hub, upcoming events, and critical deadlines.',
-            badge: 'Events OS'
+        {
+            key: 'goal',
+            emoji: '🎯',
+            nameId: 'Strategic Goals',
+            nameEn: 'Strategic Goals',
+            descId: 'Peta target jangka panjang, breakdown milestone, dan vision board.',
+            descDesc: 'Long-term goal OKRs, milestone breakdown, and progress tracking.',
+            badge: 'Vision OS'
         },
-        job: {
-            idName: 'Pusat Karier & Kerja',
-            enName: 'Jobs & Career',
-            idDesc: 'Lacak pipeline lamaran kerja, catatan wawancara, dan recruiter CRM.',
-            enDesc: 'Job application funnel, interview logs, and recruiter CRM.',
+        {
+            key: 'study',
+            emoji: '🎓',
+            nameId: 'Study & Academic',
+            nameEn: 'Study & Academic',
+            descId: 'Simulasi IPK, jadwal mata kuliah, deadline tugas, dan buku.',
+            descDesc: 'GPA simulator, course schedules, assignment deadlines, and books.',
+            badge: 'Study OS'
+        },
+        {
+            key: 'job',
+            emoji: '💼',
+            nameId: 'Job Tracker',
+            nameEn: 'Job Tracker',
+            descId: 'Pipeline status lamaran kerja, catatan interview, dan CRM karier.',
+            descDesc: 'Job application pipeline, interview notes, and recruiter CRM.',
             badge: 'Career OS'
         },
-        goal: {
-            idName: 'Target Strategis',
-            enName: 'Strategic Goals',
-            idDesc: 'Target jangka panjang, breakdown milestone mingguan, dan visi hidup.',
-            enDesc: 'Long-term goal OKRs, weekly milestone breakdown, and vision board.',
-            badge: 'Vision OS'
+        {
+            key: 'calendar',
+            emoji: '📅',
+            nameId: 'Smart Calendar',
+            nameEn: 'Smart Calendar',
+            descId: 'Pusat kalender visual untuk sinkronisasi seluruh event & tugas.',
+            descDesc: 'Visual calendar hub consolidating all schedules and events.',
+            badge: 'Events OS'
+        },
+    ];
+
+    const handleSelectRole = (roleId: string) => {
+        setSelectedRole(roleId);
+        const r = roles.find(item => item.id === roleId);
+        if (r) {
+            setSelectedTabKeys(r.defaultModules);
         }
     };
 
-    const handlePersonaClick = async (presetId: string) => {
-        setSelectedPersona(presetId);
-        const preset = MODULE_PRESETS.find(p => p.id === presetId);
-        if (preset) {
-            setSelectedTabKeys(preset.modules);
-            await applyPreset(presetId);
+    const toggleGoal = (goalId: string) => {
+        setSelectedGoals(prev => 
+            prev.includes(goalId) ? prev.filter(g => g !== goalId) : [...prev, goalId]
+        );
+    };
+
+    const toggleModule = (key: ModuleKey) => {
+        setSelectedTabKeys(prev => {
+            if (prev.includes(key)) {
+                if (prev.length <= 1) return prev; // Keep at least 1 module active
+                return prev.filter(k => k !== key);
+            } else {
+                return [...prev, key];
+            }
+        });
+    };
+
+    const handleNextStep = () => {
+        if (currentStep < 4) {
+            setCurrentStep(prev => prev + 1);
         }
     };
 
-    const handleSelectModule = async (key: ModuleKey) => {
-        const isSelected = selectedTabKeys.includes(key);
-        if (isSelected) {
-            if (selectedTabKeys.length <= 1) return; // Keep at least 1 tab
-            const next = selectedTabKeys.filter(k => k !== key);
-            setSelectedTabKeys(next);
-            await toggleTab(key);
-        } else {
-            const next = [...selectedTabKeys, key];
-            setSelectedTabKeys(next);
-            await toggleTab(key);
+    const handlePrevStep = () => {
+        if (currentStep > 1) {
+            setCurrentStep(prev => prev - 1);
         }
     };
 
-    const handleFinishOnboarding = async () => {
+    const handleFinishAndLaunch = async () => {
+        setIsLaunching(true);
         setIsSaving(true);
-        try {
-            localStorage.setItem('tranvas_tab_setup_completed', 'true');
-        } catch (e) {
-            console.error(e);
-        }
 
-        if (onClose) {
-            onClose();
-        } else {
+        try {
+            // Build modules map
+            const nextModules: Record<string, boolean> = {};
+            ALL_MODULE_KEYS.forEach(k => {
+                nextModules[k] = selectedTabKeys.includes(k);
+            });
+
+            // Save to active modules system
+            await persistModules(nextModules);
+
+            // Save onboarding metadata to localStorage
+            localStorage.setItem('tranvas_tab_setup_completed', 'true');
+            localStorage.setItem('tranvas_onboarding_profile', JSON.stringify({
+                role: selectedRole,
+                goals: selectedGoals,
+                workspaceName,
+                dailyFocusVibe,
+                completedAt: new Date().toISOString()
+            }));
+
+            // Optional delay for a slick SaaS launching animation
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            if (onClose) {
+                onClose();
+            } else {
+                router.push('/dashboard');
+            }
+        } catch (e) {
+            console.error('Error completing onboarding:', e);
             router.push('/dashboard');
+        } finally {
+            setIsSaving(false);
+            setIsLaunching(false);
         }
-        setIsSaving(false);
     };
 
     return (
         <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
             
-            {/* AMBIENT GLOW BACKGROUND */}
-            <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none" />
+            {/* AMBIENT GLOW EFFECTS */}
+            <div className="absolute top-0 left-1/3 w-[600px] h-[500px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none" />
 
-            {/* TOP BAR */}
-            <header className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between relative z-20 border-b border-slate-800/60">
-                
-                {/* Brand Title */}
+            {/* TOP HEADER */}
+            <header className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between relative z-20 border-b border-slate-800/60">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-indigo-500/20">
                         T
                     </div>
                     <div>
                         <h1 className="text-base font-black tracking-tight text-white flex items-center gap-2">
-                            <span>Tranvas OS</span>
+                            <span>Tranvas Life OS</span>
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                                v2.5 Setup
+                                Workspace Setup
                             </span>
                         </h1>
-                        <p className="text-[11px] font-medium text-slate-400">
-                            {isIndo ? 'Sistem Operasi Kehidupan Terpadu' : 'Unified Life Operating System'}
-                        </p>
                     </div>
                 </div>
 
-                {/* Right Actions: Lang Switcher & Skip/Close */}
                 <div className="flex items-center gap-3">
-                    {/* Bilingual Language Switcher */}
+                    {/* Language Switcher */}
                     <div className="flex items-center bg-slate-900 border border-slate-800 rounded-2xl p-1 text-xs font-bold">
                         <button
                             type="button"
                             onClick={() => handleSwitchLang('id')}
                             className={`px-3 py-1.5 rounded-xl transition-all ${
-                                isIndo 
-                                    ? 'bg-indigo-600 text-white shadow-sm' 
-                                    : 'text-slate-400 hover:text-white'
+                                isIndo ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
                         >
                             🇮🇩 ID
@@ -222,405 +326,405 @@ export default function FullPageOnboarding({
                             type="button"
                             onClick={() => handleSwitchLang('en')}
                             className={`px-3 py-1.5 rounded-xl transition-all ${
-                                !isIndo 
-                                    ? 'bg-indigo-600 text-white shadow-sm' 
-                                    : 'text-slate-400 hover:text-white'
+                                !isIndo ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
                         >
                             🇺🇸 EN
                         </button>
                     </div>
-
-                    {!isStandalonePage && (
-                        <button
-                            type="button"
-                            onClick={handleFinishOnboarding}
-                            className="p-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition"
-                            title={isIndo ? 'Tutup Setup' : 'Close Setup'}
-                        >
-                            <X size={18} />
-                        </button>
-                    )}
                 </div>
             </header>
 
-            {/* STEP PROGRESS INDICATOR BAR */}
-            <div className="w-full bg-slate-900/50 border-b border-slate-800/40 py-3 relative z-10">
-                <div className="max-w-3xl mx-auto px-4 flex items-center justify-between">
+            {/* PROGRESS STEP BAR */}
+            <div className="w-full bg-slate-900/50 border-b border-slate-800/40 py-3.5 relative z-10">
+                <div className="max-w-4xl mx-auto px-4 flex items-center justify-between gap-2">
                     {[
-                        { step: 1, labelId: '1. Persona & Tujuan', labelEn: '1. Persona & Goals' },
-                        { step: 2, labelId: '2. Kustomisasi Modul', labelEn: '2. Custom Workspace Tabs' },
-                        { step: 3, labelId: '3. Peluncuran Workspace', labelEn: '3. Launch Workspace' },
-                    ].map(s => {
-                        const isActiveStep = currentStep === s.step;
-                        const isDone = currentStep > s.step;
+                        { step: 1, labelId: 'Peran & Fokus', labelEn: 'Role & Focus' },
+                        { step: 2, labelId: 'Prioritas Utama', labelEn: 'Key Priorities' },
+                        { step: 3, labelId: 'Pilih Modul Tab', labelEn: 'Select Modules' },
+                        { step: 4, labelId: 'Peluncuran', labelEn: 'Launch OS' },
+                    ].map(item => {
+                        const isDone = item.step < currentStep;
+                        const isCurrent = item.step === currentStep;
 
                         return (
-                            <button
-                                key={s.step}
-                                type="button"
-                                onClick={() => setCurrentStep(s.step)}
+                            <div 
+                                key={item.step} 
                                 className={`flex items-center gap-2 transition-all ${
-                                    isActiveStep 
-                                        ? 'text-indigo-400 font-black' 
-                                        : isDone 
-                                        ? 'text-emerald-400 font-bold' 
-                                        : 'text-slate-500 font-medium'
+                                    isCurrent ? 'opacity-100' : isDone ? 'opacity-80' : 'opacity-40'
                                 }`}
                             >
-                                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
-                                    isActiveStep 
-                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/40 ring-4 ring-indigo-500/20' 
-                                        : isDone 
-                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' 
-                                        : 'bg-slate-800 text-slate-500'
+                                <div className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black transition-all ${
+                                    isDone 
+                                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                                        : isCurrent 
+                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-400/40' 
+                                            : 'bg-slate-800 text-slate-400'
                                 }`}>
-                                    {isDone ? <Check size={14} strokeWidth={3} /> : s.step}
+                                    {isDone ? <Check size={14} strokeWidth={3} /> : item.step}
                                 </div>
-                                <span className="text-xs hidden sm:inline">
-                                    {isIndo ? s.labelId : s.labelEn}
+                                <span className={`text-xs font-bold hidden sm:inline ${
+                                    isCurrent ? 'text-white' : 'text-slate-400'
+                                }`}>
+                                    {isIndo ? item.labelId : item.labelEn}
                                 </span>
-                            </button>
+                            </div>
                         );
                     })}
                 </div>
             </div>
 
-            {/* MAIN CONTENT AREA */}
-            <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 sm:py-12 relative z-10 flex flex-col justify-between">
+            {/* MAIN INTERACTIVE ONBOARDING BODY */}
+            <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-10 flex flex-col justify-between relative z-10">
                 
-                {/* ================= STEP 1: PERSONA & LIFE GOAL SELECTION ================= */}
+                {/* STEP 1: PERSONA / ROLE */}
                 {currentStep === 1 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-400">
-                        
-                        {/* Headline */}
-                        <div className="text-center max-w-2xl mx-auto space-y-3">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold">
-                                <Compass size={14} className="text-indigo-400" />
-                                <span>{isIndo ? 'Langkah 1 dari 3: Kenali Persona Anda' : 'Step 1 of 3: Identify Your Persona'}</span>
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="text-center sm:text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-3">
+                                <Sparkles size={13} />
+                                <span>{isIndo ? 'Langkah 1 dari 4' : 'Step 1 of 4'}</span>
                             </div>
-                            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-                                {isIndo ? 'Pilih Gaya Hidup & Target Utama Anda Hari Ini' : 'Choose Your Primary Goal & Lifestyle Today'}
+                            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                                {isIndo ? 'Apa fokus utama aktivitas Anda saat ini?' : "What's your primary focus right now?"}
                             </h2>
-                            <p className="text-sm text-slate-400 leading-relaxed">
+                            <p className="text-sm font-medium text-slate-400 mt-2">
                                 {isIndo 
-                                    ? 'Pilih paket awal yang sesuai dengan prioritas hidup Anda saat ini. Anda bebas menambah atau menyembunyikan modul kapan saja.' 
-                                    : 'Select a preset tailored to your current priorities. You can enable or hide any module anytime.'}
+                                    ? 'Pilih persona Anda untuk menyesuaikan tata letak modul dan rekomendasi fitur terbaik.'
+                                    : 'Select your persona to tailor the workspace layout and optimal workflow.'}
                             </p>
                         </div>
 
-                        {/* Persona Cards Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {MODULE_PRESETS.map((preset) => {
-                                const isSelected = selectedPersona === preset.id;
-
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {roles.map(role => {
+                                const isSelected = selectedRole === role.id;
                                 return (
                                     <button
-                                        key={preset.id}
+                                        key={role.id}
                                         type="button"
-                                        onClick={() => handlePersonaClick(preset.id)}
-                                        className={`p-5 rounded-3xl border text-left transition-all relative flex flex-col justify-between group overflow-hidden ${
+                                        onClick={() => handleSelectRole(role.id)}
+                                        className={`p-5 rounded-2xl border text-left transition-all relative group flex flex-col justify-between ${
                                             isSelected 
-                                                ? 'bg-gradient-to-b from-indigo-950/80 via-slate-900 to-slate-900 border-indigo-500 shadow-xl shadow-indigo-500/10 ring-2 ring-indigo-500/30 scale-[1.02]' 
-                                                : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+                                                ? 'bg-indigo-600/10 border-indigo-500 ring-2 ring-indigo-500/30 shadow-xl shadow-indigo-500/10' 
+                                                : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-900 hover:border-slate-700'
                                         }`}
                                     >
-                                        <div>
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className="text-3xl p-2 rounded-2xl bg-slate-800/80 border border-slate-700/60 inline-block">
-                                                    {preset.emoji}
-                                                </span>
-                                                {isSelected && (
-                                                    <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
-                                                        <Check size={10} strokeWidth={3} />
-                                                        <span>{isIndo ? 'Terpilih' : 'Selected'}</span>
-                                                    </span>
-                                                )}
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl shadow-inner group-hover:scale-105 transition-transform">
+                                                {role.icon}
                                             </div>
-
-                                            <h3 className="text-base font-black text-white group-hover:text-indigo-300 transition-colors">
-                                                {isIndo ? preset.labelId : preset.labelEn}
-                                            </h3>
-
-                                            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                                                {isIndo ? preset.descId : preset.descEn}
-                                            </p>
-                                        </div>
-
-                                        <div className="mt-5 pt-4 border-t border-slate-800/60 flex items-center justify-between">
-                                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                                                {isIndo ? 'Fokus Utama:' : 'Primary Focus:'}
-                                            </span>
-                                            <div className="flex items-center gap-1.5">
-                                                {preset.modules.map(m => (
-                                                    <span key={m} className="px-2 py-0.5 rounded-lg bg-slate-800 text-xs font-bold border border-slate-700/50">
-                                                        {emojiMap[m]} {isIndo ? moduleDetailsMap[m]?.idName.split(' ')[0] : moduleDetailsMap[m]?.enName.split(' ')[0]}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        {/* Continue Button */}
-                        <div className="flex justify-end pt-4">
-                            <button
-                                type="button"
-                                onClick={() => setCurrentStep(2)}
-                                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-black text-sm shadow-xl shadow-indigo-500/25 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
-                            >
-                                <span>{isIndo ? 'Lanjut Kustomisasi Tab' : 'Continue to Custom Tabs'}</span>
-                                <ArrowRight size={16} strokeWidth={2.5} />
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* ================= STEP 2: INTERACTIVE 8-MODULE CUSTOMIZER ================= */}
-                {currentStep === 2 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-400">
-                        
-                        {/* Headline */}
-                        <div className="text-center max-w-2xl mx-auto space-y-3">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold">
-                                <SlidersHorizontal size={14} className="text-indigo-400" />
-                                <span>{isIndo ? 'Langkah 2 dari 3: Pilih Tab Produktivitas Anda' : 'Step 2 of 3: Customize Workspace Tabs'}</span>
-                            </div>
-                            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-                                {isIndo ? 'Pilih Modul yang Ingin Ditampilkan' : 'Select Modules to Display on Navigation'}
-                            </h2>
-                            <p className="text-sm text-slate-400 leading-relaxed">
-                                {isIndo 
-                                    ? 'Aktifkan modul yang Anda butuhkan dan sembunyikan modul yang belum diperlukan agar tampilan tetap terfokus.' 
-                                    : 'Enable the modules you need and hide unused ones to keep your workspace navigation focused.'}
-                            </p>
-                        </div>
-
-                        {/* Live Selection Counter Pill */}
-                        <div className="flex items-center justify-center">
-                            <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-sm font-black shadow-lg">
-                                <Layers size={16} className="text-indigo-400" />
-                                <span className="text-slate-200">
-                                    {isIndo ? 'Modul Aktif di Navigasi:' : 'Active Modules on Nav:'} <strong className="text-indigo-400">{selectedTabKeys.length} / 8</strong>
-                                </span>
-                                <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] uppercase font-black tracking-wider border border-emerald-500/30">
-                                    {isIndo ? 'Siap Digunakan' : 'Ready to Use'}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* 8 Module Cards Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                            {ALL_MODULE_KEYS.map((key) => {
-                                const details = moduleDetailsMap[key];
-                                const isSelected = selectedTabKeys.includes(key);
-                                const isMaxReached = selectedTabKeys.length >= MAX_FREE_ACTIVE_MODULES && !isSelected && !isUnlimited;
-
-                                return (
-                                    <button
-                                        key={key}
-                                        type="button"
-                                        disabled={isMaxReached}
-                                        onClick={() => handleSelectModule(key)}
-                                        className={`p-4 rounded-3xl border text-left transition-all relative flex flex-col justify-between ${
-                                            isSelected 
-                                                ? 'bg-gradient-to-b from-indigo-950/70 via-slate-900 to-slate-900 border-indigo-500 ring-2 ring-indigo-500/30 shadow-lg' 
-                                                : isMaxReached
-                                                ? 'bg-slate-900/40 border-slate-800/60 opacity-40 cursor-not-allowed'
-                                                : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
-                                        }`}
-                                    >
-                                        <div>
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className="text-3xl p-2 rounded-2xl bg-slate-800/80 border border-slate-700/60 inline-block">
-                                                    {emojiMap[key]}
-                                                </span>
-                                                <span className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${
-                                                    isSelected 
-                                                        ? 'bg-indigo-600 text-white' 
-                                                        : 'bg-slate-800 text-slate-400 border border-slate-700/50'
-                                                }`}>
-                                                    {details?.badge}
-                                                </span>
-                                            </div>
-
-                                            <h3 className={`text-sm font-black transition-colors ${
-                                                isSelected ? 'text-indigo-300' : 'text-white'
+                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
+                                                isSelected ? 'border-indigo-500 bg-indigo-600 text-white' : 'border-slate-700 bg-slate-800'
                                             }`}>
-                                                {isIndo ? details?.idName : details?.enName}
+                                                {isSelected && <Check size={12} strokeWidth={3} />}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-black text-base text-white mb-1">
+                                                {isIndo ? role.titleId : role.titleEn}
                                             </h3>
-
-                                            <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
-                                                {isIndo ? details?.idDesc : details?.enDesc}
+                                            <p className="text-xs text-slate-400 leading-relaxed">
+                                                {isIndo ? role.descId : role.descEn}
                                             </p>
                                         </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
-                                        <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between">
-                                            {isSelected ? (
-                                                <span className="text-[11px] font-black text-indigo-400 flex items-center gap-1">
-                                                    <Check size={12} strokeWidth={3} />
-                                                    <span>{isIndo ? 'Aktif di Navigasi' : 'Active on Nav'}</span>
+                {/* STEP 2: CORE PRIORITIES & GOALS */}
+                {currentStep === 2 && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="text-center sm:text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-3">
+                                <Target size={13} />
+                                <span>{isIndo ? 'Langkah 2 dari 4' : 'Step 2 of 4'}</span>
+                            </div>
+                            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                                {isIndo ? 'Apa target terpenting yang ingin Anda capai?' : 'What are your top priorities to conquer?'}
+                            </h2>
+                            <p className="text-sm font-medium text-slate-400 mt-2">
+                                {isIndo 
+                                    ? 'Pilih beberapa fokus utama yang ingin Anda perbaiki dan lacak setiap hari.'
+                                    : 'Select the key areas you want to track and master effortlessly.'}
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            {goalOptions.map(goal => {
+                                const isSelected = selectedGoals.includes(goal.id);
+                                return (
+                                    <button
+                                        key={goal.id}
+                                        type="button"
+                                        onClick={() => toggleGoal(goal.id)}
+                                        className={`p-4 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 ${
+                                            isSelected 
+                                                ? 'bg-indigo-600/15 border-indigo-500 text-white shadow-md shadow-indigo-500/10' 
+                                                : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:bg-slate-900 hover:border-slate-700'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xl shrink-0">{goal.emoji}</span>
+                                            <span className="text-xs font-bold leading-snug">
+                                                {isIndo ? goal.labelId : goal.labelEn}
+                                            </span>
+                                        </div>
+                                        <div className={`w-5 h-5 rounded-lg border shrink-0 flex items-center justify-center transition-all ${
+                                            isSelected ? 'border-indigo-500 bg-indigo-600 text-white' : 'border-slate-700 bg-slate-800'
+                                        }`}>
+                                            {isSelected && <Check size={12} strokeWidth={3} />}
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* STEP 3: DIRECT MODULE TAB SELECTION */}
+                {currentStep === 3 && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                            <div>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-3">
+                                    <Layers size={13} />
+                                    <span>{isIndo ? 'Langkah 3 dari 4' : 'Step 3 of 4'}</span>
+                                </div>
+                                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                                    {isIndo ? 'Pilih Modul Tab yang Ingin Diaktifkan' : 'Choose Your Active Module Tabs'}
+                                </h2>
+                                <p className="text-sm font-medium text-slate-400 mt-2">
+                                    {isIndo 
+                                        ? 'Seluruh 8 modul terbuka penuh secara default. Centang modul yang ingin Anda tampilkan di navigasi.'
+                                        : 'All 8 modules are fully unlocked. Toggle whichever tabs you want active on your navigation.'}
+                                </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                                <span className="text-xs font-bold text-slate-400">
+                                    {isIndo ? 'Aktif:' : 'Active:'}
+                                </span>
+                                <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black">
+                                    {selectedTabKeys.length} / 8 {isIndo ? 'Modul' : 'Modules'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* MODULES GRID */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                            {modulesCatalog.map(mod => {
+                                const isSelected = selectedTabKeys.includes(mod.key);
+                                return (
+                                    <button
+                                        key={mod.key}
+                                        type="button"
+                                        onClick={() => toggleModule(mod.key)}
+                                        className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between relative group min-h-[140px] ${
+                                            isSelected 
+                                                ? 'bg-slate-900 border-indigo-500/80 ring-2 ring-indigo-500/20 shadow-lg shadow-indigo-500/10' 
+                                                : 'bg-slate-900/40 border-slate-800/60 opacity-60 hover:opacity-100 hover:border-slate-700'
+                                        }`}
+                                    >
+                                        <div className="flex items-start justify-between w-full mb-3">
+                                            <span className="text-2xl">{mod.emoji}</span>
+                                            <div className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                                                isSelected ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-800 text-slate-400'
+                                            }`}>
+                                                {mod.badge}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-sm text-white flex items-center justify-between mb-1">
+                                                <span>{isIndo ? mod.nameId : mod.nameEn}</span>
+                                                <span className={`w-4 h-4 rounded flex items-center justify-center text-[10px] ${
+                                                    isSelected ? 'bg-indigo-600 text-white' : 'border border-slate-700'
+                                                }`}>
+                                                    {isSelected && <Check size={11} strokeWidth={3} />}
                                                 </span>
-                                            ) : isMaxReached ? (
-                                                <span className="text-[10px] font-bold text-slate-500">
-                                                    {isIndo ? 'Batas Modul Terpakai' : 'Module Limit Reached'}
-                                                </span>
-                                            ) : (
-                                                <span className="text-[11px] font-bold text-slate-400 hover:text-white">
-                                                    + {isIndo ? 'Pilih Tab Ini' : 'Select Tab'}
-                                                </span>
-                                            )}
+                                            </h4>
+                                            <p className="text-[11px] text-slate-400 leading-snug line-clamp-2">
+                                                {isIndo ? mod.descId : mod.descDesc}
+                                            </p>
                                         </div>
                                     </button>
                                 );
                             })}
                         </div>
 
-                        {/* Navigation Buttons */}
-                        <div className="flex items-center justify-between pt-4">
-                            <button
-                                type="button"
-                                onClick={() => setCurrentStep(1)}
-                                className="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs transition"
-                            >
-                                &larr; {isIndo ? 'Kembali ke Langkah 1' : 'Back to Step 1'}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setCurrentStep(3)}
-                                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-black text-sm shadow-xl shadow-indigo-500/25 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
-                            >
-                                <span>{isIndo ? 'Tinjau & Peluncuran' : 'Review & Launch'}</span>
-                                <ArrowRight size={16} strokeWidth={2.5} />
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* ================= STEP 3: TIER SUMMARY & WORKSPACE LAUNCH ================= */}
-                {currentStep === 3 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-400">
-                        
-                        {/* Headline */}
-                        <div className="text-center max-w-2xl mx-auto space-y-3">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-bold">
-                                <Rocket size={14} className="text-emerald-400" />
-                                <span>{isIndo ? 'Langkah 3 dari 3: Konfigurasi Selesai' : 'Step 3 of 3: System Ready'}</span>
-                            </div>
-                            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-                                {isIndo ? 'Workspace Siap Digunakan Hari Ini' : 'Your Personal Workspace is Ready'}
-                            </h2>
-                            <p className="text-sm text-slate-400 leading-relaxed">
-                                {isIndo 
-                                    ? 'Sistem produktivitas Anda telah siap digunakan. Anda bebas menyesuaikan tampilan modul kapan saja.' 
-                                    : 'Your productivity system is ready. You can customize active modules anytime.'}
-                            </p>
-                        </div>
-
-                        {/* Selected System Summary Card */}
-                        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-                            
-                            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-                                <div>
-                                    <h3 className="text-base font-black text-white">
-                                        {isIndo ? 'Modul Aktif di Navigasi Anda:' : 'Your Configured Workspace Modules:'}
-                                    </h3>
-                                    <p className="text-xs text-slate-400 mt-0.5">
-                                        {isIndo ? `${selectedTabKeys.length} modul aktif di navigasi & sidebar` : `${selectedTabKeys.length} modules active on navigation & sidebar`}
-                                    </p>
-                                </div>
-                                <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-black">
-                                    {isIndo ? 'Paket Explorer' : 'Explorer Plan'}
+                        {/* LIVE PREVIEW BAR */}
+                        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <span className="text-xs font-bold text-slate-400">
+                                {isIndo ? '👀 Tampilan Tab Navigasi Anda:' : '👀 Live Navigation Tab Preview:'}
+                            </span>
+                            <div className="flex flex-wrap items-center justify-center gap-1.5">
+                                <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold">
+                                    📊 Dashboard
                                 </span>
-                            </div>
-
-                            {/* Active Tab Pills */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                {selectedTabKeys.map((key) => {
-                                    const details = moduleDetailsMap[key];
+                                {selectedTabKeys.map(k => {
+                                    const m = modulesCatalog.find(item => item.key === k);
+                                    if (!m) return null;
                                     return (
-                                        <div key={key} className="p-4 rounded-2xl bg-slate-950 border border-indigo-500/30 flex items-center gap-3">
-                                            <span className="text-2xl p-2 rounded-xl bg-slate-900 border border-slate-800">
-                                                {emojiMap[key]}
-                                            </span>
-                                            <div>
-                                                <h4 className="text-xs font-black text-white">
-                                                    {isIndo ? details?.idName : details?.enName}
-                                                </h4>
-                                                <span className="text-[10px] font-bold text-indigo-400">
-                                                    ✓ {isIndo ? 'Aktif' : 'Active'}
-                                                </span>
-                                            </div>
-                                        </div>
+                                        <span key={k} className="px-2.5 py-1 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold flex items-center gap-1">
+                                            <span>{m.emoji}</span>
+                                            <span>{isIndo ? m.nameId : m.nameEn}</span>
+                                        </span>
                                     );
                                 })}
                             </div>
-
-                            {/* 14-Day Free Trial Upgrade Banner */}
-                            <div className="p-5 rounded-2xl bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-pink-950/80 border border-indigo-500/40 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
-                                        <Sparkles size={20} />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-black text-white">
-                                            {isIndo ? 'Ingin Akses Fitur Power-User (Batch Entry, PDF/CSV Export) + AI Coach?' : 'Want Power-User Engines (Batch Entry, PDF/CSV Exports) + AI Coach?'}
-                                        </h4>
-                                        <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
-                                            {isIndo 
-                                                ? 'Coba 14 Hari Free Trial dengan Kartu Kredit ($0 Hari Ini, Batal Kapan Saja).' 
-                                                : 'Try 14-Day Free Trial with Card ($0 Today, Cancel Anytime).'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <Link
-                                    href="/billing"
-                                    onClick={handleFinishOnboarding}
-                                    className="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-black text-xs shrink-0 shadow-lg transition active:scale-95 text-center"
-                                >
-                                    {isIndo ? 'Mulai Trial 14 Hari' : 'Start 14-Day Trial'} &rarr;
-                                </Link>
-                            </div>
-
-                        </div>
-
-                        {/* Final Launch Button */}
-                        <div className="flex items-center justify-between pt-4">
-                            <button
-                                type="button"
-                                onClick={() => setCurrentStep(2)}
-                                className="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs transition"
-                            >
-                                &larr; {isIndo ? 'Kembali ke Langkah 2' : 'Back to Step 2'}
-                            </button>
-
-                            <button
-                                type="button"
-                                disabled={isSaving}
-                                onClick={handleFinishOnboarding}
-                                className={`px-10 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-base shadow-xl shadow-emerald-500/25 flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 ${
-                                    isSaving ? 'opacity-70 cursor-not-allowed' : ''
-                                }`}
-                            >
-                                {isSaving ? (
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                    <Rocket size={18} strokeWidth={2.5} />
-                                )}
-                                <span>{isIndo ? 'Luncurkan Workspace Anda' : 'Launch Your Workspace'}</span>
-                            </button>
                         </div>
                     </div>
                 )}
 
-            </main>
+                {/* STEP 4: WORKSPACE PERSONALIZATION & LAUNCH */}
+                {currentStep === 4 && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="text-center sm:text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black tracking-wider uppercase mb-3">
+                                <Rocket size={13} />
+                                <span>{isIndo ? 'Langkah Terakhir' : 'Final Step'}</span>
+                            </div>
+                            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                                {isIndo ? 'Personalisasi & Luncurkan Workspace Anda' : 'Personalize & Launch Your Workspace'}
+                            </h2>
+                            <p className="text-sm font-medium text-slate-400 mt-2">
+                                {isIndo 
+                                    ? 'Beri nama ruang kerja Anda dan mulai bangun kehidupan yang lebih produktif & terarah.'
+                                    : 'Name your workspace and embark on your unified productivity journey.'}
+                            </p>
+                        </div>
 
-            {/* FOOTER */}
-            <footer className="w-full border-t border-slate-900 py-4 text-center text-xs text-slate-600 relative z-20">
-                Tranvas OS &copy; 2026 • {isIndo ? 'Hak Cipta Dilindungi' : 'All Rights Reserved'}
-            </footer>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {/* Workspace Name Input */}
+                            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+                                <div>
+                                    <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
+                                        {isIndo ? 'Nama Ruang Kerja / Workspace' : 'Workspace Name'}
+                                    </label>
+                                    <input 
+                                        type="text"
+                                        value={workspaceName}
+                                        onChange={(e) => setWorkspaceName(e.target.value)}
+                                        placeholder="My Productivity OS"
+                                        className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
+                                        {isIndo ? 'Gaya Fokus Harian' : 'Daily Prime Vibe'}
+                                    </label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'morning', icon: '☀️', labelId: 'Morning Clarity', labelEn: 'Morning' },
+                                            { id: 'deep_work', icon: '⚡', labelId: 'Deep Sprint', labelEn: 'Deep Work' },
+                                            { id: 'evening', icon: '🌙', labelId: 'Reflective', labelEn: 'Evening' },
+                                        ].map(vibe => (
+                                            <button
+                                                key={vibe.id}
+                                                type="button"
+                                                onClick={() => setDailyFocusVibe(vibe.id)}
+                                                className={`p-3 rounded-xl border text-center transition-all ${
+                                                    dailyFocusVibe === vibe.id
+                                                        ? 'bg-indigo-600 border-indigo-500 text-white font-black'
+                                                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                                                }`}
+                                            >
+                                                <div className="text-lg mb-1">{vibe.icon}</div>
+                                                <div className="text-[10px] font-bold">{isIndo ? vibe.labelId : vibe.labelEn}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Summary Checklist Card */}
+                            <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 border border-indigo-500/20 flex flex-col justify-between">
+                                <div className="space-y-4">
+                                    <h4 className="text-sm font-black text-white flex items-center gap-2">
+                                        <Sparkles size={16} className="text-indigo-400" />
+                                        <span>{isIndo ? 'Status Konfigurasi Life OS' : 'Life OS Setup Ready'}</span>
+                                    </h4>
+
+                                    <ul className="space-y-2.5 text-xs text-slate-300">
+                                        <li className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                                <Check size={11} strokeWidth={3} />
+                                            </div>
+                                            <span>{selectedTabKeys.length} {isIndo ? 'Modul Produktivitas Diaktifkan' : 'Productivity Modules Active'}</span>
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                                <Check size={11} strokeWidth={3} />
+                                            </div>
+                                            <span>{isIndo ? 'Dashboard & Daily Synergy Hub Tersinkronisasi' : 'Dashboard & Daily Synergy Hub Initialized'}</span>
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                                <Check size={11} strokeWidth={3} />
+                                            </div>
+                                            <span>{isIndo ? 'Akses Penuh Tanpa Kunci Waktu' : 'Full Lifetime Customization Access'}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div className="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-400">
+                                    {isIndo 
+                                        ? '💡 Anda dapat mengubah kembali modul aktif kapan saja melalui menu Pengaturan.'
+                                        : '💡 You can adjust your active modules anytime via Settings.'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* BOTTOM NAVIGATION CONTROLS */}
+                <div className="mt-10 pt-6 border-t border-slate-800/80 flex items-center justify-between">
+                    {currentStep > 1 ? (
+                        <button
+                            type="button"
+                            onClick={handlePrevStep}
+                            disabled={isLaunching}
+                            className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-sm transition flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                        >
+                            <ArrowLeft size={16} />
+                            <span>{isIndo ? 'Kembali' : 'Back'}</span>
+                        </button>
+                    ) : (
+                        <div />
+                    )}
+
+                    {currentStep < 4 ? (
+                        <button
+                            type="button"
+                            onClick={handleNextStep}
+                            className="px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 hover:translate-x-0.5 active:scale-95 cursor-pointer"
+                        >
+                            <span>{isIndo ? 'Lanjutkan' : 'Continue'}</span>
+                            <ArrowRight size={16} />
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={handleFinishAndLaunch}
+                            disabled={isLaunching}
+                            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-base shadow-xl shadow-indigo-600/40 transition flex items-center gap-3 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-75"
+                        >
+                            {isLaunching ? (
+                                <span>{isIndo ? 'Menyiapkan Ruang Kerja...' : 'Launching Workspace...'}</span>
+                            ) : (
+                                <>
+                                    <span>{isIndo ? 'Masuk ke Dashboard' : 'Launch Dashboard'}</span>
+                                    <Rocket size={18} />
+                                </>
+                            )}
+                        </button>
+                    )}
+                </div>
+
+            </main>
         </div>
     );
 }

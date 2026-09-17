@@ -47,7 +47,7 @@ export default function GuestNavbar({
                     <div className="w-9 h-9 sm:w-8 sm:h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-lg shadow-indigo-200 shrink-0">
                         <img src="/favicon.svg" alt="Tranvas Logo" className="w-5 h-5 sm:w-4 sm:h-4 brightness-0 invert" />
                     </div>
-                    <span className="text-[17px] sm:text-[17px] font-black tracking-tight text-slate-900 hidden sm:block">Tranvas</span>
+                    <span className="text-[17px] font-black tracking-tight text-slate-900 block">Tranvas</span>
                 </Link>
 
                 {/* DESKTOP MENU */}
