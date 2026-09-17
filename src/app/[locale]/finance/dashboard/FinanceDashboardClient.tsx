@@ -4,26 +4,28 @@ import React, { useMemo, useState } from 'react';
 import { useLocale } from 'next-intl';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { Link, useRouter } from '@/i18n/routing';
+import useSWR from 'swr';
 import {
     TrendingUp,
     ArrowRight,
-    Download,
     ChevronRight,
     ChevronLeft,
     Wallet,
     PiggyBank,
-    LineChart as LineChartIcon,
     ShieldCheck,
     Sparkles,
-    Calendar,
     Award,
     AlertCircle,
     ArrowUpRight,
     ArrowDownRight,
-    FileSpreadsheet
+    FileSpreadsheet,
+    Building2,
+    TrendingDown,
+    LineChart
 } from 'lucide-react';
-import { useGating } from '@/hooks/useGating';
 import YearlyCashflowChart from './YearlyCashflowChart';
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 interface YearlyStat {
     month: string;
@@ -33,27 +35,124 @@ interface YearlyStat {
     balance: number;
 }
 
-export default function FinanceDashboardClient({ 
-    selectedYear = new Date().getFullYear(),
-    yearlyStats, 
-    totalSavings = 0,
-    totalAssetsValue = 0,
-    currentBalance = 0, 
-    avgExpense = 0 
-}: { 
+interface FinanceDashboardClientProps {
     selectedYear?: number;
-    yearlyStats: YearlyStat[]; 
+    yearlyStats: YearlyStat[];
     totalSavings?: number;
     totalAssetsValue?: number;
-    currentBalance?: number; 
-    avgExpense?: number; 
-}) {
+    currentBalance?: number;
+    avgExpense?: number;
+    activeCurrency?: string;
+    currencyLocale?: string;
+    wallets?: any[];
+    investments?: any[];
+}
+
+export default function FinanceDashboardClient({ 
+    selectedYear = new Date().getFullYear(),
+    yearlyStats: initialYearlyStats, 
+    totalSavings: initialTotalSavings = 0,
+    totalAssetsValue: initialTotalAssetsValue = 0,
+    currentBalance: initialCurrentBalance = 0, 
+    avgExpense: initialAvgExpense = 0,
+    activeCurrency = 'IDR',
+    currencyLocale = 'id-ID',
+    wallets: initialWallets = [],
+    investments: initialInvestments = []
+}: FinanceDashboardClientProps) {
     const locale = useLocale();
     const router = useRouter();
     const isIndo = locale === 'id';
-    const { isArchitect } = useGating();
+
+    // SWR Data Fetching for Live Reactive Updates
+    const { data: rawYearly } = useSWR(`/api/finance/yearly?year=${selectedYear}`, fetcher, { revalidateOnFocus: false });
+    const { data: rawSavings } = useSWR('/api/finance/savings', fetcher, { revalidateOnFocus: false });
+    const { data: rawUser } = useSWR('/api/user', fetcher, { revalidateOnFocus: false });
 
     const [isExporting, setIsExporting] = useState(false);
+
+    // Compute live user settings & multi-wallets
+    const userSettings = useMemo(() => {
+        if (!rawUser) return {};
+        if (typeof rawUser.settings === 'string') {
+            try { return JSON.parse(rawUser.settings); } catch { return {}; }
+        }
+        return rawUser.settings || {};
+    }, [rawUser]);
+
+    const wallets = useMemo(() => {
+        return userSettings.finance_wallets || initialWallets;
+    }, [userSettings.finance_wallets, initialWallets]);
+
+    const investments = useMemo(() => {
+        return userSettings.finance_investments || initialInvestments;
+    }, [userSettings.finance_investments, initialInvestments]);
+
+    const effectiveCurrency = userSettings.finance_currency || activeCurrency;
+    const effectiveCurrencyLocale = effectiveCurrency === 'IDR' ? 'id-ID' : (effectiveCurrency === 'EUR' ? 'de-DE' : 'en-US');
+
+    // Parse yearly stats from SWR or fallback
+    const yearlyStats: YearlyStat[] = useMemo(() => {
+        if (!rawYearly) return initialYearlyStats;
+        if (rawYearly.monthlyStats) {
+            const stats: YearlyStat[] = [];
+            for (let i = 1; i <= 12; i++) {
+                const monthKey = `${selectedYear}-${String(i).padStart(2, '0')}`;
+                const m = rawYearly.monthlyStats[monthKey] || { income: 0, expense: 0 };
+                const inc = Number(m.income || m.total_income || 0);
+                const exp = Number(m.expense || m.total_expense || 0);
+                stats.push({
+                    month: monthKey,
+                    total_income: inc,
+                    total_expense: exp,
+                    income_target: Number(m.income_target || 0),
+                    balance: inc - exp,
+                });
+            }
+            return stats;
+        }
+        if (Array.isArray(rawYearly) && rawYearly.length > 0) {
+            return rawYearly.map((s: any) => ({
+                month: s.month,
+                total_income: Number(s.total_income || s.income || 0),
+                total_expense: Number(s.total_expense || s.expense || 0),
+                income_target: Number(s.income_target || 0),
+                balance: Number(s.balance ?? (Number(s.total_income || s.income || 0) - Number(s.total_expense || s.expense || 0))),
+            }));
+        }
+        return initialYearlyStats;
+    }, [rawYearly, selectedYear, initialYearlyStats]);
+
+    // Live savings total
+    const totalSavings = useMemo(() => {
+        if (!rawSavings || !Array.isArray(rawSavings)) return initialTotalSavings;
+        return rawSavings.reduce(
+            (acc: number, s: any) => acc + Number(s.current_amount || s.currentAmount || s.current || 0),
+            0
+        );
+    }, [rawSavings, initialTotalSavings]);
+
+    // Live investments value
+    const totalAssetsValue = useMemo(() => {
+        const invSum = investments.reduce((acc: number, inv: any) => acc + Number(inv.currentValue || inv.capital || 0), 0);
+        return invSum || initialTotalAssetsValue;
+    }, [investments, initialTotalAssetsValue]);
+
+    // Liquid cash
+    const totalWalletsBalance = useMemo(() => {
+        return wallets.reduce((sum: number, w: any) => sum + (Number(w.balance) || 0), 0);
+    }, [wallets]);
+
+    const currentMonthIdx = selectedYear === new Date().getFullYear() ? new Date().getMonth() : 11;
+    const accumulatedCashflow = useMemo(() => {
+        return yearlyStats.slice(0, currentMonthIdx + 1).reduce((acc, curr) => acc + curr.balance, 0);
+    }, [yearlyStats, currentMonthIdx]);
+
+    const currentBalance = wallets.length > 0 ? totalWalletsBalance : (accumulatedCashflow || initialCurrentBalance);
+
+    // Avg expense for runway
+    const last3Months = yearlyStats.slice(Math.max(0, currentMonthIdx - 2), currentMonthIdx + 1);
+    const avgExpense = (last3Months.reduce((acc, curr) => acc + curr.total_expense, 0) / (last3Months.length || 1)) || initialAvgExpense;
 
     // Total Liquid Net Worth (Cash + Savings Vaults + Investment Assets)
     const totalNetWorth = currentBalance + totalSavings + totalAssetsValue;
@@ -97,9 +196,9 @@ export default function FinanceDashboardClient({
     };
 
     const formatMoney = (val: number) => {
-        return new Intl.NumberFormat(locale === 'id' ? 'id-ID' : 'en-US', {
+        return new Intl.NumberFormat(effectiveCurrencyLocale, {
             style: 'currency',
-            currency: locale === 'id' ? 'IDR' : 'USD',
+            currency: effectiveCurrency,
             maximumFractionDigits: 0
         }).format(val);
     };
@@ -110,12 +209,8 @@ export default function FinanceDashboardClient({
         router.push(`/finance/dashboard?year=${nextYear}`);
     };
 
-    // Export to CSV Function (Architect Tier Benefit)
+    // Export to CSV Function
     const handleExportCSV = () => {
-        if (!isArchitect) {
-            router.push('/billing');
-            return;
-        }
         setIsExporting(true);
         try {
             const headers = ['Bulan', 'Pemasukan', 'Target_Pemasukan', 'Pengeluaran', 'Net_Surplus'];
@@ -180,7 +275,7 @@ export default function FinanceDashboardClient({
                             <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
                                 <button 
                                     onClick={() => handleYearChange(-1)} 
-                                    className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition shadow-sm"
+                                    className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition shadow-sm cursor-pointer"
                                     title="Tahun Sebelumnya"
                                 >
                                     <ChevronLeft size={16} strokeWidth={2.5} />
@@ -190,7 +285,7 @@ export default function FinanceDashboardClient({
                                 </span>
                                 <button 
                                     onClick={() => handleYearChange(1)} 
-                                    className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition shadow-sm"
+                                    className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition shadow-sm cursor-pointer"
                                     title="Tahun Berikutnya"
                                 >
                                     <ChevronRight size={16} strokeWidth={2.5} />
@@ -201,7 +296,7 @@ export default function FinanceDashboardClient({
                             <button 
                                 onClick={handleExportCSV}
                                 disabled={isExporting}
-                                className="shrink-0 flex items-center justify-center px-4 h-11 transition border bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs shadow-sm active:scale-95"
+                                className="shrink-0 flex items-center justify-center px-4 h-11 transition border bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs shadow-sm active:scale-95 cursor-pointer"
                                 title="Download CSV spreadsheet"
                             >
                                 <FileSpreadsheet size={16} className="text-emerald-500" />
@@ -236,12 +331,12 @@ export default function FinanceDashboardClient({
                                     <Wallet size={20} strokeWidth={2.5} />
                                 </div>
                             </div>
-                            <div className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                            <div className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">
                                 {formatMoney(totalNetWorth)}
                             </div>
                             <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 font-medium pt-2 border-t border-slate-100 dark:border-slate-800">
                                 <span>{isIndo ? 'Kas + Tabungan + Aset' : 'Cash + Vaults + Assets'}</span>
-                                <span className="font-bold text-indigo-600 dark:text-indigo-400">{formatMoney(currentBalance)} Kas</span>
+                                <span className="font-bold text-indigo-600 dark:text-indigo-400 font-mono">{formatMoney(currentBalance)} Kas</span>
                             </div>
                         </div>
 
@@ -256,7 +351,7 @@ export default function FinanceDashboardClient({
                                 </div>
                             </div>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                                <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">
                                     {savingsRate}%
                                 </span>
                                 <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
@@ -282,7 +377,7 @@ export default function FinanceDashboardClient({
                                 </div>
                             </div>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                                <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">
                                     {runwayMonths}
                                 </span>
                                 <span className="text-sm font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
@@ -305,14 +400,14 @@ export default function FinanceDashboardClient({
                                     <TrendingUp size={20} strokeWidth={2.5} />
                                 </div>
                             </div>
-                            <div className={`text-2xl md:text-3xl font-black tracking-tight ${ytdSurplus >= 0 ? 'text-slate-900 dark:text-white' : 'text-rose-500'}`}>
+                            <div className={`text-2xl md:text-3xl font-black tracking-tight font-mono ${ytdSurplus >= 0 ? 'text-slate-900 dark:text-white' : 'text-rose-500'}`}>
                                 {formatMoney(ytdSurplus)}
                             </div>
                             <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 font-medium pt-2 border-t border-slate-100 dark:border-slate-800">
-                                <span className="text-emerald-500 font-bold flex items-center gap-0.5">
+                                <span className="text-emerald-500 font-bold flex items-center gap-0.5 font-mono">
                                     <ArrowUpRight size={13} /> {formatMoney(ytdIncome)}
                                 </span>
-                                <span className="text-rose-500 font-bold flex items-center gap-0.5">
+                                <span className="text-rose-500 font-bold flex items-center gap-0.5 font-mono">
                                     <ArrowDownRight size={13} /> {formatMoney(ytdExpense)}
                                 </span>
                             </div>
@@ -323,9 +418,43 @@ export default function FinanceDashboardClient({
                     {/* Interactive Yearly Cashflow Dynamics Chart */}
                     <YearlyCashflowChart
                         yearlyStats={yearlyStats}
-                        activeCurrency={locale === 'id' ? 'IDR' : 'USD'}
-                        currencyLocale={locale === 'id' ? 'id-ID' : 'en-US'}
+                        activeCurrency={effectiveCurrency}
+                        currencyLocale={effectiveCurrencyLocale}
                     />
+
+                    {/* Multi-Wallets & Account Portfolios Live Strip */}
+                    {wallets.length > 0 && (
+                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-800 shadow-xl shadow-indigo-500/5">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <Building2 size={18} className="text-indigo-600 dark:text-indigo-400" />
+                                    <h3 className="font-black text-sm md:text-base text-slate-900 dark:text-white">
+                                        {isIndo ? 'Portofolio Dompet & Rekening Aktif' : 'Active Wallets & Accounts'}
+                                    </h3>
+                                </div>
+                                <span className="text-xs font-bold text-slate-400 font-mono">
+                                    {wallets.length} {isIndo ? 'Akun' : 'Accounts'} • Total: {formatMoney(totalWalletsBalance)}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                                {wallets.map((w: any) => (
+                                    <div 
+                                        key={w.id} 
+                                        className="p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col justify-between"
+                                    >
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-lg">{w.icon || '🏛️'}</span>
+                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{w.name}</span>
+                                        </div>
+                                        <div className="font-black text-xs md:text-sm text-slate-900 dark:text-white font-mono">
+                                            {formatMoney(Number(w.balance) || 0)}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Smart Financial Highlights Banner */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -372,7 +501,7 @@ export default function FinanceDashboardClient({
                                 <h4 className="text-xs font-black uppercase tracking-wider text-indigo-800 dark:text-indigo-300 mb-1">
                                     {isIndo ? 'Total Celengan Impian (Vaults)' : 'Total Savings Vaults'}
                                 </h4>
-                                <p className="text-base font-black text-slate-900 dark:text-white">
+                                <p className="text-base font-black text-slate-900 dark:text-white font-mono">
                                     {formatMoney(totalSavings)}
                                 </p>
                                 <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-1">

@@ -32,29 +32,50 @@ export default async function FinanceDashboardPage({
     const currentYear = new Date().getFullYear();
     const selectedYear = resolvedParams?.year ? parseInt(resolvedParams.year, 10) || currentYear : currentYear;
 
-    // Fetch yearly stats, savings, and assets in parallel
-    const [yearlyData, savingsData, assetsData] = await Promise.all([
+    // Fetch yearly stats, savings, assets, and user settings in parallel
+    const [yearlyData, savingsData, assetsData, userData] = await Promise.all([
         goFetchJson<any>('finance-yearly', `year=${selectedYear}`),
         goFetchJson<any[]>('finance-savings', ''),
         goFetchJson<any[]>('finance-assets', ''),
+        goFetchJson<any>('user', ''),
     ]);
 
     const rawYearly = yearlyData[0];
     const savings = Array.isArray(savingsData[0]) ? savingsData[0] : [];
     const assets = Array.isArray(assetsData[0]) ? assetsData[0] : [];
+    const userProfile = userData[0] || {};
+
+    let userSettings: any = {};
+    if (typeof userProfile.settings === 'string') {
+        try { userSettings = JSON.parse(userProfile.settings); } catch {}
+    } else if (userProfile.settings && typeof userProfile.settings === 'object') {
+        userSettings = userProfile.settings;
+    }
+
+    const wallets: any[] = Array.isArray(userSettings.finance_wallets) ? userSettings.finance_wallets : [];
+    const customInvestments: any[] = Array.isArray(userSettings.finance_investments) ? userSettings.finance_investments : [];
+    const activeCurrency = userSettings.finance_currency || 'IDR';
 
     const totalSavings = savings.reduce(
         (acc: number, s: any) => acc + Number(s.current_amount || s.currentAmount || s.current || 0),
         0
     );
 
-    const totalAssetsValue = assets.reduce(
+    // Sum database assets + user custom investment portfolio
+    const dbAssetsValue = assets.reduce(
         (acc: number, a: any) => {
             const val = Number(a.value || a.capital || a.amount || 0);
             return acc + (isNaN(val) ? 0 : val);
         },
         0
     );
+
+    const customInvestmentsValue = customInvestments.reduce(
+        (acc: number, inv: any) => acc + Number(inv.currentValue || inv.capital || 0),
+        0
+    );
+
+    const totalAssetsValue = dbAssetsValue + customInvestmentsValue;
 
     // Map Go API response (which returns monthlyStats map) or direct array into YearlyStat[]
     let stats: YearlyStat[] = [];
@@ -97,11 +118,13 @@ export default async function FinanceDashboardPage({
     const last3Months = stats.slice(Math.max(0, currentMonthIdx - 2), currentMonthIdx + 1);
     const avgExp = last3Months.reduce((acc, curr) => acc + curr.total_expense, 0) / (last3Months.length || 1);
 
-    // Calculate accumulated balance up to current month
-    const accumulatedBalance = stats.slice(0, currentMonthIdx + 1).reduce(
+    // Calculate liquid cash: from wallets if available, or accumulated cashflow balance
+    const totalWalletsBalance = wallets.reduce((sum, w) => sum + (Number(w.balance) || 0), 0);
+    const accumulatedCashflowBalance = stats.slice(0, currentMonthIdx + 1).reduce(
         (acc, curr) => acc + curr.balance,
         0
     );
+    const currentBalance = wallets.length > 0 ? totalWalletsBalance : accumulatedCashflowBalance;
 
     return (
         <FinanceDashboardClient
@@ -109,8 +132,11 @@ export default async function FinanceDashboardPage({
             yearlyStats={stats}
             totalSavings={totalSavings}
             totalAssetsValue={totalAssetsValue}
-            currentBalance={accumulatedBalance}
+            currentBalance={currentBalance}
             avgExpense={avgExp}
+            activeCurrency={activeCurrency}
+            wallets={wallets}
+            investments={customInvestments}
         />
     );
 }

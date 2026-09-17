@@ -3,35 +3,28 @@
 import React, { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import ModalPortal from '@/components/ModalPortal';
-import { X, Repeat, Sparkles, Check } from 'lucide-react';
+import { X, Repeat, Check, Wallet } from 'lucide-react';
 import { RecurringBillItem } from './RecurringBillsSection';
+import { WalletItem } from './WalletsSection';
 
 interface RecurringBillModalProps {
     show: boolean;
     editingBill: RecurringBillItem | null;
     categories: { slug: string; name: string; icon: string }[];
+    wallets?: WalletItem[];
     onClose: () => void;
     onSave: (bill: RecurringBillItem) => void;
     activeCurrency?: string;
 }
 
-const PRESET_ICONS = [
-    { icon: '🍿', name: 'Netflix / Video', color: '#e50914' },
-    { icon: '🤖', name: 'AI / ChatGPT', color: '#10a37f' },
-    { icon: '🎵', name: 'Spotify / Music', color: '#1db954' },
-    { icon: '📶', name: 'Internet / WiFi', color: '#0284c7' },
-    { icon: '⚡', name: 'Listrik / PLN', color: '#f59e0b' },
-    { icon: '🏠', name: 'Sewa Kost / Rumah', color: '#6366f1' },
-    { icon: '🛡️', name: 'Asuransi / BPJS', color: '#14b8a6' },
-    { icon: '☁️', name: 'Cloud / Domain', color: '#8b5cf6' },
-    { icon: '🏋️', name: 'Gym / Fitness', color: '#ec4899' },
-    { icon: '📱', name: 'Pulsa / Kuota', color: '#3b82f6' },
-];
+const RECURRING_ICONS = ['🍿', '🤖', '🎵', '📶', '⚡', '🏠', '🛡️', '☁️', '🏋️', '📱', '🎮', '🚗'];
+const RECURRING_COLORS = ['#e50914', '#10a37f', '#1db954', '#0284c7', '#f59e0b', '#6366f1', '#14b8a6', '#8b5cf6', '#ec4899', '#3b82f6'];
 
 export default function RecurringBillModal({
     show,
     editingBill,
     categories = [],
+    wallets = [],
     onClose,
     onSave,
     activeCurrency = 'IDR'
@@ -44,6 +37,7 @@ export default function RecurringBillModal({
     const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly');
     const [billingDay, setBillingDay] = useState(1);
     const [category, setCategory] = useState('');
+    const [walletId, setWalletId] = useState('');
     const [icon, setIcon] = useState('🍿');
     const [color, setColor] = useState('#e50914');
 
@@ -54,6 +48,7 @@ export default function RecurringBillModal({
             setCycle(editingBill.cycle || 'monthly');
             setBillingDay(editingBill.billingDay || 1);
             setCategory(editingBill.category || (categories[0]?.slug || ''));
+            setWalletId(editingBill.walletId || (wallets[0]?.id || ''));
             setIcon(editingBill.icon || '🍿');
             setColor(editingBill.color || '#6366f1');
         } else {
@@ -62,10 +57,11 @@ export default function RecurringBillModal({
             setCycle('monthly');
             setBillingDay(1);
             setCategory(categories[0]?.slug || '');
+            setWalletId(wallets[0]?.id || '');
             setIcon('🍿');
             setColor('#e50914');
         }
-    }, [editingBill, show, categories]);
+    }, [editingBill, show, categories, wallets]);
 
     if (!show) return null;
 
@@ -85,14 +81,6 @@ export default function RecurringBillModal({
         setAmount(raw);
     };
 
-    const handleSelectPreset = (preset: typeof PRESET_ICONS[0]) => {
-        setIcon(preset.icon);
-        setColor(preset.color);
-        if (!name) {
-            setName(preset.name.split(' / ')[0]);
-        }
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const numAmt = Number(amount.replace(/[^0-9]/g, ''));
@@ -105,6 +93,7 @@ export default function RecurringBillModal({
             cycle,
             billingDay: Math.min(31, Math.max(1, Number(billingDay))),
             category: category || (categories[0]?.slug || 'langganan'),
+            walletId: walletId || (wallets[0]?.id || undefined),
             icon,
             color
         });
@@ -137,42 +126,18 @@ export default function RecurringBillModal({
                                         : (isIndo ? 'Tambah Tagihan Rutin' : 'New Recurring Subscription')}
                                 </h3>
                                 <p className="text-xs text-white/80 font-medium">
-                                    {isIndo ? 'Pantau pengeluaran berulang & tanggal jatuh tempo' : 'Track ongoing bills & payment schedules'}
+                                    {isIndo ? 'Pantau pengeluaran berulang & potong otomatis' : 'Track ongoing bills & payment schedules'}
                                 </p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="p-2 rounded-full hover:bg-white/20 text-white transition">
+                        <button onClick={onClose} className="p-2 rounded-full hover:bg-white/20 text-white transition cursor-pointer">
                             <X size={20} />
                         </button>
                     </div>
 
                     {/* Form Body */}
-                    <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+                    <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
                         
-                        {/* Quick Presets */}
-                        <div>
-                            <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 block">
-                                {isIndo ? 'Pilih Preset Populer' : 'Quick Presets'}
-                            </label>
-                            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                                {PRESET_ICONS.map(p => (
-                                    <button
-                                        key={p.name}
-                                        type="button"
-                                        onClick={() => handleSelectPreset(p)}
-                                        className={`flex-shrink-0 px-3 py-2 rounded-2xl border flex items-center gap-1.5 text-xs font-bold transition-all ${
-                                            icon === p.icon 
-                                                ? 'bg-purple-100 dark:bg-purple-950/60 border-purple-500 text-purple-700 dark:text-purple-300 ring-2 ring-purple-500/30' 
-                                                : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-purple-300'
-                                        }`}
-                                    >
-                                        <span className="text-base">{p.icon}</span>
-                                        <span>{p.name.split(' / ')[0]}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Name Input */}
                         <div>
                             <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
@@ -183,7 +148,7 @@ export default function RecurringBillModal({
                                 required
                                 value={name}
                                 onChange={e => setName(e.target.value)}
-                                placeholder="Contoh: Netflix Premium, WiFi Indihome, Sewa Kost"
+                                placeholder="Contoh: Netflix Premium, WiFi Indihome, Sewa Kost, ChatGPT Plus"
                                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
                             />
                         </div>
@@ -224,7 +189,7 @@ export default function RecurringBillModal({
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
-                                    {isIndo ? 'Tanggal Jatuh Tempo (1-31)' : 'Billing Day (1-31)'}
+                                    {isIndo ? 'Tgl Jatuh Tempo (1-31)' : 'Billing Day (1-31)'}
                                 </label>
                                 <input
                                     type="number"
@@ -239,7 +204,7 @@ export default function RecurringBillModal({
 
                             <div>
                                 <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
-                                    {isIndo ? 'Kategori' : 'Category'}
+                                    {isIndo ? 'Kategori Anggaran' : 'Category'}
                                 </label>
                                 <select
                                     value={category}
@@ -251,21 +216,78 @@ export default function RecurringBillModal({
                                             {c.icon} {c.name}
                                         </option>
                                     ))}
-                                    <option value="langganan">🔄 Langganan</option>
-                                    <option value="utilitas">⚡ Utilitas / Tagihan</option>
                                 </select>
                             </div>
                         </div>
 
+                        {/* Wallet Deduction Account */}
+                        {wallets.length > 0 && (
+                            <div>
+                                <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block flex items-center gap-1">
+                                    <Wallet size={13} className="text-purple-500" />
+                                    <span>{isIndo ? 'Potong Dari Dompet / Rekening' : 'Deduct From Wallet'}</span>
+                                </label>
+                                <select
+                                    value={walletId}
+                                    onChange={e => setWalletId(e.target.value)}
+                                    className="w-full px-3 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                >
+                                    {wallets.map(w => (
+                                        <option key={w.id} value={w.id}>
+                                            {w.icon || '💳'} {w.name} ({new Intl.NumberFormat(locale === 'id' ? 'id-ID' : 'en-US', { style: 'currency', currency: activeCurrency, maximumFractionDigits: 0 }).format(w.balance)})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Icon & Color Selector */}
+                        <div>
+                            <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 block">
+                                {isIndo ? 'Ikon & Warna Tema' : 'Icon & Theme Color'}
+                            </label>
+                            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 mb-2.5">
+                                {RECURRING_ICONS.map(ic => (
+                                    <button
+                                        key={ic}
+                                        type="button"
+                                        onClick={() => setIcon(ic)}
+                                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-transform shrink-0 ${
+                                            icon === ic 
+                                                ? 'bg-purple-100 dark:bg-purple-900/40 ring-2 ring-purple-500 scale-110' 
+                                                : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200'
+                                        }`}
+                                    >
+                                        {ic}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                                {RECURRING_COLORS.map(c => (
+                                    <button
+                                        key={c}
+                                        type="button"
+                                        onClick={() => setColor(c)}
+                                        className={`w-7 h-7 rounded-full transition-transform shrink-0 flex items-center justify-center ${
+                                            color === c ? 'ring-2 ring-offset-2 ring-purple-500 scale-110' : 'hover:scale-105'
+                                        }`}
+                                        style={{ backgroundColor: c }}
+                                    >
+                                        {color === c && <Check size={12} className="text-white" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Submit Button */}
-                        <div className="pt-3">
+                        <div className="pt-2">
                             <button
                                 type="submit"
-                                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-sm shadow-xl shadow-purple-500/25 hover:opacity-95 active:scale-95 transition-all"
+                                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-sm shadow-xl shadow-purple-500/25 hover:opacity-95 active:scale-95 transition-all cursor-pointer"
                             >
                                 {editingBill 
                                     ? (isIndo ? 'Simpan Perubahan' : 'Save Changes') 
-                                    : (isIndo ? 'Simpan Tagihan Rutin' : 'Add Recurring Subscription')}
+                                    : (isIndo ? 'Simpan Tagihan Rutin' : 'Save Recurring Subscription')}
                             </button>
                         </div>
                     </form>

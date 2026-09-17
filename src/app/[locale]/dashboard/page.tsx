@@ -161,7 +161,7 @@ export default async function DashboardPage() {
                     isCompleted: Boolean(t.isCompleted || t.is_completed),
                 }))
         },
-        finance: { expense, income, net: income - expense },
+        finance: { expense, income, net: income - expense, currency: userSettings.finance_currency || 'IDR' },
         goals: { top_goal: topGoal, total_goals: goals.length },
         journal: {
             is_written: journals.length > 0,

@@ -334,14 +334,17 @@ export default function FinanceClient({
     };
 
     const handlePayAndLogBill = async (bill: RecurringBillItem) => {
+        const targetWalletId = bill.walletId || wallets[0]?.id;
         await handleSaveSingleTrx({
-            title: bill.name,
+            title: isIndo ? `Tagihan Rutin: ${bill.name}` : `Recurring: ${bill.name}`,
             amount: bill.amount,
             type: 'expense',
             category: bill.category || 'langganan',
-            walletId: (bill as any).walletId || wallets[0]?.id,
+            walletId: targetWalletId,
             date: new Date().toISOString().split('T')[0],
-            notes: `Tagihan Rutin (${bill.cycle === 'yearly' ? 'Tahunan' : 'Bulanan'})`
+            notes: isIndo 
+                ? `Tagihan Rutin (${bill.cycle === 'yearly' ? 'Tahunan' : 'Bulanan'})`
+                : `Recurring Subscription (${bill.cycle === 'yearly' ? 'Yearly' : 'Monthly'})`
         });
 
         const currentPaid = userSettings[`paid_bills_${selectedMonthKey}`] || [];
@@ -950,6 +953,7 @@ export default function FinanceClient({
                         <div className="space-y-6 animate-in fade-in duration-300">
                             <RecurringBillsSection
                                 bills={recurringBills}
+                                wallets={wallets}
                                 activeCurrency={activeCurrency}
                                 currencyLocale={currencyLocale}
                                 onOpenAddModal={() => { setEditingBill(null); setShowRecurringModal(true); }}
@@ -1034,6 +1038,7 @@ export default function FinanceClient({
                 show={showRecurringModal}
                 editingBill={editingBill}
                 categories={categories}
+                wallets={wallets}
                 onClose={() => setShowRecurringModal(false)}
                 onSave={handleSaveBill}
                 activeCurrency={activeCurrency}

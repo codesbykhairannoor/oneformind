@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import ModalPortal from '@/components/ModalPortal';
-import { X, Wallet, Building2, Smartphone, Banknote, TrendingUp } from 'lucide-react';
+import { X, Wallet, Check } from 'lucide-react';
 import { WalletItem } from './WalletsSection';
 
 interface WalletModalProps {
@@ -14,17 +14,8 @@ interface WalletModalProps {
     activeCurrency?: string;
 }
 
-const WALLET_PRESETS = [
-    { name: 'BCA', type: 'bank' as const, icon: '🏛️', color: '#005baa' },
-    { name: 'Mandiri', type: 'bank' as const, icon: '🏛️', color: '#003d79' },
-    { name: 'BRI / BNI', type: 'bank' as const, icon: '🏛️', color: '#0f766e' },
-    { name: 'GoPay', type: 'ewallet' as const, icon: '📱', color: '#00aed6' },
-    { name: 'OVO / DANA', type: 'ewallet' as const, icon: '📱', color: '#7c3aed' },
-    { name: 'ShopeePay', type: 'ewallet' as const, icon: '📱', color: '#ee4d2d' },
-    { name: 'Uang Tunai (Cash)', type: 'cash' as const, icon: '💵', color: '#10b981' },
-    { name: 'Bibit / Reksadana', type: 'investment' as const, icon: '📈', color: '#6366f1' },
-    { name: 'Crypto / Stock', type: 'investment' as const, icon: '🪙', color: '#f59e0b' },
-];
+const WALLET_ICONS = ['🏛️', '📱', '💵', '💳', '📈', '🪙', '💼', '🏦', '💎', '🛒'];
+const WALLET_COLORS = ['#005baa', '#003d79', '#00aed6', '#7c3aed', '#ee4d2d', '#10b981', '#6366f1', '#f59e0b', '#ec4899', '#0f766e'];
 
 export default function WalletModal({
     show,
@@ -79,13 +70,6 @@ export default function WalletModal({
         setBalance(raw);
     };
 
-    const handleSelectPreset = (p: typeof WALLET_PRESETS[0]) => {
-        setName(p.name);
-        setType(p.type);
-        setIcon(p.icon);
-        setColor(p.color);
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const numBal = Number(balance.replace(/[^0-9]/g, '')) || 0;
@@ -133,38 +117,14 @@ export default function WalletModal({
                                 </p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="p-2 rounded-full hover:bg-white/20 text-white transition">
+                        <button onClick={onClose} className="p-2 rounded-full hover:bg-white/20 text-white transition cursor-pointer">
                             <X size={20} />
                         </button>
                     </div>
 
                     {/* Form Body */}
-                    <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+                    <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
                         
-                        {/* Quick Presets */}
-                        <div>
-                            <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 block">
-                                {isIndo ? 'Pilih Preset Populer' : 'Quick Presets'}
-                            </label>
-                            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                                {WALLET_PRESETS.map(p => (
-                                    <button
-                                        key={p.name}
-                                        type="button"
-                                        onClick={() => handleSelectPreset(p)}
-                                        className={`flex-shrink-0 px-3 py-2 rounded-2xl border flex items-center gap-1.5 text-xs font-bold transition-all ${
-                                            name === p.name 
-                                                ? 'bg-indigo-100 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500/30' 
-                                                : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
-                                        }`}
-                                    >
-                                        <span className="text-base">{p.icon}</span>
-                                        <span>{p.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Name Input */}
                         <div>
                             <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
@@ -175,7 +135,7 @@ export default function WalletModal({
                                 required
                                 value={name}
                                 onChange={e => setName(e.target.value)}
-                                placeholder="Contoh: BCA Utama, GoPay, Uang Tunai"
+                                placeholder="Contoh: BCA Utama, GoPay, Uang Tunai, Mandiri"
                                 className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                             />
                         </div>
@@ -214,6 +174,44 @@ export default function WalletModal({
                             </div>
                         </div>
 
+                        {/* Icon & Color Selector */}
+                        <div>
+                            <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 block">
+                                {isIndo ? 'Ikon & Warna Tema' : 'Icon & Theme Color'}
+                            </label>
+                            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 mb-2.5">
+                                {WALLET_ICONS.map(ic => (
+                                    <button
+                                        key={ic}
+                                        type="button"
+                                        onClick={() => setIcon(ic)}
+                                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-transform shrink-0 ${
+                                            icon === ic 
+                                                ? 'bg-indigo-100 dark:bg-indigo-900/40 ring-2 ring-indigo-500 scale-110' 
+                                                : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200'
+                                        }`}
+                                    >
+                                        {ic}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                                {WALLET_COLORS.map(c => (
+                                    <button
+                                        key={c}
+                                        type="button"
+                                        onClick={() => setColor(c)}
+                                        className={`w-7 h-7 rounded-full transition-transform shrink-0 flex items-center justify-center ${
+                                            color === c ? 'ring-2 ring-offset-2 ring-indigo-500 scale-110' : 'hover:scale-105'
+                                        }`}
+                                        style={{ backgroundColor: c }}
+                                    >
+                                        {color === c && <Check size={12} className="text-white" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Account Number (Optional) */}
                         <div>
                             <label className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
@@ -229,10 +227,10 @@ export default function WalletModal({
                         </div>
 
                         {/* Submit Button */}
-                        <div className="pt-3">
+                        <div className="pt-2">
                             <button
                                 type="submit"
-                                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black text-sm shadow-xl shadow-indigo-500/25 hover:opacity-95 active:scale-95 transition-all"
+                                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black text-sm shadow-xl shadow-indigo-500/25 hover:opacity-95 active:scale-95 transition-all cursor-pointer"
                             >
                                 {editingWallet 
                                     ? (isIndo ? 'Simpan Perubahan' : 'Save Changes') 

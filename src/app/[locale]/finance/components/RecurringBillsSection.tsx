@@ -22,6 +22,7 @@ export interface RecurringBillItem {
     cycle: 'monthly' | 'yearly';
     billingDay: number; // 1-31
     category: string;
+    walletId?: string;
     icon: string;
     color: string;
     notes?: string;
@@ -29,6 +30,7 @@ export interface RecurringBillItem {
 
 interface RecurringBillsSectionProps {
     bills: RecurringBillItem[];
+    wallets?: any[];
     activeCurrency?: string;
     currencyLocale?: string;
     onOpenAddModal: () => void;
@@ -40,6 +42,7 @@ interface RecurringBillsSectionProps {
 
 export default function RecurringBillsSection({
     bills = [],
+    wallets = [],
     activeCurrency = 'IDR',
     currencyLocale = 'id-ID',
     onOpenAddModal,
@@ -210,7 +213,7 @@ export default function RecurringBillsSection({
                                             <h4 className="font-black text-sm text-slate-900 dark:text-white truncate">
                                                 {bill.name}
                                             </h4>
-                                            <div className="flex items-center gap-2 mt-0.5">
+                                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                                                 <span className="text-[10px] font-bold text-slate-400 capitalize">
                                                     {bill.category}
                                                 </span>
@@ -218,6 +221,19 @@ export default function RecurringBillsSection({
                                                 <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">
                                                     {isIndo ? `Tgl ${bill.billingDay}` : `Day ${bill.billingDay}`}
                                                 </span>
+                                                {(() => {
+                                                    const assignedWallet = wallets.find((w: any) => String(w.id) === String(bill.walletId));
+                                                    if (!assignedWallet) return null;
+                                                    return (
+                                                        <>
+                                                            <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                                                                <span>{assignedWallet.icon || '💳'}</span>
+                                                                <span>{assignedWallet.name}</span>
+                                                            </span>
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
                                         </div>
                                     </div>

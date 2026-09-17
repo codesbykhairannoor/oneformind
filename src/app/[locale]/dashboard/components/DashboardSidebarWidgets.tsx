@@ -5,6 +5,8 @@ import { Link } from '@/i18n/routing';
 import { HelpCircle, Wallet, TrendingUp, Target, ChevronRight, BookOpen, ArrowUpRight, ArrowDownRight, Layers } from 'lucide-react';
 import { useActiveModules } from '@/hooks/useActiveModules';
 
+import { useLocale } from 'next-intl';
+
 interface DashboardSidebarWidgetsProps {
     trend: { day: string; fullDate: string; score: number }[];
     trendMax: number;
@@ -18,6 +20,7 @@ export default function DashboardSidebarWidgets({
     synergy,
     t
 }: DashboardSidebarWidgetsProps) {
+    const locale = useLocale();
     const { isTabActive } = useActiveModules();
 
     const isHabitActive = isTabActive('habit');
@@ -25,10 +28,13 @@ export default function DashboardSidebarWidgets({
     const isGoalActive = isTabActive('goal');
     const isJournalActive = isTabActive('journal');
 
-    const formatRupiah = (number: number) => {
-        return new Intl.NumberFormat('id-ID', {
+    const effectiveCurrency = synergy.finance?.currency || (locale === 'id' ? 'IDR' : 'USD');
+    const effectiveCurrencyLocale = effectiveCurrency === 'IDR' ? 'id-ID' : (effectiveCurrency === 'EUR' ? 'de-DE' : 'en-US');
+
+    const formatMoney = (number: number) => {
+        return new Intl.NumberFormat(effectiveCurrencyLocale, {
             style: 'currency',
-            currency: 'IDR',
+            currency: effectiveCurrency,
             maximumFractionDigits: 0,
         }).format(number ?? 0);
     };
@@ -109,7 +115,7 @@ export default function DashboardSidebarWidgets({
                         </p>
                         <p className="text-xl font-black tabular-nums text-slate-900 dark:text-white flex items-center gap-1.5">
                             <ArrowDownRight size={18} className="text-rose-500" />
-                            {formatRupiah(synergy.finance.expense)}
+                            {formatMoney(synergy.finance.expense)}
                         </p>
                     </div>
 
@@ -120,7 +126,7 @@ export default function DashboardSidebarWidgets({
                             </p>
                             <p className="font-bold tabular-nums text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
                                 <ArrowUpRight size={13} />
-                                {formatRupiah(synergy.finance.income)}
+                                {formatMoney(synergy.finance.income)}
                             </p>
                         </div>
                         <div>
@@ -128,7 +134,7 @@ export default function DashboardSidebarWidgets({
                                 {t('dash_net_cashflow') || 'Arus Kas'}
                             </p>
                             <p className={`font-bold tabular-nums ${netCashflow >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                                {formatRupiah(netCashflow)}
+                                {formatMoney(netCashflow)}
                             </p>
                         </div>
                     </div>
