@@ -26,19 +26,12 @@ export const proxy = async (req: any) => {
   if (isProtectedRoute && !hasAuthCookie) {
     const isIndonesian = pathname.startsWith('/id');
     const loginUrl = new URL(isIndonesian ? '/id/login' : '/login', req.url);
-    return Response.redirect(loginUrl);
+    const res = Response.redirect(loginUrl);
+    res.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    return res;
   }
 
-  // Fast-path 2: User visiting root landing page with auth cookie -> Redirect to dashboard
-  // Note: We do NOT redirect auth pages (/login, /register) here based on raw cookies,
-  // because if the session token is expired or invalid, server components will redirect back
-  // to /login, creating an infinite redirect loop (ERR_TOO_MANY_REDIRECTS).
-  if ((pathname === '/' || pathname === '/id' || pathname === '/en') && hasAuthCookie) {
-    const locale = (pathname.startsWith('/en') || pathname === '/en') ? 'en' : 'id';
-    return Response.redirect(new URL(`/${locale}/dashboard`, req.url));
-  }
-
-  // Fast-path 3: Public marketing routes & anonymous users -> Skip Supabase network call completely!
+  // Fast-path 2: Public marketing routes & anonymous users -> Skip Supabase network call completely!
   let supabaseResponse = null;
   if (hasAuthCookie && isProtectedRoute) {
     supabaseResponse = await updateSession(req);
