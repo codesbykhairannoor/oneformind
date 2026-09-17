@@ -351,15 +351,15 @@ export default function FullPageOnboarding({
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none" />
 
             {/* TOP HEADER */}
-            <header className="w-full max-w-5xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between relative z-20 border-b border-slate-800/60">
+            <header className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between relative z-20 border-b border-slate-800/60">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-indigo-500/20">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center font-black text-white text-base sm:text-lg shadow-lg shadow-indigo-500/20">
                         T
                     </div>
                     <div>
-                        <h1 className="text-base font-black tracking-tight text-white flex items-center gap-2">
+                        <h1 className="text-sm sm:text-base font-black tracking-tight text-white flex items-center gap-2">
                             <span>Tranvas Life OS</span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hidden xs:inline-block">
                                 Workspace Setup
                             </span>
                         </h1>
@@ -368,11 +368,11 @@ export default function FullPageOnboarding({
 
                 <div className="flex items-center gap-3">
                     {/* Language Switcher */}
-                    <div className="flex items-center bg-slate-900 border border-slate-800 rounded-2xl p-1 text-xs font-bold">
+                    <div className="flex items-center bg-slate-900 border border-slate-800 rounded-2xl p-1 text-xs font-bold shadow-inner">
                         <button
                             type="button"
                             onClick={() => handleSwitchLang('id')}
-                            className={`px-3 py-1.5 rounded-xl transition-all ${
+                            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl transition-all ${
                                 isIndo ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
                         >
@@ -381,7 +381,7 @@ export default function FullPageOnboarding({
                         <button
                             type="button"
                             onClick={() => handleSwitchLang('en')}
-                            className={`px-3 py-1.5 rounded-xl transition-all ${
+                            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl transition-all ${
                                 !isIndo ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
                         >
@@ -391,67 +391,98 @@ export default function FullPageOnboarding({
                 </div>
             </header>
 
-            {/* PROGRESS STEP BAR */}
-            <div className="w-full bg-slate-900/50 border-b border-slate-800/40 py-3.5 relative z-10">
-                <div className="max-w-5xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-2">
-                    {[
-                        { step: 1, labelId: 'Peran & Fokus', labelEn: 'Role & Focus' },
-                        { step: 2, labelId: 'Prioritas Utama', labelEn: 'Key Priorities' },
-                        { step: 3, labelId: 'Pilih Modul Tab', labelEn: 'Select Modules' },
-                        { step: 4, labelId: 'Peluncuran', labelEn: 'Launch OS' },
-                    ].map(item => {
-                        const isDone = item.step < currentStep;
-                        const isCurrent = item.step === currentStep;
-
-                        return (
+            {/* PROGRESS STEP BAR (RESPONSIVE) */}
+            <div className="w-full bg-slate-900/60 backdrop-blur-md border-b border-slate-800/40 py-3 relative z-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-8">
+                    {/* Mobile Stepper Header */}
+                    <div className="flex sm:hidden flex-col gap-2">
+                        <div className="flex items-center justify-between text-xs font-bold">
+                            <span className="text-indigo-400 font-black flex items-center gap-1.5">
+                                <Sparkles size={13} />
+                                {isIndo ? `Langkah ${currentStep} dari 4` : `Step ${currentStep} of 4`}
+                            </span>
+                            <span className="text-slate-300">
+                                {currentStep === 1 && (isIndo ? 'Peran & Fokus' : 'Role & Focus')}
+                                {currentStep === 2 && (isIndo ? 'Prioritas Utama' : 'Key Priorities')}
+                                {currentStep === 3 && (isIndo ? 'Pilih Modul' : 'Select Modules')}
+                                {currentStep === 4 && (isIndo ? 'Peluncuran' : 'Launch OS')}
+                            </span>
+                        </div>
+                        {/* Mobile Progress Bar */}
+                        <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                             <div 
-                                key={item.step} 
-                                className={`flex items-center gap-2 transition-all ${
-                                    isCurrent ? 'opacity-100' : isDone ? 'opacity-80' : 'opacity-40'
-                                }`}
-                            >
-                                <div className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black transition-all ${
-                                    isDone 
-                                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                                        : isCurrent 
-                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-400/40' 
-                                            : 'bg-slate-800 text-slate-400'
-                                }`}>
-                                    {isDone ? <Check size={14} strokeWidth={3} /> : item.step}
+                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300"
+                                style={{ width: `${(currentStep / 4) * 100}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Desktop Stepper Items */}
+                    <div className="hidden sm:flex items-center justify-between gap-4">
+                        {[
+                            { step: 1, labelId: 'Peran & Fokus', labelEn: 'Role & Focus' },
+                            { step: 2, labelId: 'Prioritas Utama', labelEn: 'Key Priorities' },
+                            { step: 3, labelId: 'Pilih Modul Tab', labelEn: 'Select Modules' },
+                            { step: 4, labelId: 'Peluncuran', labelEn: 'Launch OS' },
+                        ].map(item => {
+                            const isDone = item.step < currentStep;
+                            const isCurrent = item.step === currentStep;
+
+                            return (
+                                <div 
+                                    key={item.step} 
+                                    className={`flex items-center gap-2.5 transition-all flex-1 ${
+                                        isCurrent ? 'opacity-100' : isDone ? 'opacity-85' : 'opacity-40'
+                                    }`}
+                                >
+                                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all ${
+                                        isDone 
+                                            ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                                            : isCurrent 
+                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-400/40' 
+                                                : 'bg-slate-800 text-slate-400'
+                                    }`}>
+                                        {isDone ? <Check size={15} strokeWidth={3} /> : item.step}
+                                    </div>
+                                    <div className="min-w-0 flex flex-col">
+                                        <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                                            {isIndo ? `Langkah ${item.step}` : `Step ${item.step}`}
+                                        </span>
+                                        <span className={`text-xs font-black truncate ${
+                                            isCurrent ? 'text-white' : 'text-slate-300'
+                                        }`}>
+                                            {isIndo ? item.labelId : item.labelEn}
+                                        </span>
+                                    </div>
                                 </div>
-                                <span className={`text-xs font-bold hidden sm:inline ${
-                                    isCurrent ? 'text-white' : 'text-slate-400'
-                                }`}>
-                                    {isIndo ? item.labelId : item.labelEn}
-                                </span>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
-            {/* MAIN INTERACTIVE ONBOARDING BODY */}
-            <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-10 flex flex-col justify-between relative z-10">
+            {/* MAIN INTERACTIVE ONBOARDING BODY (MAX-W-7XL) */}
+            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-10 flex flex-col justify-between relative z-10">
                 
                 {/* STEP 1: PERSONA / ROLE */}
                 {currentStep === 1 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                         <div className="text-center sm:text-left">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-3">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-2 sm:mb-3">
                                 <Sparkles size={13} />
                                 <span>{isIndo ? 'Langkah 1 dari 4' : 'Step 1 of 4'}</span>
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                            <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
                                 {isIndo ? 'Apa fokus utama aktivitas Anda saat ini?' : "What's your primary focus right now?"}
                             </h2>
-                            <p className="text-sm font-medium text-slate-400 mt-2">
+                            <p className="text-xs sm:text-sm font-medium text-slate-400 mt-1.5 sm:mt-2">
                                 {isIndo 
-                                    ? 'Pilih persona Anda untuk menyesuaikan tata letak modul dan rekomendasi fitur terbaik.'
+                                    ? 'Pilih persona Anda untuk menyesuaikan tata letak modul dan rekomendasi alur kerja terbaik.'
                                     : 'Select your persona to tailor the workspace layout and optimal workflow.'}
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 sm:gap-4">
                             {roles.map(role => {
                                 const isSelected = selectedRole === role.id;
                                 return (
@@ -459,14 +490,14 @@ export default function FullPageOnboarding({
                                         key={role.id}
                                         type="button"
                                         onClick={() => handleSelectRole(role.id)}
-                                        className={`p-5 rounded-2xl border text-left transition-all relative group flex flex-col justify-between ${
+                                        className={`p-4 sm:p-5 rounded-2xl border text-left transition-all relative group flex flex-col justify-between min-h-[170px] ${
                                             isSelected 
                                                 ? 'bg-indigo-600/10 border-indigo-500 ring-2 ring-indigo-500/30 shadow-xl shadow-indigo-500/10' 
                                                 : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-900 hover:border-slate-700'
                                         }`}
                                     >
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl shadow-inner group-hover:scale-105 transition-transform">
+                                        <div className="flex items-start justify-between mb-3 w-full">
+                                            <div className="w-11 h-11 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl shadow-inner group-hover:scale-105 transition-transform">
                                                 {role.icon}
                                             </div>
                                             <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
@@ -476,10 +507,10 @@ export default function FullPageOnboarding({
                                             </div>
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-base text-white mb-1">
+                                            <h3 className="font-black text-sm sm:text-base text-white mb-1">
                                                 {isIndo ? role.titleId : role.titleEn}
                                             </h3>
-                                            <p className="text-xs text-slate-400 leading-relaxed">
+                                            <p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed line-clamp-3">
                                                 {isIndo ? role.descId : role.descEn}
                                             </p>
                                         </div>
@@ -492,23 +523,23 @@ export default function FullPageOnboarding({
 
                 {/* STEP 2: CORE PRIORITIES & GOALS */}
                 {currentStep === 2 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                         <div className="text-center sm:text-left">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-3">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-2 sm:mb-3">
                                 <Target size={13} />
                                 <span>{isIndo ? 'Langkah 2 dari 4' : 'Step 2 of 4'}</span>
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                            <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
                                 {isIndo ? 'Apa target terpenting yang ingin Anda capai?' : 'What are your top priorities to conquer?'}
                             </h2>
-                            <p className="text-sm font-medium text-slate-400 mt-2">
+                            <p className="text-xs sm:text-sm font-medium text-slate-400 mt-1.5 sm:mt-2">
                                 {isIndo 
                                     ? 'Pilih beberapa fokus utama yang ingin Anda perbaiki dan lacak setiap hari.'
                                     : 'Select the key areas you want to track and master effortlessly.'}
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                             {goalOptions.map(goal => {
                                 const isSelected = selectedGoals.includes(goal.id);
                                 return (
@@ -516,15 +547,15 @@ export default function FullPageOnboarding({
                                         key={goal.id}
                                         type="button"
                                         onClick={() => toggleGoal(goal.id)}
-                                        className={`p-4 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 ${
+                                        className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 ${
                                             isSelected 
-                                                ? 'bg-indigo-600/15 border-indigo-500 text-white shadow-md shadow-indigo-500/10' 
+                                                ? 'bg-indigo-600/15 border-indigo-500 text-white shadow-md shadow-indigo-500/10 ring-1 ring-indigo-500/30' 
                                                 : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:bg-slate-900 hover:border-slate-700'
                                         }`}
                                     >
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                                             <span className="text-xl shrink-0">{goal.emoji}</span>
-                                            <span className="text-xs font-bold leading-snug">
+                                            <span className="text-xs font-bold leading-snug truncate sm:whitespace-normal">
                                                 {isIndo ? goal.labelId : goal.labelEn}
                                             </span>
                                         </div>
@@ -542,17 +573,17 @@ export default function FullPageOnboarding({
 
                 {/* STEP 3: DIRECT MODULE TAB SELECTION */}
                 {currentStep === 3 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
                             <div>
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-3">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black tracking-wider uppercase mb-2 sm:mb-3">
                                     <Layers size={13} />
                                     <span>{isIndo ? 'Langkah 3 dari 4' : 'Step 3 of 4'}</span>
                                 </div>
-                                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                                <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
                                     {isIndo ? 'Pilih Modul Tab yang Ingin Diaktifkan' : 'Choose Your Active Module Tabs'}
                                 </h2>
-                                <p className="text-sm font-medium text-slate-400 mt-2">
+                                <p className="text-xs sm:text-sm font-medium text-slate-400 mt-1.5 sm:mt-2">
                                     {isIndo 
                                         ? 'Seluruh 8 modul terbuka penuh secara default. Centang modul yang ingin Anda tampilkan di navigasi.'
                                         : 'All 8 modules are fully unlocked. Toggle whichever tabs you want active on your navigation.'}
@@ -563,14 +594,14 @@ export default function FullPageOnboarding({
                                 <span className="text-xs font-bold text-slate-400">
                                     {isIndo ? 'Aktif:' : 'Active:'}
                                 </span>
-                                <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black">
+                                <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black shadow-sm">
                                     {selectedTabKeys.length} / 8 {isIndo ? 'Modul' : 'Modules'}
                                 </span>
                             </div>
                         </div>
 
-                        {/* MODULES GRID */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                        {/* MODULES GRID (4X2 IN 7XL) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                             {modulesCatalog.map(mod => {
                                 const isSelected = selectedTabKeys.includes(mod.key);
                                 return (
@@ -611,11 +642,11 @@ export default function FullPageOnboarding({
                         </div>
 
                         {/* LIVE PREVIEW BAR */}
-                        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                             <span className="text-xs font-bold text-slate-400">
                                 {isIndo ? '👀 Tampilan Tab Navigasi Anda:' : '👀 Live Navigation Tab Preview:'}
                             </span>
-                            <div className="flex flex-wrap items-center justify-center gap-1.5">
+                            <div className="flex flex-wrap items-center gap-1.5">
                                 <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold">
                                     📊 Dashboard
                                 </span>
@@ -636,25 +667,25 @@ export default function FullPageOnboarding({
 
                 {/* STEP 4: WORKSPACE PERSONALIZATION & LAUNCH */}
                 {currentStep === 4 && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                         <div className="text-center sm:text-left">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black tracking-wider uppercase mb-3">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black tracking-wider uppercase mb-2 sm:mb-3">
                                 <Rocket size={13} />
                                 <span>{isIndo ? 'Langkah Terakhir' : 'Final Step'}</span>
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                            <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
                                 {isIndo ? 'Personalisasi & Luncurkan Workspace Anda' : 'Personalize & Launch Your Workspace'}
                             </h2>
-                            <p className="text-sm font-medium text-slate-400 mt-2">
+                            <p className="text-xs sm:text-sm font-medium text-slate-400 mt-1.5 sm:mt-2">
                                 {isIndo 
                                     ? 'Beri nama ruang kerja Anda dan mulai bangun kehidupan yang lebih produktif & terarah.'
                                     : 'Name your workspace and embark on your unified productivity journey.'}
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            {/* Workspace Name Input */}
-                            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8">
+                            {/* Workspace Name & Vibe Input (7 cols on Desktop) */}
+                            <div className="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 sm:space-y-5">
                                 <div>
                                     <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
                                         {isIndo ? 'Nama Ruang Kerja / Workspace' : 'Workspace Name'}
@@ -672,7 +703,7 @@ export default function FullPageOnboarding({
                                     <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
                                         {isIndo ? 'Gaya Fokus Harian' : 'Daily Prime Vibe'}
                                     </label>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
                                         {[
                                             { id: 'morning', icon: '☀️', labelId: 'Morning Clarity', labelEn: 'Morning' },
                                             { id: 'deep_work', icon: '⚡', labelId: 'Deep Sprint', labelEn: 'Deep Work' },
@@ -684,11 +715,11 @@ export default function FullPageOnboarding({
                                                 onClick={() => setDailyFocusVibe(vibe.id)}
                                                 className={`p-3 rounded-xl border text-center transition-all ${
                                                     dailyFocusVibe === vibe.id
-                                                        ? 'bg-indigo-600 border-indigo-500 text-white font-black'
+                                                        ? 'bg-indigo-600 border-indigo-500 text-white font-black shadow-md shadow-indigo-600/30'
                                                         : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                                                 }`}
                                             >
-                                                <div className="text-lg mb-1">{vibe.icon}</div>
+                                                <div className="text-lg sm:text-xl mb-1">{vibe.icon}</div>
                                                 <div className="text-[10px] font-bold">{isIndo ? vibe.labelId : vibe.labelEn}</div>
                                             </button>
                                         ))}
@@ -696,8 +727,8 @@ export default function FullPageOnboarding({
                                 </div>
                             </div>
 
-                            {/* Summary Checklist Card */}
-                            <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 border border-indigo-500/20 flex flex-col justify-between">
+                            {/* Summary Checklist Card (5 cols on Desktop) */}
+                            <div className="lg:col-span-5 p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 border border-indigo-500/20 flex flex-col justify-between">
                                 <div className="space-y-4">
                                     <h4 className="text-sm font-black text-white flex items-center gap-2">
                                         <Sparkles size={16} className="text-indigo-400" />
@@ -706,19 +737,19 @@ export default function FullPageOnboarding({
 
                                     <ul className="space-y-2.5 text-xs text-slate-300">
                                         <li className="flex items-center gap-2">
-                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                                                 <Check size={11} strokeWidth={3} />
                                             </div>
                                             <span>{selectedTabKeys.length} {isIndo ? 'Modul Produktivitas Diaktifkan' : 'Productivity Modules Active'}</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                                                 <Check size={11} strokeWidth={3} />
                                             </div>
                                             <span>{isIndo ? 'Dashboard & Daily Synergy Hub Tersinkronisasi' : 'Dashboard & Daily Synergy Hub Initialized'}</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                            <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                                                 <Check size={11} strokeWidth={3} />
                                             </div>
                                             <span>{isIndo ? 'Akses Penuh Tanpa Kunci Waktu' : 'Full Lifetime Customization Access'}</span>
@@ -737,13 +768,13 @@ export default function FullPageOnboarding({
                 )}
 
                 {/* BOTTOM NAVIGATION CONTROLS */}
-                <div className="mt-10 pt-6 border-t border-slate-800/80 flex items-center justify-between">
+                <div className="mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-slate-800/80 flex items-center justify-between gap-3">
                     {currentStep > 1 ? (
                         <button
                             type="button"
                             onClick={handlePrevStep}
                             disabled={isLaunching}
-                            className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-sm transition flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                            className="px-4 sm:px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs sm:text-sm transition flex items-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
                         >
                             <ArrowLeft size={16} />
                             <span>{isIndo ? 'Kembali' : 'Back'}</span>
@@ -756,7 +787,7 @@ export default function FullPageOnboarding({
                         <button
                             type="button"
                             onClick={handleNextStep}
-                            className="px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 hover:translate-x-0.5 active:scale-95 cursor-pointer"
+                            className="px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 hover:translate-x-0.5 active:scale-95 cursor-pointer"
                         >
                             <span>{isIndo ? 'Lanjutkan' : 'Continue'}</span>
                             <ArrowRight size={16} />
@@ -766,7 +797,7 @@ export default function FullPageOnboarding({
                             type="button"
                             onClick={handleFinishAndLaunch}
                             disabled={isLaunching}
-                            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-base shadow-xl shadow-indigo-600/40 transition flex items-center gap-3 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-75"
+                            className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm sm:text-base shadow-xl shadow-indigo-600/40 transition flex items-center gap-2.5 sm:gap-3 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-75"
                         >
                             {isLaunching ? (
                                 <span>{isIndo ? 'Menyiapkan Ruang Kerja...' : 'Launching Workspace...'}</span>
