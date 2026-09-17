@@ -1,70 +1,20 @@
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
-import { updateSession } from '@/utils/supabase/middleware'
+import { updateSession } from '@/utils/supabase/middleware';
+import { NextRequest } from 'next/server';
 
 const intlMiddleware = createMiddleware(routing);
 
 // Next.js 16: file renamed from middleware.ts to proxy.ts
 // Using named export `proxy` as required by the new API
-export const proxy = async (req: any) => {
-  const pathname = req.nextUrl.pathname;
-  
-  // Fast cookie check without network calls
-  const hasAuthCookie = req.cookies.has('sb-access-token') || 
-    req.cookies.getAll().some((c: any) => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
-
-  // Strictly match top-level application / dashboard routes, NOT public marketing pages like /features/* or /solutions/*
-  const isProtectedRoute = /^\/(?:en|id)?\/?(?:dashboard|habits|goals|study|jobs|journals|journal|coach|calendar|settings|billing|profile|finance|planner)(?:\/.*)?$/.test(pathname) &&
-    !pathname.startsWith('/features') &&
-    !pathname.startsWith('/id/features') &&
-    !pathname.startsWith('/en/features') &&
-    !pathname.startsWith('/solutions') &&
-    !pathname.startsWith('/id/solutions') &&
-    !pathname.startsWith('/en/solutions');
-
-  // Fast-path 1: Protected route with NO auth cookie -> Redirect instantly without querying Supabase
-  if (isProtectedRoute && !hasAuthCookie) {
-    const isIndonesian = pathname.startsWith('/id');
-    const loginUrl = new URL(isIndonesian ? '/id/login' : '/login', req.url);
-    const res = Response.redirect(loginUrl);
-    res.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
-    return res;
-  }
-
-  let supabaseResponse = null;
-  let user = null;
-
-  const isLandingOrAuthPage = pathname === '/' || pathname === '/id' || pathname === '/en' ||
-    pathname.includes('/login') || pathname.includes('/register');
-
-  // Verify session for protected routes OR landing/auth pages if cookies exist
-  if (hasAuthCookie && (isProtectedRoute || isLandingOrAuthPage)) {
-    const sessionResult = await updateSession(req);
-    supabaseResponse = sessionResult.supabaseResponse;
-    user = sessionResult.user;
-  }
-
-  // If user is TRULY authenticated with a valid session and visits landing or auth page -> Redirect to dashboard safely
-  if (isLandingOrAuthPage && user?.email) {
-    const locale = (pathname.startsWith('/en') || pathname === '/en') ? 'en' : 'id';
-    const res = Response.redirect(new URL(`/${locale}/dashboard`, req.url));
-    res.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
-    return res;
-  }
-
-  // Run next-intl middleware for locale routing
+export const proxy = async (req: NextRequest) => {
+  // 1. Run next-intl middleware first to handle locale routing and headers
   const intlResponse = intlMiddleware(req);
-  
-  // Merge updated Supabase session cookies if present
-  if (supabaseResponse) {
-    supabaseResponse.cookies.getAll().forEach((cookie: any) => {
-      intlResponse.cookies.set(cookie.name, cookie.value, cookie);
-    });
-  }
 
-  return intlResponse;
+  // 2. Pass intlResponse to Supabase updateSession to sync cookies and handle auth redirects safely
+  return await updateSession(req, intlResponse);
 };
- 
+
 export const config = {
   // Match all pathnames except api, _next, static files
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
