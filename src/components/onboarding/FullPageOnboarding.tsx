@@ -283,6 +283,15 @@ export default function FullPageOnboarding({
 
             // Save onboarding metadata to localStorage
             localStorage.setItem('tranvas_tab_setup_completed', 'true');
+            localStorage.setItem('tranvas_user_settings', JSON.stringify({
+                modules: nextModules,
+                tabs_activated_at: new Date().toISOString(),
+                onboarding_completed: true,
+                role: selectedRole,
+                goals: selectedGoals,
+                workspace_name: workspaceName,
+                daily_focus_vibe: dailyFocusVibe,
+            }));
             localStorage.setItem('tranvas_onboarding_profile', JSON.stringify({
                 role: selectedRole,
                 goals: selectedGoals,
@@ -297,11 +306,11 @@ export default function FullPageOnboarding({
             if (onClose) {
                 onClose();
             } else {
-                router.push('/dashboard');
+                window.location.href = `/${currentLocale}/dashboard`;
             }
         } catch (e) {
             console.error('Error completing onboarding:', e);
-            router.push('/dashboard');
+            window.location.href = `/${currentLocale}/dashboard`;
         } finally {
             setIsSaving(false);
             setIsLaunching(false);

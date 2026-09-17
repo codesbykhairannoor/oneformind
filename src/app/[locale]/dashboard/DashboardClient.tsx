@@ -57,7 +57,7 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
 
     const overallScore = hasAnyTrackedItems
         ? (activeScores.length > 0 ? Math.round(activeScores.reduce((a, b) => a + b, 0) / activeScores.length) : 0)
-        : 100;
+        : 0;
 
     return (
         <AuthenticatedLayout user={user}>

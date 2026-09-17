@@ -109,6 +109,12 @@ export default async function DashboardPage() {
         userSettings = userProfile.settings;
     }
 
+    // If fresh account without completed onboarding in DB settings, redirect to onboarding setup
+    const isNewUser = !userSettings?.onboarding_completed && habits.length === 0 && plannerTasks.length === 0 && goals.length === 0;
+    if (isNewUser) {
+        redirect(`/${locale}/onboarding`);
+    }
+
     const studyAssignments: any[] = Array.isArray(userSettings.study_assignments) ? userSettings.study_assignments : [];
     const studyBooks: any[] = Array.isArray(userSettings.study_books) ? userSettings.study_books : [];
     const studyReadingGoal = userSettings.study_reading_goal || { year: now.getFullYear(), target_books: 20 };

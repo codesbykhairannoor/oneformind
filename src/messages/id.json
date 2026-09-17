@@ -1003,6 +1003,8 @@
   "dash_status_steady": "Irama Stabil",
   "dash_status_boost": "Perlu Dorongan",
   "dash_status_fresh": "Siap Memulai Hari",
+  "dash_focus_today": "Fokus Hari Ini",
+  "dash_active_modules_clean": "Tampilan sidebar disesuaikan dengan modul aktif Anda.",
   "dash_habits_unit": "Habit",
   "dash_tasks_unit": "Tugas",
   "dash_check_habits": "Cek Habit",
