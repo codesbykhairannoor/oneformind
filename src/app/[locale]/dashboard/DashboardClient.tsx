@@ -31,8 +31,8 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
     const isGoalActive = isTabActive('goal');
     const isJournalActive = isTabActive('journal');
 
-    const plannerData = synergy.planner;
-    const trend = synergy.trend || [];
+    const plannerData = synergy?.planner || { upcoming: [], total: 0, completed: 0 };
+    const trend = synergy?.trend || [];
     const trendMax = Math.max(...trend.map((d: any) => d.score), 1);
 
     // Calculate integrated Life Synergy score adaptively based on active modules

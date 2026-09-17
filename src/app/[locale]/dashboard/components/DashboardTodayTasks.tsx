@@ -17,9 +17,9 @@ export default function DashboardTodayTasks({ plannerData, synergy, t }: Dashboa
     const isHabitActive = isTabActive('habit');
     const isPlannerActive = isTabActive('planner');
 
-    const [tasks, setTasks] = useState<any[]>(plannerData.upcoming || []);
-    const [habitsList, setHabitsList] = useState<any[]>(synergy.habits?.todayList || []);
-    const [completedHabitCount, setCompletedHabitCount] = useState<number>(synergy.habits?.completed || 0);
+    const [tasks, setTasks] = useState<any[]>(plannerData?.upcoming || []);
+    const [habitsList, setHabitsList] = useState<any[]>(synergy?.habits?.todayList || []);
+    const [completedHabitCount, setCompletedHabitCount] = useState<number>(synergy?.habits?.completed || 0);
 
     const totalHabits = habitsList.length;
     const habitPercent = totalHabits > 0 ? Math.round((completedHabitCount / totalHabits) * 100) : 0;

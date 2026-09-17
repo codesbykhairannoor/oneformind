@@ -83,7 +83,7 @@ export default function GuestLayout({ children, user = null }: { children: React
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-700 relative">
+        <div className="flex-1 w-full min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-700 relative">
             
             {/* PUBLIC NAVBAR */}
             <GuestNavbar
