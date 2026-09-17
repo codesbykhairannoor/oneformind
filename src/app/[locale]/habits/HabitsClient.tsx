@@ -106,10 +106,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     ]);
 
     const handleOpenBatchModal = () => {
-        if (!isArchitect) {
-            router.push('/billing');
-            return;
-        }
         setShowBatchModal(true);
     };
 
@@ -354,10 +350,6 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     showBatchModal={showBatchModal}
                     setShowBatchModal={setShowBatchModal}
                     onSwitchToBatch={() => {
-                        if (!isArchitect) {
-                            router.push('/billing');
-                            return;
-                        }
                         form.setShowCreateModal(false);
                         setShowBatchModal(true);
                     }}

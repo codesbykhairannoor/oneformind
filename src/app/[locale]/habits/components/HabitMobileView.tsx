@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Check, Plus, Coffee, FileText, Sparkles, Edit3 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { HabitItem, ProcessedHabitItem, MonthDateItem } from '../types';
 import { getHabitDayInfo } from '../utils/habitMath';
 
@@ -40,6 +41,8 @@ export default function HabitMobileView({
     onOpenNoteModal,
     onEditHabit
 }: HabitMobileViewProps) {
+    const locale = useLocale();
+    const isIndo = locale === 'id';
     const dateStripRef = useRef<HTMLDivElement>(null);
     const activeDateBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -104,7 +107,11 @@ export default function HabitMobileView({
                     const dayInfo = getHabitDayInfo(habit, selectedDayObj);
                     const isDone = dayInfo.status === 'completed';
                     const isRelapse = dayInfo.status === 'relapse';
-                    const isRest = dayInfo.status === 'rest';
+                    const isRest = dayInfo.status === 'rest' || !dayInfo.isScheduled;
+                    const val = dayInfo.value !== undefined ? dayInfo.value : (isDone ? (habit.targetValue || 10) : 0);
+                    const target = Math.max(1, habit.targetValue || 10);
+                    const percentVal = Math.round((val / target) * 100);
+                    const hasProgress = val > 0 || isDone || dayInfo.status === 'in_progress';
 
                     return (
                         <div
@@ -119,7 +126,7 @@ export default function HabitMobileView({
                                     onClick={() => onSelectHabitDetail(habit)}
                                     className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-transform active:scale-90"
                                     style={{ backgroundColor: `${habit.color}18`, color: habit.color }}
-                                    title="Lihat Detail Habit"
+                                    title={isIndo ? 'Lihat Detail Habit' : 'View Habit Details'}
                                 >
                                     {habit.icon}
                                 </button>
@@ -133,6 +140,12 @@ export default function HabitMobileView({
                                         {habit.streak > 1 && (
                                             <span className="text-[9px] font-black text-orange-500 bg-orange-50 dark:bg-orange-500/10 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shrink-0">
                                                 {habit.streak} 🔥
+                                            </span>
+                                        )}
+                                        {isRest && !isDone && !hasProgress && (
+                                            <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 border border-amber-200/60 dark:border-amber-500/30">
+                                                <Coffee size={10} className="shrink-0" />
+                                                <span>{isIndo ? 'Istirahat' : 'Rest Day'}</span>
                                             </span>
                                         )}
                                     </div>
@@ -159,7 +172,7 @@ export default function HabitMobileView({
                                             type="button"
                                             onClick={() => onEditHabit(habit)}
                                             title="Edit Habit"
-                                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all text-slate-300 dark:text-slate-600 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all text-slate-300 dark:text-slate-600 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                                         >
                                             <Edit3 size={15} strokeWidth={2.5} />
                                         </button>
@@ -174,8 +187,8 @@ export default function HabitMobileView({
                                                 dateStr: selectedMobileDate,
                                                 notes: dayInfo.notes || ''
                                             })}
-                                            title="Catatan Harian"
-                                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                                            title={isIndo ? 'Catatan Harian' : 'Daily Note'}
+                                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                                                 dayInfo.notes && dayInfo.notes.trim().length > 0
                                                     ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/40'
                                                     : 'text-slate-300 dark:text-slate-600 hover:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -187,10 +200,28 @@ export default function HabitMobileView({
 
                                     {/* Toggle / Counter Button */}
                                     {habit.measurementType === 'numeric' ? (() => {
-                                        const val = dayInfo.value !== undefined ? dayInfo.value : (isDone ? (habit.targetValue || 10) : 0);
-                                        const target = Math.max(1, habit.targetValue || 10);
-                                        const percentVal = Math.round((val / target) * 100);
-                                        const hasProgress = val > 0 || isDone || dayInfo.status === 'in_progress';
+                                        if (isRest && !hasProgress) {
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onOpenNumericPopover({
+                                                        habitId: habit.id,
+                                                        habitName: habit.name,
+                                                        habitIcon: habit.icon,
+                                                        habitColor: habit.color,
+                                                        dateStr: selectedMobileDate,
+                                                        currentVal: val,
+                                                        targetVal: target,
+                                                        unit: habit.unit || '',
+                                                        currentNotes: dayInfo.notes || ''
+                                                    })}
+                                                    className="px-2.5 h-11 rounded-2xl font-bold text-xs flex items-center gap-1.5 bg-amber-50/70 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-500/30 transition-all active:scale-95 cursor-pointer"
+                                                >
+                                                    <Coffee size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                                                    <span className="text-[10px] font-black">{isIndo ? 'Istirahat' : 'Rest'}</span>
+                                                </button>
+                                            );
+                                        }
 
                                         return (
                                             <button
@@ -206,7 +237,7 @@ export default function HabitMobileView({
                                                     unit: habit.unit || '',
                                                     currentNotes: dayInfo.notes || ''
                                                 })}
-                                                className={`px-3.5 h-11 rounded-2xl font-black text-xs flex items-center gap-1 transition-all active:scale-95 ${
+                                                className={`px-3.5 h-11 rounded-2xl font-black text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${
                                                     isDone
                                                         ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200 dark:shadow-none'
                                                         : hasProgress
@@ -228,20 +259,20 @@ export default function HabitMobileView({
                                         <button
                                             type="button"
                                             onClick={() => onToggleStatus(habit.id, selectedMobileDate)}
-                                            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all active:scale-90 ${
+                                            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all active:scale-90 cursor-pointer ${
                                                 isDone
                                                     ? 'shadow-md shadow-indigo-100 dark:shadow-none text-white'
                                                     : isRelapse
                                                     ? 'bg-rose-500 text-white shadow-sm'
                                                     : isRest
-                                                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                                    ? 'bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/70 dark:border-amber-500/30 text-amber-600 dark:text-amber-400'
                                                     : 'bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-400'
                                             }`}
                                             style={isDone ? { backgroundColor: habit.color } : {}}
                                         >
                                             {isDone && <Check size={18} strokeWidth={3.5} />}
                                             {isRelapse && <span className="text-xs font-black">⚠️</span>}
-                                            {isRest && <Coffee size={16} />}
+                                            {isRest && !isDone && !isRelapse && <Coffee size={18} className="text-amber-600 dark:text-amber-400" />}
                                             {!isDone && !isRelapse && !isRest && <Plus size={16} strokeWidth={2.5} />}
                                         </button>
                                     )}

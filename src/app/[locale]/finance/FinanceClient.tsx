@@ -985,10 +985,6 @@ export default function FinanceClient({
                 budgets={budgets}
                 onSaveSingleTrx={handleSaveSingleTrx}
                 onSwitchToBatch={() => { 
-                    if (!isArchitect) {
-                        router.push('/billing');
-                        return;
-                    }
                     setShowTrxModal(false); 
                     setShowBatchModal(true); 
                 }}

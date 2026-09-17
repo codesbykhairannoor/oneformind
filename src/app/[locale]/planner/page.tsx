@@ -29,10 +29,6 @@ export default function PlannerPage() {
     const [showBatchModal, setShowBatchModal] = useState(false);
 
     const handleSwitchToBatch = () => {
-        if (!isArchitect) {
-            router.push('/billing');
-            return;
-        }
         planner.setShowTaskModal(false);
         setShowBatchModal(true);
     };

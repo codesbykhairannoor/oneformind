@@ -1,7 +1,7 @@
 'use client';
 
 import PlannerTaskModal from './PlannerTaskModal';
-import PlannerBatchModal, { BatchTaskRow, GlobalPlannerDefaults } from './PlannerBatchModal';
+import PlannerBatchModal, { BatchTaskRow } from './PlannerBatchModal';
 import ModalPortal from '@/components/ModalPortal';
 import { TaskItem } from '../types';
 import { AlertTriangle, Trash2 } from 'lucide-react';
@@ -12,7 +12,7 @@ interface PlannerModalsContainerProps {
     setShowTaskModal: (show: boolean) => void;
     showBatchModal?: boolean;
     setShowBatchModal?: (show: boolean) => void;
-    submitBatchTasks?: (rows: BatchTaskRow[], defaults: GlobalPlannerDefaults) => Promise<void> | void;
+    submitBatchTasks?: (rows: BatchTaskRow[]) => Promise<void> | void;
     onSwitchToBatch?: () => void;
     onSwitchToSingle?: () => void;
     editingTaskId: number | null;

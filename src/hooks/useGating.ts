@@ -85,6 +85,11 @@ export const useGating = () => {
             return 2;
         }
 
+        // If plan is explicit (e.g. legendary, architect, quantum, lifetime)
+        if (plan && PLAN_LEVELS[plan]) {
+            return PLAN_LEVELS[plan];
+        }
+
         return 1; // Explorer (free forever)
     }, [user, trial.isActive]);
 

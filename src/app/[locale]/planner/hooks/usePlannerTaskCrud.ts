@@ -327,47 +327,55 @@ export function usePlannerTaskCrud(selectedDate: string) {
     };
 
     // Submit Batch Tasks
-    const submitBatchTasks = async (batchRows: any[], defaults: any) => {
+    const submitBatchTasks = async (batchRows: any[], defaults?: any) => {
         const validRows = batchRows.filter(r => r.title.trim().length > 0);
         if (validRows.length === 0) return;
 
         const cleanDate = normalizeDate(selectedDate);
-        const createdItems: TaskItem[] = [];
+        const tempTasks: { tempId: number; row: any; effectiveType: number }[] = [];
 
         try {
             for (const row of validRows) {
-                const tempId = Date.now() + Math.floor(Math.random() * 1000);
-                const effectiveType = row.typeOverride !== undefined ? row.typeOverride : (defaults?.type || 2);
-                const newTask: TaskItem = {
-                    id: tempId,
-                    date: cleanDate,
-                    title: row.title,
-                    start_time: row.startTime,
-                    end_time: row.endTime,
-                    type: effectiveType,
-                    notes: row.notes || '',
-                    completed: false
-                };
-                createdItems.push(newTask);
+                const tempId = Date.now() + Math.floor(Math.random() * 10000);
+                const effectiveType = row.type !== undefined ? row.type : (row.typeOverride !== undefined ? row.typeOverride : (defaults?.type || 2));
+                tempTasks.push({ tempId, row, effectiveType });
             }
 
-            updateTasksState(prev => [...prev, ...createdItems]);
+            const newTasksState: TaskItem[] = tempTasks.map(t => ({
+                id: t.tempId,
+                date: cleanDate,
+                title: t.row.title,
+                start_time: t.row.startTime,
+                end_time: t.row.endTime,
+                type: t.effectiveType,
+                notes: t.row.notes || '',
+                completed: false
+            }));
 
-            for (const row of validRows) {
-                const effectiveType = row.typeOverride !== undefined ? row.typeOverride : (defaults?.type || 2);
-                await fetch('/api/planner/tasks', {
+            updateTasksState(prev => [...prev, ...newTasksState]);
+
+            const fetchPromises = tempTasks.map(async (t) => {
+                const res = await fetch('/api/planner/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         date: cleanDate,
-                        title: row.title,
-                        startTime: row.startTime,
-                        endTime: row.endTime,
-                        type: effectiveType,
-                        notes: row.notes || ''
+                        title: t.row.title,
+                        startTime: t.row.startTime,
+                        endTime: t.row.endTime,
+                        type: t.effectiveType,
+                        notes: t.row.notes || ''
                     })
                 });
-            }
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data?.id) {
+                        updateTasksState(prev => prev.map(item => item.id === t.tempId ? { ...item, id: data.id } : item));
+                    }
+                }
+            });
+
+            await Promise.all(fetchPromises);
             window.dispatchEvent(new Event('planner_updated'));
         } catch (error) {
             console.error('Failed to submit batch tasks', error);
