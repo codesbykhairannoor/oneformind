@@ -260,6 +260,27 @@ export default function FullPageOnboarding({
             // Save to active modules system
             await persistModules(nextModules);
 
+            // Sync full onboarding metadata to backend
+            try {
+                await fetch('/api/user', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        settings: {
+                            modules: nextModules,
+                            tabs_activated_at: new Date().toISOString(),
+                            onboarding_completed: true,
+                            workspace_name: workspaceName,
+                            daily_focus_vibe: dailyFocusVibe,
+                            role: selectedRole,
+                            goals: selectedGoals
+                        }
+                    })
+                });
+            } catch (err) {
+                console.error('Failed to sync onboarding to backend:', err);
+            }
+
             // Save onboarding metadata to localStorage
             localStorage.setItem('tranvas_tab_setup_completed', 'true');
             localStorage.setItem('tranvas_onboarding_profile', JSON.stringify({

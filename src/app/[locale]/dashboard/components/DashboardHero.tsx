@@ -17,11 +17,11 @@ export default function DashboardHero({ user, synergy, t, overallScore }: Dashbo
     const isPlannerActive = isTabActive('planner');
 
     const summaryParts: string[] = [];
-    if (isHabitActive && synergy.habits) {
-        summaryParts.push(`${synergy.habits.completed}/${synergy.habits.total} Habit`);
+    if (isHabitActive && synergy.habits && synergy.habits.total > 0) {
+        summaryParts.push(`${synergy.habits.completed}/${synergy.habits.total} ${t('dash_habits_unit') || 'Habit'}`);
     }
-    if (isPlannerActive && synergy.planner) {
-        summaryParts.push(`${synergy.planner.completed}/${synergy.planner.total} Tugas`);
+    if (isPlannerActive && synergy.planner && synergy.planner.total > 0) {
+        summaryParts.push(`${synergy.planner.completed}/${synergy.planner.total} ${t('dash_tasks_unit') || 'Tugas'}`);
     }
 
     const getGreetingKey = () => {
@@ -33,6 +33,15 @@ export default function DashboardHero({ user, synergy, t, overallScore }: Dashbo
     };
 
     const firstName = user?.name ? user.name.split(' ')[0] : 'User';
+
+    const isFresh = (!synergy.habits || synergy.habits.total === 0) && (!synergy.planner || synergy.planner.total === 0);
+    const statusText = isFresh
+        ? (t('dash_status_fresh') || 'Siap Memulai Hari')
+        : overallScore >= 80 
+            ? (t('dash_status_prime') || 'Keseimbangan Prima') 
+            : overallScore >= 50 
+                ? (t('dash_status_steady') || 'Irama Stabil') 
+                : (t('dash_status_boost') || 'Perlu Dorongan');
 
     return (
         <header className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -94,7 +103,7 @@ export default function DashboardHero({ user, synergy, t, overallScore }: Dashbo
                         {t('dash_synergy_today') || 'Synergy Pulse'}
                     </p>
                     <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                        {overallScore >= 80 ? 'Keseimbangan Prima' : overallScore >= 50 ? 'Irama Stabil' : 'Perlu Dorongan'}
+                        {statusText}
                     </p>
                     {summaryParts.length > 0 ? (
                         <p className="text-[11px] text-slate-400">

@@ -35,25 +35,28 @@ export default function DashboardClient({ user, synergy, locale }: { user: any; 
     const trend = synergy?.trend || [];
     const trendMax = Math.max(...trend.map((d: any) => d.score), 1);
 
-    // Calculate integrated Life Synergy score adaptively based on active modules
+    // Calculate integrated Life Synergy score adaptively based on active modules with real data
     const activeScores: number[] = [];
-    if (isHabitActive && synergy.habits) {
+    if (isHabitActive && synergy.habits && synergy.habits.total > 0) {
         activeScores.push(synergy.habits.percent || 0);
     }
-    if (isPlannerActive && synergy.planner) {
-        activeScores.push(synergy.planner.total > 0
-            ? Math.round((synergy.planner.completed / synergy.planner.total) * 100)
-            : 100);
+    if (isPlannerActive && synergy.planner && synergy.planner.total > 0) {
+        activeScores.push(Math.round((synergy.planner.completed / synergy.planner.total) * 100));
     }
-    if (isGoalActive && synergy.goals) {
-        activeScores.push(synergy.goals.top_goal ? synergy.goals.top_goal.percent : 70);
+    if (isGoalActive && synergy.goals?.top_goal && typeof synergy.goals.top_goal.percent === 'number') {
+        activeScores.push(synergy.goals.top_goal.percent);
     }
-    if (isJournalActive && synergy.journal) {
-        activeScores.push(synergy.journal.is_written ? 100 : 50);
+    if (isJournalActive && synergy.journal?.is_written) {
+        activeScores.push(100);
     }
 
-    const overallScore = activeScores.length > 0
-        ? Math.round(activeScores.reduce((a, b) => a + b, 0) / activeScores.length)
+    const hasAnyTrackedItems = (isHabitActive && (synergy.habits?.total || 0) > 0) ||
+        (isPlannerActive && (synergy.planner?.total || 0) > 0) ||
+        (isGoalActive && Boolean(synergy.goals?.top_goal)) ||
+        (isJournalActive && Boolean(synergy.journal?.is_written));
+
+    const overallScore = hasAnyTrackedItems
+        ? (activeScores.length > 0 ? Math.round(activeScores.reduce((a, b) => a + b, 0) / activeScores.length) : 0)
         : 100;
 
     return (

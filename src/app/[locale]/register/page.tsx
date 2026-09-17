@@ -58,7 +58,7 @@ export default function Register() {
             setState({ success: false, error: error.message });
             setIsPending(false);
         } else {
-            router.push('/dashboard');
+            router.push('/onboarding');
             // Don't set isPending false if successful
         }
     };
@@ -68,7 +68,7 @@ export default function Register() {
         const checkExistingSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session && mounted) {
-                router.push('/dashboard');
+                router.push('/onboarding');
             }
         };
         checkExistingSession();
@@ -77,7 +77,7 @@ export default function Register() {
 
     useEffect(() => {
         if (state?.success) {
-            router.push('/dashboard');
+            router.push('/onboarding');
         }
     }, [state?.success, router]);
 
