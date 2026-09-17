@@ -172,6 +172,13 @@ func parseJWTClaimsUnsafe(tokenString string) (jwt.MapClaims, error) {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Exclude public callbacks/webhooks from requiring Auth token
+		route := r.URL.Query().Get("route")
+		if route == "payment-duitku-callback" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, `{"error": "Missing Authorization header"}`, http.StatusUnauthorized)
