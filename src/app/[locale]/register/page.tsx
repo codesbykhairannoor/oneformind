@@ -93,11 +93,7 @@ export default function Register() {
                     </Link>
                 </div>
 
-                <div className="text-center mb-6">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500/10 via-indigo-500/10 to-purple-500/10 border border-emerald-200/60 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-[11px] font-black uppercase tracking-wider mb-3 shadow-sm">
-                        <span>⚡</span>
-                        <span>{locale === 'id' ? 'Akses Gratis Seluruh 8 Modul Life OS • Bebas Atur Kapan Saja' : 'Free Access to All 8 Life OS Modules • Customize Display Anytime'}</span>
-                    </div>
+                <div className="text-center mb-8">
                     <h1 className="text-2xl font-black text-slate-900 mb-1.5 tracking-tight">
                         {t('auth_register_title') || 'Buat Akun Baru'}
                     </h1>

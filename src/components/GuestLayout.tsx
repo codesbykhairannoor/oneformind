@@ -47,6 +47,20 @@ export default function GuestLayout({ children, user = null }: { children: React
     }, []);
 
     useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.touchAction = 'none';
+        } else {
+            document.body.style.overflow = '';
+            document.body.style.touchAction = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+            document.body.style.touchAction = '';
+        };
+    }, [mobileMenuOpen]);
+
+    useEffect(() => {
         const timer = typeof window !== 'undefined' && 'requestIdleCallback' in window
             ? (window as any).requestIdleCallback(() => {
                 const publicRoutes = [

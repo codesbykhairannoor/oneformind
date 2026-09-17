@@ -30,7 +30,7 @@ export default function GuestMobileMenu({
     if (!mobileMenuOpen) return null;
 
     return (
-        <div className="lg:hidden fixed inset-0 top-0 bg-white dark:bg-slate-950 z-[90] pt-24 px-6 pb-24 flex flex-col h-[100dvh] overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="lg:hidden fixed inset-0 top-0 left-0 right-0 bottom-0 w-full h-full min-h-screen min-h-[100dvh] bg-white dark:bg-slate-950 z-[95] pt-24 px-6 pb-36 flex flex-col overflow-y-auto overscroll-contain animate-in fade-in slide-in-from-top-4 duration-300">
             <div className="flex-grow space-y-2">
                 {/* Features */}
                 <div className="border-b border-slate-50 dark:border-slate-800/50">
