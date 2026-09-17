@@ -17,7 +17,6 @@ import SettingsNotificationsTab from './components/SettingsNotificationsTab';
 import SettingsBillingTab from './components/SettingsBillingTab';
 import SettingsPrivacyTab from './components/SettingsPrivacyTab';
 import SettingsHelpTab from './components/SettingsHelpTab';
-import SettingsFaq from './components/SettingsFaq';
 
 export default function SettingsPage() {
     const t = useTranslations();
@@ -48,10 +47,6 @@ export default function SettingsPage() {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
-    // Notification toggles
-    const [dailySummary, setDailySummary] = useState(true);
-    const [habitReminders, setHabitReminders] = useState(true);
 
     // Save notification
     const [savedMsg, setSavedMsg] = useState(false);
@@ -270,10 +265,8 @@ export default function SettingsPage() {
 
                     {activeTab === 'notifications' && (
                         <SettingsNotificationsTab 
-                            dailySummary={dailySummary} 
-                            setDailySummary={setDailySummary} 
-                            habitReminders={habitReminders} 
-                            setHabitReminders={setHabitReminders} 
+                            userEmail={email}
+                            initialSettings={userData?.settings?.notifications}
                         />
                     )}
 
@@ -295,8 +288,6 @@ export default function SettingsPage() {
                         <SettingsHelpTab />
                     )}
                 </div>
-
-                <SettingsFaq />
             </div>
         </AuthenticatedLayout>
     );

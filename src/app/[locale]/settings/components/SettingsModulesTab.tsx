@@ -5,23 +5,18 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { 
     useActiveModules, 
-    MODULE_PRESETS, 
     ALL_MODULE_KEYS, 
-    ModuleKey,
-    MAX_FREE_ACTIVE_MODULES 
+    ModuleKey 
 } from '@/hooks/useActiveModules';
 import { 
     Check, 
-    Lock, 
     Sparkles, 
-    Clock, 
     AlertCircle, 
     ArrowRight, 
     Layers, 
     ShieldAlert, 
     RefreshCw,
-    Save,
-    CheckCircle2
+    Save
 } from 'lucide-react';
 
 interface SettingsModulesTabProps {
@@ -39,15 +34,9 @@ export default function SettingsModulesTab({
 
     const {
         modules,
-        activeKeys,
         activeCount,
-        maxAllowed,
-        daysRemaining,
-        isLocked,
-        isUnlimited,
         isSaving,
         toggleTab,
-        applyPreset,
         persistModules
     } = useActiveModules();
 
@@ -137,16 +126,6 @@ export default function SettingsModulesTab({
         }
     };
 
-    const handleApplyPreset = async (presetId: string) => {
-        const res = await applyPreset(presetId);
-        if (res.success) {
-            showFeedback(
-                'success',
-                isIndo ? 'Paket modul berhasil diterapkan!' : 'Module preset successfully applied!'
-            );
-        }
-    };
-
     return (
         <div className="space-y-8 pb-12">
             {/* Header */}
@@ -203,78 +182,18 @@ export default function SettingsModulesTab({
                 </div>
             )}
 
-            {/* SECTION: PRESET POWER TRIOS (1-CLICK APPLY) */}
+            {/* SECTION: 8 CORE MODULES CARDS (CLEAN INDIVIDUAL CONTROLS) */}
             <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-4">
                     <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        {isIndo ? 'Paket Rekomendasi (1-Klik Terapkan)' : 'Recommended Power Trios (1-Click)'}
-                    </h4>
-                    <span className="text-[11px] text-slate-400">
-                        {isIndo ? 'Pilih paket yang sesuai dengan fase hidup Anda' : 'Tailored to your current life season'}
-                    </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {MODULE_PRESETS.map((preset) => {
-                        const isPresetActive = preset.modules.every(k => Boolean(modules[k])) && activeCount === preset.modules.length;
-                        return (
-                            <button
-                                key={preset.id}
-                                type="button"
-                                disabled={isLocked}
-                                onClick={() => handleApplyPreset(preset.id)}
-                                className={`text-left p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between group ${
-                                    isPresetActive
-                                        ? 'bg-indigo-50/60 dark:bg-indigo-950/30 border-indigo-400 dark:border-indigo-600 shadow-sm ring-1 ring-indigo-400'
-                                        : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-sm'
-                                } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                            >
-                                <div>
-                                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xl">{preset.emoji}</span>
-                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                                {isIndo ? preset.labelId : preset.labelEn}
-                                            </span>
-                                        </div>
-                                        {isPresetActive && (
-                                            <span className="px-1.5 py-0.5 rounded-md bg-indigo-600 text-white text-[10px] font-black">
-                                                {isIndo ? 'AKTIF' : 'ACTIVE'}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                                        {isIndo ? preset.descId : preset.descEn}
-                                    </p>
-                                </div>
-
-                                <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                                    <div className="flex items-center gap-1 text-[11px] font-bold text-slate-400">
-                                        {preset.modules.map(m => emojiMap[m]).join(' ')}
-                                    </div>
-                                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
-                                        {isPresetActive ? (isIndo ? 'Diterapkan' : 'Applied') : (isIndo ? 'Pilih Paket' : 'Apply Trio')}
-                                        <ArrowRight size={10} />
-                                    </span>
-                                </div>
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* SECTION: 8 CORE MODULES CARDS */}
-            <div>
-                <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        {isIndo ? 'Kustomisasi Tampilan Modul (Aktifkan / Sembunyikan)' : 'Module Display Customization (Enable / Hide)'}
+                        {isIndo ? 'Pilih Modul Aktif (Aktifkan / Nonaktifkan)' : 'Select Active Modules (Enable / Disable)'}
                     </h4>
                     <span className="text-[11px] font-medium text-slate-400">
                         {activeCount} / 8 {isIndo ? 'Aktif' : 'Active'}
                     </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {ALL_MODULE_KEYS.map((key) => {
                         const isEnabled = Boolean(modules[key]);
                         const labels = labelMap[key] || { id: key, en: key };
