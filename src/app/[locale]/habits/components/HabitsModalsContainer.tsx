@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { HabitItem, LifeOSTab } from '../types';
 import HabitFormModal from './HabitFormModal';
 import HabitDeleteModal from './HabitDeleteModal';
-import HabitBatchModal, { BatchRow, GlobalHabitDefaults } from './HabitBatchModal';
+import HabitBatchModal, { BatchRow } from './HabitBatchModal';
 
 const HabitDetailModal = dynamic(() => import('./HabitDetailModal'), { ssr: false });
 const HabitNoteModal = dynamic(() => import('./HabitNoteModal'), { ssr: false });
@@ -21,7 +21,7 @@ interface HabitsModalsContainerProps {
     setShowBatchModal?: (v: boolean) => void;
     batchRows?: BatchRow[];
     setBatchRows?: React.Dispatch<React.SetStateAction<BatchRow[]>>;
-    onSubmitBatchHabits?: (defaults: GlobalHabitDefaults) => void;
+    onSubmitBatchHabits?: () => void;
     onSwitchToBatch?: () => void;
     onSwitchToSingle?: () => void;
     editingHabitId: number | null;

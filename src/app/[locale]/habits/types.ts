@@ -70,31 +70,20 @@ export interface DayInfo {
     hasNote: boolean;
 }
 
-export interface GlobalHabitDefaults {
-    habitType: 'positive' | 'negative';
-    measurementType: 'boolean' | 'numeric';
-    dailyTargetValue?: number;
-    unit?: string;
-    target: number;
-    plannerIntegration: boolean;
-    defaultStartTime?: string;
-    defaultEndTime?: string;
-}
-
 export interface BatchRow {
     name: string;
     icon: string;
     color: string;
+    habitType: 'positive' | 'negative';
+    measurementType: 'boolean' | 'numeric';
+    targetValue: number; // daily quantitative target, e.g. 10 or 8 or 2000
+    unit: string; // 'ml', 'gelas', 'menit', 'halaman', 'km', 'x', etc.
+    monthlyTarget: number; // target days per month, e.g. 25-31
     timeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
-    freqDays: number[]; // 0=Sun,1=Mon,...,6=Sat; empty = everyday
+    freqType: 'daily' | 'weekly_days';
+    freqDays: number[]; // 0=Sun, 1=Mon, ..., 6=Sat; empty or 7 items = everyday
+    plannerIntegration: boolean;
     plannerStartTime: string; // e.g. "07:00"
     plannerEndTime: string;   // e.g. "07:30"
-    // Overrides
-    target?: number; // monthly target override
-    dailyTargetValue?: number; // per-row daily numeric target (e.g. 8)
-    unit?: string; // per-row unit (e.g. 'gelas', 'menit')
-    habitTypeOverride?: 'positive' | 'negative';
-    measurementTypeOverride?: 'boolean' | 'numeric';
-    plannerIntegrationOverride?: boolean;
 }
 

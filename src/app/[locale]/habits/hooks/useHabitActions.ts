@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { mutate as globalMutate } from 'swr';
-import { HabitItem, LifeOSTab, BatchRow, GlobalHabitDefaults } from '../types';
+import { HabitItem, LifeOSTab, BatchRow } from '../types';
 import { playCheckSound, playUncheckSound } from '@/lib/habitAudio';
 
 interface UseHabitActionsParams {
@@ -513,25 +513,25 @@ export function useHabitActions({
     };
 
     // Submit Batch Habits
-    const submitBatchHabits = async (batchRows: BatchRow[], defaults: GlobalHabitDefaults, onSuccess?: () => void) => {
+    const submitBatchHabits = async (batchRows: BatchRow[], onSuccess?: () => void) => {
         const validRows = batchRows.filter(r => r.name.trim().length > 0);
         if (validRows.length === 0 || isSubmitting) return;
 
         setIsSubmitting(true);
         try {
             const createPromises = validRows.map(async (row) => {
-                const hType = row.habitTypeOverride || defaults.habitType || 'positive';
-                const mType = row.measurementTypeOverride || defaults.measurementType || 'boolean';
-                const pInt = row.plannerIntegrationOverride !== undefined ? row.plannerIntegrationOverride : (defaults.plannerIntegration || false);
+                const hType = row.habitType || 'positive';
+                const mType = row.measurementType || 'boolean';
+                const pInt = !!row.plannerIntegration;
                 const isBoolean = mType === 'boolean';
-                const mTarget = row.target || defaults.target || daysInCurrentMonth;
+                const mTarget = row.monthlyTarget || daysInCurrentMonth;
                 const freqDays = row.freqDays && row.freqDays.length > 0 && row.freqDays.length < 7 ? row.freqDays : [0, 1, 2, 3, 4, 5, 6];
                 const freqType = row.freqDays && row.freqDays.length > 0 && row.freqDays.length < 7 ? 'weekly_days' : 'daily';
                 
-                const finalUnit = isBoolean ? 'x' : (row.unit || defaults.unit || 'ml');
-                const finalTargetVal = isBoolean ? 1 : (row.dailyTargetValue || defaults.dailyTargetValue || 10);
-                const startTime = pInt ? (row.plannerStartTime || defaults.defaultStartTime || '07:00') : '';
-                const endTime = pInt ? (row.plannerEndTime || defaults.defaultEndTime || '07:30') : '';
+                const finalUnit = isBoolean ? 'x' : (row.unit || 'ml');
+                const finalTargetVal = isBoolean ? 1 : (row.targetValue || 10);
+                const startTime = pInt ? (row.plannerStartTime || '07:00') : '';
+                const endTime = pInt ? (row.plannerEndTime || '07:30') : '';
 
                 const metadata = {
                     habitType: hType,

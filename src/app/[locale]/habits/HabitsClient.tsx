@@ -55,9 +55,54 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
     // Batch Entry State (Architect Gated Feature)
     const [showBatchModal, setShowBatchModal] = useState(false);
     const [batchRows, setBatchRows] = useState<BatchRow[]>([
-        { name: '', icon: '💧', color: '#06b6d4', timeOfDay: 'morning', freqDays: [], plannerStartTime: '07:00', plannerEndTime: '07:30' },
-        { name: '', icon: '🧘', color: '#6366f1', timeOfDay: 'morning', freqDays: [], plannerStartTime: '07:30', plannerEndTime: '08:00' },
-        { name: '', icon: '🏃', color: '#10b981', timeOfDay: 'morning', freqDays: [], plannerStartTime: '08:00', plannerEndTime: '08:30' },
+        { 
+            name: '', 
+            icon: '💧', 
+            color: '#06b6d4', 
+            habitType: 'positive',
+            measurementType: 'boolean',
+            targetValue: 1,
+            unit: 'x',
+            monthlyTarget: daysInCurrentMonth,
+            timeOfDay: 'morning', 
+            freqType: 'daily',
+            freqDays: [], 
+            plannerIntegration: false,
+            plannerStartTime: '07:00', 
+            plannerEndTime: '07:30' 
+        },
+        { 
+            name: '', 
+            icon: '🧘', 
+            color: '#6366f1', 
+            habitType: 'positive',
+            measurementType: 'boolean',
+            targetValue: 1,
+            unit: 'x',
+            monthlyTarget: daysInCurrentMonth,
+            timeOfDay: 'morning', 
+            freqType: 'daily',
+            freqDays: [], 
+            plannerIntegration: false,
+            plannerStartTime: '07:30', 
+            plannerEndTime: '08:00' 
+        },
+        { 
+            name: '', 
+            icon: '🏃', 
+            color: '#10b981', 
+            habitType: 'positive',
+            measurementType: 'boolean',
+            targetValue: 1,
+            unit: 'x',
+            monthlyTarget: daysInCurrentMonth,
+            timeOfDay: 'morning', 
+            freqType: 'daily',
+            freqDays: [], 
+            plannerIntegration: false,
+            plannerStartTime: '08:00', 
+            plannerEndTime: '08:30' 
+        },
     ]);
 
     const handleOpenBatchModal = () => {
@@ -322,8 +367,8 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     }}
                     batchRows={batchRows}
                     setBatchRows={setBatchRows}
-                    onSubmitBatchHabits={(defaults) => {
-                        actions.submitBatchHabits(batchRows, defaults, () => {
+                    onSubmitBatchHabits={() => {
+                        actions.submitBatchHabits(batchRows, () => {
                             setShowBatchModal(false);
                         });
                     }}

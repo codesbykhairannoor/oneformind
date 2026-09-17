@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import ModalPortal from '@/components/ModalPortal';
-import { X, Plus, Trash2, Check, Settings2, Target, CalendarDays, Sparkles, Activity, Clock, Hash, Layers } from 'lucide-react';
-import { BatchRow, GlobalHabitDefaults } from '../types';
+import { X, Plus, Trash2, Check, Settings2, Target, CalendarDays, Sparkles, Activity, Clock, Hash, ChevronDown, ChevronUp } from 'lucide-react';
+import { BatchRow } from '../types';
 
-export { type BatchRow, type GlobalHabitDefaults };
+export { type BatchRow };
 
 interface HabitBatchModalProps {
     isOpen: boolean;
@@ -16,7 +16,7 @@ interface HabitBatchModalProps {
     batchRows: BatchRow[];
     setBatchRows: React.Dispatch<React.SetStateAction<BatchRow[]>>;
     onClose: () => void;
-    onSubmit: (defaults: GlobalHabitDefaults) => void;
+    onSubmit: () => void;
     onSwitchToSingle?: () => void;
 }
 
@@ -45,54 +45,70 @@ export default function HabitBatchModal({
     onSwitchToSingle
 }: HabitBatchModalProps) {
     const [openBatchIconDropdown, setOpenBatchIconDropdown] = useState<number | null>(null);
-    const [openSettingsRow, setOpenSettingsRow] = useState<number | null>(null);
-
-    const [globalDefaults, setGlobalDefaults] = useState<GlobalHabitDefaults>({
-        habitType: 'positive',
-        measurementType: 'boolean',
-        dailyTargetValue: 10,
-        unit: 'ml',
-        target: daysInCurrentMonth,
-        plannerIntegration: false,
-        defaultStartTime: '07:00',
-        defaultEndTime: '07:30'
-    });
+    const [openExpandedRow, setOpenExpandedRow] = useState<number | null>(0); // First row expanded by default
 
     if (!isOpen) return null;
 
     const addBatchRow = () => {
+        const nextIndex = batchRows.length;
         setBatchRows([
             ...batchRows,
             { 
                 name: '', 
                 icon: '🎯', 
-                color: '#6366f1', 
+                color: colorPalette[nextIndex % colorPalette.length] || '#6366f1', 
+                habitType: 'positive',
+                measurementType: 'boolean',
+                targetValue: 1,
+                unit: 'x',
+                monthlyTarget: daysInCurrentMonth,
                 timeOfDay: 'morning', 
+                freqType: 'daily',
                 freqDays: [], 
+                plannerIntegration: false,
                 plannerStartTime: '07:00', 
-                plannerEndTime: '07:30',
-                measurementTypeOverride: globalDefaults.measurementType,
-                dailyTargetValue: globalDefaults.dailyTargetValue || 10,
-                unit: globalDefaults.unit || 'ml'
+                plannerEndTime: '07:30'
             }
         ]);
+        setOpenExpandedRow(nextIndex);
     };
 
     const removeBatchRow = (index: number) => {
         if (batchRows.length <= 1) return;
         setBatchRows(batchRows.filter((_, i) => i !== index));
+        if (openExpandedRow === index) {
+            setOpenExpandedRow(null);
+        } else if (openExpandedRow !== null && openExpandedRow > index) {
+            setOpenExpandedRow(openExpandedRow - 1);
+        }
     };
 
     const updateBatchRow = (index: number, field: keyof BatchRow, value: any) => {
-        setBatchRows(prev => prev.map((r, i) => i === index ? { ...r, [field]: value } : r));
+        setBatchRows(prev => prev.map((r, i) => {
+            if (i !== index) return r;
+            const updated = { ...r, [field]: value };
+            
+            // Automatic adjustment for measurement type
+            if (field === 'measurementType') {
+                if (value === 'numeric') {
+                    if (!updated.unit || updated.unit === 'x') updated.unit = 'ml';
+                    if (!updated.targetValue || updated.targetValue <= 1) updated.targetValue = 10;
+                } else {
+                    updated.unit = 'x';
+                    updated.targetValue = 1;
+                }
+            }
+            return updated;
+        }));
     };
 
     const toggleDay = (rowIndex: number, day: number) => {
         const row = batchRows[rowIndex];
         const current = row.freqDays.length === 0 ? [...ALL_DAYS] : [...row.freqDays];
         const next = current.includes(day) ? current.filter(d => d !== day) : [...current, day].sort();
-        // If all days selected, reset to empty (means everyday)
-        updateBatchRow(rowIndex, 'freqDays', next.length === 7 ? [] : next);
+        const isAll = next.length === 7 || next.length === 0;
+        updateBatchRow(rowIndex, 'freqDays', isAll ? [] : next);
+        updateBatchRow(rowIndex, 'freqType', isAll ? 'daily' : 'weekly_days');
     };
 
     const validRowsCount = batchRows.filter(r => r.name.trim().length > 0).length;
@@ -114,11 +130,11 @@ export default function HabitBatchModal({
                                 <h3 className="text-base font-black text-slate-900 dark:text-white leading-tight flex items-center gap-2">
                                     <span>{isIndo ? 'Tambah Habit Sekaligus' : 'Batch Add Habits'}</span>
                                     <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-500/20">
-                                        Architect
+                                        {batchRows.length} {isIndo ? 'Habit' : 'Habits'}
                                     </span>
                                 </h3>
                                 <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-0.5">
-                                    {isIndo ? 'Input daftar habit yang ingin kamu buat secara efisien dan cepat.' : 'Add your habit list efficiently with custom quantitative targets.'}
+                                    {isIndo ? 'Setiap habit memiliki konfigurasi mandiri (tipe, angka, target, jadwal & planner).' : 'Each habit has its own independent settings (type, metric, schedule & planner).'}
                                 </p>
                             </div>
                         </div>
@@ -143,298 +159,234 @@ export default function HabitBatchModal({
                         </div>
                     </div>
 
-                    {/* Body */}
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4 bg-slate-50/60 dark:bg-[#080b12]/60">
-                        
-                        {/* 1. GLOBAL DEFAULTS CONFIGURATION */}
-                        <div className="bg-white dark:bg-[#0f1117] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Settings2 size={14} className="text-indigo-500" />
-                                    <span className="font-black text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                                        {isIndo ? 'Pengaturan Default Global' : 'Global Default Configuration'}
-                                    </span>
-                                </div>
-                                <span className="text-[10px] text-slate-400 font-medium">
-                                    {isIndo ? 'Diterapkan ke baris tanpa override' : 'Applied to rows without override'}
-                                </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                                {/* Type */}
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                        <Sparkles size={10} /> {isIndo ? 'Tipe' : 'Type'}
-                                    </label>
-                                    <select 
-                                        value={globalDefaults.habitType}
-                                        onChange={(e) => setGlobalDefaults({...globalDefaults, habitType: e.target.value as any})}
-                                        className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.03] text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
-                                    >
-                                        <option value="positive">✨ {isIndo ? 'Bangun (+)' : 'Build (+)'}</option>
-                                        <option value="negative">🛡️ {isIndo ? 'Hentikan (-)' : 'Quit (-)'}</option>
-                                    </select>
-                                </div>
+                    {/* Body: List of Independent Habit Cards */}
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-5 space-y-3.5 bg-slate-50/60 dark:bg-[#080b12]/60">
+                        {batchRows.map((row, index) => {
+                            const isExpanded = openExpandedRow === index;
+                            const isNumeric = row.measurementType === 'numeric';
+                            const dayLabels = isIndo ? DAY_LABELS_ID : DAY_LABELS_EN;
 
-                                {/* Measure (Boolean vs Numeric) */}
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                        <Activity size={10} /> {isIndo ? 'Pengukuran' : 'Measurement'}
-                                    </label>
-                                    <select 
-                                        value={globalDefaults.measurementType}
-                                        onChange={(e) => {
-                                            const nextMeasure = e.target.value as 'boolean' | 'numeric';
-                                            setGlobalDefaults({
-                                                ...globalDefaults, 
-                                                measurementType: nextMeasure,
-                                                dailyTargetValue: nextMeasure === 'numeric' ? 10 : 1,
-                                                unit: nextMeasure === 'numeric' ? 'ml' : 'x'
-                                            });
-                                        }}
-                                        className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.03] text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
-                                    >
-                                        <option value="boolean">✓ {isIndo ? 'Centang (Ya/Tidak)' : 'Checkbox'}</option>
-                                        <option value="numeric">🔢 {isIndo ? 'Kuantitatif (Angka)' : 'Quantitative (Numeric)'}</option>
-                                    </select>
-                                </div>
+                            return (
+                                <div 
+                                    key={index} 
+                                    className={`bg-white dark:bg-[#0f1117] rounded-2xl border-2 transition-all shadow-xs overflow-hidden ${
+                                        isExpanded 
+                                            ? 'border-indigo-500/50 dark:border-indigo-500/40 ring-2 ring-indigo-500/10' 
+                                            : 'border-slate-200/90 dark:border-white/[0.07] hover:border-slate-300 dark:hover:border-white/[0.12]'
+                                    }`}
+                                >
+                                    {/* Card Header Line */}
+                                    <div className="p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3 bg-white dark:bg-[#0f1117]">
+                                        {/* Number Badge */}
+                                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 w-5 shrink-0 text-center">
+                                            #{index + 1}
+                                        </span>
 
-                                {/* Monthly Target */}
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                        <Target size={10} /> {isIndo ? 'Target Bulanan' : 'Monthly Target'}
-                                    </label>
-                                    <div className="flex items-center gap-1 bg-slate-50 dark:bg-white/[0.03] px-2.5 py-2 rounded-xl border border-slate-200 dark:border-white/[0.07]">
-                                        <input 
-                                            type="number" 
-                                            value={globalDefaults.target}
-                                            onChange={(e) => setGlobalDefaults({...globalDefaults, target: Math.max(1, parseInt(e.target.value) || 1)})}
-                                            className="w-10 bg-transparent text-xs font-black text-slate-800 dark:text-slate-200 outline-none text-center"
-                                        />
-                                        <span className="text-[10px] font-bold text-slate-400">{isIndo ? 'hari' : 'days'}</span>
-                                    </div>
-                                </div>
+                                        {/* Icon Picker */}
+                                        <div className="relative shrink-0">
+                                            <button
+                                                type="button"
+                                                onClick={() => setOpenBatchIconDropdown(openBatchIconDropdown === index ? null : index)}
+                                                className="w-10 h-10 rounded-xl flex items-center justify-center text-lg border-2 border-slate-200 dark:border-white/[0.08] transition hover:scale-105 active:scale-95 shadow-xs cursor-pointer"
+                                                style={{ backgroundColor: `${row.color}20` }}
+                                            >
+                                                {row.icon}
+                                            </button>
 
-                                {/* Planner Integration */}
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                        <CalendarDays size={10} /> {isIndo ? 'Sinkron Planner' : 'Planner Sync'}
-                                    </label>
-                                    <button
-                                        type="button"
-                                        onClick={() => setGlobalDefaults({...globalDefaults, plannerIntegration: !globalDefaults.plannerIntegration})}
-                                        className={`w-full flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl border text-xs font-bold transition cursor-pointer ${globalDefaults.plannerIntegration 
-                                            ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/20 dark:border-indigo-500/30 dark:text-indigo-300' 
-                                            : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-white/[0.03] dark:border-white/[0.07] dark:text-slate-400'}`}
-                                    >
-                                        <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border ${globalDefaults.plannerIntegration ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'}`}>
-                                            {globalDefaults.plannerIntegration && <Check size={9} strokeWidth={4} />}
+                                            {openBatchIconDropdown === index && (
+                                                <div className="absolute left-0 top-12 p-2 bg-white dark:bg-[#1a1d27] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/[0.08] grid grid-cols-5 gap-1.5 z-50 w-56 animate-in zoom-in-95">
+                                                    {iconList.map(icon => (
+                                                        <button
+                                                            key={icon}
+                                                            type="button"
+                                                            onClick={() => { updateBatchRow(index, 'icon', icon); setOpenBatchIconDropdown(null); }}
+                                                            className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-xl text-lg transition flex items-center justify-center cursor-pointer"
+                                                        >
+                                                            {icon}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
-                                        <span>{globalDefaults.plannerIntegration ? (isIndo ? 'Aktif' : 'Active') : (isIndo ? 'Nonaktif' : 'Disabled')}</span>
-                                    </button>
-                                </div>
-                            </div>
 
-                            {/* QUANTITATIVE DETAIL SUB-PANEL (If Global is Numeric) */}
-                            {globalDefaults.measurementType === 'numeric' && (
-                                <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in duration-200">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                            <Hash size={10} /> {isIndo ? 'Target Angka Harian (Default)' : 'Daily Numeric Target'}
-                                        </label>
-                                        <input 
-                                            type="number"
-                                            value={globalDefaults.dailyTargetValue || 10}
-                                            onChange={(e) => setGlobalDefaults({...globalDefaults, dailyTargetValue: Math.max(1, parseInt(e.target.value) || 1)})}
-                                            className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.03] text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                            {isIndo ? 'Satuan / Unit (Default)' : 'Unit Label'}
-                                        </label>
-                                        <div className="flex items-center gap-1">
-                                            <input 
+                                        {/* Habit Name Input */}
+                                        <div className="flex-1 min-w-0">
+                                            <input
                                                 type="text"
-                                                value={globalDefaults.unit || 'ml'}
-                                                onChange={(e) => setGlobalDefaults({...globalDefaults, unit: e.target.value})}
-                                                placeholder="cth: ml, gelas, halaman"
-                                                className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.03] text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
+                                                value={row.name}
+                                                onChange={(e) => updateBatchRow(index, 'name', e.target.value)}
+                                                placeholder={isIndo ? 'Nama habit (cth: Minum 2L Air / Baca Buku)...' : 'Habit name (e.g. Read 20 pages)...'}
+                                                className="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] font-bold text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-500 transition"
                                             />
                                         </div>
-                                        <div className="flex flex-wrap gap-1 mt-1">
-                                            {POPULAR_UNITS.slice(0, 6).map(u => (
-                                                <button
-                                                    key={u}
-                                                    type="button"
-                                                    onClick={() => setGlobalDefaults({...globalDefaults, unit: u})}
-                                                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition cursor-pointer ${globalDefaults.unit === u ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800'}`}
-                                                >
-                                                    {u}
-                                                </button>
-                                            ))}
+
+                                        {/* Summary Pill on collapsed state */}
+                                        <div className="hidden sm:flex items-center gap-1.5 shrink-0 text-[10px] font-bold">
+                                            <span className={`px-2 py-1 rounded-lg ${row.habitType === 'negative' ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}`}>
+                                                {row.habitType === 'negative' ? '🛡️ Quit' : '✨ Build'}
+                                            </span>
+                                            {isNumeric ? (
+                                                <span className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-500/20">
+                                                    🔢 {row.targetValue} {row.unit}
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                                    ✓ Checkbox
+                                                </span>
+                                            )}
                                         </div>
+
+                                        {/* Expand/Collapse Accordion Button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setOpenExpandedRow(isExpanded ? null : index)}
+                                            title={isExpanded ? (isIndo ? 'Tutup Pengaturan' : 'Collapse Settings') : (isIndo ? 'Buka Pengaturan Lengkap' : 'Expand Full Settings')}
+                                            className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition cursor-pointer ${
+                                                isExpanded 
+                                                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs' 
+                                                    : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-white/[0.03] dark:border-white/[0.07] hover:bg-slate-100 hover:text-slate-700'
+                                            }`}
+                                        >
+                                            {isExpanded ? <ChevronUp size={16} strokeWidth={2.5} /> : <ChevronDown size={16} strokeWidth={2.5} />}
+                                        </button>
+
+                                        {/* Delete Button */}
+                                        {batchRows.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeBatchRow(index)}
+                                                className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-rose-100 bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-600 dark:border-rose-900/30 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 flex items-center justify-center transition cursor-pointer"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        )}
                                     </div>
-                                </div>
-                            )}
-                        </div>
 
-                        {/* 2. BATCH HABIT ROWS */}
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between px-1">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                    <Layers size={12} />
-                                    {isIndo ? 'Daftar Habit Kolektif:' : 'Habits List:'} ({batchRows.length})
-                                </span>
-                                <span className="text-[10px] font-bold text-indigo-500">
-                                    {validRowsCount} {isIndo ? 'valid' : 'valid'}
-                                </span>
-                            </div>
+                                    {/* Expanded Settings Panel (Full single habit configuration) */}
+                                    {isExpanded && (
+                                        <div className="p-4 bg-slate-50/80 dark:bg-[#12151f] border-t border-slate-200/80 dark:border-white/[0.06] space-y-3.5 animate-in slide-in-from-top-2 fade-in duration-150">
+                                            
+                                            {/* Row 1: Type, Measurement, Time of Day */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                                {/* Habit Type */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                        <Sparkles size={10} /> {isIndo ? 'Tipe Habit' : 'Habit Type'}
+                                                    </label>
+                                                    <select
+                                                        value={row.habitType}
+                                                        onChange={(e) => updateBatchRow(index, 'habitType', e.target.value as any)}
+                                                        className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                                                    >
+                                                        <option value="positive">✨ {isIndo ? 'Bangun Kebiasaan (+)' : 'Build Habit (+)'}</option>
+                                                        <option value="negative">🛡️ {isIndo ? 'Hentikan Kebiasaan (-)' : 'Quit Habit (-)'}</option>
+                                                    </select>
+                                                </div>
 
-                            {batchRows.map((row, index) => {
-                                const dayLabels = isIndo ? DAY_LABELS_ID : DAY_LABELS_EN;
-                                const activeDays = row.freqDays.length === 0 ? ALL_DAYS : row.freqDays;
-                                const showPlanner = row.plannerIntegrationOverride !== undefined 
-                                    ? row.plannerIntegrationOverride 
-                                    : globalDefaults.plannerIntegration;
+                                                {/* Measurement Type */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                        <Activity size={10} /> {isIndo ? 'Metode Pengukuran' : 'Measurement'}
+                                                    </label>
+                                                    <select
+                                                        value={row.measurementType}
+                                                        onChange={(e) => updateBatchRow(index, 'measurementType', e.target.value as any)}
+                                                        className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                                                    >
+                                                        <option value="boolean">✓ {isIndo ? 'Centang (Ya/Tidak)' : 'Checkbox'}</option>
+                                                        <option value="numeric">🔢 {isIndo ? 'Kuantitatif (Angka)' : 'Quantitative (Numeric)'}</option>
+                                                    </select>
+                                                </div>
 
-                                const effectiveMeasure = row.measurementTypeOverride || globalDefaults.measurementType;
-                                const isNumeric = effectiveMeasure === 'numeric';
-                                const rowDailyVal = row.dailyTargetValue || globalDefaults.dailyTargetValue || 10;
-                                const rowUnit = row.unit || globalDefaults.unit || 'ml';
+                                                {/* Time of Day */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                        <Clock size={10} /> {isIndo ? 'Waktu Rutinitas' : 'Time of Day'}
+                                                    </label>
+                                                    <select
+                                                        value={row.timeOfDay}
+                                                        onChange={(e) => updateBatchRow(index, 'timeOfDay', e.target.value as any)}
+                                                        className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                                                    >
+                                                        <option value="morning">🌅 {isIndo ? 'Pagi Hari' : 'Morning'}</option>
+                                                        <option value="afternoon">☀️ {isIndo ? 'Siang Hari' : 'Afternoon'}</option>
+                                                        <option value="evening">🌙 {isIndo ? 'Malam Hari' : 'Evening'}</option>
+                                                        <option value="anytime">🔄 {isIndo ? 'Kapan Saja (Fleksibel)' : 'Anytime'}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
 
-                                return (
-                                    <div key={index} className="bg-white dark:bg-[#0f1117] rounded-2xl border-2 border-slate-200 dark:border-white/[0.07] overflow-hidden transition-all shadow-xs">
-                                        {/* Main Row Line */}
-                                        <div className="p-3 sm:p-3.5 flex items-center gap-2 sm:gap-3">
-                                            {/* Icon with Dropdown */}
-                                            <div className="relative shrink-0">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setOpenBatchIconDropdown(openBatchIconDropdown === index ? null : index)}
-                                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-lg border-2 border-slate-200 dark:border-white/[0.08] transition hover:scale-105 active:scale-95 shadow-xs cursor-pointer"
-                                                    style={{ backgroundColor: `${row.color}20` }}
-                                                >
-                                                    {row.icon}
-                                                </button>
-
-                                                {openBatchIconDropdown === index && (
-                                                    <div className="absolute left-0 top-12 p-2 bg-white dark:bg-[#1a1d27] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/[0.08] grid grid-cols-5 gap-1.5 z-50 w-56 animate-in zoom-in-95">
-                                                        {iconList.map(icon => (
+                                            {/* Row 2: Quantitative inputs (Target Angka Harian & Unit) if numeric */}
+                                            {isNumeric && (
+                                                <div className="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-200/70 dark:border-indigo-500/20 space-y-2 animate-in fade-in duration-150">
+                                                    <div className="flex items-center gap-1 text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
+                                                        <Hash size={11} />
+                                                        <span>{isIndo ? 'Konfigurasi Target Kuantitatif' : 'Quantitative Target Configuration'}</span>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                                        <div className="space-y-1">
+                                                            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-300">{isIndo ? 'Target Harian (Nilai/Angka)' : 'Daily Target Value'}</label>
+                                                            <input
+                                                                type="number"
+                                                                value={row.targetValue || 10}
+                                                                onChange={(e) => updateBatchRow(index, 'targetValue', Math.max(1, parseInt(e.target.value) || 1))}
+                                                                className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-black text-slate-800 dark:text-slate-200 outline-none"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-300">{isIndo ? 'Satuan / Unit' : 'Unit Label'}</label>
+                                                            <input
+                                                                type="text"
+                                                                value={row.unit || 'ml'}
+                                                                onChange={(e) => updateBatchRow(index, 'unit', e.target.value)}
+                                                                placeholder="cth: gelas, menit, halaman, ml, km"
+                                                                className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-1 pt-1">
+                                                        {POPULAR_UNITS.map(u => (
                                                             <button
-                                                                key={icon}
+                                                                key={u}
                                                                 type="button"
-                                                                onClick={() => { updateBatchRow(index, 'icon', icon); setOpenBatchIconDropdown(null); }}
-                                                                className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-xl text-lg transition flex items-center justify-center cursor-pointer"
+                                                                onClick={() => updateBatchRow(index, 'unit', u)}
+                                                                className={`px-2 py-0.5 rounded-lg text-[9px] font-bold transition cursor-pointer ${
+                                                                    row.unit === u 
+                                                                        ? 'bg-indigo-600 text-white' 
+                                                                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'
+                                                                }`}
                                                             >
-                                                                {icon}
+                                                                {u}
                                                             </button>
                                                         ))}
                                                     </div>
-                                                )}
-                                            </div>
-
-                                            {/* Habit Name Input */}
-                                            <div className="flex-1 min-w-0">
-                                                <input
-                                                    type="text"
-                                                    value={row.name}
-                                                    onChange={(e) => updateBatchRow(index, 'name', e.target.value)}
-                                                    placeholder={isIndo ? 'Nama habit (cth: Minum 2L Air)...' : 'Habit name (e.g. Read 20 pages)...'}
-                                                    className="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] font-bold text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-500 transition"
-                                                />
-                                            </div>
-
-                                            {/* Numeric Tag Preview if Quantitative */}
-                                            {isNumeric && (
-                                                <div className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/30 text-[10px] font-black shrink-0">
-                                                    <span>{rowDailyVal} {rowUnit}</span>
                                                 </div>
                                             )}
-                                            
-                                            {/* Settings Toggle Button */}
-                                            <button
-                                                type="button"
-                                                onClick={() => setOpenSettingsRow(openSettingsRow === index ? null : index)}
-                                                title={isIndo ? 'Kustomisasi Pengaturan Habit Ini' : 'Customize Habit Settings'}
-                                                className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition cursor-pointer ${openSettingsRow === index 
-                                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/20 dark:border-indigo-500/30 dark:text-indigo-400 shadow-sm' 
-                                                    : 'bg-slate-50 border-slate-200 text-slate-400 dark:bg-white/[0.03] dark:border-white/[0.07] hover:bg-slate-100 hover:text-slate-600'}`}
-                                            >
-                                                <Settings2 size={14} />
-                                            </button>
-                                            
-                                            {/* Delete Row Button */}
-                                            {batchRows.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeBatchRow(index)}
-                                                    className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-rose-100 bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-600 dark:border-rose-900/30 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 flex items-center justify-center transition cursor-pointer"
-                                                >
-                                                    <Trash2 size={13} />
-                                                </button>
-                                            )}
-                                        </div>
 
-                                        {/* Bottom Quick Bar: Time of Day + Colors */}
-                                        <div className="px-3.5 pb-3 flex flex-wrap gap-2 items-center justify-between">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                {/* Time of Day */}
-                                                <select
-                                                    value={row.timeOfDay}
-                                                    onChange={(e) => updateBatchRow(index, 'timeOfDay', e.target.value)}
-                                                    className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.03] text-slate-800 dark:text-white font-bold text-[10px] outline-none cursor-pointer"
-                                                >
-                                                    <option value="morning">🌅 {isIndo ? 'Pagi' : 'Morning'}</option>
-                                                    <option value="afternoon">☀️ {isIndo ? 'Siang' : 'Afternoon'}</option>
-                                                    <option value="evening">🌙 {isIndo ? 'Malam' : 'Evening'}</option>
-                                                    <option value="anytime">🔄 {isIndo ? 'Fleksibel' : 'Anytime'}</option>
-                                                </select>
-
-                                                {/* Color Picker Palette */}
-                                                <div className="flex items-center gap-1 bg-slate-50 dark:bg-white/[0.03] px-2 py-1.5 rounded-xl border border-slate-200 dark:border-white/[0.07]">
-                                                    {colorPalette.slice(0, 7).map(c => (
-                                                        <button
-                                                            key={c}
-                                                            type="button"
-                                                            onClick={() => updateBatchRow(index, 'color', c)}
-                                                            className={`w-3.5 h-3.5 rounded-full transition cursor-pointer ${row.color === c ? 'ring-2 ring-white dark:ring-slate-900 ring-offset-1 ring-offset-indigo-500 scale-110' : 'hover:scale-110'}`}
-                                                            style={{ backgroundColor: c }}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            {/* Days summary pill */}
-                                            <span className="text-[10px] font-bold text-slate-400">
-                                                {row.freqDays.length === 0 ? (isIndo ? 'Setiap Hari' : 'Daily') : `${row.freqDays.length} ${isIndo ? 'hari/minggu' : 'days/wk'}`}
-                                            </span>
-                                        </div>
-
-                                        {/* Expanded Per-Habit Customization Drawer */}
-                                        {openSettingsRow === index && (
-                                            <div className="mx-3.5 mb-3.5 p-4 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-2xl space-y-3.5 animate-in slide-in-from-top-2 fade-in duration-200">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                        <Settings2 size={12} />
-                                                        {isIndo ? 'Kustomisasi Khusus Habit Ini' : 'Per-Habit Custom Overrides'}
-                                                    </span>
-                                                    <button 
-                                                        type="button" 
-                                                        onClick={() => setOpenSettingsRow(null)}
-                                                        className="text-[10px] font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
-                                                    >
-                                                        {isIndo ? 'Tutup' : 'Close'}
-                                                    </button>
-                                                </div>
-                                                
-                                                {/* 1. Custom Active Days */}
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
-                                                        <CalendarDays size={11} />
-                                                        {isIndo ? 'Jadwal Hari Aktif' : 'Active Days Schedule'}
+                                            {/* Row 3: Monthly Target & Active Days */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200/60 dark:border-white/[0.06]">
+                                                {/* Monthly Target */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                        <Target size={10} /> {isIndo ? 'Target Bulanan (Hari Aktif)' : 'Monthly Target (Days)'}
                                                     </label>
-                                                    <div className="flex gap-1.5 flex-wrap">
+                                                    <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                                                        <input 
+                                                            type="number"
+                                                            value={row.monthlyTarget}
+                                                            onChange={(e) => updateBatchRow(index, 'monthlyTarget', Math.max(1, parseInt(e.target.value) || 1))}
+                                                            className="w-12 bg-transparent text-xs font-black text-slate-900 dark:text-white outline-none"
+                                                        />
+                                                        <span className="text-[10px] font-bold text-slate-400">{isIndo ? 'hari / bulan' : 'days / month'}</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Active Days Selection */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                        <CalendarDays size={10} /> {isIndo ? 'Jadwal Hari Aktif' : 'Active Days'}
+                                                    </label>
+                                                    <div className="flex gap-1 flex-wrap">
                                                         {ALL_DAYS.map(day => {
                                                             const isActive = row.freqDays.length === 0 || row.freqDays.includes(day);
                                                             return (
@@ -442,73 +394,47 @@ export default function HabitBatchModal({
                                                                     key={day}
                                                                     type="button"
                                                                     onClick={() => toggleDay(index, day)}
-                                                                    className={`w-9 h-8 rounded-xl text-[10px] font-black border transition cursor-pointer ${isActive 
-                                                                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs' 
-                                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-300'}`}
+                                                                    className={`w-7 h-7 rounded-lg text-[9px] font-black border transition cursor-pointer ${
+                                                                        isActive 
+                                                                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs' 
+                                                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-300'
+                                                                    }`}
                                                                 >
                                                                     {dayLabels[day]}
                                                                 </button>
                                                             );
                                                         })}
                                                     </div>
-                                                    <p className="text-[10px] text-slate-400 font-medium">
-                                                        {row.freqDays.length === 0 ? (isIndo ? '✓ Berjalan setiap hari' : '✓ Runs everyday') : (isIndo ? `✓ Berjalan di ${row.freqDays.length} hari terpilih` : `✓ Runs on ${row.freqDays.length} selected days`)}
-                                                    </p>
                                                 </div>
+                                            </div>
 
-                                                {/* 2. Numeric / Measurement Overrides */}
-                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 border-t border-slate-200/60 dark:border-white/[0.06]">
-                                                    <div className="space-y-1">
-                                                        <label className="text-[10px] font-bold text-slate-500">{isIndo ? 'Metode Pengukuran' : 'Measurement Type'}</label>
-                                                        <select 
-                                                            value={row.measurementTypeOverride || ''}
-                                                            onChange={(e) => {
-                                                                const val = e.target.value;
-                                                                updateBatchRow(index, 'measurementTypeOverride', val === '' ? undefined : val);
-                                                            }}
-                                                            className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
-                                                        >
-                                                            <option value="">{isIndo ? 'Ikuti Global' : 'Follow Global'}</option>
-                                                            <option value="boolean">✓ {isIndo ? 'Centang' : 'Checkbox'}</option>
-                                                            <option value="numeric">🔢 {isIndo ? 'Kuantitatif (Angka)' : 'Quantitative'}</option>
-                                                        </select>
-                                                    </div>
+                                            {/* Row 4: Planner Integration & Color Picker */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200/60 dark:border-white/[0.06]">
+                                                {/* Planner Integration */}
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                        <CalendarDays size={10} /> {isIndo ? 'Sinkron Daily Planner' : 'Planner Integration'}
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateBatchRow(index, 'plannerIntegration', !row.plannerIntegration)}
+                                                        className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                                                            row.plannerIntegration 
+                                                                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/20 dark:border-indigo-500/30 dark:text-indigo-300' 
+                                                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
+                                                        }`}
+                                                    >
+                                                        <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border ${row.plannerIntegration ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'}`}>
+                                                            {row.plannerIntegration && <Check size={9} strokeWidth={4} />}
+                                                        </div>
+                                                        <span>{row.plannerIntegration ? (isIndo ? 'Aktif di Planner' : 'Active in Planner') : (isIndo ? 'Tidak Disinkron' : 'Disabled')}</span>
+                                                    </button>
 
-                                                    {isNumeric && (
-                                                        <>
-                                                            <div className="space-y-1">
-                                                                <label className="text-[10px] font-bold text-slate-500">{isIndo ? 'Target Harian' : 'Daily Target'}</label>
-                                                                <input 
-                                                                    type="number"
-                                                                    value={row.dailyTargetValue || globalDefaults.dailyTargetValue || 10}
-                                                                    onChange={(e) => updateBatchRow(index, 'dailyTargetValue', Math.max(1, parseInt(e.target.value) || 1))}
-                                                                    className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
-                                                                />
-                                                            </div>
-
-                                                            <div className="space-y-1">
-                                                                <label className="text-[10px] font-bold text-slate-500">{isIndo ? 'Satuan / Unit' : 'Unit Label'}</label>
-                                                                <input 
-                                                                    type="text"
-                                                                    value={row.unit || globalDefaults.unit || 'ml'}
-                                                                    onChange={(e) => updateBatchRow(index, 'unit', e.target.value)}
-                                                                    placeholder="cth: gelas, menit"
-                                                                    className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
-                                                                />
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-
-                                                {/* 3. Planner Time Scheduling */}
-                                                {showPlanner && (
-                                                    <div className="space-y-1.5 pt-2 border-t border-slate-200/60 dark:border-white/[0.06]">
-                                                        <label className="text-[10px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
-                                                            <Clock size={11} /> {isIndo ? 'Jadwal Jam di Daily Planner' : 'Daily Planner Time Slot'}
-                                                        </label>
-                                                        <div className="flex gap-2">
-                                                            <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-                                                                <span className="text-[10px] font-bold text-slate-400">{isIndo ? 'Mulai:' : 'Start:'}</span>
+                                                    {/* Planner Times */}
+                                                    {row.plannerIntegration && (
+                                                        <div className="flex gap-2 pt-1 animate-in fade-in duration-150">
+                                                            <div className="flex-1 flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                                                                <span className="text-[9px] font-bold text-slate-400">{isIndo ? 'Mulai:' : 'Start:'}</span>
                                                                 <input
                                                                     type="time"
                                                                     value={row.plannerStartTime}
@@ -521,8 +447,8 @@ export default function HabitBatchModal({
                                                                     className="bg-transparent font-black text-xs text-slate-900 dark:text-white outline-none cursor-pointer"
                                                                 />
                                                             </div>
-                                                            <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-                                                                <span className="text-[10px] font-bold text-slate-400">{isIndo ? 'Selesai:' : 'End:'}</span>
+                                                            <div className="flex-1 flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                                                                <span className="text-[9px] font-bold text-slate-400">{isIndo ? 'Selesai:' : 'End:'}</span>
                                                                 <input
                                                                     type="time"
                                                                     value={row.plannerEndTime}
@@ -531,16 +457,39 @@ export default function HabitBatchModal({
                                                                 />
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                                    )}
+                                                </div>
 
-                        {/* Add Another Row Button */}
+                                                {/* Color Palette */}
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                                        {isIndo ? 'Warna Tema Habit' : 'Theme Color'}
+                                                    </label>
+                                                    <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                                                        {colorPalette.map(c => (
+                                                            <button
+                                                                key={c}
+                                                                type="button"
+                                                                onClick={() => updateBatchRow(index, 'color', c)}
+                                                                className={`w-5 h-5 rounded-full transition cursor-pointer ${
+                                                                    row.color === c 
+                                                                        ? 'ring-2 ring-white dark:ring-slate-900 ring-offset-2 ring-offset-indigo-500 scale-110 shadow-sm' 
+                                                                        : 'hover:scale-110 opacity-70 hover:opacity-100'
+                                                                }`}
+                                                                style={{ backgroundColor: c }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+
+                        {/* Add Another Habit Row */}
                         <button
                             type="button"
                             onClick={addBatchRow}
@@ -562,15 +511,15 @@ export default function HabitBatchModal({
                         </button>
                         <button
                             type="button"
-                            onClick={() => onSubmit(globalDefaults)}
+                            onClick={onSubmit}
                             disabled={validRowsCount === 0}
                             className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-500/25 transition active:scale-95 flex items-center gap-2 disabled:opacity-50 cursor-pointer"
                         >
                             <Check size={15} strokeWidth={3} />
                             <span>
                                 {isIndo 
-                                    ? `Simpan ${validRowsCount} Habit Terpilih` 
-                                    : `Save ${validRowsCount} Habits`}
+                                    ? `Simpan Semua (${validRowsCount} Habit)` 
+                                    : `Save All (${validRowsCount} Habits)`}
                             </span>
                         </button>
                     </div>
