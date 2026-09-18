@@ -155,6 +155,15 @@ export default function SettingsBillingTab({
                                 </li>
                             </ul>
                         </div>
+
+                        <button
+                            type="button"
+                            onClick={() => router.push('/billing')}
+                            className="mt-6 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 active:scale-95"
+                        >
+                            <span>{isIndo ? 'Buka Halaman Billing' : 'Open Billing Page'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
                     </div>
 
                     {/* Architect */}
@@ -187,6 +196,15 @@ export default function SettingsBillingTab({
                                 </li>
                             </ul>
                         </div>
+
+                        <button
+                            type="button"
+                            onClick={() => router.push('/billing')}
+                            className="mt-6 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95"
+                        >
+                            <span>{isIndo ? 'Pilih / Upgrade ke Architect' : 'Select Architect Plan'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
                     </div>
 
                     {/* Quantum */}
@@ -226,12 +244,38 @@ export default function SettingsBillingTab({
                         <button
                             type="button"
                             onClick={() => router.push('/billing')}
-                            className="mt-5 w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black shadow-md shadow-indigo-400/20 transition-all hover:scale-[1.02]"
+                            className="mt-6 w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-black shadow-md shadow-purple-500/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-1.5 active:scale-95"
                         >
-                            {isIndo ? 'Pilih Quantum Plan' : 'Select Quantum Plan'}
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>{isIndo ? 'Pilih / Upgrade ke Quantum' : 'Select Quantum Plan'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* Bottom Direct Link Action Banner */}
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-900/50 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-1 text-center sm:text-left">
+                    <h5 className="text-base font-black flex items-center justify-center sm:justify-start gap-2 text-white">
+                        <Sparkles className="w-4 h-4 text-indigo-400" />
+                        <span>{isIndo ? 'Pusat Tagihan, Riwayat Invoice, & Checkout' : 'Billing Hub, Invoices & Checkout'}</span>
+                    </h5>
+                    <p className="text-xs text-slate-300 max-w-lg">
+                        {isIndo
+                            ? 'Buka halaman billing utama untuk melihat detail metode pembayaran, riwayat langganan, atau upgrade instan.'
+                            : 'Open the main billing page to manage payment methods, invoice receipts, or upgrade instantly.'}
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onClick={() => router.push('/billing')}
+                    className="shrink-0 px-6 py-3 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2"
+                >
+                    <span>{isIndo ? 'Buka Halaman Billing & Checkout' : 'Go to Billing & Checkout'}</span>
+                    <ArrowRight className="w-4 h-4 text-indigo-600" />
+                </button>
             </div>
         </div>
     );

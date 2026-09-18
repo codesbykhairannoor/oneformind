@@ -76,13 +76,13 @@ export default function GoalFilterBar({
     ];
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full max-w-full min-w-0">
             
             {/* 1. TOP ROW: Search, Time Horizon Switcher & View Switcher */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 w-full min-w-0">
                 
                 {/* Search Input */}
-                <div className="relative flex-1 max-w-md">
+                <div className="relative flex-1 max-w-md w-full min-w-0">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                     <input
                         type="text"
@@ -103,12 +103,12 @@ export default function GoalFilterBar({
                 </div>
 
                 {/* View Switcher Tabs & Export */}
-                <div className="flex items-center gap-2 shrink-0 self-start lg:self-auto">
-                    <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-2 max-w-full min-w-0 overflow-x-auto no-scrollbar py-0.5 self-start lg:self-auto">
+                    <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/60 dark:border-slate-800 overflow-x-auto no-scrollbar shrink-0">
                         <button
                             type="button"
                             onClick={() => setViewMode('gallery')}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shrink-0 ${
                                 viewMode === 'gallery'
                                     ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -122,7 +122,7 @@ export default function GoalFilterBar({
                         <button
                             type="button"
                             onClick={() => setViewMode('kanban')}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shrink-0 ${
                                 viewMode === 'kanban'
                                     ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -136,7 +136,7 @@ export default function GoalFilterBar({
                         <button
                             type="button"
                             onClick={() => setViewMode('timeline')}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shrink-0 ${
                                 viewMode === 'timeline'
                                     ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -150,7 +150,7 @@ export default function GoalFilterBar({
                         <button
                             type="button"
                             onClick={() => setViewMode('wheel_of_life')}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shrink-0 ${
                                 viewMode === 'wheel_of_life'
                                     ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -166,7 +166,7 @@ export default function GoalFilterBar({
                         <button
                             type="button"
                             onClick={onOpenExportModal}
-                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition"
+                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition shrink-0"
                             title={isIndo ? 'Ekspor Target & Sasaran (CSV / JSON)' : 'Export Goals (CSV / JSON)'}
                         >
                             <Download className="w-3.5 h-3.5 text-indigo-500" />
@@ -178,10 +178,10 @@ export default function GoalFilterBar({
             </div>
 
             {/* 2. TIME HORIZON & SORT ROW */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 w-full min-w-0">
                 
                 {/* Time Horizon Pills */}
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto max-w-full min-w-0">
                     {timeHorizons.map((th) => {
                         const isSelected = selectedTimeHorizon === th.id;
                         return (
@@ -202,7 +202,7 @@ export default function GoalFilterBar({
                 </div>
 
                 {/* Sort Dropdown & Priority Pills */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
                     
                     {/* Priority Filter */}
                     <div className="hidden sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-800">
@@ -247,7 +247,7 @@ export default function GoalFilterBar({
             </div>
 
             {/* 3. CATEGORY PILLS ROW */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full max-w-full min-w-0">
                 <button
                     type="button"
                     onClick={() => setSelectedCategory('all')}

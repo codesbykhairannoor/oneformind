@@ -3,11 +3,10 @@
 import React, { useState, useMemo } from 'react';
 import { useLocale } from 'next-intl';
 import { 
-    Camera, Trash2, Sparkles, LayoutTemplate, Zap, ShieldCheck, 
+    Camera, Trash2, Sparkles, Zap, ShieldCheck, 
     Tag, HelpCircle, Lightbulb, AlertTriangle, CheckCircle2, ChevronRight, X,
     CalendarCheck2, Eye, Pencil
 } from 'lucide-react';
-import { JOURNAL_TEMPLATES, JournalTemplate } from '../../lib/journalTemplates';
 import { analyzeJournalCognitive } from '../../lib/journalAi';
 
 interface JournalEditorBodyProps {
@@ -64,7 +63,6 @@ export default function JournalEditorBody({
     const locale = useLocale();
     const isIndo = locale === 'id';
 
-    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [customTagInput, setCustomTagInput] = useState('');
     const [previewMode, setPreviewMode] = useState(false);
 
@@ -117,29 +115,6 @@ export default function JournalEditorBody({
         return analyzeJournalCognitive(content, mood, locale);
     }, [content, mood, locale]);
 
-    // Handle template injection
-    const handleApplyTemplate = (tmpl: JournalTemplate) => {
-        const tmplContent = isIndo ? tmpl.contentTemplate.id : tmpl.contentTemplate.en;
-        const tmplTitle = isIndo ? tmpl.title.id : tmpl.title.en;
-
-        if (content.trim().length > 0) {
-            const confirmReplace = window.confirm(
-                isIndo 
-                    ? 'Tambahkan template ini di akhir tulisanmu?' 
-                    : 'Append this template to your current draft?'
-            );
-            if (!confirmReplace) return;
-            setContent(prev => prev + '\n\n' + tmplContent);
-        } else {
-            setContent(tmplContent);
-            if (!title) {
-                setTitle(tmplTitle);
-            }
-        }
-        setMood(tmpl.moodDefault);
-        setSelectedTemplate(tmpl.id);
-    };
-
     // Handle inserting quick tag
     const handleInsertTag = (tag: string) => {
         if (!content.includes(tag)) {
@@ -159,21 +134,27 @@ export default function JournalEditorBody({
     return (
         <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-10 space-y-6">
             
-            {/* 1. TOP GUIDED TEMPLATES BAR & LIFE OS BRIEF CTA */}
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                            <LayoutTemplate className="w-4 h-4" />
+            {/* MAIN WRITING CANVAS */}
+            <div className={`p-6 sm:p-10 rounded-[2.5rem] shadow-sm border relative transition-all duration-300 ${
+                isZenMode 
+                    ? 'bg-slate-900 border-slate-800' 
+                    : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800'
+            }`}>
+                
+                {/* Date, Privacy Indicator & Quick Brief Tools */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <div className="text-[10px] font-black tracking-widest text-indigo-500 uppercase flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/40 px-3 py-1.5 rounded-xl">
+                            <span>📅</span>
+                            <span>{dateStr}</span>
                         </div>
-                        <div>
-                            <h4 className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100">
-                                {isIndo ? 'Template Refleksi Terarah (Anti-Blank Page)' : 'Guided Reflection Templates'}
-                            </h4>
-                            <p className="text-[10px] font-semibold text-slate-400">
-                                {isIndo ? 'Pilih panduan struktur menulis sesuai fase harimu' : 'Pick a guided structure tailored to your daily flow'}
-                            </p>
-                        </div>
+
+                        {isPrivacyBlur && (
+                            <div className="flex items-center gap-1.5 text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/40 px-2.5 py-1.5 rounded-xl animate-pulse">
+                                <ShieldCheck className="w-3 h-3" />
+                                <span>{isIndo ? 'Mode Privasi Blur Aktif' : 'Privacy Camouflage Active'}</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
@@ -182,7 +163,7 @@ export default function JournalEditorBody({
                             type="button"
                             onClick={onInsertLifeOSBrief}
                             disabled={isInsertingBrief}
-                            className="group flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black transition-all active:scale-95 disabled:opacity-50 shadow-sm"
+                            className="group flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black transition-all active:scale-95 disabled:opacity-50 shadow-sm"
                         >
                             <Zap className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
                             <span>{isInsertingBrief ? (isIndo ? 'Menyisipkan...' : 'Injecting...') : (isIndo ? '+ Rekap Cepat OS' : '+ Quick OS Brief')}</span>
@@ -194,65 +175,13 @@ export default function JournalEditorBody({
                                 type="button"
                                 onClick={onImportPlanner}
                                 disabled={isImportingPlanner}
-                                className="group flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 hover:from-indigo-500/20 hover:to-purple-500/20 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400 text-xs font-black transition-all active:scale-95 disabled:opacity-50 shadow-sm"
+                                className="group flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 hover:from-indigo-500/20 hover:to-purple-500/20 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400 text-xs font-black transition-all active:scale-95 disabled:opacity-50 shadow-sm"
                             >
                                 <CalendarCheck2 className="w-3.5 h-3.5 text-indigo-500 group-hover:scale-110 transition-transform" />
                                 <span>{isImportingPlanner ? (isIndo ? 'Mengimpor Log...' : 'Importing...') : (isIndo ? '🌙 Impor Log Planner' : '🌙 Import Planner Log')}</span>
                             </button>
                         )}
                     </div>
-                </div>
-
-                {/* Template Chips */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1">
-                    {JOURNAL_TEMPLATES.map((tmpl) => {
-                        const isSelected = selectedTemplate === tmpl.id;
-                        return (
-                            <button
-                                key={tmpl.id}
-                                type="button"
-                                onClick={() => handleApplyTemplate(tmpl)}
-                                className={`text-left p-2.5 rounded-2xl border transition-all active:scale-95 flex flex-col justify-between ${
-                                    isSelected 
-                                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-300 dark:border-indigo-700 shadow-sm' 
-                                        : 'bg-slate-50/70 dark:bg-slate-800/50 border-slate-200/60 dark:border-slate-700/60 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-slate-100/80 dark:hover:bg-slate-800/80'
-                                }`}
-                            >
-                                <div className="flex items-center gap-1.5 mb-1">
-                                    <span className="text-base">{tmpl.icon}</span>
-                                    <span className="text-[11px] font-black text-slate-800 dark:text-slate-200 truncate">
-                                        {isIndo ? tmpl.title.id.split('(')[0] : tmpl.title.en.split('&')[0]}
-                                    </span>
-                                </div>
-                                <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400 line-clamp-1 leading-tight">
-                                    {isIndo ? tmpl.subtitle.id : tmpl.subtitle.en}
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* 2. MAIN WRITING CANVAS */}
-            <div className={`p-6 sm:p-10 rounded-[2.5rem] shadow-sm border relative transition-all duration-300 ${
-                isZenMode 
-                    ? 'bg-slate-900 border-slate-800' 
-                    : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800'
-            }`}>
-                
-                {/* Date & Privacy Indicator */}
-                <div className="flex items-center justify-between gap-3 mb-6">
-                    <div className="text-[10px] font-black tracking-widest text-indigo-500 uppercase flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/40 px-3 py-1 rounded-xl">
-                        <span>📅</span>
-                        <span>{dateStr}</span>
-                    </div>
-
-                    {isPrivacyBlur && (
-                        <div className="flex items-center gap-1.5 text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/40 px-2.5 py-1 rounded-xl animate-pulse">
-                            <ShieldCheck className="w-3 h-3" />
-                            <span>{isIndo ? 'Mode Privasi Blur Aktif' : 'Privacy Camouflage Active'}</span>
-                        </div>
-                    )}
                 </div>
 
                 {/* Journal Title */}

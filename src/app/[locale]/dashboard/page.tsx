@@ -109,11 +109,8 @@ export default async function DashboardPage() {
         userSettings = userProfile.settings;
     }
 
-    // If fresh account without completed onboarding in DB settings, redirect to onboarding setup
-    const isNewUser = !userSettings?.onboarding_completed && habits.length === 0 && plannerTasks.length === 0 && goals.length === 0;
-    if (isNewUser) {
-        redirect(`/${locale}/onboarding`);
-    }
+    // Safely parse settings without aggressive redirection
+    const userModules = userSettings?.modules || {};
 
     const studyAssignments: any[] = Array.isArray(userSettings.study_assignments) ? userSettings.study_assignments : [];
     const studyBooks: any[] = Array.isArray(userSettings.study_books) ? userSettings.study_books : [];

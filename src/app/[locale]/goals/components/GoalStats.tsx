@@ -49,12 +49,12 @@ export default function GoalStats({ stats }: GoalStatsProps) {
     const totalCount = stats?.totalCount || stats?.active || 0;
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8 w-full max-w-full min-w-0">
             
             {/* 1. Master Momentum Circular Gauge */}
-            <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-[2.5rem] p-7 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-6 group hover:shadow-xl hover:shadow-indigo-500/5 dark:hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden relative">
+            <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 sm:p-7 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4 sm:gap-6 group hover:shadow-xl hover:shadow-indigo-500/5 dark:hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden relative min-w-0">
                 <div className="relative shrink-0">
-                    <svg className="w-24 h-24 transform -rotate-90">
+                    <svg className="w-20 h-20 sm:w-24 sm:h-24 transform -rotate-90">
                         <circle className="text-slate-100 dark:text-slate-800" strokeWidth="8" stroke="currentColor" fill="transparent" r="34" cx="48" cy="48" />
                         <circle 
                             className="text-indigo-600 dark:text-indigo-500 transition-all duration-1000 ease-out" 
@@ -70,20 +70,20 @@ export default function GoalStats({ stats }: GoalStatsProps) {
                         />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xl font-black text-slate-800 dark:text-white transition-colors duration-500 font-mono">
+                        <span className="text-lg sm:text-xl font-black text-slate-800 dark:text-white transition-colors duration-500 font-mono">
                             {masterProgress}%
                         </span>
                     </div>
                 </div>
                 
                 <div className="flex flex-col min-w-0">
-                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
+                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 truncate">
                         {isIndo ? 'Momentum Visi' : 'Vision Momentum'}
                     </p>
-                    <h3 className="text-xl font-black text-slate-800 dark:text-white leading-tight">
+                    <h3 className="text-lg sm:text-xl font-black text-slate-800 dark:text-white leading-tight truncate">
                         {isIndo ? 'Eksekusi Impian' : 'Mastering Vision'}
                     </h3>
-                    <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 mt-1">
+                    <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 mt-1 truncate">
                         {stats?.completedCount || 0} {isIndo ? 'Tercapai' : 'Achieved'} • {stats?.activeCount || 0} {isIndo ? 'Aktif' : 'Active'}
                     </span>
                 </div>
@@ -92,7 +92,7 @@ export default function GoalStats({ stats }: GoalStatsProps) {
             </div>
 
             {/* 2. Command Center 3-Cards */}
-            <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-5 w-full min-w-0">
                 
                 {/* Card 1: North Star Target */}
                 <div className="p-6 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group overflow-hidden relative">

@@ -326,6 +326,11 @@ export default function FullPageOnboarding({
                 completedAt: new Date().toISOString()
             }));
 
+            // Also set cookie so middleware and server components recognize onboarding completion
+            if (typeof document !== 'undefined') {
+                document.cookie = "tranvas_onboarding_completed=true; path=/; max-age=31536000; SameSite=Lax";
+            }
+
             // Optional delay for a slick SaaS launching animation
             await new Promise(resolve => setTimeout(resolve, 800));
 
@@ -340,6 +345,35 @@ export default function FullPageOnboarding({
         } finally {
             setIsSaving(false);
             setIsLaunching(false);
+        }
+    };
+
+    const handleSkipToDashboard = async () => {
+        try {
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('tranvas_onboarding_step');
+                localStorage.setItem('tranvas_tab_setup_completed', 'true');
+                localStorage.setItem('tranvas_onboarding_completed', 'true');
+                document.cookie = "tranvas_onboarding_completed=true; path=/; max-age=31536000; SameSite=Lax";
+            }
+            await fetch('/api/user', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    settings: {
+                        onboarding_completed: true,
+                        tabs_activated_at: new Date().toISOString()
+                    }
+                })
+            }).catch(() => {});
+        } catch (e) {
+            console.error('Error skipping onboarding:', e);
+        }
+
+        if (onClose) {
+            onClose();
+        } else {
+            window.location.href = `/${currentLocale}/dashboard`;
         }
     };
 
@@ -367,6 +401,15 @@ export default function FullPageOnboarding({
                 </div>
 
                 <div className="flex items-center gap-3">
+                    {/* Skip to Dashboard Button */}
+                    <button
+                        type="button"
+                        onClick={handleSkipToDashboard}
+                        className="px-3.5 py-1.5 rounded-xl border border-slate-700/80 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+                    >
+                        {isIndo ? 'Lewati ke Dashboard' : 'Skip to Dashboard'}
+                    </button>
+
                     {/* Language Switcher */}
                     <div className="flex items-center bg-slate-900 border border-slate-800 rounded-2xl p-1 text-xs font-bold shadow-inner">
                         <button
