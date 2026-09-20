@@ -275,7 +275,7 @@ export default function AuthHeader({
                                             <span>Settings</span>
                                         </Link>
                                         <Link 
-                                            href="/affiliates"
+                                            href="/settings?tab=affiliate"
                                             onClick={() => setShowProfileDropdown(false)}
                                             className="flex items-center justify-between px-3 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all text-slate-700 dark:text-slate-200 text-[12px] font-medium group"
                                         >

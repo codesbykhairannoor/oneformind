@@ -252,7 +252,7 @@ export default function BillingPricingPage() {
                             </p>
                         </div>
                         <Link
-                            href="/affiliates"
+                            href="/settings?tab=affiliate"
                             className="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 active:scale-95 shrink-0 relative z-10"
                         >
                             <span>{isId ? 'Buka Portal Partner' : 'Open Partner Portal'}</span>

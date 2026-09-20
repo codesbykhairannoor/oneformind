@@ -84,28 +84,41 @@ for (const table of requiredTables) {
 }
 
 // ---------------------------------------------------------------
-// 2. LAYOUT & AUTH HIERARCHY INVARIANT CHECKS
+// 2. SETTINGS CENTRALIZATION & AUTH INVARIANT CHECKS
 // ---------------------------------------------------------------
-console.log("\n--- 2. Layout & Auth Hierarchy Invariant Checks ---");
+console.log("\n--- 2. Settings Centralization & Auth Invariant Checks ---");
 
+const settingsPagePath = path.join(ROOT_DIR, 'src/app/[locale]/settings/page.tsx');
 const affiliatesPagePath = path.join(ROOT_DIR, 'src/app/[locale]/affiliates/page.tsx');
+const sidebarPath = path.join(ROOT_DIR, 'src/components/layout/AuthSidebar.tsx');
+const headerPath = path.join(ROOT_DIR, 'src/components/layout/AuthHeader.tsx');
+
+assertTest(fs.existsSync(settingsPagePath), 'settings/page.tsx exists');
 assertTest(fs.existsSync(affiliatesPagePath), 'affiliates/page.tsx exists');
+
+if (fs.existsSync(settingsPagePath)) {
+  const content = fs.readFileSync(settingsPagePath, 'utf8');
+  assertTest(content.includes("id: 'affiliate'"), 'Settings page includes affiliate tab ID');
+  assertTest(content.includes("SettingsAffiliateTab"), 'Settings page renders SettingsAffiliateTab component');
+  assertTest(content.includes("AuthenticatedLayout"), 'Settings page is wrapped in AuthenticatedLayout');
+}
 
 if (fs.existsSync(affiliatesPagePath)) {
   const content = fs.readFileSync(affiliatesPagePath, 'utf8');
+  assertTest(
+    content.includes("router.replace('/settings?tab=affiliate')") || content.includes('/settings?tab=affiliate'),
+    'affiliates/page.tsx routes authenticated users directly to /settings?tab=affiliate'
+  );
+}
 
-  // Must import AuthenticatedLayout
-  const importsAuthLayout = content.includes("import AuthenticatedLayout from '@/components/AuthenticatedLayout'");
-  assertTest(importsAuthLayout, 'Page imports AuthenticatedLayout for logged-in users');
+if (fs.existsSync(sidebarPath)) {
+  const content = fs.readFileSync(sidebarPath, 'utf8');
+  assertTest(content.includes("href=\"/settings?tab=affiliate\""), 'Sidebar Partner link points directly to /settings?tab=affiliate');
+}
 
-  // Must render AuthenticatedLayout when session?.user is present
-  const hasAuthBranch = content.includes("if (session?.user)") && content.includes("<AuthenticatedLayout>");
-  assertTest(hasAuthBranch, 'Renders AuthenticatedLayout when session is active (Prevents logged-out feeling)');
-
-  // Must NOT render GuestLayout unconditionally (must have session check before GuestLayout)
-  const hasAuthGuardBeforeGuest = content.includes("if (session?.user)") && 
-                                 content.indexOf("if (session?.user)") < content.lastIndexOf("<GuestLayout>");
-  assertTest(hasAuthGuardBeforeGuest, 'GuestLayout is strictly conditional and guarded by auth session check');
+if (fs.existsSync(headerPath)) {
+  const content = fs.readFileSync(headerPath, 'utf8');
+  assertTest(content.includes("href=\"/settings?tab=affiliate\""), 'Header Profile Partner link points directly to /settings?tab=affiliate');
 }
 
 // ---------------------------------------------------------------

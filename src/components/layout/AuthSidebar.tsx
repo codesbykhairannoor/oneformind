@@ -321,28 +321,25 @@ export default function AuthSidebar({
                 </Link>
 
                 <Link 
-                    href="/affiliates"
+                    href="/settings?tab=affiliate"
                     className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                         isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                     } ${
-                        isActive('/affiliates')
+                        (isActive('/settings') || isActive('/affiliates'))
                             ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                             : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                     }`}
                 >
-                    <Sparkles size={18} className={isActive('/affiliates') ? 'text-indigo-600 dark:text-indigo-400' : 'text-emerald-500 shrink-0'} />
+                    <Sparkles size={18} className="text-emerald-500 shrink-0" />
                     {!isSidebarCollapsed && (
                         <>
                             <span className="text-[15px] font-semibold tracking-tight truncate flex-1 text-left">
-                                {locale === 'id' ? 'Partner' : 'Affiliates'}
+                                {locale === 'id' ? 'Partner (60%)' : 'Affiliates (60%)'}
                             </span>
                             <span className="text-[7.5px] font-black text-emerald-600 dark:text-emerald-400 uppercase bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-500/20 px-1.5 py-0.5 rounded-full shrink-0 tracking-wider">
                                 60%
                             </span>
                         </>
-                    )}
-                    {isActive('/affiliates') && !isSidebarCollapsed && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                     )}
                 </Link>
 
