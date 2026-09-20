@@ -60,6 +60,36 @@ export async function POST(req: NextRequest) {
             console.warn('Backend webhook forward notice:', fetchErr);
         }
 
+        // Record 60% affiliate commission for eligible referrals
+        if (
+            userId &&
+            (eventName === 'order_created' ||
+             eventName === 'subscription_payment_success' ||
+             eventName === 'subscription_created')
+        ) {
+            try {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabaseAdmin = createClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                );
+                const { recordAffiliateCommission } = await import('@/lib/affiliate/affiliate-service');
+                const rawTotal = attributes.total || attributes.subtotal_usd || 1500;
+                const txAmount = typeof rawTotal === 'number' && rawTotal > 100 ? rawTotal / 100 : Number(rawTotal);
+
+                await recordAffiliateCommission(supabaseAdmin, {
+                    referredUserId: userId,
+                    gateway: 'lemonsqueezy',
+                    transactionId: String(payload.data?.id || `ls_${Date.now()}`),
+                    planName: attributes.variant_name || attributes.product_name || 'architect',
+                    transactionAmount: txAmount || 15.0,
+                    currency: attributes.currency || 'USD',
+                });
+            } catch (affErr) {
+                console.warn('Lemon Squeezy affiliate reward notice:', affErr);
+            }
+        }
+
         return NextResponse.json({ received: true, event: eventName });
     } catch (error: any) {
         console.error('Lemon Squeezy Webhook Error:', error);

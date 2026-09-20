@@ -35,6 +35,25 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await goRes.json();
+
+    // Record 60% affiliate commission for eligible referrals
+    try {
+      const parsedBody = JSON.parse(body || '{}');
+      const { recordAffiliateCommission } = await import('@/lib/affiliate/affiliate-service');
+      const txAmount = Number(parsedBody.amount || data.amount || 15.0);
+
+      await recordAffiliateCommission(supabase, {
+        referredUserId: session.user.id,
+        gateway: 'paypal',
+        transactionId: String(parsedBody.orderID || data.orderID || `pp_${Date.now()}`),
+        planName: parsedBody.plan || 'architect',
+        transactionAmount: txAmount,
+        currency: parsedBody.currency || 'USD',
+      });
+    } catch (affErr) {
+      console.warn('PayPal affiliate reward notice:', affErr);
+    }
+
     return NextResponse.json(data);
   } catch (error: any) {
     console.error('PayPal Capture Exception:', error);
