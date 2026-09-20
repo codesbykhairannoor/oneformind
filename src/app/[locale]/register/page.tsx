@@ -1,22 +1,54 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import InputError from '@/components/InputError';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { createClient } from '@/utils/supabase/client';
+import { Sparkles } from 'lucide-react';
 
 export default function Register() {
     usePageTitle('Register');
     const t = useTranslations();
     const locale = useLocale();
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const [showPassword, setShowPassword] = useState(false);
     const [state, setState] = useState({ success: false, error: '' });
     const [isPending, setIsPending] = useState(false);
+    const [capturedRefCode, setCapturedRefCode] = useState<string>('');
     const supabase = createClient();
+
+    // Auto-detect referral code from URL search params, cookies, or storage
+    useEffect(() => {
+        let code = '';
+        if (searchParams) {
+            const urlRef = searchParams.get('ref') || searchParams.get('via') || searchParams.get('fpr') || searchParams.get('aff');
+            if (urlRef) {
+                code = urlRef.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+            }
+        }
+        if (!code) {
+            try {
+                const cookieMatch = document.cookie.match(/tranvas_ref_code=([^;]+)/);
+                code = cookieMatch ? decodeURIComponent(cookieMatch[1]) : (localStorage.getItem('tranvas_ref_code') || sessionStorage.getItem('tranvas_ref_code') || '');
+            } catch (e) {}
+        }
+
+        if (code) {
+            setCapturedRefCode(code);
+            const expires = new Date();
+            expires.setDate(expires.getDate() + 90);
+            document.cookie = `tranvas_ref_code=${encodeURIComponent(code)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+            try {
+                localStorage.setItem('tranvas_ref_code', code);
+                sessionStorage.setItem('tranvas_ref_code', code);
+            } catch (e) {}
+        }
+    }, [searchParams]);
 
     const handleGoogleLogin = async () => {
         if (isPending) return;
@@ -128,6 +160,17 @@ export default function Register() {
                         <Link href="/login" className="text-indigo-600 hover:text-indigo-800 transition font-bold">{t('auth_link_login') || 'Masuk sekarang'}</Link>
                     </p>
                 </div>
+
+                {capturedRefCode && (
+                    <div className="mb-6 p-3 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/25 flex items-center gap-2.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold shadow-sm animate-in fade-in duration-200">
+                        <Sparkles className="w-4 h-4 text-emerald-500 shrink-0 animate-pulse" />
+                        <span>
+                            {locale === 'id' 
+                                ? `Referral Aktif: ${capturedRefCode} (Free Trial 14 Hari)` 
+                                : `Referral Applied: ${capturedRefCode} (14-Day Free Trial)`}
+                        </span>
+                    </div>
+                )}
 
                 {state?.error && (
                     <div className="mb-6 font-bold text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100 flex items-center gap-3">

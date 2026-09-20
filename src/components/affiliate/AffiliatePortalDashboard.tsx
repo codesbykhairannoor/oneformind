@@ -48,8 +48,8 @@ export default function AffiliatePortalDashboard() {
     const [accountSaving, setAccountSaving] = useState(false);
     const [accountSaved, setAccountSaved] = useState(false);
 
-    // Activity Sub-tabs (1. Daftar Referral, 2. Riwayat Komisi, 3. Riwayat Penarikan)
     const [activeTab, setActiveTab] = useState<'referrals' | 'commissions' | 'payouts'>('referrals');
+    const [linkDestination, setLinkDestination] = useState<'register' | 'landing'>('register');
 
     const fetchPortalData = async () => {
         try {
@@ -79,13 +79,19 @@ export default function AffiliatePortalDashboard() {
         fetchPortalData();
     }, []);
 
-    const affiliateLink = typeof window !== 'undefined' && stats?.profile?.ref_code
-        ? `${window.location.origin}?ref=${stats.profile.ref_code}`
-        : `https://tranvas.com?ref=${stats?.profile?.ref_code || 'PARTNER'}`;
+    const registerLink = typeof window !== 'undefined' && stats?.profile?.ref_code
+        ? `${window.location.origin}/${locale}/register?ref=${stats.profile.ref_code}`
+        : `https://tranvas.com/${locale}/register?ref=${stats?.profile?.ref_code || 'PARTNER'}`;
+
+    const landingLink = typeof window !== 'undefined' && stats?.profile?.ref_code
+        ? `${window.location.origin}/${locale}?ref=${stats.profile.ref_code}`
+        : `https://tranvas.com/${locale}?ref=${stats?.profile?.ref_code || 'PARTNER'}`;
+
+    const activeAffiliateLink = linkDestination === 'register' ? registerLink : landingLink;
 
     const handleCopyLink = () => {
         if (!navigator?.clipboard) return;
-        navigator.clipboard.writeText(affiliateLink);
+        navigator.clipboard.writeText(activeAffiliateLink);
         setCopied(true);
         setTimeout(() => setCopied(false), 2500);
     };
@@ -219,12 +225,38 @@ export default function AffiliatePortalDashboard() {
                     </div>
                 </div>
 
+                {/* PILIHAN TUJUAN LINK REFERRAL */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <button
+                        type="button"
+                        onClick={() => setLinkDestination('register')}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                            linkDestination === 'register'
+                                ? 'bg-emerald-500 text-white shadow-md'
+                                : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                        }`}
+                    >
+                        <span>🎯 {isId ? 'Link Pendaftaran Langsung (Rekomendasi)' : 'Direct Registration (High Conversion)'}</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setLinkDestination('landing')}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                            linkDestination === 'landing'
+                                ? 'bg-indigo-600 text-white shadow-md'
+                                : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                        }`}
+                    >
+                        <span>🌐 {isId ? 'Link Beranda / Landing Page' : 'Homepage / Landing Page'}</span>
+                    </button>
+                </div>
+
                 {/* INPUT LINK & TOMBOL COPY */}
                 <div className="flex items-center gap-2 bg-slate-950/80 p-2 rounded-xl border border-white/10">
                     <input
                         type="text"
                         readOnly
-                        value={affiliateLink}
+                        value={activeAffiliateLink}
                         className="bg-transparent text-xs text-indigo-100 font-mono flex-1 outline-none px-2 select-all font-semibold"
                     />
                     <button
@@ -244,8 +276,8 @@ export default function AffiliatePortalDashboard() {
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span>
                         {isId 
-                            ? 'Kode & link referral terikat permanen ke akun Anda untuk menjamin atribusi komisi seumur hidup tanpa risiko hilang.' 
-                            : 'Referral code is permanently tied to your account for guaranteed lifelong attribution tracking.'}
+                            ? 'Link mengarahkan calon pengguna langsung ke pendaftaran dengan kode referral otomatis terisi & cookie aktif 90 hari.' 
+                            : 'Link directs leads straight to signup with referral code auto-filled & 90-day tracking cookie.'}
                     </span>
                 </div>
             </div>
