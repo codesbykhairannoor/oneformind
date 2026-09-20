@@ -7,9 +7,11 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
     try {
         const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
         const { data: { session } } = await supabase.auth.getSession();
+        const user = authUser || session?.user;
 
-        if (!session?.user) {
+        if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing required payout fields' }, { status: 400 });
         }
 
-        const result = await requestAffiliatePayout(supabase, session.user.id, {
+        const result = await requestAffiliatePayout(supabase, user.id, {
             amount,
             currency,
             bank_name,
