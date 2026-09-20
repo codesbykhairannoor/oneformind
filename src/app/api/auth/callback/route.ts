@@ -54,8 +54,17 @@ export async function GET(request: Request) {
         },
       }
     )
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error && data?.session?.user) {
+      const refCookie = cookieStore.get('tranvas_ref_code')?.value;
+      if (refCookie) {
+        try {
+          const { recordSignupReferral } = await import('@/lib/affiliate/affiliate-service');
+          await recordSignupReferral(supabase, data.session.user.id, refCookie);
+        } catch (refErr) {
+          console.warn('OAuth referral attribution notice:', refErr);
+        }
+      }
       return NextResponse.redirect(`${origin}${safeNext}`)
     }
   }

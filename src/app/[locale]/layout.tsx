@@ -8,6 +8,8 @@ import InstantIntlProvider from "@/components/InstantIntlProvider";
 import SwrProvider from "@/components/SwrProvider";
 import { SessionProvider } from "@/components/SessionProvider";
 
+import AffiliateTracker from "@/components/AffiliateTracker";
+
 import "../globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -97,6 +99,7 @@ export default async function RootLayout({
           `}
         </Script>
           <InstantIntlProvider initialLocale={locale} initialMessages={messages as any}>
+            <AffiliateTracker />
             <SessionProvider>
               <SwrProvider>
                 {children}

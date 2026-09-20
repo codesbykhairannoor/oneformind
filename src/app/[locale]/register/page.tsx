@@ -46,11 +46,23 @@ export default function Register() {
             return;
         }
 
-        const { error } = await supabase.auth.signUp({
+        // Extract referral code from cookies or storage
+        let refCode = '';
+        try {
+            const cookieMatch = document.cookie.match(/tranvas_ref_code=([^;]+)/);
+            refCode = cookieMatch ? decodeURIComponent(cookieMatch[1]) : (localStorage.getItem('tranvas_ref_code') || sessionStorage.getItem('tranvas_ref_code') || '');
+        } catch (e) {}
+
+        const signUpData: Record<string, any> = { full_name: name };
+        if (refCode) {
+            signUpData.referred_by_code = refCode;
+        }
+
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                data: { full_name: name }
+                data: signUpData
             }
         });
 
@@ -58,6 +70,20 @@ export default function Register() {
             setState({ success: false, error: error.message });
             setIsPending(false);
         } else {
+            if (refCode && data?.user?.id) {
+                try {
+                    await fetch('/api/affiliates/register-referral', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ref_code: refCode,
+                            user_id: data.user.id,
+                        }),
+                    });
+                } catch (refErr) {
+                    console.warn('Referral registration notice:', refErr);
+                }
+            }
             router.push('/onboarding');
             // Don't set isPending false if successful
         }

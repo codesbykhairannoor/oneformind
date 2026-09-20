@@ -10,8 +10,8 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/affiliates',
-    title: 'Affiliate Partner Program — Earn 30% Recurring',
-    description: 'Join the Tranvas Affiliate Partner Program. Earn 30% lifetime recurring commissions promoting the unified Life OS. Fast payouts & 60-day cookies.',
+    title: 'Affiliate Partner Program — Earn 60% Recurring for 8 Months',
+    description: 'Join the Tranvas Affiliate Partner Program. Earn 60% monthly recurring commissions for up to 8 months with a 90-day cookie window and multi-gateway payouts.',
   });
 }
 
