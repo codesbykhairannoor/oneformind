@@ -6,6 +6,8 @@ import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { loadScript } from '@paypal/paypal-js';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { getTrialStatus, isSubscriptionActive } from '@/lib/auth/subscription';
+import { Link } from '@/i18n/routing';
+import { Sparkles, ArrowRight } from 'lucide-react';
 import BillingPricingCards from './components/BillingPricingCards';
 import BillingComparisonTable from './components/BillingComparisonTable';
 import BillingFaq from './components/BillingFaq';
@@ -230,6 +232,34 @@ export default function BillingPricingPage() {
                     trialIsActive={trial.isActive}
                     onCheckout={handleCheckout}
                 />
+
+                {/* 60% RECURRING PARTNER BANNER */}
+                <section className="max-w-5xl mx-auto px-6 my-14">
+                    <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-900/50 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 blur-3xl rounded-full pointer-events-none" />
+                        <div className="space-y-2 max-w-xl relative z-10">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-black uppercase tracking-wider border border-indigo-400/20">
+                                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>60% Recurring Partner Program</span>
+                            </div>
+                            <h3 className="text-xl md:text-2xl font-black text-white">
+                                {isId ? 'Dapatkan 60% Komisi Berulang Tiap Bulan' : 'Earn 60% Monthly Recurring Commission'}
+                            </h3>
+                            <p className="text-indigo-200/80 text-xs md:text-sm leading-relaxed">
+                                {isId 
+                                    ? 'Ajak teman atau komunitas Anda menggunakan Tranvas. Nikmati bagi hasil 60% rutin setiap bulan selama hingga 8 bulan masa langganan aktif per pengguna.'
+                                    : 'Refer friends or your community to Tranvas. Earn a 60% revenue share every month for up to 8 active months per subscriber.'}
+                            </p>
+                        </div>
+                        <Link
+                            href="/affiliates"
+                            className="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 active:scale-95 shrink-0 relative z-10"
+                        >
+                            <span>{isId ? 'Buka Portal Partner' : 'Open Partner Portal'}</span>
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                </section>
 
                 <BillingComparisonTable />
 

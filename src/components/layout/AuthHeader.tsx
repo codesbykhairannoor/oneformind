@@ -14,7 +14,8 @@ import {
     ChevronDown,
     User,
     Settings as SettingsIcon,
-    LogOut
+    LogOut,
+    Sparkles
 } from 'lucide-react';
 
 interface AuthHeaderProps {
@@ -272,6 +273,19 @@ export default function AuthHeader({
                                         >
                                             <SettingsIcon size={15} className="text-slate-400" />
                                             <span>Settings</span>
+                                        </Link>
+                                        <Link 
+                                            href="/affiliates"
+                                            onClick={() => setShowProfileDropdown(false)}
+                                            className="flex items-center justify-between px-3 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all text-slate-700 dark:text-slate-200 text-[12px] font-medium group"
+                                        >
+                                            <div className="flex items-center gap-2.5">
+                                                <Sparkles size={15} className="text-indigo-500" />
+                                                <span>{locale === 'id' ? 'Partner & Afiliasi' : 'Affiliate Program'}</span>
+                                            </div>
+                                            <span className="text-[8.5px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded-md border border-emerald-500/20">
+                                                60%
+                                            </span>
                                         </Link>
                                         <button
                                             type="button"
