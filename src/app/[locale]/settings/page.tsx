@@ -182,19 +182,19 @@ export default function SettingsPage() {
         help: { title: t('settings_page_help_title'), subtitle: t('settings_page_help_subtitle') },
     };
 
-    const currentMeta = tabMeta[activeTab] || tabMeta.general;
-
     return (
         <AuthenticatedLayout>
             <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-10 py-6 sm:py-10 pb-28">
                 
-                {/* Header */}
-                <div style={{ marginBottom: '80px' }}>
-                    <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-slate-900 dark:text-white tracking-tight">
-                        {currentMeta.title}
+                {/* Unified Settings Header */}
+                <div className="mb-6 sm:mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                        {locale === 'id' ? 'Pengaturan' : 'Settings'}
                     </h1>
-                    <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="mt-2 text-slate-500 dark:text-slate-400 font-medium">
-                        {currentMeta.subtitle}
+                    <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium mt-1">
+                        {locale === 'id' 
+                            ? 'Kelola preferensi akun, keamanan, sistem modul, paket, dan program afiliasi Anda.' 
+                            : 'Manage your account preferences, security, active modules, billing, and affiliate program.'}
                     </p>
                 </div>
 
