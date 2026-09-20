@@ -7,7 +7,6 @@ import { Link, useRouter } from '@/i18n/routing';
 import InputError from '@/components/InputError';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { createClient } from '@/utils/supabase/client';
-import { Sparkles } from 'lucide-react';
 
 export default function Register() {
     usePageTitle('Register');
@@ -167,16 +166,6 @@ export default function Register() {
                     </p>
                 </div>
 
-                {capturedRefCode && (
-                    <div className="mb-6 p-3 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/25 flex items-center gap-2.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold shadow-sm animate-in fade-in duration-200">
-                        <Sparkles className="w-4 h-4 text-emerald-500 shrink-0 animate-pulse" />
-                        <span>
-                            {locale === 'id' 
-                                ? `Referral Aktif: ${capturedRefCode} (Free Trial 14 Hari)` 
-                                : `Referral Applied: ${capturedRefCode} (14-Day Free Trial)`}
-                        </span>
-                    </div>
-                )}
 
                 {state?.error && (
                     <div className="mb-6 font-bold text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100 flex items-center gap-3">
