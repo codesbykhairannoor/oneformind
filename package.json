@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:seo": "npx tsx scripts/test-seo-audit.mjs",
-    "test:security": "npx tsx scripts/security-qa-test.mjs"
+    "test:security": "npx tsx scripts/security-qa-test.mjs",
+    "test:affiliate": "node scripts/affiliate-qa-test.mjs"
   },
   "dependencies": {
     "@paypal/paypal-js": "^10.1.0",

@@ -7,7 +7,7 @@ import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import { 
     User, Lock, LayoutGrid, Bell, CreditCard, ShieldCheck, 
-    HelpCircle, Check 
+    HelpCircle, Check, Sparkles 
 } from 'lucide-react';
 import { getTrialStatus, isExplorer as checkIsExplorer, isSubscriptionActive } from '@/lib/auth/subscription';
 import SettingsGeneralTab from './components/SettingsGeneralTab';
@@ -15,6 +15,7 @@ import SettingsSecurityTab from './components/SettingsSecurityTab';
 import SettingsModulesTab from './components/SettingsModulesTab';
 import SettingsNotificationsTab from './components/SettingsNotificationsTab';
 import SettingsBillingTab from './components/SettingsBillingTab';
+import SettingsAffiliateTab from './components/SettingsAffiliateTab';
 import SettingsPrivacyTab from './components/SettingsPrivacyTab';
 import SettingsHelpTab from './components/SettingsHelpTab';
 
@@ -27,7 +28,7 @@ export default function SettingsPage() {
 
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ['general', 'security', 'modules', 'notifications', 'billing', 'privacy', 'help'].includes(tab)) {
+        if (tab && ['general', 'security', 'modules', 'notifications', 'billing', 'affiliate', 'privacy', 'help'].includes(tab)) {
             setActiveTab(tab);
         }
     }, [searchParams]);
@@ -165,6 +166,7 @@ export default function SettingsPage() {
         { id: 'modules', label: t('settings_nav_modules'), icon: LayoutGrid },
         { id: 'notifications', label: t('settings_nav_notifications'), icon: Bell },
         { id: 'billing', label: t('settings_nav_billing'), icon: CreditCard },
+        { id: 'affiliate', label: t('settings_nav_affiliate') || (locale === 'id' ? 'Program Afiliasi (60%)' : 'Affiliate Program (60%)'), icon: Sparkles },
         { id: 'privacy', label: t('settings_nav_privacy'), icon: ShieldCheck },
         { id: 'help', label: t('settings_nav_help'), icon: HelpCircle },
     ];
@@ -175,6 +177,7 @@ export default function SettingsPage() {
         modules: { title: t('settings_page_modules_title'), subtitle: t('settings_page_modules_subtitle') },
         notifications: { title: t('settings_page_notifications_title'), subtitle: t('settings_page_notifications_subtitle') },
         billing: { title: t('settings_page_billing_title'), subtitle: t('settings_page_billing_subtitle') },
+        affiliate: { title: t('settings_page_affiliate_title') || 'Program Partner & Afiliasi (60% Recurring)', subtitle: t('settings_page_affiliate_subtitle') || 'Komisi 60% recurring bulanan, link referral unik, dan manajemen penarikan saldo.' },
         privacy: { title: t('settings_page_privacy_title'), subtitle: t('settings_page_privacy_subtitle') },
         help: { title: t('settings_page_help_title'), subtitle: t('settings_page_help_subtitle') },
     };
@@ -278,6 +281,10 @@ export default function SettingsPage() {
                             isExplorer={isExplorer} 
                             premiumUntilFormatted={premiumUntilFormatted} 
                         />
+                    )}
+
+                    {activeTab === 'affiliate' && (
+                        <SettingsAffiliateTab />
                     )}
 
                     {activeTab === 'privacy' && (
