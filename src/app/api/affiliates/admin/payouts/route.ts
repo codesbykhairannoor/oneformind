@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { isAdminUser } from '@/lib/auth/admin';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     try {
         const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
         const { data: { session } } = await supabase.auth.getSession();
+        const user = authUser || session?.user;
 
-        if (!session?.user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        if (!user || !isAdminUser(user)) {
+            return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
         const statusParam = req.nextUrl.searchParams.get('status');
@@ -44,10 +47,12 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
     try {
         const supabase = await createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
         const { data: { session } } = await supabase.auth.getSession();
+        const user = authUser || session?.user;
 
-        if (!session?.user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        if (!user || !isAdminUser(user)) {
+            return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
         const body = await req.json();
