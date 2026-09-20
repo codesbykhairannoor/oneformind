@@ -32,6 +32,53 @@ export async function POST(req: NextRequest) {
         }
 
         const data = await goRes.json();
+
+        // Record 60% affiliate commission for eligible referrals upon successful Duitku payment
+        try {
+            let resultCode = '';
+            let merchantOrderId = '';
+            let amount = 0;
+            let userId = data?.user_id || data?.userId || '';
+
+            // Parse requestBody whether URL-encoded or JSON
+            if (contentType.includes('application/json')) {
+                const parsed = JSON.parse(requestBody || '{}');
+                resultCode = parsed.resultCode || '';
+                merchantOrderId = parsed.merchantOrderId || '';
+                amount = Number(parsed.amount || 0);
+                if (!userId && parsed.additionalParam) {
+                    userId = parsed.additionalParam;
+                }
+            } else {
+                const params = new URLSearchParams(requestBody);
+                resultCode = params.get('resultCode') || '';
+                merchantOrderId = params.get('merchantOrderId') || '';
+                amount = Number(params.get('amount') || 0);
+                if (!userId && params.get('additionalParam')) {
+                    userId = params.get('additionalParam') || '';
+                }
+            }
+
+            if (resultCode === '00' && userId && amount > 0) {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabaseAdmin = createClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                );
+                const { recordAffiliateCommission } = await import('@/lib/affiliate/affiliate-service');
+                await recordAffiliateCommission(supabaseAdmin, {
+                    referredUserId: userId,
+                    gateway: 'duitku',
+                    transactionId: String(merchantOrderId || `duitku_${Date.now()}`),
+                    planName: 'quantum',
+                    transactionAmount: amount,
+                    currency: 'IDR',
+                });
+            }
+        } catch (affErr) {
+            console.warn('Duitku affiliate commission hook notice:', affErr);
+        }
+
         return NextResponse.json(data);
     } catch (error: any) {
         console.error('Duitku Callback Error:', error);

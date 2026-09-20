@@ -6081,5 +6081,14 @@
   "affiliate_status_completed": "Selesai Ditransfer",
   "affiliate_status_processing": "Sedang Diproses",
   "affiliate_status_rejected": "Ditolak",
-  "affiliate_cycle_label": "Bulan ke-"
+  "affiliate_cycle_label": "Bulan ke-",
+  "affiliate_tab_promokit": "Media & Promo Kit",
+  "affiliate_promokit_title": "Materi Promosi Siap Pakai",
+  "affiliate_promokit_desc": "Salin template caption, thread, dan deskripsi berikut untuk mulai mempromosikan Tranvas ke audiens Anda.",
+  "affiliate_promokit_copied": "Template Berhasil Disalin!",
+  "affiliate_promokit_template_x": "Template Thread Twitter / X",
+  "affiliate_promokit_template_ig": "Template Caption Instagram / Threads",
+  "affiliate_promokit_template_yt": "Template Deskripsi YouTube / Video",
+  "affiliate_promokit_template_blog": "Template Artikel / Review Blog",
+  "affiliate_promokit_template_badge": "Embed Badge HTML & Markdown"
 }

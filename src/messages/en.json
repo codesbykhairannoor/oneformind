@@ -6093,5 +6093,14 @@
   "affiliate_status_completed": "Completed (Paid)",
   "affiliate_status_processing": "Processing",
   "affiliate_status_rejected": "Rejected",
-  "affiliate_cycle_label": "Month #"
+  "affiliate_cycle_label": "Month #",
+  "affiliate_tab_promokit": "Media & Promo Kit",
+  "affiliate_promokit_title": "Ready-to-Use Promo Kit",
+  "affiliate_promokit_desc": "Copy these ready-to-use captions, threads, and descriptions to promote Tranvas to your audience.",
+  "affiliate_promokit_copied": "Template Copied!",
+  "affiliate_promokit_template_x": "Twitter / X Post Template",
+  "affiliate_promokit_template_ig": "Instagram / Threads Caption",
+  "affiliate_promokit_template_yt": "YouTube / Video Description",
+  "affiliate_promokit_template_blog": "Blog / Review Article Snippet",
+  "affiliate_promokit_template_badge": "HTML & Markdown Embed Badge"
 }

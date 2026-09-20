@@ -19,7 +19,8 @@ import {
     ExternalLink,
     AlertCircle,
     CheckCircle2,
-    Lock
+    Lock,
+    Share2
 } from 'lucide-react';
 import { AffiliateDashboardStats } from '@/lib/affiliate/affiliate-service';
 
@@ -30,7 +31,8 @@ export default function AffiliatePortalDashboard() {
 
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<AffiliateDashboardStats | null>(null);
-    const [activeTab, setActiveTab] = useState<'overview' | 'referrals' | 'commissions' | 'payouts' | 'settings'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'referrals' | 'commissions' | 'payouts' | 'promokit' | 'settings'>('overview');
+    const [copiedKey, setCopiedKey] = useState<string | null>(null);
     
     const [copied, setCopied] = useState(false);
     const [showPayoutModal, setShowPayoutModal] = useState(false);
@@ -423,6 +425,18 @@ export default function AffiliatePortalDashboard() {
                 </button>
 
                 <button
+                    onClick={() => setActiveTab('promokit')}
+                    className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                        activeTab === 'promokit'
+                            ? 'bg-indigo-600 text-white shadow-md'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>{t('affiliate_tab_promokit') || 'Media & Promo Kit'}</span>
+                </button>
+
+                <button
                     onClick={() => setActiveTab('settings')}
                     className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                         activeTab === 'settings'
@@ -656,6 +670,139 @@ export default function AffiliatePortalDashboard() {
                             </table>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* TAB: MEDIA & PROMO KIT */}
+            {activeTab === 'promokit' && (
+                <div className="space-y-6">
+                    <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-2">
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <Share2 className="w-5 h-5 text-indigo-600" />
+                            <span>{t('affiliate_promokit_title') || 'Materi Promosi Siap Pakai'}</span>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {t('affiliate_promokit_desc') || 'Salin template caption, thread, dan deskripsi berikut untuk mulai mempromosikan Tranvas ke audiens Anda.'}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* 1. Twitter / X Post Template */}
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-black text-slate-800 dark:text-white flex items-center gap-1.5">
+                                        🐦 {t('affiliate_promokit_template_x') || 'Template Twitter / X'}
+                                    </span>
+                                </div>
+                                <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed border border-slate-100 dark:border-slate-700/60">
+                                    {isId
+                                        ? `Saya baru saja beralih ke Tranvas (Neural Life OS) untuk mengelola Habit, Keuangan, dan Daily Planning dalam 1 workspace terpadu. ⚡\n\nCoba gratis 14 hari di sini:\n${affiliateLink}`
+                                        : `I just upgraded my entire productivity stack with Tranvas (Unified Life OS) combining Habits, Finance & Daily Planner in one place. ⚡\n\nClaim your 14-day free trial here:\n${affiliateLink}`}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const txt = isId
+                                        ? `Saya baru saja beralih ke Tranvas (Neural Life OS) untuk mengelola Habit, Keuangan, dan Daily Planning dalam 1 workspace terpadu. ⚡\n\nCoba gratis 14 hari di sini:\n${affiliateLink}`
+                                        : `I just upgraded my entire productivity stack with Tranvas (Unified Life OS) combining Habits, Finance & Daily Planner in one place. ⚡\n\nClaim your 14-day free trial here:\n${affiliateLink}`;
+                                    navigator?.clipboard?.writeText(txt);
+                                    setCopiedKey('x');
+                                    setTimeout(() => setCopiedKey(null), 2500);
+                                }}
+                                className="w-full py-2.5 px-4 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
+                            >
+                                {copiedKey === 'x' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                                <span>{copiedKey === 'x' ? (t('affiliate_promokit_copied') || 'Tersalin!') : (t('affiliate_copy_link') || 'Salin Teks')}</span>
+                            </button>
+                        </div>
+
+                        {/* 2. Instagram / Threads / WhatsApp Caption */}
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-black text-slate-800 dark:text-white flex items-center gap-1.5">
+                                        📸 {t('affiliate_promokit_template_ig') || 'Template Instagram / Threads'}
+                                    </span>
+                                </div>
+                                <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed border border-slate-100 dark:border-slate-700/60">
+                                    {isId
+                                        ? `Stop buang waktu pakai 5 aplikasi terpisah buat atur hidup! 🚀\n\nTranvas Life OS menggabungkan:\n✅ Daily Planner & Timeblocking\n✅ Atomic Habit Tracker\n✅ Finance Management\n\nDaftar Free Trial 14 Hari di sini:\n${affiliateLink}`
+                                        : `Stop wasting time switching between 5 separate apps to manage your life! 🚀\n\nTranvas Life OS combines:\n✅ Daily Planner & Timeblocking\n✅ Atomic Habit Tracker\n✅ Finance Tracker\n\nClaim your 14-Day Free Trial:\n${affiliateLink}`}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const txt = isId
+                                        ? `Stop buang waktu pakai 5 aplikasi terpisah buat atur hidup! 🚀\n\nTranvas Life OS menggabungkan:\n✅ Daily Planner & Timeblocking\n✅ Atomic Habit Tracker\n✅ Finance Management\n\nDaftar Free Trial 14 Hari di sini:\n${affiliateLink}`
+                                        : `Stop wasting time switching between 5 separate apps to manage your life! 🚀\n\nTranvas Life OS combines:\n✅ Daily Planner & Timeblocking\n✅ Atomic Habit Tracker\n✅ Finance Tracker\n\nClaim your 14-Day Free Trial:\n${affiliateLink}`;
+                                    navigator?.clipboard?.writeText(txt);
+                                    setCopiedKey('ig');
+                                    setTimeout(() => setCopiedKey(null), 2500);
+                                }}
+                                className="w-full py-2.5 px-4 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
+                            >
+                                {copiedKey === 'ig' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                                <span>{copiedKey === 'ig' ? (t('affiliate_promokit_copied') || 'Tersalin!') : (t('affiliate_copy_link') || 'Salin Teks')}</span>
+                            </button>
+                        </div>
+
+                        {/* 3. YouTube Video Description */}
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-black text-slate-800 dark:text-white flex items-center gap-1.5">
+                                        🎥 {t('affiliate_promokit_template_yt') || 'Template YouTube Description'}
+                                    </span>
+                                </div>
+                                <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed border border-slate-100 dark:border-slate-700/60">
+                                    {isId
+                                        ? `📌 Link Aplikasi Tranvas Life OS (Free 14-Day Pro Access):\n${affiliateLink}\n\nTranvas adalah Life OS terbaik untuk mengatur produktivitas, kebiasaan positif, dan finansial Anda.`
+                                        : `📌 Get Tranvas Life OS (14-Day Free Pro Access):\n${affiliateLink}\n\nTranvas is the unified Life Operating System designed to master productivity, habit building, and finance.`}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const txt = isId
+                                        ? `📌 Link Aplikasi Tranvas Life OS (Free 14-Day Pro Access):\n${affiliateLink}\n\nTranvas adalah Life OS terbaik untuk mengatur produktivitas, kebiasaan positif, dan finansial Anda.`
+                                        : `📌 Get Tranvas Life OS (14-Day Free Pro Access):\n${affiliateLink}\n\nTranvas is the unified Life Operating System designed to master productivity, habit building, and finance.`;
+                                    navigator?.clipboard?.writeText(txt);
+                                    setCopiedKey('yt');
+                                    setTimeout(() => setCopiedKey(null), 2500);
+                                }}
+                                className="w-full py-2.5 px-4 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
+                            >
+                                {copiedKey === 'yt' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                                <span>{copiedKey === 'yt' ? (t('affiliate_promokit_copied') || 'Tersalin!') : (t('affiliate_copy_link') || 'Salin Teks')}</span>
+                            </button>
+                        </div>
+
+                        {/* 4. Embed Badge */}
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-black text-slate-800 dark:text-white flex items-center gap-1.5">
+                                        🏷️ {t('affiliate_promokit_template_badge') || 'Embed Badge HTML / Markdown'}
+                                    </span>
+                                </div>
+                                <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed border border-slate-100 dark:border-slate-700/60">
+                                    {`[![Tranvas Partner](${typeof window !== 'undefined' ? window.location.origin : 'https://tranvas.com'}/favicon.svg)](${affiliateLink})`}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const txt = `[![Tranvas Partner](${typeof window !== 'undefined' ? window.location.origin : 'https://tranvas.com'}/favicon.svg)](${affiliateLink})`;
+                                    navigator?.clipboard?.writeText(txt);
+                                    setCopiedKey('badge');
+                                    setTimeout(() => setCopiedKey(null), 2500);
+                                }}
+                                className="w-full py-2.5 px-4 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
+                            >
+                                {copiedKey === 'badge' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                                <span>{copiedKey === 'badge' ? (t('affiliate_promokit_copied') || 'Tersalin!') : (t('affiliate_copy_link') || 'Salin Kode Badge')}</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

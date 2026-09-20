@@ -274,6 +274,37 @@ export async function recordAffiliateClick(
 }
 
 /**
+ * Automatically approve commissions that have passed their 14-day Net-14 Escrow holding date
+ */
+export async function autoReleaseMaturedCommissions(supabase: SupabaseClient, userId?: string) {
+    try {
+        const now = new Date().toISOString();
+        let query = supabase
+            .from('affiliate_commissions')
+            .update({
+                status: 'approved',
+                approved_at: now,
+            })
+            .eq('status', 'pending')
+            .lte('holding_until', now);
+
+        if (userId) {
+            query = query.eq('affiliate_user_id', userId);
+        }
+
+        const { data, error } = await query.select('id, commission_amount');
+        if (error) {
+            console.warn('Auto-release escrow error:', error);
+            return { releasedCount: 0 };
+        }
+
+        return { releasedCount: data?.length || 0, data };
+    } catch (e) {
+        return { releasedCount: 0 };
+    }
+}
+
+/**
  * Fetch all partner portal dashboard data and calculated financial metrics
  */
 export async function getAffiliateDashboardData(
@@ -282,6 +313,9 @@ export async function getAffiliateDashboardData(
     userMeta?: { name?: string; email?: string }
 ): Promise<AffiliateDashboardStats | null> {
     try {
+        // 0. Auto-release any matured escrow commissions for this user
+        await autoReleaseMaturedCommissions(supabase, userId);
+
         // 1. Get or create profile
         const profile = await getOrCreateAffiliateProfile(supabase, userId, userMeta);
         if (!profile) return null;
