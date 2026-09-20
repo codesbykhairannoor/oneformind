@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test:seo": "npx tsx scripts/test-seo-audit.mjs",
     "test:security": "npx tsx scripts/security-qa-test.mjs",
-    "test:affiliate": "node scripts/affiliate-qa-test.mjs"
+    "test:affiliate": "node scripts/affiliate-qa-test.mjs",
+    "test:integration": "node scripts/live-integration-qa.mjs"
   },
   "dependencies": {
     "@paypal/paypal-js": "^10.1.0",
