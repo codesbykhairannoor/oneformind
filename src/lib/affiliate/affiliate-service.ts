@@ -450,7 +450,7 @@ export async function getAffiliateDashboardData(
 }
 
 /**
- * Update payout details or custom referral handle
+ * Update payout details (Referral codes are permanent and locked once generated)
  */
 export async function updateAffiliateSettings(
     supabase: SupabaseClient,
@@ -471,26 +471,7 @@ export async function updateAffiliateSettings(
         if (params.payout_account_number !== undefined) updatePayload.payout_account_number = params.payout_account_number;
         if (params.payout_account_name !== undefined) updatePayload.payout_account_name = params.payout_account_name;
 
-        // If user wants to customize their ref code
-        if (params.custom_ref_code) {
-            const cleanCode = params.custom_ref_code.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
-            if (cleanCode.length < 3 || cleanCode.length > 25) {
-                return { success: false, message: 'Custom code must be between 3 and 25 alphanumeric characters.' };
-            }
-
-            // Check uniqueness
-            const { data: existing } = await supabase
-                .from('affiliate_profiles')
-                .select('id, user_id')
-                .eq('ref_code', cleanCode)
-                .maybeSingle();
-
-            if (existing && existing.user_id !== userId) {
-                return { success: false, message: 'This referral code is already taken. Please pick another.' };
-            }
-
-            updatePayload.ref_code = cleanCode;
-        }
+        // Note: Referral codes are permanent and cannot be modified once created to protect commission tracking integrity.
 
         const { error } = await supabase
             .from('affiliate_profiles')
@@ -501,8 +482,7 @@ export async function updateAffiliateSettings(
 
         return {
             success: true,
-            message: 'Affiliate settings successfully updated',
-            ref_code: updatePayload.ref_code,
+            message: 'Payout settings successfully saved',
         };
     } catch (err: any) {
         return { success: false, message: err?.message || 'Failed to update settings' };

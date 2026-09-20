@@ -38,12 +38,20 @@ export async function GET(req: NextRequest) {
             .order('created_at', { ascending: false })
             .limit(100);
 
-        if (commErr) throw commErr;
+        // 4. Fetch recent referrals across the platform
+        const { data: referrals, error: refErr } = await supabase
+            .from('affiliate_referrals')
+            .select('*')
+            .order('registered_at', { ascending: false })
+            .limit(200);
 
-        // 4. Calculate executive KPIs
+        if (refErr) throw refErr;
+
+        // 5. Calculate executive KPIs
         const partnerList = profiles || [];
         const payoutList = payouts || [];
         const commissionList = commissions || [];
+        const referralList = referrals || [];
 
         let totalClicks = 0;
         let totalSignups = 0;
@@ -89,6 +97,7 @@ export async function GET(req: NextRequest) {
                     escrowAmount,
                 },
                 partners: partnerList,
+                referrals: referralList,
                 pendingPayouts: payoutList.filter(p => p.status === 'pending' || p.status === 'processing'),
                 allPayouts: payoutList,
                 recentCommissions: commissionList,

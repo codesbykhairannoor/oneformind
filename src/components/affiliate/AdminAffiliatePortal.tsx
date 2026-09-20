@@ -16,7 +16,11 @@ import {
     CheckCircle2,
     ArrowUpRight,
     TrendingUp,
-    ExternalLink
+    ExternalLink,
+    MousePointerClick,
+    CheckCircle,
+    UserCheck,
+    Lock
 } from 'lucide-react';
 
 interface AdminMetrics {
@@ -33,6 +37,7 @@ interface AdminMetrics {
 interface AdminData {
     metrics: AdminMetrics;
     partners: any[];
+    referrals: any[];
     pendingPayouts: any[];
     allPayouts: any[];
     recentCommissions: any[];
@@ -44,7 +49,7 @@ export default function AdminAffiliatePortal() {
 
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<AdminData | null>(null);
-    const [activeTab, setActiveTab] = useState<'payouts' | 'partners' | 'commissions'>('payouts');
+    const [activeTab, setActiveTab] = useState<'payouts' | 'partners' | 'referrals' | 'commissions'>('payouts');
     const [searchQuery, setSearchQuery] = useState('');
 
     // Processing payout modal
@@ -154,6 +159,16 @@ export default function AdminAffiliatePortal() {
         );
     });
 
+    const filteredReferrals = (data.referrals || []).filter(r => {
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return (
+            r.ref_code_used?.toLowerCase().includes(q) ||
+            r.referred_user_id?.toLowerCase().includes(q) ||
+            r.affiliate_user_id?.toLowerCase().includes(q)
+        );
+    });
+
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
             {/* 1. EXECUTIVE HEADER BANNER */}
@@ -178,8 +193,8 @@ export default function AdminAffiliatePortal() {
                 </h2>
                 <p className="text-xs text-slate-400 max-w-2xl">
                     {isId 
-                        ? 'Pantau total performa mitra afiliasi, validasi dan setujui penarikan saldo, serta tinjau buku besar komisi multi-gateway (Duitku, Lemon Squeezy, PayPal).' 
-                        : 'Monitor all affiliate partners, approve withdrawal requests, and audit multi-gateway commission settlements.'}
+                        ? 'Pantau total klik & leads seluruh mitra, kelola pendaftar (referral network), proses pencairan saldo, dan audit komisi multi-gateway (Duitku, Lemon Squeezy, PayPal).' 
+                        : 'Monitor clicks & leads across all partners, manage referral signups, approve payout requests, and audit multi-gateway commission settlements.'}
                 </p>
             </div>
 
@@ -209,16 +224,16 @@ export default function AdminAffiliatePortal() {
                     </p>
                 </div>
 
-                {/* Total Mitra Terdaftar */}
+                {/* Total Mitra & Total Klik */}
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                        {isId ? 'Total Mitra Partner' : 'Total Affiliates'}
+                        {isId ? 'Total Mitra & Klik' : 'Partners & Clicks'}
                     </span>
                     <div className="text-xl md:text-2xl font-black text-indigo-600 dark:text-indigo-400">
-                        {data.metrics.totalPartners} <span className="text-xs font-normal text-slate-400">({data.metrics.totalSignups} {isId ? 'leads' : 'leads'})</span>
+                        {data.metrics.totalPartners} <span className="text-xs font-normal text-slate-400">mitra ({data.metrics.totalClicks} klik)</span>
                     </div>
                     <p className="text-[10px] text-slate-400">
-                        {data.metrics.totalClicks.toLocaleString()} {isId ? 'total klik tercatat' : 'total clicks recorded'}
+                        {data.metrics.totalSignups} {isId ? 'total leads mendaftar' : 'total signups recorded'}
                     </p>
                 </div>
 
@@ -249,11 +264,11 @@ export default function AdminAffiliatePortal() {
                 </div>
             </div>
 
-            {/* 3. NAVIGATION TABS */}
-            <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+            {/* 3. NAVIGATION TABS (4 TABS LENGKAP) */}
+            <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
                 <button
                     onClick={() => setActiveTab('payouts')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                         activeTab === 'payouts'
                             ? 'bg-indigo-600 text-white shadow-sm'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -265,7 +280,7 @@ export default function AdminAffiliatePortal() {
 
                 <button
                     onClick={() => setActiveTab('partners')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                         activeTab === 'partners'
                             ? 'bg-indigo-600 text-white shadow-sm'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -276,8 +291,20 @@ export default function AdminAffiliatePortal() {
                 </button>
 
                 <button
+                    onClick={() => setActiveTab('referrals')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                        activeTab === 'referrals'
+                            ? 'bg-indigo-600 text-white shadow-sm'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span>{isId ? 'Log Pendaftar & Leads' : 'Referral Leads'} ({(data.referrals || []).length})</span>
+                </button>
+
+                <button
                     onClick={() => setActiveTab('commissions')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                         activeTab === 'commissions'
                             ? 'bg-indigo-600 text-white shadow-sm'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -341,7 +368,7 @@ export default function AdminAffiliatePortal() {
                                                         setSelectedPayout(payout);
                                                         setActionType('complete');
                                                     }}
-                                                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer"
+                                                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer shadow-sm"
                                                 >
                                                     <Check className="w-3 h-3" />
                                                     <span>{isId ? 'Setujui & Tandai Cair' : 'Mark as Paid'}</span>
@@ -376,7 +403,7 @@ export default function AdminAffiliatePortal() {
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder={isId ? 'Cari berdasarkan kode referral, nama, atau ID mitra...' : 'Search by referral code or partner name...'}
+                            placeholder={isId ? 'Cari berdasarkan kode referral permanen, nama, atau ID mitra...' : 'Search by permanent referral code or partner name...'}
                             className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-indigo-500"
                         />
                     </div>
@@ -385,7 +412,7 @@ export default function AdminAffiliatePortal() {
                         <table className="w-full text-left text-xs">
                             <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-500 font-bold uppercase text-[10px]">
                                 <tr>
-                                    <th className="p-3">Kode Referral</th>
+                                    <th className="p-3">Kode Permanen</th>
                                     <th className="p-3">Tarif Komisi</th>
                                     <th className="p-3">Klik Link</th>
                                     <th className="p-3">Leads Terdaftar</th>
@@ -398,8 +425,9 @@ export default function AdminAffiliatePortal() {
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {filteredPartners.map((p) => (
                                     <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                                        <td className="p-3 font-mono font-black text-indigo-600 dark:text-indigo-400">
-                                            {p.ref_code}
+                                        <td className="p-3 font-mono font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                            <Lock className="w-3 h-3 text-emerald-500" />
+                                            <span>{p.ref_code}</span>
                                         </td>
                                         <td className="p-3 font-bold text-emerald-600">
                                             {Math.round(p.commission_rate * 100)}%
@@ -430,7 +458,86 @@ export default function AdminAffiliatePortal() {
                 </div>
             )}
 
-            {/* 6. TAB CONTENT: COMMISSION STREAM */}
+            {/* 6. TAB CONTENT: LOG PENDAFTAR & LEADS GLOBAL */}
+            {activeTab === 'referrals' && (
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm space-y-4 p-4">
+                    <div className="relative">
+                        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={isId ? 'Cari pendaftar berdasarkan kode referral atau ID user...' : 'Search referral signups by ref code or user ID...'}
+                            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-indigo-500"
+                        />
+                    </div>
+
+                    {filteredReferrals.length === 0 ? (
+                        <div className="p-12 text-center text-slate-400 space-y-2">
+                            <Users className="w-10 h-10 mx-auto opacity-50" />
+                            <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                                {isId ? 'Belum Ada Pendaftar Melalui Jalur Referral' : 'No Referral Leads Registered'}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs">
+                                <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-500 font-bold uppercase text-[10px]">
+                                    <tr>
+                                        <th className="p-3">Waktu Pendaftaran</th>
+                                        <th className="p-3">Kode Referral Digunakan</th>
+                                        <th className="p-3">ID Pengguna Mendaftar</th>
+                                        <th className="p-3">ID Mitra Pengundang</th>
+                                        <th className="p-3">Status Langganan</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                    {filteredReferrals.map((r) => (
+                                        <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                            <td className="p-3 font-mono text-[11px] text-slate-500">
+                                                {new Date(r.registered_at).toLocaleString(isId ? 'id-ID' : 'en-US', {
+                                                    dateStyle: 'medium',
+                                                    timeStyle: 'short',
+                                                })}
+                                            </td>
+                                            <td className="p-3 font-mono font-black text-indigo-600 dark:text-indigo-400">
+                                                {r.ref_code_used}
+                                            </td>
+                                            <td className="p-3 font-mono select-all text-slate-700 dark:text-slate-300">
+                                                {r.referred_user_id}
+                                            </td>
+                                            <td className="p-3 font-mono text-[11px] text-slate-400 select-all">
+                                                {r.affiliate_user_id}
+                                            </td>
+                                            <td className="p-3">
+                                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                                                    r.status === 'converted'
+                                                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                                        : 'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
+                                                }`}>
+                                                    {r.status === 'converted' ? (
+                                                        <>
+                                                            <CheckCircle className="w-3 h-3" />
+                                                            <span>{isId ? 'Berlangganan (60% Komisi Aktif)' : 'Paid Subscriber'}</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Clock className="w-3 h-3" />
+                                                            <span>{isId ? 'Masa Trial 14 Hari' : '14-Day Free Trial'}</span>
+                                                        </>
+                                                    )}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* 7. TAB CONTENT: COMMISSION STREAM */}
             {activeTab === 'commissions' && (
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
@@ -450,22 +557,24 @@ export default function AdminAffiliatePortal() {
                                 {data.recentCommissions.map((c) => (
                                     <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                                         <td className="p-3 font-mono text-[11px] text-slate-500">
-                                            {new Date(c.created_at).toLocaleString()}
+                                            {new Date(c.created_at).toLocaleString(isId ? 'id-ID' : 'en-US')}
                                         </td>
-                                        <td className="p-3 font-bold uppercase text-indigo-500">
+                                        <td className="p-3 font-mono uppercase font-bold text-indigo-600">
                                             {c.gateway}
                                         </td>
                                         <td className="p-3 font-bold capitalize">{c.plan_name}</td>
                                         <td className="p-3 font-mono">{formatCurrency(c.transaction_amount, c.currency)}</td>
-                                        <td className="p-3 font-mono font-bold text-emerald-600">
+                                        <td className="p-3 font-mono font-black text-emerald-600 dark:text-emerald-400">
                                             {formatCurrency(c.commission_amount, c.currency)}
                                         </td>
-                                        <td className="p-3 font-mono">{c.billing_cycle}/8</td>
+                                        <td className="p-3 font-mono text-[11px]">{c.billing_cycle}/8</td>
                                         <td className="p-3">
                                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                                c.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                                                c.status === 'approved' || c.status === 'paid'
+                                                    ? 'bg-emerald-50 text-emerald-600'
+                                                    : 'bg-amber-50 text-amber-600'
                                             }`}>
-                                                {c.status === 'approved' ? 'Approved' : 'Escrow (14 Hari)'}
+                                                {c.status === 'pending' ? 'Net-14 Escrow' : c.status}
                                             </span>
                                         </td>
                                     </tr>
@@ -476,81 +585,105 @@ export default function AdminAffiliatePortal() {
                 </div>
             )}
 
-            {/* 7. MODAL APPROVE / REJECT PAYOUT */}
-            {selectedPayout && (
+            {/* MODAL APPROVE / REJECT PAYOUT */}
+            {selectedPayout && actionType && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
                         <div className="flex justify-between items-center">
                             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                                {actionType === 'complete' ? (isId ? 'Konfirmasi Transfer Selesai' : 'Confirm Payout Completed') : (isId ? 'Tolak Pengajuan Penarikan' : 'Reject Payout Request')}
+                                {actionType === 'complete' 
+                                    ? (isId ? 'Persetujuan Transfer Payout' : 'Approve Payout') 
+                                    : (isId ? 'Tolak Pengajuan Payout' : 'Reject Payout')}
                             </h3>
                             <button
-                                onClick={() => setSelectedPayout(null)}
-                                className="text-slate-400 hover:text-white text-sm cursor-pointer"
+                                onClick={() => {
+                                    setSelectedPayout(null);
+                                    setActionType(null);
+                                }}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm"
                             >
                                 ✕
                             </button>
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs space-y-1">
-                            <p><strong>Nominal:</strong> <span className="font-mono text-emerald-600 font-bold">{formatCurrency(selectedPayout.amount, selectedPayout.currency)}</span></p>
-                            <p><strong>Bank/PayPal:</strong> {selectedPayout.bank_name}</p>
-                            <p><strong>No. Rekening:</strong> <span className="font-mono font-bold">{selectedPayout.account_number}</span></p>
-                            <p><strong>Pemilik:</strong> {selectedPayout.account_name}</p>
+                        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 space-y-1.5 text-xs">
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">{isId ? 'Nominal:' : 'Amount:'}</span>
+                                <span className="font-mono font-black text-emerald-600 text-sm">
+                                    {formatCurrency(selectedPayout.amount, selectedPayout.currency)}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">{isId ? 'Bank/Tujuan:' : 'Destination:'}</span>
+                                <span className="font-bold">{selectedPayout.bank_name} - {selectedPayout.account_number}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">{isId ? 'Atas Nama:' : 'Beneficiary:'}</span>
+                                <span className="font-bold">{selectedPayout.account_name}</span>
+                            </div>
                         </div>
 
                         {actionError && (
-                            <div className="p-2.5 bg-red-50 text-red-600 rounded-lg text-xs">
+                            <div className="p-3 rounded-xl bg-red-50 text-red-600 text-xs">
                                 {actionError}
                             </div>
                         )}
 
                         <div className="space-y-3">
-                            <div>
-                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 block mb-1">
-                                    {isId ? 'Catatan Admin (Opsional)' : 'Admin Notes'}
-                                </label>
-                                <input
-                                    type="text"
-                                    value={adminNotes}
-                                    onChange={(e) => setAdminNotes(e.target.value)}
-                                    placeholder={actionType === 'complete' ? 'Contoh: Transfer via BCA ref #81923' : 'Alasan penolakan...'}
-                                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-indigo-500"
-                                />
-                            </div>
-
-                            {actionType === 'complete' && (
+                            {actionType === 'complete' ? (
                                 <div>
                                     <label className="text-xs font-bold text-slate-600 dark:text-slate-300 block mb-1">
-                                        {isId ? 'Link / URL Bukti Transfer (Opsional)' : 'Transfer Proof URL'}
+                                        {isId ? 'Nomor Referensi Bank / URL Bukti Transfer (Opsional)' : 'Transfer Proof URL / Bank Reference (Optional)'}
                                     </label>
                                     <input
                                         type="text"
                                         value={proofUrl}
                                         onChange={(e) => setProofUrl(e.target.value)}
-                                        placeholder="https://..."
+                                        placeholder="cth: TRF-BCA-987654 atau URL bukti"
                                         className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-indigo-500"
                                     />
                                 </div>
-                            )}
+                            ) : null}
+
+                            <div>
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 block mb-1">
+                                    {isId ? 'Catatan Admin (Akan Dilihat Mitra)' : 'Admin Notes (Visible to Partner)'}
+                                </label>
+                                <textarea
+                                    value={adminNotes}
+                                    onChange={(e) => setAdminNotes(e.target.value)}
+                                    placeholder={actionType === 'complete' ? (isId ? 'Transfer berhasil diproses ke rekening BCA Anda.' : 'Payout successfully transferred.') : (isId ? 'Rekening tidak valid atau ada kendala kepatuhan.' : 'Invalid account number or policy violation.')}
+                                    rows={2}
+                                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-indigo-500"
+                                />
+                            </div>
 
                             <div className="flex gap-2 pt-2">
                                 <button
                                     type="button"
-                                    onClick={() => setSelectedPayout(null)}
-                                    className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition cursor-pointer"
+                                    onClick={() => {
+                                        setSelectedPayout(null);
+                                        setActionType(null);
+                                    }}
+                                    className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs cursor-pointer"
                                 >
                                     {isId ? 'Batal' : 'Cancel'}
                                 </button>
                                 <button
                                     type="button"
-                                    disabled={actionSubmitting}
                                     onClick={handleUpdatePayout}
-                                    className={`flex-1 py-2 text-white rounded-xl text-xs font-bold transition cursor-pointer ${
-                                        actionType === 'complete' ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-red-600 hover:bg-red-500'
+                                    disabled={actionSubmitting}
+                                    className={`w-1/2 py-2.5 text-white font-bold rounded-xl text-xs cursor-pointer shadow-sm ${
+                                        actionType === 'complete'
+                                            ? 'bg-emerald-600 hover:bg-emerald-500'
+                                            : 'bg-red-600 hover:bg-red-500'
                                     }`}
                                 >
-                                    {actionSubmitting ? '...' : (actionType === 'complete' ? (isId ? 'Tandai Selesai' : 'Confirm Paid') : (isId ? 'Konfirmasi Tolak' : 'Confirm Reject'))}
+                                    {actionSubmitting 
+                                        ? '...' 
+                                        : actionType === 'complete' 
+                                        ? (isId ? 'Konfirmasi Transfer' : 'Confirm Payout') 
+                                        : (isId ? 'Tolak Penarikan' : 'Reject Payout')}
                                 </button>
                             </div>
                         </div>
