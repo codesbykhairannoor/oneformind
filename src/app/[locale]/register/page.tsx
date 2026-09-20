@@ -78,12 +78,18 @@ export default function Register() {
             return;
         }
 
-        // Extract referral code from cookies or storage
-        let refCode = '';
-        try {
-            const cookieMatch = document.cookie.match(/tranvas_ref_code=([^;]+)/);
-            refCode = cookieMatch ? decodeURIComponent(cookieMatch[1]) : (localStorage.getItem('tranvas_ref_code') || sessionStorage.getItem('tranvas_ref_code') || '');
-        } catch (e) {}
+        // Extract referral code from state, search params, cookies, or storage
+        let refCode = capturedRefCode || '';
+        if (!refCode && searchParams) {
+            const urlRef = searchParams.get('ref') || searchParams.get('via') || searchParams.get('fpr') || searchParams.get('aff');
+            if (urlRef) refCode = urlRef.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+        }
+        if (!refCode) {
+            try {
+                const cookieMatch = document.cookie.match(/tranvas_ref_code=([^;]+)/);
+                refCode = cookieMatch ? decodeURIComponent(cookieMatch[1]) : (localStorage.getItem('tranvas_ref_code') || sessionStorage.getItem('tranvas_ref_code') || '');
+            } catch (e) {}
+        }
 
         const signUpData: Record<string, any> = { full_name: name };
         if (refCode) {

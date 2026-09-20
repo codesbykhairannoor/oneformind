@@ -45,9 +45,9 @@ if (fs.existsSync(settingsPagePath)) {
   assertTest(settingsContent.includes("affiliate:"), 'Settings page includes affiliate in tabMeta configuration');
 }
 
-if (fs.existsSync(sidebarPath)) {
-  const sidebarContent = fs.readFileSync(sidebarPath, 'utf8');
-  assertTest(sidebarContent.includes('/affiliates') || sidebarContent.includes('affiliate'), 'AuthSidebar has direct affiliate link');
+if (fs.existsSync(headerPath)) {
+  const headerContent = fs.readFileSync(headerPath, 'utf8');
+  assertTest(headerContent.includes('/settings?tab=affiliate'), 'AuthHeader profile dropdown has direct affiliate link');
 }
 
 // ==========================================

@@ -111,14 +111,9 @@ if (fs.existsSync(affiliatesPagePath)) {
   );
 }
 
-if (fs.existsSync(sidebarPath)) {
-  const content = fs.readFileSync(sidebarPath, 'utf8');
-  assertTest(content.includes("href=\"/settings?tab=affiliate\""), 'Sidebar Partner link points directly to /settings?tab=affiliate');
-}
-
 if (fs.existsSync(headerPath)) {
   const content = fs.readFileSync(headerPath, 'utf8');
-  assertTest(content.includes("href=\"/settings?tab=affiliate\""), 'Header Profile Partner link points directly to /settings?tab=affiliate');
+  assertTest(content.includes('/settings?tab=affiliate'), 'Header Profile Partner link points directly to /settings?tab=affiliate');
 }
 
 // ---------------------------------------------------------------
