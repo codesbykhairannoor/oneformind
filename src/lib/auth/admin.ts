@@ -18,7 +18,8 @@ export function isAdminUser(userOrEmail?: any): boolean {
     const cleanEmail = email.trim().toLowerCase();
 
     // Check environment variable configuration
-    const envAdmins = (process.env.ADMIN_EMAILS || '')
+    const rawEnv = process.env.NEXT_PUBLIC_ADMIN_EMAILS || process.env.ADMIN_EMAILS || '';
+    const envAdmins = rawEnv
         .split(',')
         .map(e => e.trim().toLowerCase())
         .filter(Boolean);

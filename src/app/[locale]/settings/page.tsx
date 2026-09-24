@@ -18,20 +18,29 @@ import SettingsBillingTab from './components/SettingsBillingTab';
 import SettingsAffiliateTab from './components/SettingsAffiliateTab';
 import SettingsPrivacyTab from './components/SettingsPrivacyTab';
 import SettingsHelpTab from './components/SettingsHelpTab';
+import { isAdminUser } from '@/lib/auth/admin';
+import AdminAffiliatePortal from '@/components/affiliate/AdminAffiliatePortal';
 
 export default function SettingsPage() {
     const t = useTranslations();
     const locale = useLocale();
     const [activeTab, setActiveTab] = useState<string>('general');
+    const { data: session, status } = useSession();
+    // User subscription details from DB
+    const [userData, setUserData] = useState<any>(null);
+    const isAdmin = isAdminUser(session?.user || userData);
 
     const searchParams = useSearchParams();
 
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ['general', 'security', 'modules', 'notifications', 'billing', 'affiliate', 'privacy', 'help'].includes(tab)) {
+        const view = searchParams.get('view');
+        if ((tab === 'admin' || view === 'admin') && isAdmin) {
+            setActiveTab('admin');
+        } else if (tab && ['admin', 'general', 'security', 'modules', 'notifications', 'billing', 'affiliate', 'privacy', 'help'].includes(tab)) {
             setActiveTab(tab);
         }
-    }, [searchParams]);
+    }, [searchParams, isAdmin]);
 
     const handleTabChange = (tabId: string) => {
         setActiveTab(tabId);
@@ -64,8 +73,7 @@ export default function SettingsPage() {
     });
 
     // User subscription details from DB
-    const [userData, setUserData] = useState<any>(null);
-    const { data: session, status } = useSession();
+    // (session, status and userData declared above)
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -161,6 +169,12 @@ export default function SettingsPage() {
     })();
 
     const tabs = [
+        ...(isAdmin ? [{ 
+            id: 'admin', 
+            label: locale === 'id' ? 'Konsol Admin' : 'Admin Console', 
+            icon: ShieldCheck, 
+            badge: 'ADMIN' 
+        }] : []),
         { id: 'general', label: t('settings_nav_general'), icon: User },
         { id: 'security', label: t('settings_nav_security'), icon: Lock },
         { id: 'modules', label: t('settings_nav_modules'), icon: LayoutGrid },
@@ -172,6 +186,10 @@ export default function SettingsPage() {
     ];
 
     const tabMeta: Record<string, { title: string; subtitle: string }> = {
+        admin: { 
+            title: locale === 'id' ? 'Konsol Administrasi Platform' : 'Platform Administrator Console', 
+            subtitle: locale === 'id' ? 'Pusat kendali eksekutif, persetujuan penarikan saldo, direktori mitra afiliasi, dan audit finansial.' : 'Executive control center, payout disbursement approvals, partner affiliate directory, and financial audits.' 
+        },
         general: { title: t('settings_page_general_title'), subtitle: t('settings_page_general_subtitle') },
         security: { title: t('settings_page_security_title'), subtitle: t('settings_page_security_subtitle') },
         modules: { title: t('settings_page_modules_title'), subtitle: t('settings_page_modules_subtitle') },
@@ -206,6 +224,7 @@ export default function SettingsPage() {
                                 {tabs.map((tab) => {
                                     const Icon = tab.icon;
                                     const isActive = activeTab === tab.id;
+                                    const isAdminTab = tab.id === 'admin';
                                     return (
                                         <button
                                             key={tab.id}
@@ -213,12 +232,25 @@ export default function SettingsPage() {
                                             onClick={() => handleTabChange(tab.id)}
                                             className={`shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
                                                 isActive
-                                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200/30 dark:shadow-none'
-                                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
+                                                    ? (isAdminTab 
+                                                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200/30 dark:shadow-none'
+                                                        : 'bg-indigo-600 text-white shadow-md shadow-indigo-200/30 dark:shadow-none')
+                                                    : (isAdminTab 
+                                                        ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 font-bold border border-emerald-500/30'
+                                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/60')
                                             }`}
                                         >
-                                            <Icon size={16} />
+                                            <Icon size={16} className={isAdminTab && !isActive ? 'text-emerald-600 dark:text-emerald-400' : ''} />
                                             <span>{tab.label}</span>
+                                            {(tab as any).badge && (
+                                                <span className={`text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full ${
+                                                    isActive 
+                                                        ? 'bg-white/20 text-white' 
+                                                        : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                                                }`}>
+                                                    {(tab as any).badge}
+                                                </span>
+                                            )}
                                         </button>
                                     );
                                 })}
@@ -281,6 +313,10 @@ export default function SettingsPage() {
                             isExplorer={isExplorer} 
                             premiumUntilFormatted={premiumUntilFormatted} 
                         />
+                    )}
+
+                    {activeTab === 'admin' && isAdmin && (
+                        <AdminAffiliatePortal />
                     )}
 
                     {activeTab === 'affiliate' && (

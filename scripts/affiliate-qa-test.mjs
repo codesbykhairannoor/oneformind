@@ -193,12 +193,30 @@ assertTest(validatePayoutRequest(5.0, 'USD', 50.0).valid === true, 'Accept USD p
 console.log("\n--- 6. Admin Authorization Integrity Tests ---");
 
 const adminAuthPath = path.join(ROOT_DIR, 'src/lib/auth/admin.ts');
+const adminPagePath = path.join(ROOT_DIR, 'src/app/[locale]/admin/page.tsx');
 assertTest(fs.existsSync(adminAuthPath), 'src/lib/auth/admin.ts exists');
+assertTest(fs.existsSync(adminPagePath), 'src/app/[locale]/admin/page.tsx exists');
 if (fs.existsSync(adminAuthPath)) {
   const adminContent = fs.readFileSync(adminAuthPath, 'utf8');
   assertTest(adminContent.includes('khairking6@gmail.com'), 'Admin whitelist includes khairking6@gmail.com');
   assertTest(adminContent.includes('DEFAULT_ADMIN_EMAILS'), 'DEFAULT_ADMIN_EMAILS array is defined');
   assertTest(adminContent.includes('isAdminUser'), 'isAdminUser helper function is defined');
+}
+
+if (fs.existsSync(sidebarPath)) {
+  const sidebarContent = fs.readFileSync(sidebarPath, 'utf8');
+  assertTest(sidebarContent.includes("href=\"/settings\""), 'Sidebar includes permanent Settings link');
+  assertTest(sidebarContent.includes("href=\"/admin\""), 'Sidebar includes Admin Console link for admins');
+}
+
+if (fs.existsSync(headerPath)) {
+  const headerContent = fs.readFileSync(headerPath, 'utf8');
+  assertTest(headerContent.includes("href=\"/admin\""), 'Header includes Admin Console link');
+}
+
+if (fs.existsSync(settingsPagePath)) {
+  const settingsContent = fs.readFileSync(settingsPagePath, 'utf8');
+  assertTest(settingsContent.includes("id: 'admin'"), 'Settings page includes Admin Console tab');
 }
 
 // ==========================================

@@ -15,7 +15,9 @@ import {
     ChevronDown,
     Crown,
     Flame,
-    Zap
+    Zap,
+    Settings,
+    ShieldCheck
 } from 'lucide-react';
 
 interface AuthSidebarProps {
@@ -31,6 +33,7 @@ interface AuthSidebarProps {
     toggleCore: () => void;
     togglePlatinum: () => void;
     isActive: (path: string) => boolean;
+    isAdmin?: boolean;
 }
 
 export default function AuthSidebar({
@@ -45,7 +48,8 @@ export default function AuthSidebar({
     pathname,
     toggleCore,
     togglePlatinum,
-    isActive
+    isActive,
+    isAdmin = false
 }: AuthSidebarProps) {
     return (
         <aside 
@@ -353,6 +357,61 @@ export default function AuthSidebar({
                         </div>
                     </div>
                 )}
+
+                {/* ── 5. PREFERENCES & ADMIN ── */}
+                <div className="h-2" />
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-0.5">
+                    {/* Admin Console Link (Visible only to authorized platform administrators) */}
+                    {isAdmin && (
+                        <Link 
+                            href="/admin"
+                            className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
+                                isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
+                            } ${
+                                isActive('/admin')
+                                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/30'
+                                    : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-medium'
+                            }`}
+                        >
+                            <ShieldCheck size={18} className={isActive('/admin') ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-500'} />
+                            {!isSidebarCollapsed && (
+                                <>
+                                    <span className="text-[14px] font-bold tracking-tight truncate flex-1 text-left">
+                                        {locale === 'id' ? 'Konsol Admin' : 'Admin Console'}
+                                    </span>
+                                    <span className="text-[8px] font-black text-emerald-700 dark:text-emerald-300 uppercase bg-emerald-100 dark:bg-emerald-500/20 px-1.5 py-0.5 rounded-full shrink-0 tracking-wider">
+                                        ADMIN
+                                    </span>
+                                </>
+                            )}
+                            {isActive('/admin') && !isSidebarCollapsed && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-emerald-500 rounded-r-full" />
+                            )}
+                        </Link>
+                    )}
+
+                    {/* Settings / Pengaturan Link */}
+                    <Link 
+                        href="/settings"
+                        className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
+                            isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
+                        } ${
+                            isActive('/settings')
+                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
+                                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
+                        }`}
+                    >
+                        <Settings size={18} className={isActive('/settings') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                        {!isSidebarCollapsed && (
+                            <span className="text-[14px] font-semibold tracking-tight truncate">
+                                {locale === 'id' ? 'Pengaturan' : 'Settings'}
+                            </span>
+                        )}
+                        {isActive('/settings') && !isSidebarCollapsed && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
+                        )}
+                    </Link>
+                </div>
             </nav>
         </aside>
     );

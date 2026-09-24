@@ -6,6 +6,7 @@ import { usePathname, useRouter } from '@/i18n/routing';
 import { useSupabaseSession as useSession } from "@/hooks/useSupabaseSession";
 import { createClient } from "@/utils/supabase/client";
 import { getTrialStatus, isSubscriptionActive, isExplorer as checkIsExplorer } from '@/lib/auth/subscription';
+import { isAdminUser } from '@/lib/auth/admin';
 
 import AuthHeader from './layout/AuthHeader';
 import AuthSidebar from './layout/AuthSidebar';
@@ -49,6 +50,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
     const trial = getTrialStatus(session?.user || user);
     const isExplorer = checkIsExplorer(session?.user || user);
     const isUnlimited = isSubscriptionActive(session?.user || user) || trial.isActive;
+    const isAdmin = isAdminUser(session?.user || user);
 
     // Layout States
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -234,6 +236,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                 setShowProfileDropdown={setShowProfileDropdown}
                 switchLang={switchLang}
                 onOpenLogoutModal={() => setShowLogoutModal(true)}
+                isAdmin={isAdmin}
             />
 
             {/* BODY WITH SIDEBAR & MAIN CONTENT */}
@@ -261,6 +264,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                     toggleCore={toggleCore}
                     togglePlatinum={togglePlatinum}
                     isActive={isActive}
+                    isAdmin={isAdmin}
                 />
 
                 {/* MAIN CONTENT AREA */}

@@ -15,7 +15,8 @@ import {
     User,
     Settings as SettingsIcon,
     LogOut,
-    Sparkles
+    Sparkles,
+    ShieldCheck
 } from 'lucide-react';
 
 interface AuthHeaderProps {
@@ -40,6 +41,7 @@ interface AuthHeaderProps {
     setShowProfileDropdown: (show: boolean) => void;
     switchLang: (locale: string) => void;
     onOpenLogoutModal: () => void;
+    isAdmin?: boolean;
 }
 
 export default function AuthHeader({
@@ -63,7 +65,8 @@ export default function AuthHeader({
     showProfileDropdown,
     setShowProfileDropdown,
     switchLang,
-    onOpenLogoutModal
+    onOpenLogoutModal,
+    isAdmin = false
 }: AuthHeaderProps) {
     return (
         <header className="h-[72px] sm:h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/60 sticky top-0 z-[70] transition-all duration-500 shadow-sm">
@@ -167,6 +170,18 @@ export default function AuthHeader({
                         {isDark ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
                     </button>
 
+                    {/* Admin Console Pill (Visible directly in header for authorized administrators) */}
+                    {isAdmin && (
+                        <Link 
+                            href="/admin" 
+                            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 rounded-xl transition-all shadow-sm active:scale-95 mx-0.5 group"
+                            title="Buka Konsol Administrator Tranvas"
+                        >
+                            <ShieldCheck size={13} className="text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-[10px] font-black uppercase tracking-wider">Admin</span>
+                        </Link>
+                    )}
+
                     <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1 sm:mx-1.5" />
 
                     {/* PROFILE DROPDOWN */}
@@ -258,13 +273,29 @@ export default function AuthHeader({
                                     </div>
 
                                     <div className="p-1.5 space-y-0.5">
+                                        {/* Admin Entry in Dropdown */}
+                                        {isAdmin && (
+                                            <Link 
+                                                href="/admin"
+                                                onClick={() => setShowProfileDropdown(false)}
+                                                className="flex items-center justify-between px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl transition-all text-emerald-800 dark:text-emerald-300 text-[12px] font-bold border border-emerald-500/20 mb-1"
+                                            >
+                                                <div className="flex items-center gap-2.5">
+                                                    <ShieldCheck size={15} className="text-emerald-600 dark:text-emerald-400" />
+                                                    <span>{locale === 'id' ? 'Konsol Admin' : 'Admin Console'}</span>
+                                                </div>
+                                                <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white">
+                                                    ADMIN
+                                                </span>
+                                            </Link>
+                                        )}
                                         <Link 
                                             href="/settings"
                                             onClick={() => setShowProfileDropdown(false)}
                                             className="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all text-slate-700 dark:text-slate-200 text-[12px] font-medium"
                                         >
                                             <User size={15} className="text-slate-400" />
-                                            <span>My Profile</span>
+                                            <span>{locale === 'id' ? 'Profil Saya' : 'My Profile'}</span>
                                         </Link>
                                         <Link 
                                             href="/settings"
@@ -272,7 +303,7 @@ export default function AuthHeader({
                                             className="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all text-slate-700 dark:text-slate-200 text-[12px] font-medium"
                                         >
                                             <SettingsIcon size={15} className="text-slate-400" />
-                                            <span>Settings</span>
+                                            <span>{locale === 'id' ? 'Pengaturan' : 'Settings'}</span>
                                         </Link>
                                         <Link 
                                             href="/settings?tab=affiliate"
