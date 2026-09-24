@@ -188,6 +188,20 @@ assertTest(validatePayoutRequest(4.0, 'USD', 50.0).valid === false, 'Reject USD 
 assertTest(validatePayoutRequest(5.0, 'USD', 50.0).valid === true, 'Accept USD payout at threshold $5.00');
 
 // ==========================================
+// TEST GROUP 6: ADMIN AUTHORIZATION INTEGRITY
+// ==========================================
+console.log("\n--- 6. Admin Authorization Integrity Tests ---");
+
+const adminAuthPath = path.join(ROOT_DIR, 'src/lib/auth/admin.ts');
+assertTest(fs.existsSync(adminAuthPath), 'src/lib/auth/admin.ts exists');
+if (fs.existsSync(adminAuthPath)) {
+  const adminContent = fs.readFileSync(adminAuthPath, 'utf8');
+  assertTest(adminContent.includes('khairking6@gmail.com'), 'Admin whitelist includes khairking6@gmail.com');
+  assertTest(adminContent.includes('DEFAULT_ADMIN_EMAILS'), 'DEFAULT_ADMIN_EMAILS array is defined');
+  assertTest(adminContent.includes('isAdminUser'), 'isAdminUser helper function is defined');
+}
+
+// ==========================================
 // TEST RESULTS SUMMARY
 // ==========================================
 console.log("\n=======================================================");

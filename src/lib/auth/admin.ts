@@ -6,7 +6,8 @@ export const DEFAULT_ADMIN_EMAILS = [
     'tranvasapp@gmail.com',
     'admin@tranvas.com',
     'khairan@tranvas.com',
-    'codesbykhairannoor@gmail.com'
+    'codesbykhairannoor@gmail.com',
+    'khairking6@gmail.com'
 ];
 
 export function isAdminUser(userOrEmail?: any): boolean {
