@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, BookOpen, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Flame, Briefcase, Sparkles, Check, GripVertical, Play, Pause, RotateCcw, X, Utensils, Droplets, StickyNote, BookOpen, AlertCircle, Target } from 'lucide-react';
 import { InboxTask } from '../types';
 import { Link } from '@/i18n/routing';
 
@@ -15,6 +15,9 @@ interface PlannerSidebarProps {
     setWaterGlasses: (val: number) => void;
     taskInbox: InboxTask[];
     setTaskInbox: (val: InboxTask[]) => void;
+    goals?: any[];
+    onScheduleGoalMilestone?: (milestone: any, goal: any) => void;
+    onToggleGoalMilestone?: (goalId: string | number, milestoneId: string | number, completed: boolean) => void;
     pendingStudyAssignments?: any[];
     onStudyClick?: (assignment: any) => void;
     onToggleStudyCompleted?: (id: string) => void;
@@ -39,6 +42,9 @@ export default function PlannerSidebar({
     meals, setMeals,
     waterGlasses, setWaterGlasses,
     taskInbox, setTaskInbox,
+    goals = [],
+    onScheduleGoalMilestone,
+    onToggleGoalMilestone,
     pendingStudyAssignments = [],
     onStudyClick,
     onToggleStudyCompleted,
@@ -60,7 +66,7 @@ export default function PlannerSidebar({
 
     const [newInboxTitle, setNewInboxTitle] = useState('');
     const [dailyHubTab, setDailyHubTab] = useState<'notes' | 'meals' | 'water'>('notes');
-    const [sidebarTrayTab, setSidebarTrayTab] = useState<'inbox' | 'study'>('inbox');
+    const [sidebarTrayTab, setSidebarTrayTab] = useState<'inbox' | 'goals' | 'study'>('inbox');
 
     // Inbox Themes
     const getInboxTaskTheme = (type: number) => {
@@ -111,6 +117,38 @@ export default function PlannerSidebar({
             title: `[📚 Kuliah] ${assignment.course_name || assignment.courseName || ''}: ${assignment.title}`
         }));
         e.dataTransfer.setData('text/plain', assignment.title);
+    };
+
+    // Goals & Milestones Integration
+    const activeGoals = (goals || []).filter((g: any) => g.status !== 'completed');
+    const totalPendingMilestonesCount = activeGoals.reduce((acc: number, g: any) => {
+        const ms = g.milestones || [];
+        return acc + ms.filter((m: any) => !m.is_completed && !m.completed).length;
+    }, 0);
+
+    const getTimeHorizonBadge = (th?: string) => {
+        switch (th) {
+            case 'weekly': return { label: isIndo ? '📅 Mingguan' : '📅 Weekly', color: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' };
+            case 'monthly': return { label: isIndo ? '🗓️ Bulanan' : '🗓️ Monthly', color: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800' };
+            case 'quarterly': return { label: isIndo ? '📊 Kuartal' : '📊 Quarterly', color: 'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' };
+            case 'lifetime': return { label: isIndo ? '🌌 Vision' : '🌌 Vision', color: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' };
+            default: return { label: isIndo ? '🎯 Tahunan' : '🎯 Yearly', color: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' };
+        }
+    };
+
+    const handleGoalMilestoneDragStart = (e: React.DragEvent, milestone: any, goal: any) => {
+        e.dataTransfer.dropEffect = 'copy';
+        e.dataTransfer.effectAllowed = 'copyMove';
+        e.dataTransfer.setData('application/json', JSON.stringify({
+            type: 'GOAL_MILESTONE',
+            milestone,
+            goal: {
+                id: goal.id,
+                title: goal.title,
+                time_horizon: goal.time_horizon
+            }
+        }));
+        e.dataTransfer.setData('text/plain', milestone.title);
     };
 
     // Calculate filled meals count
@@ -200,56 +238,69 @@ export default function PlannerSidebar({
                 </div>
             </div>
 
-            {/* 2. PERSISTENT TRAY: INBOX & TUGAS KULIAH (DRAG-TO-TIMELINE) */}
+            {/* 2. PERSISTENT TRAY: INBOX, TARGET GOALS & TUGAS KULIAH (DRAG-TO-TIMELINE) */}
             <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-[2rem] shadow-sm border border-slate-200/80 dark:border-slate-800 transition-colors">
                 
-                {/* Segmented Switcher: Inbox vs Tugas Kuliah (Only if Study module is active) */}
-                {isStudyActive ? (
-                    <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3">
-                        <button
-                            type="button"
-                            onClick={() => setSidebarTrayTab('inbox')}
-                            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
-                                sidebarTrayTab === 'inbox'
-                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                            }`}
-                        >
-                            <span>📥 {isIndo ? 'Kotak Masuk' : 'Inbox'}</span>
-                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-mono">
-                                {taskInbox.length}
-                            </span>
-                        </button>
+                {/* Segmented Switcher: Inbox vs Target Goals vs Tugas Kuliah */}
+                <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3 overflow-x-auto no-scrollbar">
+                    <button
+                        type="button"
+                        onClick={() => setSidebarTrayTab('inbox')}
+                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${
+                            sidebarTrayTab === 'inbox'
+                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                    >
+                        <span>📥 {isIndo ? 'Kotak' : 'Inbox'}</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-mono">
+                            {taskInbox.length}
+                        </span>
+                    </button>
 
+                    <button
+                        type="button"
+                        onClick={() => setSidebarTrayTab('goals')}
+                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${
+                            sidebarTrayTab === 'goals'
+                                ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                    >
+                        <span>🎯 {isIndo ? 'Target' : 'Goals'}</span>
+                        {totalPendingMilestonesCount > 0 ? (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-mono font-bold">
+                                {totalPendingMilestonesCount}
+                            </span>
+                        ) : activeGoals.length > 0 ? (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-mono">
+                                {activeGoals.length}
+                            </span>
+                        ) : null}
+                    </button>
+
+                    {isStudyActive && (
                         <button
                             type="button"
                             onClick={() => setSidebarTrayTab('study')}
-                            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+                            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${
                                 sidebarTrayTab === 'study'
                                     ? 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                             }`}
                         >
-                            <span>📚 {isIndo ? 'Tugas Kuliah' : 'Study'}</span>
+                            <span>📚 {isIndo ? 'Kuliah' : 'Study'}</span>
                             {pendingStudyAssignments.length > 0 && (
                                 <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-mono font-bold">
                                     {pendingStudyAssignments.length}
                                 </span>
                             )}
                         </button>
-                    </div>
-                ) : (
-                    <div className="flex items-center justify-between mb-3 px-1">
-                        <span className="text-xs font-black text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                            <span>📥 {isIndo ? 'Kotak Masuk' : 'Quick Inbox'}</span>
-                        </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono font-bold">
-                            {taskInbox.length} {isIndo ? 'tugas' : 'tasks'}
-                        </span>
-                    </div>
-                )}
+                    )}
+                </div>
 
-                {(!isStudyActive || sidebarTrayTab === 'inbox') ? (
+                {/* TAB 1: INBOX TRAY */}
+                {sidebarTrayTab === 'inbox' && (
                     <>
                         {/* Quick Add Form */}
                         <form onSubmit={handleAddQuickInbox} className="mb-2.5">
@@ -336,8 +387,147 @@ export default function PlannerSidebar({
                             </div>
                         )}
                     </>
-                ) : (
-                    /* Study Assignments Tray */
+                )}
+
+                {/* TAB 2: GOALS & MILESTONES TRAY */}
+                {sidebarTrayTab === 'goals' && (
+                    <div>
+                        {activeGoals.length === 0 ? (
+                            <div className="text-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl bg-emerald-50/20 dark:bg-emerald-950/10 p-4">
+                                <span className="text-2xl">🎯</span>
+                                <p className="text-xs font-black text-slate-700 dark:text-slate-300 mt-1">
+                                    {isIndo ? 'Belum ada target aktif' : 'No active goals found'}
+                                </p>
+                                <p className="text-[10px] text-slate-400 mt-0.5 mb-3 leading-relaxed">
+                                    {isIndo ? 'Buat target mingguan, bulanan, atau tahunan untuk dipecah ke jadwal harian.' : 'Create weekly, monthly, or yearly goals to schedule into your day.'}
+                                </p>
+                                <Link
+                                    href="/goals"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-sm"
+                                >
+                                    <Sparkles size={12} />
+                                    <span>{isIndo ? 'Buka Modul Goals' : 'Open Goals'}</span>
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="space-y-2.5 max-h-[290px] overflow-y-auto pr-1 custom-scrollbar">
+                                <div className="flex items-center justify-between px-1">
+                                    <p className="text-[10px] text-slate-400 font-bold">
+                                        {isIndo ? 'Tarik milestone ke timeline:' : 'Drag milestone to timeline:'}
+                                    </p>
+                                    <Link
+                                        href="/goals"
+                                        className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-0.5"
+                                    >
+                                        <span>{isIndo ? 'Semua Target' : 'All Goals'}</span>
+                                        <span>→</span>
+                                    </Link>
+                                </div>
+
+                                {activeGoals.map((goal: any) => {
+                                    const badge = getTimeHorizonBadge(goal.time_horizon);
+                                    const msList = goal.milestones || [];
+
+                                    return (
+                                        <div 
+                                            key={`planner-goal-${goal.id}`}
+                                            className="p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition hover:border-emerald-200 dark:hover:border-emerald-800/60"
+                                        >
+                                            {/* Goal Header */}
+                                            <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                                                <div className="flex items-center gap-1.5 min-w-0">
+                                                    <span className={`px-1.5 py-0.2 rounded-md text-[8.5px] font-black uppercase tracking-wider border shrink-0 ${badge.color}`}>
+                                                        {badge.label}
+                                                    </span>
+                                                    <span className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate" title={goal.title}>
+                                                        {goal.title}
+                                                    </span>
+                                                </div>
+                                                {goal.end_date && (
+                                                    <span className="text-[9px] font-mono text-slate-400 shrink-0">
+                                                        {String(goal.end_date).split('T')[0]}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Milestones list */}
+                                            {msList.length === 0 ? (
+                                                <div className="flex items-center justify-between py-1 px-1 text-[11px] text-slate-400 italic">
+                                                    <span>{isIndo ? 'Belum ada checkpoint' : 'No checkpoints yet'}</span>
+                                                    {onScheduleGoalMilestone && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onScheduleGoalMilestone({ title: goal.title, id: `g-${goal.id}` }, goal)}
+                                                            className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-[10px] font-black hover:bg-emerald-100 transition"
+                                                        >
+                                                            + {isIndo ? 'Jadwal Target' : 'Schedule'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-1 mt-1">
+                                                    {msList.map((m: any, mIdx: number) => {
+                                                        const isCompleted = Boolean(m.is_completed || m.completed);
+                                                        return (
+                                                            <div
+                                                                key={`goal-${goal.id}-ms-${m.id || mIdx}`}
+                                                                draggable={!isCompleted}
+                                                                onDragStart={(e) => !isCompleted && handleGoalMilestoneDragStart(e, m, goal)}
+                                                                className={`flex items-center justify-between gap-2 p-1.5 rounded-xl border text-xs transition ${
+                                                                    isCompleted
+                                                                        ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800/60 opacity-60'
+                                                                        : 'bg-slate-50/70 dark:bg-slate-850/60 border-slate-200/60 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700 cursor-grab active:cursor-grabbing shadow-xs'
+                                                                }`}
+                                                                title={isCompleted ? (isIndo ? 'Selesai' : 'Completed') : (isIndo ? 'Tarik ke timeline untuk menjadwalkan' : 'Drag to timeline')}
+                                                            >
+                                                                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => onToggleGoalMilestone && onToggleGoalMilestone(goal.id, m.id, isCompleted)}
+                                                                        className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
+                                                                            isCompleted
+                                                                                ? 'bg-emerald-500 border-emerald-500 text-white'
+                                                                                : 'border-slate-300 dark:border-slate-600 hover:border-emerald-500 bg-white dark:bg-slate-800'
+                                                                        }`}
+                                                                    >
+                                                                        {isCompleted && <Check size={10} strokeWidth={4} />}
+                                                                    </button>
+                                                                    <span className={`text-[11px] font-bold truncate ${isCompleted ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}`}>
+                                                                        {m.title}
+                                                                    </span>
+                                                                </div>
+
+                                                                {!isCompleted && (
+                                                                    <div className="flex items-center gap-1 shrink-0">
+                                                                        {onScheduleGoalMilestone && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => onScheduleGoalMilestone(m, goal)}
+                                                                                className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-[10px] font-black transition"
+                                                                                title={isIndo ? 'Jadwalkan ke timeline' : 'Schedule to timeline'}
+                                                                            >
+                                                                                <Clock size={10} className="inline mr-0.5" />
+                                                                                <span>{isIndo ? 'Jadwal' : 'Schedule'}</span>
+                                                                            </button>
+                                                                        )}
+                                                                        <GripVertical size={11} className="text-slate-300 dark:text-slate-600" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* TAB 3: STUDY ASSIGNMENTS TRAY */}
+                {sidebarTrayTab === 'study' && (
                     <div>
                         {pendingStudyAssignments.length === 0 ? (
                             <div className="text-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl bg-purple-50/20 dark:bg-purple-950/10">

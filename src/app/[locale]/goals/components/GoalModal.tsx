@@ -663,9 +663,10 @@ export default function GoalModal({
                                         <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                                             {isIndo ? 'Horison Waktu' : 'Time Horizon'}
                                         </label>
-                                        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+                                        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-x-auto no-scrollbar">
                                             {[
-                                                { id: 'sprint', label: 'Sprint' },
+                                                { id: 'weekly', label: isIndo ? 'Mingguan' : 'Weekly' },
+                                                { id: 'monthly', label: isIndo ? 'Bulanan' : 'Monthly' },
                                                 { id: 'quarterly', label: isIndo ? 'Kuartal' : 'Quarter' },
                                                 { id: 'yearly', label: isIndo ? 'Tahunan' : 'Yearly' },
                                                 { id: 'lifetime', label: 'Vision' },
@@ -674,7 +675,7 @@ export default function GoalModal({
                                                     key={th.id}
                                                     type="button"
                                                     onClick={() => setForm(prev => ({ ...prev, time_horizon: th.id }))}
-                                                    className={`flex-1 py-2 rounded-xl text-[9.5px] font-black tracking-wider transition ${
+                                                    className={`flex-1 min-w-[54px] py-2 rounded-xl text-[9px] font-black tracking-wider transition text-center shrink-0 ${
                                                         form.time_horizon === th.id 
                                                             ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md' 
                                                             : 'text-slate-400 hover:text-slate-600'

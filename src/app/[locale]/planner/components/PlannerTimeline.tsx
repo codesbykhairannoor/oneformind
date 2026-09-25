@@ -47,6 +47,7 @@ interface PlannerTimelineProps {
     onStudyClick?: (study: ScheduledStudyItem) => void;
     onToggleStudyCompleted?: (assignmentId: string) => void;
     onScheduleStudyAssignment?: (assignmentId: string, startTime: string) => void;
+    onScheduleGoalMilestone?: (milestone: any, goal: any, startTime: string) => void;
     selectedDate: string;
     now: Date;
     startHour: number;
@@ -75,6 +76,7 @@ export default function PlannerTimeline({
     onStudyClick,
     onToggleStudyCompleted,
     onScheduleStudyAssignment,
+    onScheduleGoalMilestone,
     selectedDate,
     now,
     startHour,
@@ -218,7 +220,7 @@ export default function PlannerTimeline({
     const handleDrop = (e: React.DragEvent, newStartTime: string) => {
         e.preventDefault();
         
-        // Check if dragged from Inbox or Study Tray
+        // Check if dragged from Inbox, Study, or Goals Tray
         const jsonStr = e.dataTransfer.getData('application/json');
         if (jsonStr) {
             try {
@@ -229,6 +231,10 @@ export default function PlannerTimeline({
                 }
                 if (parsed && parsed.type === 'STUDY_ASSIGNMENT' && onScheduleStudyAssignment) {
                     onScheduleStudyAssignment(parsed.id, newStartTime);
+                    return;
+                }
+                if (parsed && parsed.type === 'GOAL_MILESTONE' && onScheduleGoalMilestone) {
+                    onScheduleGoalMilestone(parsed.milestone, parsed.goal, newStartTime);
                     return;
                 }
             } catch (err) {}

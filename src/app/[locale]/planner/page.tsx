@@ -157,6 +157,9 @@ export default function PlannerPage() {
                                 setWaterGlasses={planner.handleSetWaterGlasses}
                                 taskInbox={planner.taskInbox} 
                                 setTaskInbox={planner.handleSetTaskInbox}
+                                goals={planner.goals}
+                                onScheduleGoalMilestone={(milestone, goal) => planner.handleScheduleGoalMilestone(milestone, goal)}
+                                onToggleGoalMilestone={(goalId, milestoneId, completed) => planner.handleToggleGoalMilestone(goalId, milestoneId, completed)}
                                 isStudyActive={planner.isStudyActive}
                                 pendingStudyAssignments={planner.pendingStudyAssignments}
                                 onStudyClick={(study) => planner.setSelectedStudyForModal(study)}
@@ -199,6 +202,7 @@ export default function PlannerPage() {
                                  onStudyClick={planner.setSelectedStudyForModal}
                                  onToggleStudyCompleted={planner.toggleStudyAssignmentCompleted}
                                  onScheduleStudyAssignment={planner.handleScheduleStudyAssignment}
+                                 onScheduleGoalMilestone={planner.handleScheduleGoalMilestone}
                                  selectedDate={planner.selectedDate}
                                  now={planner.now}
                                  startHour={planner.startHour}

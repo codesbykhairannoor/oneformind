@@ -98,6 +98,8 @@ export default function GoalCard({
 
     const getTimeHorizonLabel = (th?: string) => {
         switch (th) {
+            case 'weekly': return isIndo ? '📅 Mingguan' : '📅 Weekly';
+            case 'monthly': return isIndo ? '🗓️ Bulanan' : '🗓️ Monthly';
             case 'sprint': return isIndo ? '⚡ Sprint' : '⚡ Sprint';
             case 'quarterly': return isIndo ? '📊 Kuartal' : '📊 Quarterly';
             case 'lifetime': return isIndo ? '🌌 Seumur Hidup' : '🌌 Lifetime';

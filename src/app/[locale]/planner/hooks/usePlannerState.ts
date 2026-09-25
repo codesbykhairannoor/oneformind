@@ -44,6 +44,10 @@ export function usePlannerState() {
     const isStudyActive = isTabActive('study');
     const isJobActive = isTabActive('job');
     const isJournalActive = isTabActive('journal');
+    const isGoalActive = isTabActive('goal');
+
+    // Goals SWR sync
+    const { data: rawGoals, mutate: mutateGoals } = useSWR(isGoalActive ? '/api/goals' : null, habitsFetcher);
 
     // Habits SWR sync
     const { data: rawHabits, mutate: mutateHabits } = useSWR(isHabitActive ? '/api/habits' : null, habitsFetcher);
@@ -509,6 +513,33 @@ export function usePlannerState() {
         }, startTime, 60);
     };
 
+    // Handle scheduling a goal milestone onto timeline
+    const handleScheduleGoalMilestone = async (milestone: any, goal: any, startTime?: string) => {
+        const timeToUse = startTime || '09:00';
+        const goalPrefix = goal?.title ? `[🎯 ${goal.title}] ` : '[🎯 Target] ';
+        await taskCrud.scheduleInboxTask({
+            id: Date.now(),
+            title: `${goalPrefix}${milestone.title}`,
+            type: 1 // Priority 1 (Urgent/Vital)
+        }, timeToUse, 60);
+    };
+
+    // Toggle milestone completion directly from planner
+    const handleToggleGoalMilestone = async (goalId: string | number, milestoneId: string | number, currentCompleted: boolean) => {
+        const nextState = !currentCompleted;
+        try {
+            await fetch(`/api/goals/${goalId}/milestones/${milestoneId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: nextState })
+            });
+            await mutateGoals();
+            globalMutate('/api/goals');
+        } catch (err) {
+            console.error('Failed to toggle goal milestone in planner:', err);
+        }
+    };
+
     // Unlink habit from Planner schedule
     const unlinkHabitFromPlanner = async (habitId: number) => {
         if (!rawHabits || !Array.isArray(rawHabits)) return;
@@ -678,6 +709,9 @@ export function usePlannerState() {
         handleMoveTask: taskCrud.handleMoveTask,
         handleScheduleInboxTask,
         handleScheduleStudyAssignment,
+        goals: Array.isArray(rawGoals) ? rawGoals : [],
+        handleScheduleGoalMilestone,
+        handleToggleGoalMilestone,
         deleteTask: taskCrud.deleteTask,
         unfinishedYesterdayTasks,
         showRolloverBanner,
@@ -701,7 +735,8 @@ export function usePlannerState() {
         isHabitActive,
         isStudyActive,
         isJobActive,
-        isJournalActive
+        isJournalActive,
+        isGoalActive
     };
 }
 

@@ -54,9 +54,11 @@ export default function GoalFilterBar({
 
     const timeHorizons = [
         { id: 'all', label: isIndo ? 'Semua Waktu' : 'All Horizons' },
+        { id: 'weekly', label: isIndo ? '📅 Mingguan' : '📅 Weekly' },
+        { id: 'monthly', label: isIndo ? '🗓️ Bulanan' : '🗓️ Monthly' },
         { id: 'sprint', label: isIndo ? '⚡ Sprint (30-90 Hari)' : '⚡ Sprint (30-90 Days)' },
         { id: 'quarterly', label: isIndo ? '📊 Kuartal (Q1-Q4)' : '📊 Quarterly (Q1-Q4)' },
-        { id: 'yearly', label: isIndo ? '🎯 Target 2026' : '🎯 2026 Goals' },
+        { id: 'yearly', label: isIndo ? '🎯 Target Tahunan' : '🎯 Yearly Target' },
         { id: 'lifetime', label: isIndo ? '🌌 Seumur Hidup / Vision' : '🌌 Lifetime Vision' },
     ];
 

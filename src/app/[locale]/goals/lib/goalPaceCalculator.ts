@@ -13,7 +13,7 @@ export interface GoalMilestone {
 export type GoalType = 'numeric' | 'currency' | 'milestones' | 'habit_frequency' | 'boolean' | string;
 export type GoalPriority = 'vital' | 'important' | 'optional' | string;
 export type GoalStatus = 'active' | 'completed' | 'on_track' | 'at_risk' | 'behind' | 'draft' | string;
-export type GoalTimeHorizon = 'sprint' | 'quarterly' | 'yearly' | 'lifetime' | string;
+export type GoalTimeHorizon = 'weekly' | 'monthly' | 'sprint' | 'quarterly' | 'yearly' | 'lifetime' | string;
 
 export interface GoalItem {
     id: number | string;
