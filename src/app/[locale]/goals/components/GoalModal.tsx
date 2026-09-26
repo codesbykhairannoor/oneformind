@@ -372,7 +372,7 @@ export default function GoalModal({
                                 </span>
                             </div>
 
-                            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl gap-1">
+                            <div className="flex p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl gap-1 border border-slate-200/80 dark:border-slate-800">
                                 {targetTypes.map((tt) => {
                                     const TTIcon = tt.icon;
                                     const isSelected = form.type === tt.id;
@@ -383,11 +383,11 @@ export default function GoalModal({
                                             onClick={() => setForm(prev => ({ ...prev, type: tt.id }))}
                                             className={`flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                                                 isSelected
-                                                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200/80 dark:ring-slate-600'
-                                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                                                    ? 'bg-indigo-600 text-white shadow-md'
+                                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/40 dark:hover:bg-slate-800/60'
                                             }`}
                                         >
-                                            <TTIcon size={14} className={isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} />
+                                            <TTIcon size={14} className={isSelected ? 'text-white' : 'text-slate-400'} />
                                             <span className="text-[11px] font-black tracking-tight">{tt.shortLabel || tt.label}</span>
                                         </button>
                                     );
@@ -412,7 +412,7 @@ export default function GoalModal({
                                             type="number"
                                             value={form.start_value || 0}
                                             onChange={(e) => setForm(prev => ({ ...prev, start_value: Number(e.target.value) }))}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
                                         />
                                     </div>
                                     <div>
@@ -423,7 +423,7 @@ export default function GoalModal({
                                             type="number"
                                             value={form.current_value || 0}
                                             onChange={(e) => setForm(prev => ({ ...prev, current_value: Number(e.target.value) }))}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono"
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono"
                                         />
                                     </div>
                                     <div>
@@ -434,7 +434,7 @@ export default function GoalModal({
                                             type="number"
                                             value={form.target_value || 10}
                                             onChange={(e) => setForm(prev => ({ ...prev, target_value: Number(e.target.value) }))}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
                                         />
                                     </div>
                                     <div>
@@ -446,7 +446,7 @@ export default function GoalModal({
                                             value={form.unit || ''}
                                             onChange={(e) => setForm(prev => ({ ...prev, unit: e.target.value }))}
                                             placeholder={isIndo ? 'buku / km / kg' : 'books / km / kg'}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
                                         />
                                     </div>
                                 </div>
@@ -481,7 +481,7 @@ export default function GoalModal({
                                             className={`w-full border rounded-xl px-3 py-2 text-xs font-bold font-mono transition ${
                                                 form.linked_source === 'finance_savings'
                                                     ? 'bg-emerald-50/60 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-850 text-emerald-700 dark:text-emerald-300 cursor-not-allowed opacity-90'
-                                                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-emerald-600 dark:text-emerald-400'
+                                                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400'
                                             }`}
                                             placeholder="0"
                                         />
@@ -494,7 +494,7 @@ export default function GoalModal({
                                             type="number"
                                             value={form.target_value || 50000000}
                                             onChange={(e) => setForm(prev => ({ ...prev, target_value: Number(e.target.value) }))}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
                                             placeholder="50000000"
                                         />
                                     </div>
@@ -505,7 +505,7 @@ export default function GoalModal({
                                         <select
                                             value={form.currency || 'IDR'}
                                             onChange={(e) => setForm(prev => ({ ...prev, currency: e.target.value }))}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
                                         >
                                             <option value="IDR">IDR (Rp - Rupiah)</option>
                                             <option value="USD">USD ($ - Dollar)</option>
@@ -553,7 +553,7 @@ export default function GoalModal({
                                                     }
                                                 }
                                             }}
-                                            className="w-full bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white shadow-sm"
+                                            className="w-full bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white shadow-sm"
                                         >
                                             <option value="manual">
                                                 {isIndo ? '✏️ Input Manual (Tidak terhubung ke tabungan)' : '✏️ Manual Input (Not linked)'}
@@ -571,7 +571,7 @@ export default function GoalModal({
                         )}
 
                         {/* 5. Essential Parameters Grid (Horizon, Priority, Category, Deadline) */}
-                        <div className="p-4 sm:p-5 rounded-3xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 space-y-4">
+                        <div className="p-4 sm:p-5 rounded-3xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 space-y-4">
                             
                             {/* Row 1: Time Horizon & Priority */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -580,7 +580,7 @@ export default function GoalModal({
                                     <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                                         {isIndo ? 'Horison Waktu' : 'Time Horizon'}
                                     </label>
-                                    <div className="flex gap-1 p-1 bg-white dark:bg-slate-850 rounded-2xl border border-slate-200 dark:border-slate-700/80">
+                                    <div className="flex gap-1 p-1 bg-slate-150 dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
                                         {[
                                             { id: 'weekly', label: isIndo ? 'Mingguan' : 'Weekly' },
                                             { id: 'monthly', label: isIndo ? 'Bulanan' : 'Monthly' },
@@ -595,7 +595,7 @@ export default function GoalModal({
                                                 className={`flex-1 py-2 px-1 rounded-xl text-[10px] font-black tracking-wider transition text-center shrink-0 ${
                                                     form.time_horizon === th.id 
                                                         ? 'bg-indigo-600 text-white shadow-md' 
-                                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/40 dark:hover:bg-slate-800/60'
                                                 }`}
                                             >
                                                 {th.label}
@@ -609,7 +609,7 @@ export default function GoalModal({
                                     <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                                         {isIndo ? 'Tingkat Prioritas' : 'Priority Level'}
                                     </label>
-                                    <div className="flex gap-1.5 p-1 bg-white dark:bg-slate-850 rounded-2xl border border-slate-200 dark:border-slate-700/80">
+                                    <div className="flex gap-1.5 p-1 bg-slate-150 dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
                                         {[
                                             { id: 'vital', label: 'Vital 🔥' },
                                             { id: 'important', label: isIndo ? 'Penting' : 'Important' },
@@ -622,7 +622,7 @@ export default function GoalModal({
                                                 className={`flex-1 py-2 rounded-xl text-[10px] font-black tracking-wider uppercase transition capitalize ${
                                                     form.priority === p.id 
                                                         ? 'bg-indigo-600 text-white shadow-md' 
-                                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/40 dark:hover:bg-slate-800/60'
                                                 }`}
                                             >
                                                 {p.label}
@@ -651,7 +651,7 @@ export default function GoalModal({
                                                 color: matched?.color || prev.color
                                             }));
                                         }}
-                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
+                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
                                     >
                                         {archetypeOptions.map((opt) => (
                                             <option key={opt.id} value={opt.id}>
@@ -681,7 +681,7 @@ export default function GoalModal({
                                         <button 
                                             type="button" 
                                             onClick={() => { setShowEndPicker(!showEndPicker); setShowStartPicker(false); }}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
                                         >
                                             <span className={!form.end_date ? 'text-slate-400' : ''}>
                                                 {formatDateDisplay(form.end_date)}
@@ -718,7 +718,7 @@ export default function GoalModal({
                             <button
                                 type="button"
                                 onClick={() => setShowAdvanced(!showAdvanced)}
-                                className="w-full py-3.5 px-5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 transition-all flex items-center justify-between group shadow-sm"
+                                className="w-full py-3.5 px-5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/60 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all flex items-center justify-between group shadow-sm"
                             >
                                 <div className="flex items-center gap-2.5">
                                     <SlidersHorizontal size={15} className="text-indigo-500 group-hover:rotate-45 transition-transform" />
@@ -743,11 +743,11 @@ export default function GoalModal({
                             </button>
 
                             {showAdvanced && (
-                                <div className="mt-4 p-5 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 space-y-6 animate-in fade-in duration-200">
+                                <div className="mt-4 p-5 rounded-3xl bg-slate-50/70 dark:bg-slate-900/30 border border-slate-200/80 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
                                     
                                     {/* Advanced Item 1: Supporting Habit Engine (Leading Measures) */}
                                     {isHabitActive && (
-                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5">
+                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-2.5">
                                         <div className="flex items-center justify-between">
                                             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                                                 <Sparkles size={14} />
@@ -785,15 +785,15 @@ export default function GoalModal({
                                                                     return { ...prev, linked_habit_ids: nextIds };
                                                                 });
                                                             }}
-                                                            className={`p-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
+                                                            className={`p-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
                                                                 isSelected
                                                                     ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-400/40'
-                                                                    : 'bg-slate-50 dark:bg-slate-750 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700/80 hover:border-indigo-300 hover:bg-indigo-50/30'
+                                                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500/50 hover:bg-indigo-50/20 dark:hover:bg-slate-700'
                                                             }`}
                                                         >
-                                                            <div className="flex items-center gap-1.5 min-w-0">
+                                                            <div className="flex items-center gap-2 min-w-0">
                                                                 <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
-                                                                <span className="truncate text-[11px] font-bold">{h.name}</span>
+                                                                <span className="truncate text-xs font-bold">{h.name}</span>
                                                             </div>
                                                             {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
                                                         </button>
@@ -805,7 +805,7 @@ export default function GoalModal({
                                     )}
 
                                     {/* Advanced Item 2: Psychological & WOOP Fields */}
-                                    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 space-y-3.5">
+                                    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-3.5">
                                         <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                                             <Compass size={15} />
                                             {isIndo ? 'Psikologi Pencapaian & Motivasi (WOOP)' : 'Goal Psychology & Motivation (WOOP)'}
@@ -813,14 +813,14 @@ export default function GoalModal({
 
                                         {/* Core Motivation */}
                                         <div className="space-y-1">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                            <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                                 {isIndo ? 'Alasan Utama ("The Why")' : 'The Core Motivation ("The Why")'}
                                             </label>
                                             <textarea
                                                 value={form.core_why || ''}
                                                 onChange={(e) => setForm(prev => ({ ...prev, core_why: e.target.value }))}
                                                 rows={2}
-                                                className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs font-medium text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                                                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/20 outline-none"
                                                 placeholder={isIndo ? 'Mengapa target ini sangat berarti dan tidak boleh gagal?' : 'Why is this goal non-negotiable for your life?'}
                                             />
                                         </div>
@@ -836,7 +836,7 @@ export default function GoalModal({
                                                     type="text"
                                                     value={form.obstacle || ''}
                                                     onChange={(e) => setForm(prev => ({ ...prev, obstacle: e.target.value }))}
-                                                    className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
+                                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                                                     placeholder={isIndo ? 'Contoh: Godaan belanja impulsif / Malas malam hari' : 'E.g. Impulsive spending / evening fatigue'}
                                                 />
                                             </div>
@@ -849,14 +849,14 @@ export default function GoalModal({
                                                     type="text"
                                                     value={form.obstacle_plan || ''}
                                                     onChange={(e) => setForm(prev => ({ ...prev, obstacle_plan: e.target.value }))}
-                                                    className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
+                                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                                                     placeholder={isIndo ? 'Jika terjadi, saya akan...' : 'If it happens, I will...'}
                                                 />
                                             </div>
                                         </div>
 
                                         {/* Self-Reward */}
-                                        <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                        <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800">
                                             <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
                                                 <Award size={13} />
                                                 {isIndo ? 'Hadiah Kemenangan (Victory Self-Reward)' : 'Victory Self-Reward'}
@@ -865,7 +865,7 @@ export default function GoalModal({
                                                 type="text"
                                                 value={form.reward || ''}
                                                 onChange={(e) => setForm(prev => ({ ...prev, reward: e.target.value }))}
-                                                className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
+                                                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                                                 placeholder={isIndo ? 'Rayakan saat 100% tercapai (contoh: Liburan 3 hari / Dinner mewah)' : 'Reward yourself when done (e.g. Weekend getaway / Special dinner)'}
                                             />
                                         </div>
@@ -879,7 +879,7 @@ export default function GoalModal({
                                                 <Palette size={13} />
                                                 {isIndo ? 'Warna Tema Target' : 'Goal Color Theme'}
                                             </label>
-                                            <div className="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                                            <div className="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-900/60 rounded-2xl border border-slate-200/80 dark:border-slate-800">
                                                 {colorOptions.map((c) => (
                                                     <button 
                                                         key={c}
@@ -908,7 +908,7 @@ export default function GoalModal({
                                                 <button 
                                                     type="button" 
                                                     onClick={() => { setShowStartPicker(!showStartPicker); setShowEndPicker(false); }}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
+                                                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
                                                 >
                                                     <span>{formatDateDisplay(form.start_date)}</span>
                                                     <Calendar className="w-4 h-4 text-slate-400" />
@@ -926,7 +926,7 @@ export default function GoalModal({
                                     </div>
 
                                     {/* Advanced Item 4: Visual Archetype Grid */}
-                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
                                         <GoalArchetypesGrid
                                             selectedArchetype={selectedArchetype}
                                             onSelectArchetype={selectArchetype}
