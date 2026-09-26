@@ -272,10 +272,10 @@ export default function GoalModal({
     ];
 
     const targetTypes = [
-        { id: 'milestones', label: isIndo ? 'Langkah / OKR' : 'Milestones / OKR', icon: ListTodo, desc: isIndo ? 'Checklist langkah terstruktur' : 'Structured checklist steps' },
-        { id: 'numeric', label: isIndo ? 'Angka / Metrik' : 'Numeric Counter', icon: Hash, desc: isIndo ? 'Target buku, km, sesi, halaman' : 'Count books, km, pages, sessions' },
-        { id: 'currency', label: isIndo ? 'Finansial (Rp/$)' : 'Currency Goal', icon: DollarSign, desc: isIndo ? 'Tabungan, investasi, aset uang' : 'Savings, emergency funds, revenue' },
-        { id: 'boolean', label: isIndo ? 'Sederhana' : 'Simple Done', icon: CheckSquare, desc: isIndo ? 'Target 1 kali selesai' : 'Single milestone accomplishment' },
+        { id: 'milestones', label: isIndo ? 'Langkah / OKR' : 'Milestones', shortLabel: isIndo ? 'Langkah' : 'Steps', icon: ListTodo },
+        { id: 'numeric', label: isIndo ? 'Hitung Angka' : 'Numeric', shortLabel: isIndo ? 'Angka' : 'Numeric', icon: Hash },
+        { id: 'currency', label: isIndo ? 'Finansial (Rp/$)' : 'Financial', shortLabel: isIndo ? 'Finansial' : 'Finance', icon: DollarSign },
+        { id: 'boolean', label: isIndo ? 'Sederhana' : 'Simple', shortLabel: isIndo ? 'Sederhana' : 'Simple', icon: CheckSquare },
     ];
 
     const archetypeOptions = [
@@ -358,13 +358,21 @@ export default function GoalModal({
                             />
                         </div>
 
-                        {/* 2. Target Type Selector */}
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                {isIndo ? 'Tipe Target' : 'Goal Type'}
-                            </label>
+                        {/* 2. Target Type Selector (Compact 1-line segmented bar) */}
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                    {isIndo ? 'Model Pengukuran Progres' : 'Progress Measurement'}
+                                </label>
+                                <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-800/50">
+                                    {form.type === 'milestones' ? (isIndo ? '📋 Checklist Langkah' : '📋 Steps Checklist') :
+                                     form.type === 'numeric' ? (isIndo ? '🔢 Hitungan Angka' : '🔢 Numeric Counter') :
+                                     form.type === 'currency' ? (isIndo ? '💰 Target Keuangan' : '💰 Financial Target') :
+                                     (isIndo ? '✅ Sekali Selesai' : '✅ Single Milestone')}
+                                </span>
+                            </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl gap-1">
                                 {targetTypes.map((tt) => {
                                     const TTIcon = tt.icon;
                                     const isSelected = form.type === tt.id;
@@ -373,17 +381,14 @@ export default function GoalModal({
                                             key={tt.id}
                                             type="button"
                                             onClick={() => setForm(prev => ({ ...prev, type: tt.id }))}
-                                            className={`p-3 rounded-2xl border-2 flex flex-col items-start gap-1.5 text-left transition ${
+                                            className={`flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                                                 isSelected
-                                                    ? 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                                                    : 'border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                                                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200/80 dark:ring-slate-600'
+                                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                             }`}
                                         >
-                                            <TTIcon size={17} className={isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} />
-                                            <div>
-                                                <div className="text-xs font-black">{tt.label}</div>
-                                                <div className="text-[10px] text-slate-400 leading-tight line-clamp-1">{tt.desc}</div>
-                                            </div>
+                                            <TTIcon size={14} className={isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} />
+                                            <span className="text-[11px] font-black tracking-tight">{tt.shortLabel || tt.label}</span>
                                         </button>
                                     );
                                 })}
