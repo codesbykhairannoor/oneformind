@@ -6,7 +6,8 @@ import useSWR from 'swr';
 import { 
     Target, Calendar, Award, Zap, CheckCircle2, Star, 
     Hash, DollarSign, ListTodo, CheckSquare, Compass, 
-    ShieldAlert, Sparkles, Flag, Link2
+    ShieldAlert, Sparkles, Link2, SlidersHorizontal,
+    ChevronDown, ChevronUp, Palette, PaletteIcon
 } from 'lucide-react';
 import GoalDatePicker from './GoalDatePicker';
 import { GoalItem } from './GoalCard';
@@ -65,7 +66,7 @@ export default function GoalModal({
             list.push(h);
         });
         return list;
-    }, [fetchedHabitsRaw]);
+    }, [fetchedHabitsRaw, isHabitActive]);
 
     const [form, setForm] = useState<GoalItem>({
         id: '',
@@ -101,6 +102,7 @@ export default function GoalModal({
     const [showStartPicker, setShowStartPicker] = useState(false);
     const [showEndPicker, setShowEndPicker] = useState(false);
     const [selectedArchetype, setSelectedArchetype] = useState('other');
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     useEffect(() => {
         if (goal) {
@@ -120,6 +122,16 @@ export default function GoalModal({
             setForm(parsedGoal);
             setImagePreview(goal.cover_image_url || null);
             setSelectedArchetype(goal.category || 'other');
+
+            // Auto-expand advanced options if goal already has WOOP or linked habits
+            const hasAdv = Boolean(
+                parsedGoal.core_why ||
+                parsedGoal.obstacle ||
+                parsedGoal.obstacle_plan ||
+                parsedGoal.reward ||
+                (parsedGoal.linked_habit_ids && parsedGoal.linked_habit_ids.length > 0)
+            );
+            setShowAdvanced(hasAdv);
         } else {
             setForm({
                 id: '',
@@ -151,6 +163,7 @@ export default function GoalModal({
             });
             setImagePreview(null);
             setSelectedArchetype('other');
+            setShowAdvanced(false);
         }
     }, [goal, show, isIndo]);
 
@@ -169,7 +182,7 @@ export default function GoalModal({
     const HeaderIcon = currentHeaderIcon();
 
     const formatDateDisplay = (dateStr?: string | null) => {
-        if (!dateStr) return isIndo ? 'Pilih Tanggal' : 'Select Date';
+        if (!dateStr) return isIndo ? 'Pilih Tenggat Waktu' : 'Select Deadline';
         try {
             return new Date(dateStr).toLocaleDateString(isIndo ? 'id-ID' : 'en-US', {
                 day: 'numeric',
@@ -201,7 +214,6 @@ export default function GoalModal({
                 return;
             }
 
-            // Perform client-side compression via HTML canvas to keep payload small, sharp & snappy
             const img = new Image();
             img.onload = () => {
                 try {
@@ -266,12 +278,38 @@ export default function GoalModal({
         { id: 'boolean', label: isIndo ? 'Sederhana' : 'Simple Done', icon: CheckSquare, desc: isIndo ? 'Target 1 kali selesai' : 'Single milestone accomplishment' },
     ];
 
+    const archetypeOptions = [
+        { id: 'career', label: isIndo ? '💼 Karier & Pekerjaan' : '💼 Career & Work' },
+        { id: 'wealth', label: isIndo ? '💰 Keuangan & Investasi' : '💰 Wealth & Finance' },
+        { id: 'learning', label: isIndo ? '🎓 Belajar & Pendidikan' : '🎓 Learning & Education' },
+        { id: 'fitness', label: isIndo ? '🏋️ Fitness & Olahraga' : '🏋️ Fitness & Gym' },
+        { id: 'health', label: isIndo ? '❤️ Kesehatan Fisik & Mental' : '❤️ Health & Wellness' },
+        { id: 'spiritual', label: isIndo ? '✨ Spiritual & Ibadah' : '✨ Spiritual & Faith' },
+        { id: 'coding', label: isIndo ? '💻 Coding & Proyek' : '💻 Coding & Tech' },
+        { id: 'creative', label: isIndo ? '🎨 Kreatif & Seni' : '🎨 Creative & Arts' },
+        { id: 'reading', label: isIndo ? '📖 Membaca Buku' : '📖 Reading Books' },
+        { id: 'social', label: isIndo ? '👥 Sosial & Relasi' : '👥 Social & Networking' },
+        { id: 'travel', label: isIndo ? '✈️ Traveling & Petualangan' : '✈️ Travel & Adventure' },
+        { id: 'music', label: isIndo ? '🎵 Musik & Instrumen' : '🎵 Music' },
+        { id: 'photography', label: isIndo ? '📷 Fotografi' : '📷 Photography' },
+        { id: 'gaming', label: isIndo ? '🎮 Gaming & Hiburan' : '🎮 Gaming & Entertainment' },
+        { id: 'other', label: isIndo ? '🎯 Lainnya / Umum' : '🎯 Other / General' },
+    ];
+
+    const hasAdvancedData = Boolean(
+        form.core_why || 
+        form.obstacle || 
+        form.obstacle_plan || 
+        form.reward || 
+        (form.linked_habit_ids && form.linked_habit_ids.length > 0)
+    );
+
     return (
         <ModalPortal>
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 md:p-6">
                 <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-                <div className="relative w-full max-w-4xl lg:max-w-5xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[92vh] transition-colors border border-slate-200/80 dark:border-slate-800">
+                <div className="relative w-full max-w-3xl lg:max-w-4xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[92vh] transition-colors border border-slate-200/80 dark:border-slate-800">
                     
                     <GoalModalHeader
                         goal={goal}
@@ -288,533 +326,380 @@ export default function GoalModal({
                     />
 
                     {/* Modal Form Scrollable Area */}
-                    <div className="p-5 sm:p-6 md:p-8 overflow-y-auto custom-scrollbar space-y-6 pb-28">
+                    <div className="p-5 sm:p-7 md:p-8 overflow-y-auto custom-scrollbar space-y-6 pb-28">
                         
-                        {/* 2-Column Responsive Layout for Tablet & Desktop */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                            
-                            {/* LEFT COLUMN: Vision, Type, Metrics & Habit Engine (lg:col-span-7) */}
-                            <div className="lg:col-span-7 space-y-5">
-                                
-                                {/* 1. Goal Title & North Star Pinning */}
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                            {isIndo ? 'Judul Target / Visi Impian' : 'Goal Title / Vision'} *
-                                        </label>
+                        {/* 1. Goal Title & North Star Pinning */}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                    {isIndo ? 'Judul Target / Visi Impian' : 'Goal Title / Vision'} *
+                                </label>
 
+                                <button
+                                    type="button"
+                                    onClick={() => setForm(prev => ({ ...prev, is_north_star: !prev.is_north_star }))}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold border transition ${
+                                        form.is_north_star
+                                            ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-600 dark:text-amber-400 shadow-sm'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-amber-950/30'
+                                    }`}
+                                >
+                                    <Star size={13} className={form.is_north_star ? 'fill-amber-400 text-amber-500' : ''} />
+                                    <span>{isIndo ? 'Bintang Utama (North Star)' : 'North Star Goal'}</span>
+                                </button>
+                            </div>
+
+                            <input 
+                                type="text"
+                                value={form.title}
+                                onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
+                                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3.5 text-slate-800 dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-400 transition text-base shadow-sm"
+                                placeholder={isIndo ? 'Contoh: Baca 24 Buku Tahun Ini / Kumpul Dana Darurat 50jt...' : 'E.g. Read 24 Books This Year / Save $10k Emergency Fund...'} 
+                            />
+                        </div>
+
+                        {/* 2. Target Type Selector */}
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                {isIndo ? 'Tipe Target' : 'Goal Type'}
+                            </label>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                {targetTypes.map((tt) => {
+                                    const TTIcon = tt.icon;
+                                    const isSelected = form.type === tt.id;
+                                    return (
                                         <button
+                                            key={tt.id}
                                             type="button"
-                                            onClick={() => setForm(prev => ({ ...prev, is_north_star: !prev.is_north_star }))}
-                                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold border transition ${
-                                                form.is_north_star
-                                                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-600 dark:text-amber-400 shadow-sm'
-                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-amber-50'
+                                            onClick={() => setForm(prev => ({ ...prev, type: tt.id }))}
+                                            className={`p-3 rounded-2xl border-2 flex flex-col items-start gap-1.5 text-left transition ${
+                                                isSelected
+                                                    ? 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                                                    : 'border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                                             }`}
                                         >
-                                            <Star size={13} className={form.is_north_star ? 'fill-amber-400 text-amber-500' : ''} />
-                                            <span>{isIndo ? 'Bintang Utama (North Star)' : 'North Star Goal'}</span>
+                                            <TTIcon size={17} className={isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} />
+                                            <div>
+                                                <div className="text-xs font-black">{tt.label}</div>
+                                                <div className="text-[10px] text-slate-400 leading-tight line-clamp-1">{tt.desc}</div>
+                                            </div>
                                         </button>
-                                    </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
 
-                                    <input 
-                                        type="text"
-                                        value={form.title}
-                                        onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3.5 text-slate-800 dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-400 transition text-base shadow-sm"
-                                        placeholder={isIndo ? 'Contoh: Baca 24 Buku Tahun Ini / Kumpul Dana Darurat 50jt...' : 'E.g. Read 24 Books This Year / Save $10k Emergency Fund...'} 
-                                    />
+                        {/* 3. Numeric / Metric Dynamic Inputs */}
+                        {form.type === 'numeric' && (
+                            <div className="p-4 rounded-2xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
+                                <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                    <Hash size={14} />
+                                    {isIndo ? 'Parameter Target Angka' : 'Numeric Target Parameters'}
+                                </span>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                                            {isIndo ? 'Nilai Awal' : 'Start Value'}
+                                        </label>
+                                        <input 
+                                            type="number"
+                                            value={form.start_value || 0}
+                                            onChange={(e) => setForm(prev => ({ ...prev, start_value: Number(e.target.value) }))}
+                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                                            {isIndo ? 'Saat Ini' : 'Current Value'}
+                                        </label>
+                                        <input 
+                                            type="number"
+                                            value={form.current_value || 0}
+                                            onChange={(e) => setForm(prev => ({ ...prev, current_value: Number(e.target.value) }))}
+                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                                            {isIndo ? 'Nilai Target' : 'Target Value'} *
+                                        </label>
+                                        <input 
+                                            type="number"
+                                            value={form.target_value || 10}
+                                            onChange={(e) => setForm(prev => ({ ...prev, target_value: Number(e.target.value) }))}
+                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                                            {isIndo ? 'Satuan Unit' : 'Unit Label'}
+                                        </label>
+                                        <input 
+                                            type="text"
+                                            value={form.unit || ''}
+                                            onChange={(e) => setForm(prev => ({ ...prev, unit: e.target.value }))}
+                                            placeholder={isIndo ? 'buku / km / kg' : 'books / km / kg'}
+                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
+                                        />
+                                    </div>
                                 </div>
+                            </div>
+                        )}
 
-                                {/* 2. Target Type Selector */}
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                        {isIndo ? 'Tipe Target' : 'Goal Type'}
-                                    </label>
+                        {/* 4. Currency Dynamic Inputs */}
+                        {form.type === 'currency' && (
+                            <div className="p-4 rounded-2xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 space-y-3">
+                                <span className="text-[11px] font-black uppercase text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                    <DollarSign size={14} />
+                                    {isIndo ? 'Parameter Target Finansial' : 'Currency Target Parameters'}
+                                </span>
 
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        {targetTypes.map((tt) => {
-                                            const TTIcon = tt.icon;
-                                            const isSelected = form.type === tt.id;
-                                            return (
-                                                <button
-                                                    key={tt.id}
-                                                    type="button"
-                                                    onClick={() => setForm(prev => ({ ...prev, type: tt.id }))}
-                                                    className={`p-3 rounded-2xl border-2 flex flex-col items-start gap-1.5 text-left transition ${
-                                                        isSelected
-                                                            ? 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                                                            : 'border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                                                    }`}
-                                                >
-                                                    <TTIcon size={17} className={isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} />
-                                                    <div>
-                                                        <div className="text-xs font-black">{tt.label}</div>
-                                                        <div className="text-[10px] text-slate-400 leading-tight line-clamp-1">{tt.desc}</div>
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {/* 3. Numeric / Metric Dynamic Inputs */}
-                                {form.type === 'numeric' && (
-                                    <div className="p-4 rounded-2xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-3">
-                                        <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                                            <Hash size={14} />
-                                            {isIndo ? 'Parameter Target Angka' : 'Numeric Target Parameters'}
-                                        </span>
-
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                                                    {isIndo ? 'Nilai Awal' : 'Start Value'}
-                                                </label>
-                                                <input 
-                                                    type="number"
-                                                    value={form.start_value || 0}
-                                                    onChange={(e) => setForm(prev => ({ ...prev, start_value: Number(e.target.value) }))}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                                                    {isIndo ? 'Saat Ini' : 'Current Value'}
-                                                </label>
-                                                <input 
-                                                    type="number"
-                                                    value={form.current_value || 0}
-                                                    onChange={(e) => setForm(prev => ({ ...prev, current_value: Number(e.target.value) }))}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                                                    {isIndo ? 'Nilai Target' : 'Target Value'} *
-                                                </label>
-                                                <input 
-                                                    type="number"
-                                                    value={form.target_value || 10}
-                                                    onChange={(e) => setForm(prev => ({ ...prev, target_value: Number(e.target.value) }))}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                                                    {isIndo ? 'Satuan Unit' : 'Unit Label'}
-                                                </label>
-                                                <input 
-                                                    type="text"
-                                                    value={form.unit || ''}
-                                                    onChange={(e) => setForm(prev => ({ ...prev, unit: e.target.value }))}
-                                                    placeholder={isIndo ? 'buku / km / kg' : 'books / km / kg'}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* 4. Currency Dynamic Inputs */}
-                                {form.type === 'currency' && (
-                                    <div className="p-4 rounded-2xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 space-y-3">
-                                        <span className="text-[11px] font-black uppercase text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                                            <DollarSign size={14} />
-                                            {isIndo ? 'Parameter Target Finansial' : 'Currency Target Parameters'}
-                                        </span>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                                            <div>
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <label className="text-[10px] font-bold text-slate-400 block">
-                                                        {isIndo ? 'Nominal Saat Ini' : 'Current Amount'}
-                                                    </label>
-                                                    {form.linked_source === 'finance_savings' && (
-                                                        <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase">
-                                                            {isIndo ? '🟢 Auto-Sync' : '🟢 Live Synced'}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <input 
-                                                    type="number"
-                                                    disabled={form.linked_source === 'finance_savings'}
-                                                    value={form.current_value || 0}
-                                                    onChange={(e) => setForm(prev => ({ ...prev, current_value: Number(e.target.value) }))}
-                                                    className={`w-full border rounded-xl px-3 py-2 text-xs font-bold font-mono transition ${
-                                                        form.linked_source === 'finance_savings'
-                                                            ? 'bg-emerald-50/60 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-850 text-emerald-700 dark:text-emerald-300 cursor-not-allowed opacity-90'
-                                                            : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-emerald-600 dark:text-emerald-400'
-                                                    }`}
-                                                    placeholder="0"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                                                    {isIndo ? 'Nominal Target' : 'Target Amount'} *
-                                                </label>
-                                                <input 
-                                                    type="number"
-                                                    value={form.target_value || 50000000}
-                                                    onChange={(e) => setForm(prev => ({ ...prev, target_value: Number(e.target.value) }))}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
-                                                    placeholder="50000000"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                                                    {isIndo ? 'Mata Uang' : 'Currency'}
-                                                </label>
-                                                <select
-                                                    value={form.currency || 'IDR'}
-                                                    onChange={(e) => setForm(prev => ({ ...prev, currency: e.target.value }))}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
-                                                >
-                                                    <option value="IDR">IDR (Rp - Rupiah)</option>
-                                                    <option value="USD">USD ($ - Dollar)</option>
-                                                </select>
-                                            </div>
-
-                                            {/* Link to Finance Savings Account (Only if Finance module active) */}
-                                            {isFinanceActive && (
-                                            <div className="sm:col-span-3 pt-2.5 border-t border-emerald-200/50 dark:border-emerald-800/50 space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <label className="text-[11px] font-black uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                                                        <Link2 size={13} />
-                                                        {isIndo ? 'Sinkronisasi Tabungan Finansial (Auto-Sync)' : 'Link to Finance Savings (Auto-Sync)'}
-                                                    </label>
-                                                    {form.linked_source === 'finance_savings' && (
-                                                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
-                                                            {isIndo ? '🟢 Terhubung Langsung' : '🟢 Live Linked'}
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                <select
-                                                    value={form.linked_account_id ? String(form.linked_account_id) : 'manual'}
-                                                    onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        if (val === 'manual') {
-                                                            setForm(prev => ({
-                                                                ...prev,
-                                                                linked_source: 'manual',
-                                                                linked_account_id: null,
-                                                                linked_account_title: null
-                                                            }));
-                                                        } else {
-                                                            const savingsList: any[] = Array.isArray(fetchedSavings) ? fetchedSavings : [];
-                                                            const matched = savingsList.find((s: any) => String(s.id) === val);
-                                                            if (matched) {
-                                                                setForm(prev => ({
-                                                                    ...prev,
-                                                                    linked_source: 'finance_savings',
-                                                                    linked_account_id: matched.id,
-                                                                    linked_account_title: matched.title,
-                                                                    current_value: matched.currentAmount ?? prev.current_value,
-                                                                    target_value: (prev.target_value === 50000000 && matched.targetAmount) ? matched.targetAmount : prev.target_value
-                                                                }));
-                                                            }
-                                                        }
-                                                    }}
-                                                    className="w-full bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white shadow-sm"
-                                                >
-                                                    <option value="manual">
-                                                        {isIndo ? '✏️ Input Manual (Tidak terhubung ke tabungan)' : '✏️ Manual Input (Not linked)'}
-                                                    </option>
-                                                    {(Array.isArray(fetchedSavings) ? fetchedSavings : []).map((sav: any) => (
-                                                        <option key={sav.id} value={sav.id}>
-                                                            {sav.icon || '💰'} {sav.title} — {new Intl.NumberFormat(isIndo ? 'id-ID' : 'en-US', { style: 'currency', currency: form.currency || 'IDR', maximumFractionDigits: 0 }).format(sav.currentAmount || 0)}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                {form.linked_source === 'finance_savings' && (
-                                                    <p className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 leading-tight">
-                                                        {isIndo 
-                                                            ? 'Saldo target ini akan selalu disinkronkan otomatis dari saldo tabungan Anda di modul Finansial.' 
-                                                            : 'This goal will automatically sync its progress with your savings account in Finance.'}
-                                                    </p>
-                                                )}
-                                            </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="text-[10px] font-bold text-slate-400 block">
+                                                {isIndo ? 'Nominal Saat Ini' : 'Current Amount'}
+                                            </label>
+                                            {form.linked_source === 'finance_savings' && (
+                                                <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase">
+                                                    {isIndo ? '🟢 Auto-Sync' : '🟢 Live Synced'}
+                                                </span>
                                             )}
                                         </div>
+                                        <input 
+                                            type="number"
+                                            disabled={form.linked_source === 'finance_savings'}
+                                            value={form.current_value || 0}
+                                            onChange={(e) => setForm(prev => ({ ...prev, current_value: Number(e.target.value) }))}
+                                            className={`w-full border rounded-xl px-3 py-2 text-xs font-bold font-mono transition ${
+                                                form.linked_source === 'finance_savings'
+                                                    ? 'bg-emerald-50/60 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-850 text-emerald-700 dark:text-emerald-300 cursor-not-allowed opacity-90'
+                                                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-emerald-600 dark:text-emerald-400'
+                                            }`}
+                                            placeholder="0"
+                                        />
                                     </div>
-                                )}
-
-                                {/* 5. Habit Engine (Leading Measures) Selector (Only if Habit module active) */}
-                                {isHabitActive && (
-                                <div className="p-4 rounded-3xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-2.5">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                                            <Sparkles size={14} />
-                                            {isIndo ? '🌱 Mesin Kebiasaan Pendorong (Leading Measures)' : '🌱 Supporting Habit Engine'}
-                                        </span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
-                                            {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'linked'}
-                                        </span>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                                            {isIndo ? 'Nominal Target' : 'Target Amount'} *
+                                        </label>
+                                        <input 
+                                            type="number"
+                                            value={form.target_value || 50000000}
+                                            onChange={(e) => setForm(prev => ({ ...prev, target_value: Number(e.target.value) }))}
+                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white font-mono"
+                                            placeholder="50000000"
+                                        />
                                     </div>
-                                    <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                                        {isIndo 
-                                            ? 'Hubungkan kebiasaan harian aktif di bulan ini yang menjadi penggerak utama target ini.' 
-                                            : 'Link active daily habits for this month that act as the leading measures directly powering this goal.'}
-                                    </p>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                                            {isIndo ? 'Mata Uang' : 'Currency'}
+                                        </label>
+                                        <select
+                                            value={form.currency || 'IDR'}
+                                            onChange={(e) => setForm(prev => ({ ...prev, currency: e.target.value }))}
+                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white"
+                                        >
+                                            <option value="IDR">IDR (Rp - Rupiah)</option>
+                                            <option value="USD">USD ($ - Dollar)</option>
+                                        </select>
+                                    </div>
 
-                                    {uniqueHabits.length === 0 ? (
-                                        <div className="text-xs text-slate-400 italic py-1.5">
-                                            {isIndo ? 'Belum ada kebiasaan aktif di bulan ini.' : 'No active habits found for this month.'}
+                                    {/* Link to Finance Savings Account */}
+                                    {isFinanceActive && (
+                                    <div className="sm:col-span-3 pt-2.5 border-t border-emerald-200/50 dark:border-emerald-800/50 space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-[11px] font-black uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                                <Link2 size={13} />
+                                                {isIndo ? 'Sinkronisasi Tabungan Finansial (Auto-Sync)' : 'Link to Finance Savings (Auto-Sync)'}
+                                            </label>
+                                            {form.linked_source === 'finance_savings' && (
+                                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                                                    {isIndo ? '🟢 Terhubung Langsung' : '🟢 Live Linked'}
+                                                </span>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
-                                            {uniqueHabits.map((h: any) => {
-                                                const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
-                                                return (
-                                                    <button
-                                                        key={h.id}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setForm(prev => {
-                                                                const currentIds = prev.linked_habit_ids || [];
-                                                                const exists = currentIds.some(id => String(id) === String(h.id));
-                                                                const nextIds = exists 
-                                                                    ? currentIds.filter(id => String(id) !== String(h.id))
-                                                                    : [...currentIds, h.id];
-                                                                return { ...prev, linked_habit_ids: nextIds };
-                                                            });
-                                                        }}
-                                                        className={`p-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
-                                                            isSelected
-                                                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-400/40'
-                                                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700/80 hover:border-indigo-300 hover:bg-indigo-50/30'
-                                                        }`}
-                                                    >
-                                                        <div className="flex items-center gap-1.5 min-w-0">
-                                                            <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
-                                                            <span className="truncate text-[11px] font-bold">{h.name}</span>
-                                                        </div>
-                                                        {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
+
+                                        <select
+                                            value={form.linked_account_id ? String(form.linked_account_id) : 'manual'}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val === 'manual') {
+                                                    setForm(prev => ({
+                                                        ...prev,
+                                                        linked_source: 'manual',
+                                                        linked_account_id: null,
+                                                        linked_account_title: null
+                                                    }));
+                                                } else {
+                                                    const savingsList: any[] = Array.isArray(fetchedSavings) ? fetchedSavings : [];
+                                                    const matched = savingsList.find((s: any) => String(s.id) === val);
+                                                    if (matched) {
+                                                        setForm(prev => ({
+                                                            ...prev,
+                                                            linked_source: 'finance_savings',
+                                                            linked_account_id: matched.id,
+                                                            linked_account_title: matched.title,
+                                                            current_value: matched.currentAmount ?? prev.current_value,
+                                                            target_value: (prev.target_value === 50000000 && matched.targetAmount) ? matched.targetAmount : prev.target_value
+                                                        }));
+                                                    }
+                                                }
+                                            }}
+                                            className="w-full bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white shadow-sm"
+                                        >
+                                            <option value="manual">
+                                                {isIndo ? '✏️ Input Manual (Tidak terhubung ke tabungan)' : '✏️ Manual Input (Not linked)'}
+                                            </option>
+                                            {(Array.isArray(fetchedSavings) ? fetchedSavings : []).map((sav: any) => (
+                                                <option key={sav.id} value={sav.id}>
+                                                    {sav.icon || '💰'} {sav.title} — {new Intl.NumberFormat(isIndo ? 'id-ID' : 'en-US', { style: 'currency', currency: form.currency || 'IDR', maximumFractionDigits: 0 }).format(sav.currentAmount || 0)}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                     )}
                                 </div>
-                                )}
+                            </div>
+                        )}
 
-                                {/* 6. Color Theme Selector */}
+                        {/* 5. Essential Parameters Grid (Horizon, Priority, Category, Deadline) */}
+                        <div className="p-4 sm:p-5 rounded-3xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 space-y-4">
+                            
+                            {/* Row 1: Time Horizon & Priority */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Time Horizon */}
                                 <div className="space-y-1.5">
                                     <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                        {isIndo ? 'Warna Tema Target' : 'Goal Color Theme'}
+                                        {isIndo ? 'Horison Waktu' : 'Time Horizon'}
                                     </label>
-                                    <div className="flex flex-wrap gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/60 dark:border-slate-800">
-                                        {colorOptions.map((c) => (
+                                    <div className="flex gap-1 p-1 bg-white dark:bg-slate-850 rounded-2xl border border-slate-200 dark:border-slate-700/80">
+                                        {[
+                                            { id: 'weekly', label: isIndo ? 'Mingguan' : 'Weekly' },
+                                            { id: 'monthly', label: isIndo ? 'Bulanan' : 'Monthly' },
+                                            { id: 'quarterly', label: isIndo ? 'Kuartal' : 'Quarter' },
+                                            { id: 'yearly', label: isIndo ? 'Tahunan' : 'Yearly' },
+                                            { id: 'lifetime', label: 'Vision' },
+                                        ].map((th) => (
                                             <button 
-                                                key={c}
+                                                key={th.id}
                                                 type="button"
-                                                onClick={() => setForm(prev => ({ ...prev, color: c }))}
-                                                className={`w-7 h-7 rounded-xl transition-all flex items-center justify-center hover:scale-110 active:scale-95 ${
-                                                    form.color === c ? 'ring-4 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500/30 shadow-md' : 'opacity-70 hover:opacity-100'
+                                                onClick={() => setForm(prev => ({ ...prev, time_horizon: th.id }))}
+                                                className={`flex-1 py-2 px-1 rounded-xl text-[10px] font-black tracking-wider transition text-center shrink-0 ${
+                                                    form.time_horizon === th.id 
+                                                        ? 'bg-indigo-600 text-white shadow-md' 
+                                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                                                 }`}
-                                                style={{ backgroundColor: c }}
                                             >
-                                                {form.color === c && (
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-white drop-shadow" />
-                                                )}
+                                                {th.label}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
-                            </div>
-
-                            {/* RIGHT COLUMN: Category, Timeline & Psychology (lg:col-span-5) */}
-                            <div className="lg:col-span-5 space-y-5">
-                                
-                                {/* 7. Archetype Template Selection */}
-                                <GoalArchetypesGrid
-                                    selectedArchetype={selectedArchetype}
-                                    onSelectArchetype={selectArchetype}
-                                    t={() => ''}
-                                />
-
-                                {/* 8. Priority & Time Horizon */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                            {isIndo ? 'Tingkat Prioritas' : 'Priority Level'}
-                                        </label>
-                                        <div className="flex gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
-                                            {['vital', 'important', 'optional'].map((p) => (
-                                                <button 
-                                                    key={p}
-                                                    type="button"
-                                                    onClick={() => setForm(prev => ({ ...prev, priority: p }))}
-                                                    className={`flex-1 py-2 rounded-xl text-[10px] font-black tracking-wider uppercase transition capitalize ${
-                                                        form.priority === p 
-                                                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md' 
-                                                            : 'text-slate-400 hover:text-slate-600'
-                                                    }`}
-                                                >
-                                                    {p === 'vital' ? 'Vital 🔥' : p === 'important' ? (isIndo ? 'Penting' : 'Important') : 'Opsional'}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1.5">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                            {isIndo ? 'Horison Waktu' : 'Time Horizon'}
-                                        </label>
-                                        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-x-auto no-scrollbar">
-                                            {[
-                                                { id: 'weekly', label: isIndo ? 'Mingguan' : 'Weekly' },
-                                                { id: 'monthly', label: isIndo ? 'Bulanan' : 'Monthly' },
-                                                { id: 'quarterly', label: isIndo ? 'Kuartal' : 'Quarter' },
-                                                { id: 'yearly', label: isIndo ? 'Tahunan' : 'Yearly' },
-                                                { id: 'lifetime', label: 'Vision' },
-                                            ].map((th) => (
-                                                <button 
-                                                    key={th.id}
-                                                    type="button"
-                                                    onClick={() => setForm(prev => ({ ...prev, time_horizon: th.id }))}
-                                                    className={`flex-1 min-w-[54px] py-2 rounded-xl text-[9px] font-black tracking-wider transition text-center shrink-0 ${
-                                                        form.time_horizon === th.id 
-                                                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md' 
-                                                            : 'text-slate-400 hover:text-slate-600'
-                                                    }`}
-                                                >
-                                                    {th.label}
-                                                </button>
-                                            ))}
-                                        </div>
+                                {/* Priority Level */}
+                                <div className="space-y-1.5">
+                                    <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                        {isIndo ? 'Tingkat Prioritas' : 'Priority Level'}
+                                    </label>
+                                    <div className="flex gap-1.5 p-1 bg-white dark:bg-slate-850 rounded-2xl border border-slate-200 dark:border-slate-700/80">
+                                        {[
+                                            { id: 'vital', label: 'Vital 🔥' },
+                                            { id: 'important', label: isIndo ? 'Penting' : 'Important' },
+                                            { id: 'optional', label: isIndo ? 'Opsional' : 'Optional' }
+                                        ].map((p) => (
+                                            <button 
+                                                key={p.id}
+                                                type="button"
+                                                onClick={() => setForm(prev => ({ ...prev, priority: p.id }))}
+                                                className={`flex-1 py-2 rounded-xl text-[10px] font-black tracking-wider uppercase transition capitalize ${
+                                                    form.priority === p.id 
+                                                        ? 'bg-indigo-600 text-white shadow-md' 
+                                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                                                }`}
+                                            >
+                                                {p.label}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* 9. Start Date & Target Deadline */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 relative z-50">
-                                    <div className="space-y-1.5 relative">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                            {isIndo ? 'Tanggal Mulai' : 'Start Date'}
-                                        </label>
-                                        <div className="relative">
-                                            <button 
-                                                type="button" 
-                                                onClick={() => { setShowStartPicker(!showStartPicker); setShowEndPicker(false); }}
-                                                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-3 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm"
-                                            >
-                                                <span>{formatDateDisplay(form.start_date)}</span>
-                                                <Calendar className="w-4 h-4 text-slate-400" />
-                                            </button>
-                                            
-                                            <GoalDatePicker 
-                                                show={showStartPicker}
-                                                teleport={true}
-                                                modelValue={form.start_date}
-                                                onUpdateModelValue={(val) => { setForm(prev => ({ ...prev, start_date: val })); setShowStartPicker(false); }}
-                                                onClose={() => setShowStartPicker(false)}
-                                            />
-                                        </div>
-                                    </div>
+                            {/* Row 2: Category & Target Deadline */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Category Dropdown */}
+                                <div className="space-y-1.5">
+                                    <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                        {isIndo ? 'Kategori Target (Archetype)' : 'Goal Category'}
+                                    </label>
+                                    <select
+                                        value={form.category || 'other'}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            setSelectedArchetype(val);
+                                            const matched = archetypes.find(a => a.id === val);
+                                            setForm(prev => ({
+                                                ...prev,
+                                                category: val,
+                                                color: matched?.color || prev.color
+                                            }));
+                                        }}
+                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
+                                    >
+                                        {archetypeOptions.map((opt) => (
+                                            <option key={opt.id} value={opt.id}>
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                                    <div className="space-y-1.5 relative">
+                                {/* Target Deadline */}
+                                <div className="space-y-1.5 relative">
+                                    <div className="flex items-center justify-between">
                                         <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                                             {isIndo ? 'Tenggat Waktu Akhir' : 'Target Deadline'}
                                         </label>
-                                        <div className="relative">
+                                        {form.end_date && (
                                             <button 
                                                 type="button" 
-                                                onClick={() => { setShowEndPicker(!showEndPicker); setShowStartPicker(false); }}
-                                                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-3 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm"
+                                                onClick={() => setForm(prev => ({ ...prev, end_date: null }))}
+                                                className="text-[10px] font-bold text-rose-500 hover:underline"
                                             >
-                                                <span className={!form.end_date ? 'text-slate-400' : ''}>
-                                                    {formatDateDisplay(form.end_date)}
-                                                </span>
-                                                <Zap className={`w-4 h-4 ${form.end_date ? 'text-rose-500' : 'text-slate-400'}`} />
+                                                {isIndo ? 'Kosongkan' : 'Clear'}
                                             </button>
-                                            
-                                            <GoalDatePicker 
-                                                show={showEndPicker}
-                                                teleport={true}
-                                                modelValue={form.end_date}
-                                                onUpdateModelValue={(val) => { setForm(prev => ({ ...prev, end_date: val })); setShowEndPicker(false); }}
-                                                onClose={() => setShowEndPicker(false)}
-                                            />
-                                        </div>
+                                        )}
                                     </div>
-                                </div>
-
-                                {/* 10. Psychological & WOOP Fields */}
-                                <div className="p-4 sm:p-5 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 space-y-3.5">
-                                    <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                                        <Compass size={15} />
-                                        {isIndo ? 'Psikologi Pencapaian & Motivasi (WOOP)' : 'Goal Psychology & WOOP Pre-Mortem'}
-                                    </span>
-
-                                    {/* Core Motivation */}
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                                            {isIndo ? 'Alasan Utama ("The Why")' : 'The Core Motivation ("The Why")'}
-                                        </label>
-                                        <textarea
-                                            value={form.core_why || ''}
-                                            onChange={(e) => setForm(prev => ({ ...prev, core_why: e.target.value }))}
-                                            rows={2}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs font-medium text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 outline-none"
-                                            placeholder={isIndo ? 'Mengapa target ini sangat berarti dan tidak boleh gagal?' : 'Why is this goal non-negotiable for your life?'}
-                                        />
-                                    </div>
-
-                                    {/* Obstacle & Plan */}
-                                    <div className="space-y-2.5">
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                                                <ShieldAlert size={12} />
-                                                {isIndo ? 'Potensi Rintangan Terbesar' : 'Biggest Obstacle'}
-                                            </label>
-                                            <input 
-                                                type="text"
-                                                value={form.obstacle || ''}
-                                                onChange={(e) => setForm(prev => ({ ...prev, obstacle: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
-                                                placeholder={isIndo ? 'Contoh: Godaan belanja impulsif / Malas malam hari' : 'E.g. Impulsive spending / evening fatigue'}
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                                                {isIndo ? 'Rencana Antisipasi (If-Then)' : 'Anticipation Plan (If-Then)'}
-                                            </label>
-                                            <input 
-                                                type="text"
-                                                value={form.obstacle_plan || ''}
-                                                onChange={(e) => setForm(prev => ({ ...prev, obstacle_plan: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
-                                                placeholder={isIndo ? 'Jika terjadi, saya akan...' : 'If it happens, I will...'}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Self-Reward */}
-                                    <div className="space-y-1 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                                        <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                                            <Award size={13} />
-                                            {isIndo ? 'Hadiah Kemenangan (Victory Self-Reward)' : 'Victory Self-Reward'}
-                                        </label>
-                                        <input 
-                                            type="text"
-                                            value={form.reward || ''}
-                                            onChange={(e) => setForm(prev => ({ ...prev, reward: e.target.value }))}
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
-                                            placeholder={isIndo ? 'Rayakan saat 100% tercapai (contoh: Liburan 3 hari / Dinner mewah)' : 'Reward yourself when done (e.g. Weekend getaway / Special dinner)'}
+                                    <div className="relative">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setShowEndPicker(!showEndPicker); setShowStartPicker(false); }}
+                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
+                                        >
+                                            <span className={!form.end_date ? 'text-slate-400' : ''}>
+                                                {formatDateDisplay(form.end_date)}
+                                            </span>
+                                            <Zap className={`w-4 h-4 ${form.end_date ? 'text-rose-500' : 'text-slate-400'}`} />
+                                        </button>
+                                        
+                                        <GoalDatePicker 
+                                            show={showEndPicker}
+                                            teleport={true}
+                                            modelValue={form.end_date}
+                                            onUpdateModelValue={(val) => { setForm(prev => ({ ...prev, end_date: val })); setShowEndPicker(false); }}
+                                            onClose={() => setShowEndPicker(false)}
                                         />
                                     </div>
                                 </div>
-
                             </div>
 
                         </div>
 
-                        {/* 11. Milestones Section (Full width if type is milestones) */}
+                        {/* 6. Milestones Section (Prominently accessible right here) */}
                         {form.type === 'milestones' && (
-                            <div className="pt-3 border-t border-slate-150 dark:border-slate-800">
+                            <div className="pt-2">
                                 <GoalMilestonesSection
                                     form={form}
                                     setForm={setForm}
@@ -822,6 +707,231 @@ export default function GoalModal({
                                 />
                             </div>
                         )}
+
+                        {/* 7. Collapsible Advanced Options Accordion */}
+                        <div className="pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowAdvanced(!showAdvanced)}
+                                className="w-full py-3.5 px-5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 transition-all flex items-center justify-between group shadow-sm"
+                            >
+                                <div className="flex items-center gap-2.5">
+                                    <SlidersHorizontal size={15} className="text-indigo-500 group-hover:rotate-45 transition-transform" />
+                                    <div className="text-left">
+                                        <span className="text-xs font-black text-slate-700 dark:text-slate-200 block">
+                                            {isIndo ? '⚙️ Opsi Lanjutan & Psikologi (Opsional)' : '⚙️ Advanced Options & Psychology (Optional)'}
+                                        </span>
+                                        <span className="text-[10px] text-slate-400 block font-normal">
+                                            {isIndo ? 'Kebiasaan pendorong, psikologi WOOP, warna tema & tanggal mulai' : 'Habit engine, WOOP reflection, color & start date'}
+                                        </span>
+                                    </div>
+                                    {hasAdvancedData && !showAdvanced && (
+                                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                                            {isIndo ? 'Terisi' : 'Configured'}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-1.5 text-slate-400">
+                                    <span className="text-[11px] font-bold">{showAdvanced ? (isIndo ? 'Tutup' : 'Collapse') : (isIndo ? 'Buka' : 'Expand')}</span>
+                                    {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                </div>
+                            </button>
+
+                            {showAdvanced && (
+                                <div className="mt-4 p-5 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 space-y-6 animate-in fade-in duration-200">
+                                    
+                                    {/* Advanced Item 1: Supporting Habit Engine (Leading Measures) */}
+                                    {isHabitActive && (
+                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                                <Sparkles size={14} />
+                                                {isIndo ? '🌱 Mesin Kebiasaan Pendorong (Leading Measures)' : '🌱 Supporting Habit Engine'}
+                                            </span>
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
+                                                {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'linked'}
+                                            </span>
+                                        </div>
+                                        <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                            {isIndo 
+                                                ? 'Hubungkan kebiasaan harian aktif di bulan ini yang menjadi penggerak utama target ini.' 
+                                                : 'Link active daily habits for this month that act as the leading measures directly powering this goal.'}
+                                        </p>
+
+                                        {uniqueHabits.length === 0 ? (
+                                            <div className="text-xs text-slate-400 italic py-1.5">
+                                                {isIndo ? 'Belum ada kebiasaan aktif di bulan ini.' : 'No active habits found for this month.'}
+                                            </div>
+                                        ) : (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                                                {uniqueHabits.map((h: any) => {
+                                                    const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
+                                                    return (
+                                                        <button
+                                                            key={h.id}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setForm(prev => {
+                                                                    const currentIds = prev.linked_habit_ids || [];
+                                                                    const exists = currentIds.some(id => String(id) === String(h.id));
+                                                                    const nextIds = exists 
+                                                                        ? currentIds.filter(id => String(id) !== String(h.id))
+                                                                        : [...currentIds, h.id];
+                                                                    return { ...prev, linked_habit_ids: nextIds };
+                                                                });
+                                                            }}
+                                                            className={`p-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
+                                                                isSelected
+                                                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-400/40'
+                                                                    : 'bg-slate-50 dark:bg-slate-750 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700/80 hover:border-indigo-300 hover:bg-indigo-50/30'
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center gap-1.5 min-w-0">
+                                                                <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
+                                                                <span className="truncate text-[11px] font-bold">{h.name}</span>
+                                                            </div>
+                                                            {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                    )}
+
+                                    {/* Advanced Item 2: Psychological & WOOP Fields */}
+                                    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 space-y-3.5">
+                                        <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                            <Compass size={15} />
+                                            {isIndo ? 'Psikologi Pencapaian & Motivasi (WOOP)' : 'Goal Psychology & Motivation (WOOP)'}
+                                        </span>
+
+                                        {/* Core Motivation */}
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                                {isIndo ? 'Alasan Utama ("The Why")' : 'The Core Motivation ("The Why")'}
+                                            </label>
+                                            <textarea
+                                                value={form.core_why || ''}
+                                                onChange={(e) => setForm(prev => ({ ...prev, core_why: e.target.value }))}
+                                                rows={2}
+                                                className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs font-medium text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                                                placeholder={isIndo ? 'Mengapa target ini sangat berarti dan tidak boleh gagal?' : 'Why is this goal non-negotiable for your life?'}
+                                            />
+                                        </div>
+
+                                        {/* Obstacle & Plan */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                                                    <ShieldAlert size={12} />
+                                                    {isIndo ? 'Potensi Rintangan Terbesar' : 'Biggest Obstacle'}
+                                                </label>
+                                                <input 
+                                                    type="text"
+                                                    value={form.obstacle || ''}
+                                                    onChange={(e) => setForm(prev => ({ ...prev, obstacle: e.target.value }))}
+                                                    className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
+                                                    placeholder={isIndo ? 'Contoh: Godaan belanja impulsif / Malas malam hari' : 'E.g. Impulsive spending / evening fatigue'}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                                                    {isIndo ? 'Rencana Antisipasi (If-Then)' : 'Anticipation Plan (If-Then)'}
+                                                </label>
+                                                <input 
+                                                    type="text"
+                                                    value={form.obstacle_plan || ''}
+                                                    onChange={(e) => setForm(prev => ({ ...prev, obstacle_plan: e.target.value }))}
+                                                    className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
+                                                    placeholder={isIndo ? 'Jika terjadi, saya akan...' : 'If it happens, I will...'}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Self-Reward */}
+                                        <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                            <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                                                <Award size={13} />
+                                                {isIndo ? 'Hadiah Kemenangan (Victory Self-Reward)' : 'Victory Self-Reward'}
+                                            </label>
+                                            <input 
+                                                type="text"
+                                                value={form.reward || ''}
+                                                onChange={(e) => setForm(prev => ({ ...prev, reward: e.target.value }))}
+                                                className="w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white"
+                                                placeholder={isIndo ? 'Rayakan saat 100% tercapai (contoh: Liburan 3 hari / Dinner mewah)' : 'Reward yourself when done (e.g. Weekend getaway / Special dinner)'}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Advanced Item 3: Color Theme & Start Date */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {/* Color Theme Selector */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
+                                                <Palette size={13} />
+                                                {isIndo ? 'Warna Tema Target' : 'Goal Color Theme'}
+                                            </label>
+                                            <div className="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                                                {colorOptions.map((c) => (
+                                                    <button 
+                                                        key={c}
+                                                        type="button"
+                                                        onClick={() => setForm(prev => ({ ...prev, color: c }))}
+                                                        className={`w-6 h-6 rounded-xl transition-all flex items-center justify-center hover:scale-110 active:scale-95 ${
+                                                            form.color === c ? 'ring-4 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500/30 shadow-md' : 'opacity-70 hover:opacity-100'
+                                                        }`}
+                                                        style={{ backgroundColor: c }}
+                                                    >
+                                                        {form.color === c && (
+                                                            <CheckCircle2 className="w-3 h-3 text-white drop-shadow" />
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Start Date Picker */}
+                                        <div className="space-y-2 relative">
+                                            <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
+                                                <Calendar size={13} />
+                                                {isIndo ? 'Tanggal Mulai' : 'Start Date'}
+                                            </label>
+                                            <div className="relative">
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => { setShowStartPicker(!showStartPicker); setShowEndPicker(false); }}
+                                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
+                                                >
+                                                    <span>{formatDateDisplay(form.start_date)}</span>
+                                                    <Calendar className="w-4 h-4 text-slate-400" />
+                                                </button>
+                                                
+                                                <GoalDatePicker 
+                                                    show={showStartPicker}
+                                                    teleport={true}
+                                                    modelValue={form.start_date}
+                                                    onUpdateModelValue={(val) => { setForm(prev => ({ ...prev, start_date: val })); setShowStartPicker(false); }}
+                                                    onClose={() => setShowStartPicker(false)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Advanced Item 4: Visual Archetype Grid */}
+                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                                        <GoalArchetypesGrid
+                                            selectedArchetype={selectedArchetype}
+                                            onSelectArchetype={selectArchetype}
+                                            t={() => ''}
+                                        />
+                                    </div>
+
+                                </div>
+                            )}
+                        </div>
 
                     </div>
 
