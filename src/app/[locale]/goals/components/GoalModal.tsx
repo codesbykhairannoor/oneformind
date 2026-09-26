@@ -22,6 +22,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 interface GoalModalProps {
     show: boolean;
     goal?: GoalItem | null;
+    allGoals?: GoalItem[];
     onClose: () => void;
     onSave: (form: GoalItem) => void;
     onUploadImage?: (file: File) => void;
@@ -32,6 +33,7 @@ interface GoalModalProps {
 export default function GoalModal({
     show,
     goal,
+    allGoals = [],
     onClose,
     onSave,
     onUploadImage,
@@ -78,6 +80,7 @@ export default function GoalModal({
         category: 'other',
         time_horizon: 'yearly',
         is_north_star: false,
+        parent_goal_id: null,
         start_value: 0,
         current_value: 0,
         target_value: 10,
@@ -96,6 +99,15 @@ export default function GoalModal({
         linked_account_title: null,
         linked_habit_ids: []
     });
+
+    const potentialParentGoals = useMemo(() => {
+        if (!allGoals || !Array.isArray(allGoals)) return [];
+        return allGoals.filter(g => {
+            if (form.id && String(g.id) === String(form.id)) return false;
+            if (goal?.id && String(g.id) === String(goal.id)) return false;
+            return true;
+        });
+    }, [allGoals, form.id, goal?.id]);
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -119,6 +131,7 @@ export default function GoalModal({
                 } catch {}
             }
             if (!parsedGoal.linked_habit_ids) parsedGoal.linked_habit_ids = [];
+            parsedGoal.parent_goal_id = parsedGoal.parent_goal_id ?? parsedGoal.parentGoalId ?? null;
             setForm(parsedGoal);
             setImagePreview(goal.cover_image_url || null);
             setSelectedArchetype(goal.category || 'other');
@@ -143,6 +156,7 @@ export default function GoalModal({
                 category: 'other',
                 time_horizon: 'yearly',
                 is_north_star: false,
+                parent_goal_id: null,
                 start_value: 0,
                 current_value: 0,
                 target_value: 10,
@@ -632,6 +646,56 @@ export default function GoalModal({
                                 </div>
                             </div>
 
+                            {/* Row 1b: Parent Goal (Target Induk) Hierarchy Selector */}
+                            {potentialParentGoals.length > 0 && form.time_horizon !== 'lifetime' && (
+                                <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-1.5">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
+                                            <Link2 size={13} />
+                                            {isIndo ? '🔗 Target Induk (Parent Goal) — Bagian Dari Mana?' : '🔗 Parent Goal — Connected Vision'}
+                                        </label>
+                                        {form.parent_goal_id && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setForm(prev => ({ ...prev, parent_goal_id: null }))}
+                                                className="text-[10px] font-bold text-rose-500 hover:underline"
+                                            >
+                                                {isIndo ? 'Jadikan Mandiri (Lepas Hubungan)' : 'Make Standalone (Unlink)'}
+                                            </button>
+                                        )}
+                                    </div>
+                                    <select
+                                        value={form.parent_goal_id ? String(form.parent_goal_id) : ''}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            setForm(prev => ({ ...prev, parent_goal_id: val ? Number(val) : null }));
+                                        }}
+                                        className="w-full bg-white dark:bg-slate-900 border border-indigo-200/80 dark:border-indigo-800/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
+                                    >
+                                        <option value="">
+                                            {isIndo ? '🎯 Target Mandiri (Bukan sub-target / Standalone)' : '🎯 Standalone Goal (Not a sub-goal)'}
+                                        </option>
+                                        {potentialParentGoals.map(pg => {
+                                            const horizonLabel = pg.time_horizon === 'lifetime' ? 'Vision' :
+                                                pg.time_horizon === 'yearly' ? (isIndo ? 'Tahunan' : 'Yearly') :
+                                                pg.time_horizon === 'quarterly' ? (isIndo ? 'Kuartal' : 'Quarterly') :
+                                                pg.time_horizon === 'monthly' ? (isIndo ? 'Bulanan' : 'Monthly') :
+                                                (isIndo ? 'Mingguan' : 'Weekly');
+                                            return (
+                                                <option key={pg.id} value={pg.id}>
+                                                    [{horizonLabel}] {pg.title}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                        {isIndo 
+                                            ? 'Target mingguan/bulanan dapat dihubungkan ke target tahunan/kuartal agar capaian sub-target otomatis mempercepat target induk.'
+                                            : 'Link this weekly/monthly target to a higher-level goal so sub-target achievements drive parent progression.'}
+                                    </p>
+                                </div>
+                            )}
+
                             {/* Row 2: Category & Color Theme */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Category Dropdown */}
@@ -814,8 +878,8 @@ export default function GoalModal({
                                         </div>
                                         <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                                             {isIndo 
-                                                ? 'Hubungkan kebiasaan harian aktif di bulan ini yang menjadi penggerak utama target ini.' 
-                                                : 'Link active daily habits for this month that act as the leading measures directly powering this goal.'}
+                                                ? 'Hubungkan kebiasaan harian atau sprint mingguan (misal 3x/minggu) yang menjadi mesin pendorong utama target ini.' 
+                                                : 'Link active daily habits or weekly sprint routines (e.g. 3x/week) that act as the leading measures directly powering this goal.'}
                                         </p>
 
                                         {uniqueHabits.length === 0 ? (
@@ -823,9 +887,12 @@ export default function GoalModal({
                                                 {isIndo ? 'Belum ada kebiasaan aktif di bulan ini.' : 'No active habits found for this month.'}
                                             </div>
                                         ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[170px] overflow-y-auto pr-1 custom-scrollbar">
                                                 {uniqueHabits.map((h: any) => {
                                                     const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
+                                                    const freqBadge = (h.frequencyType === 'weekly_days' && Array.isArray(h.frequencyDays) && h.frequencyDays.length > 0)
+                                                        ? `${h.frequencyDays.length}x/mgg`
+                                                        : (h.frequencyCount && h.frequencyCount > 0 ? `${h.frequencyCount}x/mgg` : (isIndo ? 'Harian' : 'Daily'));
                                                     return (
                                                         <button
                                                             key={h.id}
@@ -848,7 +915,14 @@ export default function GoalModal({
                                                         >
                                                             <div className="flex items-center gap-2 min-w-0">
                                                                 <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
-                                                                <span className="truncate text-xs font-bold">{h.name}</span>
+                                                                <div className="min-w-0">
+                                                                    <span className="truncate text-xs font-bold block">{h.name}</span>
+                                                                    <span className={`text-[9px] font-black uppercase tracking-wider block ${
+                                                                        isSelected ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'
+                                                                    }`}>
+                                                                        ⚡ {freqBadge}
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                             {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
                                                         </button>

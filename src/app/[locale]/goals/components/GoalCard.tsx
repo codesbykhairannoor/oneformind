@@ -9,7 +9,7 @@ import {
     ChevronRight, Zap, CheckCircle2, Sparkles, Star,
     Heart, DollarSign, Briefcase, GraduationCap, Users, 
     Plane, Palette, Dumbbell, Music, Code, Camera, BookOpen, 
-    Gamepad2, ShieldAlert, Compass, Plus, Minus
+    Gamepad2, ShieldAlert, Compass, Plus, Minus, Link2
 } from 'lucide-react';
 import MilestoneItem, { Milestone } from './MilestoneItem';
 import { 
@@ -227,6 +227,19 @@ export default function GoalCard({
                                 <span>💰 Live Sync</span>
                             </span>
                         )}
+
+                        {goal.child_goals_count && goal.child_goals_count > 0 ? (
+                            <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-indigo-600/90 text-white border border-indigo-400/40 flex items-center gap-1 shadow-sm">
+                                <span>🌱 {goal.child_goals_count} {isIndo ? 'Sub-Target' : 'Sub-Goals'}</span>
+                            </span>
+                        ) : null}
+
+                        {goal.parent_goal_title ? (
+                            <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-purple-600/90 text-white border border-purple-400/40 flex items-center gap-1 shadow-sm">
+                                <Link2 className="w-2.5 h-2.5" />
+                                <span>{isIndo ? 'Sub-Target' : 'Sub-Goal'}</span>
+                            </span>
+                        ) : null}
                     </div>
 
                     <h3 className={`text-lg sm:text-xl font-black truncate drop-shadow-sm transition-colors ${
@@ -239,6 +252,16 @@ export default function GoalCard({
 
             {/* Card Body */}
             <div className="p-5 sm:p-6 flex flex-col flex-1 space-y-4">
+                
+                {/* Parent Goal Hierarchy Link */}
+                {goal.parent_goal_title && (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                        <Link2 className="w-3 h-3 text-indigo-500 shrink-0" />
+                        <span className="truncate">
+                            {isIndo ? 'Sub-target dari:' : 'Sub-goal of:'} <span className="font-extrabold underline">{goal.parent_goal_title}</span>
+                        </span>
+                    </div>
+                )}
                 
                 {/* 1. Progress Header & Mark Done */}
                 <div className="flex items-center justify-between">

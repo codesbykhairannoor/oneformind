@@ -26,6 +26,9 @@ export interface GoalItem {
     category?: string;
     time_horizon?: GoalTimeHorizon;
     is_north_star?: boolean;
+    parent_goal_id?: number | string | null;
+    parent_goal_title?: string | null;
+    child_goals_count?: number;
     
     // Numeric & Metric targets
     start_value?: number;

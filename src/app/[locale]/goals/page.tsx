@@ -67,6 +67,26 @@ export default function GoalsPage() {
 
     const parsedGoals = useMemo(() => {
         if (!fetchedGoals || !Array.isArray(fetchedGoals)) return null;
+
+        // Build Title Map and Child Count Map for Parent-Child Goal Hierarchy
+        const titleMap = new Map<string, string>();
+        const childCountMap = new Map<string, number>();
+
+        fetchedGoals.forEach((g: any) => {
+            titleMap.set(String(g.id), g.title || '');
+            let meta: any = {};
+            const rawSpecific = g.specific_days || g.specificDays;
+            if (rawSpecific && typeof rawSpecific === 'string') {
+                try { meta = JSON.parse(rawSpecific); } catch {}
+            } else if (rawSpecific && typeof rawSpecific === 'object') {
+                meta = rawSpecific;
+            }
+            const pId = g.parent_goal_id ?? g.parentGoalId ?? meta.parent_goal_id ?? meta.parentGoalId;
+            if (pId) {
+                childCountMap.set(String(pId), (childCountMap.get(String(pId)) || 0) + 1);
+            }
+        });
+
         return fetchedGoals.map((g: any) => {
             // Parse specific_days / metadata
             let meta: any = {};
@@ -76,6 +96,10 @@ export default function GoalsPage() {
             } else if (rawSpecific && typeof rawSpecific === 'object') {
                 meta = rawSpecific;
             }
+
+            const parentGoalId = g.parent_goal_id ?? g.parentGoalId ?? meta.parent_goal_id ?? meta.parentGoalId ?? null;
+            const parentGoalTitle = parentGoalId ? (titleMap.get(String(parentGoalId)) || null) : null;
+            const childGoalsCount = childCountMap.get(String(g.id)) || 0;
 
             const linkedSource = g.linked_source || meta.linked_source || 'manual';
             const linkedAccountId = g.linked_account_id ?? meta.linked_account_id ?? null;
@@ -141,6 +165,9 @@ export default function GoalsPage() {
                 category: g.category || 'other',
                 time_horizon: g.time_horizon || g.timeHorizon || meta.time_horizon || 'yearly',
                 is_north_star: Boolean(g.is_north_star || g.isNorthStar || meta.is_north_star),
+                parent_goal_id: parentGoalId,
+                parent_goal_title: parentGoalTitle,
+                child_goals_count: childGoalsCount,
                 start_value: Number(g.start_value ?? g.startValue ?? 0),
                 current_value: dynamicCurrentValue,
                 target_value: Number(g.target_value ?? g.targetValue ?? 10),
@@ -284,6 +311,7 @@ export default function GoalsPage() {
             linked_account_id: form.linked_account_id || null,
             linked_account_title: form.linked_account_title || null,
             linked_habit_ids: form.linked_habit_ids || [],
+            parent_goal_id: form.parent_goal_id ? Number(form.parent_goal_id) : null,
             time_horizon: form.time_horizon || 'yearly',
             is_north_star: Boolean(form.is_north_star),
             core_why: form.core_why || '',
@@ -308,6 +336,8 @@ export default function GoalsPage() {
                         priority: form.priority,
                         time_horizon: form.time_horizon || 'yearly',
                         is_north_star: form.is_north_star,
+                        parentGoalId: form.parent_goal_id ? Number(form.parent_goal_id) : null,
+                        parent_goal_id: form.parent_goal_id ? Number(form.parent_goal_id) : null,
                         start_value: form.start_value,
                         current_value: form.current_value,
                         target_value: form.target_value,
@@ -349,6 +379,8 @@ export default function GoalsPage() {
                         priority: form.priority,
                         time_horizon: form.time_horizon || 'yearly',
                         is_north_star: form.is_north_star,
+                        parentGoalId: form.parent_goal_id ? Number(form.parent_goal_id) : null,
+                        parent_goal_id: form.parent_goal_id ? Number(form.parent_goal_id) : null,
                         start_value: form.start_value,
                         current_value: form.current_value,
                         target_value: form.target_value,
@@ -733,6 +765,7 @@ export default function GoalsPage() {
                     <GoalModal 
                         show={isModalOpen}
                         goal={editingGoal}
+                        allGoals={goals}
                         onClose={() => setIsModalOpen(false)}
                         onSave={handleSaveGoal}
                     />

@@ -45,6 +45,7 @@ type Goal struct {
 	Reward        *string         `json:"reward"`
 	Priority      string          `json:"priority"`
 	Color         *string         `json:"color"`
+	ParentGoalID  *int            `json:"parentGoalId,omitempty"`
 	CreatedAt     *time.Time      `json:"createdAt"`
 	UpdatedAt     *time.Time      `json:"updatedAt"`
 	Milestones    []GoalMilestone `json:"milestones"`
@@ -94,7 +95,7 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 
 	// Fetch Goals
 	rows, err := dbGoals.Query(`
-		SELECT id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at
+		SELECT id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at
 		FROM goals
 		WHERE user_id = $1
 		ORDER BY id DESC
@@ -112,12 +113,17 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 	for rows.Next() {
 		var g Goal
 		var startDate, endDate, createdAt, updatedAt sql.NullTime
+		var parentGoalID sql.NullInt64
 		err := rows.Scan(
-			&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &startDate, &endDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &createdAt, &updatedAt,
+			&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &startDate, &endDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &parentGoalID, &createdAt, &updatedAt,
 		)
 		if err != nil {
 			http.Error(w, "Failed to scan goal", http.StatusInternalServerError)
 			return
+		}
+		if parentGoalID.Valid {
+			v := int(parentGoalID.Int64)
+			g.ParentGoalID = &v
 		}
 		if startDate.Valid {
 			t := startDate.Time
@@ -202,6 +208,7 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		Reward        *string  `json:"reward"`
 		Priority      *string  `json:"priority"`
 		Color         *string  `json:"color"`
+		ParentGoalID  *int     `json:"parentGoalId"`
 		Milestones    []struct {
 			Title       string `json:"title"`
 			Completed   *bool  `json:"completed"`
@@ -264,15 +271,25 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		return
 	}
 
+	var parentID *int
+	if body.ParentGoalID != nil && *body.ParentGoalID > 0 {
+		parentID = body.ParentGoalID
+	}
+
 	// Insert
 	var g Goal
+	var retParentID sql.NullInt64
 	err := dbGoals.QueryRow(`
-		INSERT INTO goals (user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-		RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at
-	`, userId, body.Title, body.Category, tType, tTarget, tCurrent, startDate, endDate, body.SpecificDays, tStatus, body.CoverImageUrl, body.Reward, tPriority, body.Color).Scan(
-		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &g.CreatedAt, &g.UpdatedAt,
+		INSERT INTO goals (user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at
+	`, userId, body.Title, body.Category, tType, tTarget, tCurrent, startDate, endDate, body.SpecificDays, tStatus, body.CoverImageUrl, body.Reward, tPriority, body.Color, parentID).Scan(
+		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &retParentID, &g.CreatedAt, &g.UpdatedAt,
 	)
+	if retParentID.Valid {
+		v := int(retParentID.Int64)
+		g.ParentGoalID = &v
+	}
 
 	if err != nil {
 		http.Error(w, "Failed to insert goal", http.StatusInternalServerError)
@@ -339,6 +356,7 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		Reward        *string  `json:"reward"`
 		Priority      *string  `json:"priority"`
 		Color         *string  `json:"color"`
+		ParentGoalID  *int     `json:"parentGoalId"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -459,14 +477,28 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		args = append(args, *body.SpecificDays)
 		argId++
 	}
+	if body.ParentGoalID != nil {
+		query += `, parent_goal_id = $` + strconv.Itoa(argId)
+		if *body.ParentGoalID > 0 {
+			args = append(args, *body.ParentGoalID)
+		} else {
+			args = append(args, nil)
+		}
+		argId++
+	}
 
-	query += ` WHERE id = $` + strconv.Itoa(argId) + ` RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, created_at, updated_at`
+	query += ` WHERE id = $` + strconv.Itoa(argId) + ` RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at`
 	args = append(args, goalId)
 
 	var g Goal
+	var retParentID sql.NullInt64
 	err = dbGoals.QueryRow(query, args...).Scan(
-		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &g.CreatedAt, &g.UpdatedAt,
+		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &retParentID, &g.CreatedAt, &g.UpdatedAt,
 	)
+	if retParentID.Valid {
+		v := int(retParentID.Int64)
+		g.ParentGoalID = &v
+	}
 
 	if err != nil {
 		http.Error(w, "Failed to update goal", http.StatusInternalServerError)
