@@ -60,7 +60,7 @@ export default function PlannerHeader({
 
     return (
         <div className="relative z-[60] transition-all bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shrink-0">
-            <div className="w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4">
+            <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4">
                     
                     {/* Top Row on Mobile: Nav & Date + Quick Actions */}

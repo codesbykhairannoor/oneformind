@@ -250,7 +250,7 @@ export default function FinanceDashboardClient({
 
                 {/* Topbar */}
                 <div className="relative z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b shadow-sm dark:shadow-none border-slate-200/50 dark:border-slate-800/50 sticky top-0">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-4 lg:py-5 max-w-[1700px] mx-auto">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-4 lg:py-5 max-w-[1800px] mx-auto">
                         <div className="flex items-center gap-3.5">
                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
                                 <Wallet size={24} strokeWidth={2.5} />
@@ -316,7 +316,7 @@ export default function FinanceDashboardClient({
                 </div>
 
                 {/* Main Content Workspace */}
-                <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-[1700px] mx-auto relative z-10">
+                <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 max-w-[1800px] mx-auto relative z-10">
                     
                     {/* 4 Top Executive KPI Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">

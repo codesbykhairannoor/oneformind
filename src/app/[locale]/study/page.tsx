@@ -124,7 +124,7 @@ export default function StudyPage() {
                                     onOpenExportModal={() => setIsExportOpen(true)}
                                 />
 
-                                <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+                                <main className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
                                     
                                     {/* Interactive GPA Simulator Banner (hidden on portfolio tab for clean layout) */}
                                     {activeTab !== 'portfolio' && (

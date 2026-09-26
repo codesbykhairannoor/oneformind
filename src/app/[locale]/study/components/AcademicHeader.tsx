@@ -122,7 +122,7 @@ export default function AcademicHeader({
 
     return (
         <header className="relative z-40 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 transition-colors">
-            <div className="w-full px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
+            <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
                 
                 {/* Top Row: Title, Major, Semester Picker, Public Portfolio & Add Course */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

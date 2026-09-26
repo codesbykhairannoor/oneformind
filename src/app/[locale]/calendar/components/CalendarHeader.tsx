@@ -65,7 +65,7 @@ export default function CalendarHeader({
 
     return (
         <div className="relative z-40 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
-            <div className="w-full px-4 py-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div className="w-full max-w-[1800px] mx-auto px-4 py-3 sm:px-6 lg:px-8">
                 
                 <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                     

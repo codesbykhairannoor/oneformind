@@ -62,7 +62,7 @@ export default function HabitStatsHeader({
 }: HabitStatsHeaderProps) {
     return (
         <div className="relative z-50 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 transition-all duration-500">
-            <div className="w-full px-3 sm:px-6 md:px-8 py-3 sm:py-4">
+            <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
                 <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-4">
                     
                     {/* Top Row on Mobile: Title + Today Badge + Desktop Filters */}

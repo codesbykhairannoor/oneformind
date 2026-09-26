@@ -166,7 +166,7 @@ export default function FinanceHeader({
 
     return (
         <div className="relative z-[60] transition-all bg-white dark:bg-slate-900 border-b shadow-sm dark:shadow-none border-slate-100 dark:border-slate-800 transition-colors duration-500">
-            <div className="flex flex-col items-stretch justify-between w-full min-w-0 gap-3 md:flex-row md:items-center px-3 sm:px-6 lg:px-8 py-4">
+            <div className="flex flex-col items-stretch justify-between w-full max-w-[1800px] mx-auto min-w-0 gap-3 md:flex-row md:items-center px-4 sm:px-6 lg:px-8 py-4">
                 
                 <div className="flex items-center gap-2 w-full min-w-0 md:w-auto md:max-w-[min(100%,28rem)]">
                     <Link 

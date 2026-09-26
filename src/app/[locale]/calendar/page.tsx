@@ -486,7 +486,7 @@ export default function CalendarPage() {
                     />
 
                     {/* Main Container */}
-                    <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 min-w-0">
+                    <div className="w-full max-w-[1800px] mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 min-w-0">
                         {/* Filter Bar & View Switcher */}
                         <CalendarFilterBar
                             activeView={viewMode}

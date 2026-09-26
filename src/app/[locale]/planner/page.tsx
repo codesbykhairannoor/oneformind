@@ -106,7 +106,8 @@ export default function PlannerPage() {
                     onOpenExportModal={() => setIsExportOpen(true)}
                 />
 
-                <div className="flex-1 w-full bg-slate-50/50 dark:bg-slate-950 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 transition-colors duration-500">
+                <div className="flex-1 w-full bg-slate-50/50 dark:bg-slate-950 transition-colors duration-500">
+                    <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                     
                     {/* Mobile Segmented Switcher (< lg) */}
                     <div className="flex lg:hidden items-center justify-center p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl mb-4 max-w-sm mx-auto w-full shrink-0">
@@ -221,6 +222,7 @@ export default function PlannerPage() {
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <PlannerHabitModal
                     isOpen={Boolean(planner.selectedHabitForModal)}

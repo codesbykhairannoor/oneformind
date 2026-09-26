@@ -436,7 +436,7 @@ export default function JobsPage() {
                     
                     {/* TOP NAVBAR / SUB HEADER */}
                     <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 relative z-40 transition-colors duration-500">
-                        <div className="w-full min-w-0 px-4 sm:px-6 lg:px-8 py-3.5">
+                        <div className="w-full max-w-[1800px] mx-auto min-w-0 px-4 sm:px-6 lg:px-8 py-3.5">
                             <div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3 md:flex-nowrap">
                                 
                                 {/* Title & Pipeline Count Badge */}
@@ -489,7 +489,7 @@ export default function JobsPage() {
                     </div>
 
                     {/* MAIN CONTAINER */}
-                    <div className="w-full max-w-[98%] mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-4 space-y-3 min-w-0 transition-all duration-500">
+                    <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 min-w-0 transition-all duration-500">
                         
                         {/* Cross-Module Life OS: Habit Auto-Completion Banner */}
                         {jobHabitNotice && (

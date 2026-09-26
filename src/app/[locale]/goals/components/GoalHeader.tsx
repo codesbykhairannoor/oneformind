@@ -14,7 +14,7 @@ export default function GoalHeader({ onAddClick }: GoalHeaderProps) {
 
     return (
         <div className="relative z-[60] transition-all bg-white dark:bg-slate-900 border-b shadow-sm border-slate-100 dark:border-slate-800 duration-500 w-full overflow-hidden">
-            <div className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-col items-stretch justify-between gap-3 px-4 md:px-6 lg:px-8 py-4 md:flex-row md:items-center">
+            <div className="mx-auto flex w-full max-w-[1800px] min-w-0 flex-col items-stretch justify-between gap-3 px-4 sm:px-6 lg:px-8 py-4 md:flex-row md:items-center">
                 
                 <div className="flex items-center gap-3 w-full min-w-0 md:w-auto">
                     <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 border border-indigo-100 dark:border-indigo-800/40">

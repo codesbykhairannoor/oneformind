@@ -310,7 +310,7 @@ export default function JournalIndexPage() {
                         onOpenExportModal={() => setIsExportOpen(true)}
                     />
 
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                    <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                         {/* Habits Friction Diagnostic (Metacognition) - Only if Habit active */}
                         {isHabitActive && habitFrictions.length > 0 && !isDiagnosticDismissed && (
                             <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/40 dark:bg-amber-950/15 border border-amber-200/70 dark:border-amber-900/30 backdrop-blur-sm space-y-3 transition-all duration-300 shadow-xs">

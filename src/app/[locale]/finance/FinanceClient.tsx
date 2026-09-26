@@ -584,7 +584,7 @@ export default function FinanceClient({
                     transactions={transactions}
                 />
 
-                <div className="w-full min-h-screen px-3 sm:px-6 lg:px-8 py-6 transition-colors duration-500 max-w-[1750px] mx-auto space-y-6">
+                <div className="w-full min-h-screen px-4 sm:px-6 lg:px-8 py-6 transition-colors duration-500 max-w-[1800px] mx-auto space-y-6">
                     
                     {/* ===== TOP EXECUTIVE NET WORTH & WEALTH STRIP ===== */}
                     <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-[2.5rem] p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-slate-700/50">

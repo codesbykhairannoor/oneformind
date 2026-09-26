@@ -273,7 +273,7 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     openExportModal={() => setIsExportOpen(true)}
                 />
 
-                <main className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+                <main className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
                     {/* HABITS MATRIX (DESKTOP) */}
                     {calc.filteredHabits.length > 0 ? (
                         <>

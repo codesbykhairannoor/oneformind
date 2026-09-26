@@ -566,7 +566,7 @@ export default function GoalsPage() {
                     {/* Header Top Bar */}
                     <GoalHeader onAddClick={handleOpenCreateModal} />
 
-                    <div className="w-full max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 space-y-8 pb-24 min-w-0">
+                    <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 pb-24 min-w-0">
                         {/* TABS NAVIGATION (Active / In Progress vs Completed) */}
                         <div className="flex items-center gap-2 mb-4 bg-white dark:bg-slate-900 p-1.5 rounded-2xl w-fit max-w-full overflow-x-auto no-scrollbar shadow-sm border border-slate-200/80 dark:border-slate-800 relative z-10">
                             <button 

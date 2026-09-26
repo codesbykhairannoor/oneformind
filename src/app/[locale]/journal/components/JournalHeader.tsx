@@ -43,7 +43,7 @@ export default function JournalHeader({
 
     return (
         <div className="relative z-30 transition-all bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+            <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     
                     {/* Left: Title & Writing Streak */}
