@@ -53,34 +53,27 @@ export default function GoalFilterBar({
     const isIndo = locale === 'id';
 
     const timeHorizons = [
-        { id: 'all', label: isIndo ? 'Semua Waktu' : 'All Horizons' },
+        { id: 'all', label: isIndo ? 'Semua' : 'All' },
         { id: 'weekly', label: isIndo ? '📅 Mingguan' : '📅 Weekly' },
         { id: 'monthly', label: isIndo ? '🗓️ Bulanan' : '🗓️ Monthly' },
-        { id: 'sprint', label: isIndo ? '⚡ Sprint (30-90 Hari)' : '⚡ Sprint (30-90 Days)' },
-        { id: 'quarterly', label: isIndo ? '📊 Kuartal (Q1-Q4)' : '📊 Quarterly (Q1-Q4)' },
-        { id: 'yearly', label: isIndo ? '🎯 Target Tahunan' : '🎯 Yearly Target' },
-        { id: 'lifetime', label: isIndo ? '🌌 Seumur Hidup / Vision' : '🌌 Lifetime Vision' },
+        { id: 'yearly', label: isIndo ? '🎯 Tahunan' : '🎯 Yearly' },
+        { id: 'lifetime', label: isIndo ? '🌌 Visi' : '🌌 Vision' },
     ];
 
     const sortOptions = [
         { id: 'deadline', label: isIndo ? 'Tenggat Terdekat' : 'Nearest Deadline' },
         { id: 'progress_desc', label: isIndo ? 'Progres Tertinggi' : 'Highest Progress' },
         { id: 'progress_asc', label: isIndo ? 'Progres Terendah' : 'Lowest Progress' },
-        { id: 'priority', label: isIndo ? 'Prioritas Tertinggi (Vital)' : 'Highest Priority (Vital)' },
-        { id: 'newest', label: isIndo ? 'Paling Baru Dibuat' : 'Recently Created' },
+        { id: 'priority', label: isIndo ? 'Prioritas Vital' : 'Vital Priority' },
+        { id: 'newest', label: isIndo ? 'Paling Baru' : 'Recently Created' },
     ];
 
-    const priorities = [
-        { id: 'all', label: isIndo ? 'Semua' : 'All' },
-        { id: 'vital', label: 'Vital 🔥', color: 'text-rose-500' },
-        { id: 'important', label: isIndo ? 'Penting' : 'Important', color: 'text-indigo-500' },
-        { id: 'optional', label: 'Optional', color: 'text-slate-400' },
-    ];
+    const hasActiveFilters = selectedCategory !== 'all' || selectedPriority !== 'all' || selectedTimeHorizon !== 'all' || searchQuery.trim().length > 0;
 
     return (
-        <div className="space-y-4 w-full max-w-full min-w-0">
+        <div className="space-y-3.5 w-full max-w-full min-w-0">
             
-            {/* 1. TOP ROW: Search, Time Horizon Switcher & View Switcher */}
+            {/* 1. TOP ROW: Search & View Switcher */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 w-full min-w-0">
                 
                 {/* Search Input */}
@@ -168,21 +161,21 @@ export default function GoalFilterBar({
                         <button
                             type="button"
                             onClick={onOpenExportModal}
-                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition shrink-0"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition shrink-0"
                             title={isIndo ? 'Ekspor Target & Sasaran (CSV / JSON)' : 'Export Goals (CSV / JSON)'}
                         >
                             <Download className="w-3.5 h-3.5 text-indigo-500" />
-                            <span>{isIndo ? 'Ekspor' : 'Export'}</span>
+                            <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
                         </button>
                     )}
                 </div>
 
             </div>
 
-            {/* 2. TIME HORIZON & SORT ROW */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 w-full min-w-0">
+            {/* 2. TIME HORIZONS & SLEEK COMPACT CONTROLS ROW */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-0.5 w-full min-w-0">
                 
-                {/* Time Horizon Pills */}
+                {/* Clean Time Horizon Segmented Pills (5 simple options) */}
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto max-w-full min-w-0">
                     {timeHorizons.map((th) => {
                         const isSelected = selectedTimeHorizon === th.id;
@@ -203,31 +196,26 @@ export default function GoalFilterBar({
                     })}
                 </div>
 
-                {/* Sort Dropdown & Priority Pills */}
+                {/* Compact Dropdown Controls: Priority + Sort */}
                 <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
                     
-                    {/* Priority Filter */}
-                    <div className="hidden sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                        {priorities.map((p) => {
-                            const isSelected = selectedPriority === p.id;
-                            return (
-                                <button
-                                    key={p.id}
-                                    type="button"
-                                    onClick={() => setSelectedPriority(p.id)}
-                                    className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
-                                        isSelected
-                                            ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                                            : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                                    }`}
-                                >
-                                    {p.label}
-                                </button>
-                            );
-                        })}
+                    {/* Priority Dropdown Select */}
+                    <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
+                        <Flame size={13} className={selectedPriority === 'vital' ? 'text-rose-500' : 'text-slate-400'} />
+                        <select
+                            value={selectedPriority}
+                            onChange={(e) => setSelectedPriority(e.target.value)}
+                            aria-label={isIndo ? "Filter prioritas" : "Filter priority"}
+                            className="bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-700 dark:text-slate-200 p-0 outline-none cursor-pointer"
+                        >
+                            <option value="all" className="dark:bg-slate-900">{isIndo ? 'Semua Prioritas' : 'All Priority'}</option>
+                            <option value="vital" className="dark:bg-slate-900">Vital 🔥</option>
+                            <option value="important" className="dark:bg-slate-900">{isIndo ? 'Penting' : 'Important'}</option>
+                            <option value="optional" className="dark:bg-slate-900">{isIndo ? 'Opsional' : 'Optional'}</option>
+                        </select>
                     </div>
 
-                    {/* Sort Select */}
+                    {/* Sort Dropdown Select */}
                     <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
                         <ArrowUpDown size={12} className="text-slate-400" />
                         <select
@@ -250,6 +238,23 @@ export default function GoalFilterBar({
 
             {/* 3. CATEGORY PILLS ROW */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full max-w-full min-w-0">
+                {hasActiveFilters && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSelectedCategory('all');
+                            setSelectedPriority('all');
+                            setSelectedTimeHorizon('all');
+                            setSearchQuery('');
+                        }}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition shrink-0 shadow-xs"
+                        title={isIndo ? 'Hapus semua filter aktif' : 'Clear all active filters'}
+                    >
+                        <X size={12} strokeWidth={2.5} />
+                        <span>{isIndo ? 'Reset Filter' : 'Reset Filters'}</span>
+                    </button>
+                )}
+
                 <button
                     type="button"
                     onClick={() => setSelectedCategory('all')}

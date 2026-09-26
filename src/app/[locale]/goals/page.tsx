@@ -13,6 +13,7 @@ import GoalKanbanView from './components/GoalKanbanView';
 import GoalTimelineView from './components/GoalTimelineView';
 import GoalWheelOfLifeView from './components/GoalWheelOfLifeView';
 import GoalCelebrationModal from './components/GoalCelebrationModal';
+import GoalDeleteModal from './components/GoalDeleteModal';
 import GatedPage from '@/components/GatedPage';
 import { Milestone } from './components/MilestoneItem';
 import { 
@@ -45,6 +46,10 @@ export default function GoalsPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingGoal, setEditingGoal] = useState<GoalItem | null>(null);
+
+    // Custom Bilingual Delete Modal state
+    const [goalToDelete, setGoalToDelete] = useState<GoalItem | null>(null);
+    const [isDeletingGoal, setIsDeletingGoal] = useState(false);
 
     const [celebratingGoal, setCelebratingGoal] = useState<GoalItem | null>(null);
     const [isCelebrationOpen, setIsCelebrationOpen] = useState(false);
@@ -211,7 +216,13 @@ export default function GoalsPage() {
             // Time Horizon Filter
             if (selectedTimeHorizon !== 'all') {
                 const th = g.time_horizon || 'yearly';
-                if (th !== selectedTimeHorizon) return false;
+                if (selectedTimeHorizon === 'monthly') {
+                    if (th !== 'monthly' && th !== 'sprint') return false;
+                } else if (selectedTimeHorizon === 'yearly') {
+                    if (th !== 'yearly' && th !== 'quarterly') return false;
+                } else {
+                    if (th !== selectedTimeHorizon) return false;
+                }
             }
 
             return true;
@@ -354,16 +365,34 @@ export default function GoalsPage() {
         }
     };
 
-    const handleDeleteGoal = async (id: number | string) => {
-        if (typeof window !== 'undefined' && window.confirm(isIndo ? 'Hapus Target ini? Data akan dihapus.' : 'Delete this goal permanently?')) {
-            setGoals(prev => prev.filter(g => g.id !== id));
-            try {
-                await fetch(`/api/goals/${id}`, { method: 'DELETE' });
-                mutateGoals();
-            } catch (error) {
-                console.error('Failed to delete goal:', error);
-                mutateGoals();
+    const handleRequestDeleteGoal = (goalOrId: GoalItem | number | string) => {
+        if (typeof goalOrId === 'object' && goalOrId !== null) {
+            setGoalToDelete(goalOrId);
+        } else {
+            const found = goals.find(g => String(g.id) === String(goalOrId));
+            if (found) {
+                setGoalToDelete(found);
+            } else {
+                setGoalToDelete({ id: goalOrId, title: isIndo ? 'Target ini' : 'This goal' } as GoalItem);
             }
+        }
+    };
+
+    const handleConfirmDeleteGoal = async () => {
+        if (!goalToDelete) return;
+        const targetId = goalToDelete.id;
+        setIsDeletingGoal(true);
+        // Optimistic UI update
+        setGoals(prev => prev.filter(g => g.id !== targetId));
+        try {
+            await fetch(`/api/goals/${targetId}`, { method: 'DELETE' });
+            await mutateGoals();
+            setGoalToDelete(null);
+        } catch (error) {
+            console.error('Failed to delete goal:', error);
+            await mutateGoals();
+        } finally {
+            setIsDeletingGoal(false);
         }
     };
 
@@ -628,7 +657,7 @@ export default function GoalsPage() {
                                                     key={goal.id}
                                                     goal={goal}
                                                     onEdit={handleOpenEditModal}
-                                                    onDelete={handleDeleteGoal}
+                                                    onDelete={handleRequestDeleteGoal}
                                                     onSaveMilestone={handleSaveMilestone}
                                                     onAddMilestone={handleAddMilestone}
                                                     onToggleMilestone={handleToggleMilestone}
@@ -648,7 +677,7 @@ export default function GoalsPage() {
                                     <GoalKanbanView 
                                         goals={filteredGoals}
                                         onEdit={handleOpenEditModal}
-                                        onDelete={handleDeleteGoal}
+                                        onDelete={handleRequestDeleteGoal}
                                         onQuickIncrement={handleQuickIncrement}
                                         onCompleteGoal={handleCompleteGoal}
                                         onMarkAsActive={handleMarkAsActive}
@@ -697,6 +726,15 @@ export default function GoalsPage() {
                         onClose={() => setIsExportOpen(false)}
                         moduleType="goals"
                         currentData={goals}
+                    />
+
+                    {/* Custom Bilingual Delete Confirmation Modal */}
+                    <GoalDeleteModal
+                        goal={goalToDelete}
+                        isOpen={Boolean(goalToDelete)}
+                        isDeleting={isDeletingGoal}
+                        onClose={() => setGoalToDelete(null)}
+                        onConfirm={handleConfirmDeleteGoal}
                     />
 
                 </div>
