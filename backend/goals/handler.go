@@ -238,12 +238,22 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 
 	var startDate, endDate *time.Time
 	if body.StartDate != nil && *body.StartDate != "" {
-		t, _ := time.Parse(time.RFC3339, *body.StartDate)
-		startDate = &t
+		t, err := time.Parse(time.RFC3339, *body.StartDate)
+		if err != nil {
+			t, err = time.Parse("2006-01-02", *body.StartDate)
+		}
+		if err == nil {
+			startDate = &t
+		}
 	}
 	if body.EndDate != nil && *body.EndDate != "" {
-		t, _ := time.Parse(time.RFC3339, *body.EndDate)
-		endDate = &t
+		t, err := time.Parse(time.RFC3339, *body.EndDate)
+		if err != nil {
+			t, err = time.Parse("2006-01-02", *body.EndDate)
+		}
+		if err == nil {
+			endDate = &t
+		}
 	}
 
 	if dbGoals == nil {
@@ -413,8 +423,15 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	if body.StartDate != nil {
 		query += `, start_date = $` + strconv.Itoa(argId)
 		if *body.StartDate != "" {
-			t, _ := time.Parse(time.RFC3339, *body.StartDate)
-			args = append(args, t)
+			t, err := time.Parse(time.RFC3339, *body.StartDate)
+			if err != nil {
+				t, err = time.Parse("2006-01-02", *body.StartDate)
+			}
+			if err == nil {
+				args = append(args, t)
+			} else {
+				args = append(args, nil)
+			}
 		} else {
 			args = append(args, nil)
 		}
@@ -423,8 +440,15 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	if body.EndDate != nil {
 		query += `, end_date = $` + strconv.Itoa(argId)
 		if *body.EndDate != "" {
-			t, _ := time.Parse(time.RFC3339, *body.EndDate)
-			args = append(args, t)
+			t, err := time.Parse(time.RFC3339, *body.EndDate)
+			if err != nil {
+				t, err = time.Parse("2006-01-02", *body.EndDate)
+			}
+			if err == nil {
+				args = append(args, t)
+			} else {
+				args = append(args, nil)
+			}
 		} else {
 			args = append(args, nil)
 		}

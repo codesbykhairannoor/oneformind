@@ -13,7 +13,7 @@ import GoalDatePicker from './GoalDatePicker';
 import { GoalItem } from './GoalCard';
 import ModalPortal from '@/components/ModalPortal';
 import GoalModalHeader from './GoalModalHeader';
-import GoalArchetypesGrid, { archetypes } from './GoalArchetypesGrid';
+import { archetypes } from './GoalArchetypesGrid';
 import GoalMilestonesSection from './GoalMilestonesSection';
 import { useActiveModules } from '@/hooks/useActiveModules';
 
@@ -632,7 +632,7 @@ export default function GoalModal({
                                 </div>
                             </div>
 
-                            {/* Row 2: Category & Target Deadline */}
+                            {/* Row 2: Category & Color Theme */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Category Dropdown */}
                                 <div className="space-y-1.5">
@@ -661,10 +661,65 @@ export default function GoalModal({
                                     </select>
                                 </div>
 
+                                {/* Color Theme Selector */}
+                                <div className="space-y-1.5">
+                                    <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
+                                        <Palette size={13} />
+                                        {isIndo ? 'Warna Tema Target' : 'Goal Color Theme'}
+                                    </label>
+                                    <div className="flex flex-wrap items-center gap-1.5 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
+                                        {colorOptions.map((c) => (
+                                            <button 
+                                                key={c}
+                                                type="button"
+                                                onClick={() => setForm(prev => ({ ...prev, color: c }))}
+                                                className={`w-6 h-6 rounded-xl transition-all flex items-center justify-center hover:scale-110 active:scale-95 ${
+                                                    form.color === c ? 'ring-2 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500 shadow-sm scale-105' : 'opacity-70 hover:opacity-100'
+                                                }`}
+                                                style={{ backgroundColor: c }}
+                                            >
+                                                {form.color === c && (
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-white drop-shadow" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Row 3: Dates Side-by-Side (Tanggal Mulai & Tenggat Waktu Akhir) */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                                {/* Start Date */}
+                                <div className="space-y-1.5 relative">
+                                    <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
+                                        <Calendar size={13} className="text-indigo-500" />
+                                        {isIndo ? 'Tanggal Mulai' : 'Start Date'}
+                                    </label>
+                                    <div className="relative">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setShowStartPicker(!showStartPicker); setShowEndPicker(false); }}
+                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
+                                        >
+                                            <span>{formatDateDisplay(form.start_date)}</span>
+                                            <Calendar className="w-4 h-4 text-indigo-500" />
+                                        </button>
+                                        
+                                        <GoalDatePicker 
+                                            show={showStartPicker}
+                                            teleport={true}
+                                            modelValue={form.start_date}
+                                            onUpdateModelValue={(val) => { setForm(prev => ({ ...prev, start_date: val })); setShowStartPicker(false); }}
+                                            onClose={() => setShowStartPicker(false)}
+                                        />
+                                    </div>
+                                </div>
+
                                 {/* Target Deadline */}
                                 <div className="space-y-1.5 relative">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                        <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
+                                            <Zap size={13} className="text-rose-500" />
                                             {isIndo ? 'Tenggat Waktu Akhir' : 'Target Deadline'}
                                         </label>
                                         {form.end_date && (
@@ -727,7 +782,7 @@ export default function GoalModal({
                                             {isIndo ? '⚙️ Opsi Lanjutan & Psikologi (Opsional)' : '⚙️ Advanced Options & Psychology (Optional)'}
                                         </span>
                                         <span className="text-[10px] text-slate-400 block font-normal">
-                                            {isIndo ? 'Kebiasaan pendorong, psikologi WOOP, warna tema & tanggal mulai' : 'Habit engine, WOOP reflection, color & start date'}
+                                            {isIndo ? 'Kebiasaan pendorong & psikologi pencapaian (WOOP)' : 'Supporting habit engine & WOOP psychology'}
                                         </span>
                                     </div>
                                     {hasAdvancedData && !showAdvanced && (
@@ -871,68 +926,7 @@ export default function GoalModal({
                                         </div>
                                     </div>
 
-                                    {/* Advanced Item 3: Color Theme & Start Date */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {/* Color Theme Selector */}
-                                        <div className="space-y-2">
-                                            <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
-                                                <Palette size={13} />
-                                                {isIndo ? 'Warna Tema Target' : 'Goal Color Theme'}
-                                            </label>
-                                            <div className="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-900/60 rounded-2xl border border-slate-200/80 dark:border-slate-800">
-                                                {colorOptions.map((c) => (
-                                                    <button 
-                                                        key={c}
-                                                        type="button"
-                                                        onClick={() => setForm(prev => ({ ...prev, color: c }))}
-                                                        className={`w-6 h-6 rounded-xl transition-all flex items-center justify-center hover:scale-110 active:scale-95 ${
-                                                            form.color === c ? 'ring-4 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500/30 shadow-md' : 'opacity-70 hover:opacity-100'
-                                                        }`}
-                                                        style={{ backgroundColor: c }}
-                                                    >
-                                                        {form.color === c && (
-                                                            <CheckCircle2 className="w-3 h-3 text-white drop-shadow" />
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
 
-                                        {/* Start Date Picker */}
-                                        <div className="space-y-2 relative">
-                                            <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5">
-                                                <Calendar size={13} />
-                                                {isIndo ? 'Tanggal Mulai' : 'Start Date'}
-                                            </label>
-                                            <div className="relative">
-                                                <button 
-                                                    type="button" 
-                                                    onClick={() => { setShowStartPicker(!showStartPicker); setShowEndPicker(false); }}
-                                                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-slate-700 dark:text-slate-200 font-bold text-left transition flex justify-between items-center text-xs shadow-sm hover:border-indigo-400"
-                                                >
-                                                    <span>{formatDateDisplay(form.start_date)}</span>
-                                                    <Calendar className="w-4 h-4 text-slate-400" />
-                                                </button>
-                                                
-                                                <GoalDatePicker 
-                                                    show={showStartPicker}
-                                                    teleport={true}
-                                                    modelValue={form.start_date}
-                                                    onUpdateModelValue={(val) => { setForm(prev => ({ ...prev, start_date: val })); setShowStartPicker(false); }}
-                                                    onClose={() => setShowStartPicker(false)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Advanced Item 4: Visual Archetype Grid */}
-                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
-                                        <GoalArchetypesGrid
-                                            selectedArchetype={selectedArchetype}
-                                            onSelectArchetype={selectArchetype}
-                                            t={() => ''}
-                                        />
-                                    </div>
 
                                 </div>
                             )}

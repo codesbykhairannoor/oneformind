@@ -277,6 +277,9 @@ export default function GoalsPage() {
     const handleSaveGoal = async (form: GoalItem) => {
         setIsModalOpen(false);
         const specificMetadata = JSON.stringify({
+            start_value: form.start_value,
+            unit: form.unit,
+            currency: form.currency,
             linked_source: form.linked_source || 'manual',
             linked_account_id: form.linked_account_id || null,
             linked_account_title: form.linked_account_title || null,
@@ -286,7 +289,8 @@ export default function GoalsPage() {
             core_why: form.core_why || '',
             obstacle: form.obstacle || '',
             obstacle_plan: form.obstacle_plan || '',
-            reward: form.reward || ''
+            reward: form.reward || '',
+            progress_type: form.type || 'milestones'
         });
 
         try {
@@ -299,10 +303,10 @@ export default function GoalsPage() {
                     body: JSON.stringify({
                         title: form.title, 
                         category: form.category, 
-                        type: form.type,
+                        type: form.type || 'milestones',
                         status: form.status,
                         priority: form.priority,
-                        time_horizon: form.time_horizon,
+                        time_horizon: form.time_horizon || 'yearly',
                         is_north_star: form.is_north_star,
                         start_value: form.start_value,
                         current_value: form.current_value,
@@ -314,15 +318,22 @@ export default function GoalsPage() {
                         obstacle_plan: form.obstacle_plan,
                         reward: form.reward,
                         color: form.color,
-                        startDate: form.start_date, 
-                        endDate: form.end_date,
-                        coverImageUrl: form.cover_image_url,
-                        cover_image_url: form.cover_image_url,
+                        startDate: form.start_date || null, 
+                        endDate: form.end_date || null,
+                        coverImageUrl: form.cover_image_url || null,
+                        cover_image_url: form.cover_image_url || null,
                         specificDays: specificMetadata,
                         specific_days: specificMetadata
                     })
                 });
-                if (res.ok) mutateGoals();
+                if (res.ok) {
+                    await mutateGoals();
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    console.error('Failed to update goal:', errData);
+                    alert(errData.error || (isIndo ? 'Gagal memperbarui target' : 'Failed to update goal'));
+                    await mutateGoals();
+                }
             } else {
                 // Optimistic update
                 const tempId = Date.now();
@@ -348,20 +359,33 @@ export default function GoalsPage() {
                         obstacle_plan: form.obstacle_plan,
                         reward: form.reward,
                         color: form.color,
-                        startDate: form.start_date, 
-                        endDate: form.end_date,
-                        coverImageUrl: form.cover_image_url,
-                        cover_image_url: form.cover_image_url,
+                        startDate: form.start_date || null, 
+                        endDate: form.end_date || null,
+                        coverImageUrl: form.cover_image_url || null,
+                        cover_image_url: form.cover_image_url || null,
                         specificDays: specificMetadata,
                         specific_days: specificMetadata,
                         milestones: form.milestones || []
                     })
                 });
-                if (res.ok) mutateGoals();
+                if (res.ok) {
+                    const saved = await res.json().catch(() => null);
+                    if (saved && saved.id) {
+                        setGoals(prev => prev.map(g => g.id === tempId ? { ...g, ...saved, milestones: saved.milestones || form.milestones || [] } : g));
+                    }
+                    await mutateGoals();
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    console.error('Failed to create goal:', errData);
+                    alert(errData.error || (isIndo ? 'Gagal menyimpan target' : 'Failed to create goal'));
+                    // Revert optimistic insert
+                    setGoals(prev => prev.filter(g => g.id !== tempId));
+                    await mutateGoals();
+                }
             }
         } catch (error) {
             console.error('Failed to save goal:', error);
-            mutateGoals();
+            await mutateGoals();
         }
     };
 
