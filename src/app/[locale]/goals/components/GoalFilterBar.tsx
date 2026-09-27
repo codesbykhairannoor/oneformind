@@ -8,6 +8,8 @@ import {
     Star, Flame, Tag, Download, Trash2
 } from 'lucide-react';
 
+import { getCategoryBundles } from '../lib/goalCategories';
+
 export type GoalViewMode = 'gallery' | 'kanban' | 'timeline' | 'wheel_of_life';
 export type GoalSortOption = 'deadline' | 'progress_desc' | 'progress_asc' | 'priority' | 'newest';
 
@@ -72,26 +74,33 @@ export default function GoalFilterBar({
     const hasActiveFilters = selectedCategory !== 'all' || selectedPriority !== 'all' || selectedTimeHorizon !== 'weekly' || searchQuery.trim().length > 0;
 
     const displayCategories = React.useMemo(() => {
-        const list: { id: string; label: string; count: number }[] = [];
+        const list: { id: string; label: string; icon?: string; color?: string; count: number }[] = [];
 
         // Always include 'other' if it has goals or is selected
         const otherCount = categoryCounts['other'] || 0;
         if (otherCount > 0 || selectedCategory === 'other') {
             list.push({
                 id: 'other',
-                label: isIndo ? '🎯 Lainnya' : '🎯 Other',
+                label: isIndo ? 'Lainnya' : 'Other',
+                icon: '🎯',
                 count: otherCount
             });
         }
 
-        // Include any custom categories from categoryCounts
+        // Include any custom categories from categoryCounts using category bundles
+        const bundles = getCategoryBundles();
         Object.entries(categoryCounts).forEach(([catId, count]) => {
             if (catId === 'other' || catId === 'all') return;
             if (count > 0 || selectedCategory === catId) {
-                const label = catId.charAt(0).toUpperCase() + catId.slice(1);
+                const bundle = bundles[catId.toLowerCase().trim()];
+                const catName = bundle?.name || catId.charAt(0).toUpperCase() + catId.slice(1);
+                const catIcon = bundle?.icon || '🏷️';
+                const catColor = bundle?.color;
                 list.push({
                     id: catId,
-                    label: `🏷️ ${label}`,
+                    label: catName,
+                    icon: catIcon,
+                    color: catColor,
                     count
                 });
             }
@@ -315,6 +324,10 @@ export default function GoalFilterBar({
                                 onClick={() => setSelectedCategory(isSelected ? 'all' : cat.id)}
                                 className="flex items-center gap-1.5"
                             >
+                                {cat.color && (
+                                    <span className="w-2 h-2 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: cat.color }} />
+                                )}
+                                <span>{cat.icon || '🏷️'}</span>
                                 <span>{cat.label}</span>
                                 {cat.count > 0 && (
                                     <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">

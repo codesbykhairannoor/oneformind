@@ -15,6 +15,7 @@ import ModalPortal from '@/components/ModalPortal';
 import GoalModalHeader from './GoalModalHeader';
 import GoalMilestonesSection from './GoalMilestonesSection';
 import { useActiveModules } from '@/hooks/useActiveModules';
+import { getCategoryBundles, saveCategoryBundle, removeCategoryBundle, CategoryBundle } from '../lib/goalCategories';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -139,21 +140,50 @@ export default function GoalModal({
         });
     }, [allGoals, form.id, goal?.id, form.time_horizon]);
 
-    // Distinct custom categories from existing goals (excluding 'other')
+    const [categoryBundles, setCategoryBundles] = useState<Record<string, CategoryBundle>>(() => getCategoryBundles(allGoals));
+
+    useEffect(() => {
+        setCategoryBundles(getCategoryBundles(allGoals));
+    }, [allGoals, show]);
+
+    // Distinct custom categories with bundled icon & color
     const existingCustomCategories = useMemo(() => {
-        if (!allGoals || !Array.isArray(allGoals)) return [];
-        const set = new Set<string>();
-        allGoals.forEach(g => {
-            const cat = (g.category || '').trim();
-            if (cat && cat.toLowerCase() !== 'other') {
-                set.add(cat);
+        const list: CategoryBundle[] = [];
+        const seen = new Set<string>();
+
+        Object.values(categoryBundles).forEach(b => {
+            const k = b.name.toLowerCase().trim();
+            if (k && k !== 'other' && !seen.has(k)) {
+                seen.add(k);
+                list.push(b);
             }
         });
-        return Array.from(set);
-    }, [allGoals]);
+
+        if (Array.isArray(allGoals)) {
+            allGoals.forEach(g => {
+                const cat = (g.category || '').trim();
+                if (cat && cat.toLowerCase() !== 'other') {
+                    const k = cat.toLowerCase();
+                    if (!seen.has(k)) {
+                        seen.add(k);
+                        list.push({
+                            name: cat,
+                            icon: g.icon || '🎯',
+                            color: g.color || '#6366f1'
+                        });
+                    }
+                }
+            });
+        }
+
+        return list;
+    }, [categoryBundles, allGoals]);
 
     const [categoryMode, setCategoryMode] = useState<'other' | 'existing' | 'new'>('other');
     const [customCatText, setCustomCatText] = useState('');
+    const [newCatIcon, setNewCatIcon] = useState('🎯');
+    const [newCatColor, setNewCatColor] = useState('#6366f1');
+    const [showNewCatIconPicker, setShowNewCatIconPicker] = useState(false);
 
     useEffect(() => {
         if (form.parent_goal_id) {
@@ -197,11 +227,8 @@ export default function GoalModal({
             if (cat === 'other') {
                 setCategoryMode('other');
                 setCustomCatText('');
-            } else if (existingCustomCategories.includes(cat)) {
-                setCategoryMode('existing');
-                setCustomCatText(cat);
             } else {
-                setCategoryMode('new');
+                setCategoryMode('existing');
                 setCustomCatText(cat);
             }
 
@@ -274,6 +301,22 @@ export default function GoalModal({
             alert(isIndo ? 'Judul Target Wajib Diisi! Beri nama impian Anda.' : 'Goal Title is required! Name your dream.');
             return;
         }
+
+        // Save category bundle if custom category is created or used
+        if (categoryMode === 'new' && customCatText.trim()) {
+            saveCategoryBundle({
+                name: customCatText.trim(),
+                icon: form.icon || newCatIcon || '🎯',
+                color: form.color || newCatColor || '#6366f1'
+            });
+        } else if (form.category && form.category !== 'other') {
+            saveCategoryBundle({
+                name: form.category,
+                icon: form.icon || '🎯',
+                color: form.color || '#6366f1'
+            });
+        }
+
         onSave(form);
     };
 
@@ -360,9 +403,66 @@ export default function GoalModal({
         '🎓', '💎', '🔑', '📈', '⚡', '🎵', '🏠', '✨'
     ];
 
+    const handleSelectCategory = (catName: string) => {
+        if (catName === 'other') {
+            setCategoryMode('other');
+            setCustomCatText('');
+            setForm(prev => ({ ...prev, category: 'other' }));
+        } else if (catName === '__new__') {
+            setCategoryMode('new');
+            setCustomCatText('');
+            const curIcon = form.icon || '🎯';
+            const curColor = form.color || '#6366f1';
+            setNewCatIcon(curIcon);
+            setNewCatColor(curColor);
+            setForm(prev => ({ ...prev, category: '' }));
+        } else {
+            setCategoryMode('existing');
+            setCustomCatText(catName);
+            
+            // Find bundle for this category!
+            const bundle = existingCustomCategories.find(c => c.name.toLowerCase() === catName.toLowerCase());
+            const appliedIcon = bundle?.icon || form.icon || '🎯';
+            const appliedColor = bundle?.color || form.color || '#6366f1';
+
+            // AUTO-APPLY bundled icon and color to form!
+            setForm(prev => ({
+                ...prev,
+                category: catName,
+                icon: appliedIcon,
+                color: appliedColor
+            }));
+        }
+    };
+
+    const handleNewCategoryChange = (name: string, icon: string, color: string) => {
+        setCustomCatText(name);
+        setNewCatIcon(icon);
+        setNewCatColor(color);
+
+        const trimmed = name.trim();
+        setForm(prev => ({
+            ...prev,
+            category: trimmed || 'other',
+            icon: icon,
+            color: color
+        }));
+
+        if (trimmed) {
+            saveCategoryBundle({ name: trimmed, icon, color });
+            setCategoryBundles(getCategoryBundles(allGoals));
+        }
+    };
+
     const handleDeleteCategoryClick = (catName?: string | null) => {
         if (!catName || catName === 'other') return;
-        if (form.category === catName) {
+        removeCategoryBundle(catName);
+        setCategoryBundles(prev => {
+            const copy = { ...prev };
+            delete copy[catName.toLowerCase().trim()];
+            return copy;
+        });
+        if (form.category?.toLowerCase() === catName.toLowerCase()) {
             setForm(prev => ({ ...prev, category: 'other' }));
             setCategoryMode('other');
             setCustomCatText('');
@@ -869,29 +969,16 @@ export default function GoalModal({
                                     <div className="flex items-center gap-2">
                                         <select
                                             value={categoryMode === 'new' ? '__new__' : (categoryMode === 'existing' ? form.category : 'other')}
-                                            onChange={(e) => {
-                                                const val = e.target.value;
-                                                if (val === 'other') {
-                                                    setCategoryMode('other');
-                                                    setCustomCatText('');
-                                                    setForm(prev => ({ ...prev, category: 'other' }));
-                                                } else if (val === '__new__') {
-                                                    setCategoryMode('new');
-                                                    setCustomCatText('');
-                                                    setForm(prev => ({ ...prev, category: '' }));
-                                                } else {
-                                                    setCategoryMode('existing');
-                                                    setCustomCatText(val);
-                                                    setForm(prev => ({ ...prev, category: val }));
-                                                }
-                                            }}
+                                            onChange={(e) => handleSelectCategory(e.target.value)}
                                             className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
                                         >
                                             <option value="other">{isIndo ? '🎯 Lainnya / Umum (Other)' : '🎯 Other / General'}</option>
                                             {existingCustomCategories.map(cat => (
-                                                <option key={cat} value={cat}>🏷️ {cat}</option>
+                                                <option key={cat.name} value={cat.name}>
+                                                    {cat.icon} {cat.name}
+                                                </option>
                                             ))}
-                                            <option value="__new__">{isIndo ? '➕ Buat Kategori Baru...' : '➕ Create New Category...'}</option>
+                                            <option value="__new__">{isIndo ? '➕ Buat Kategori Baru (Sepaket Ikon & Warna)...' : '➕ Create New Category (Bundle Icon & Color)...'}</option>
                                         </select>
 
                                         {categoryMode === 'existing' && form.category && form.category !== 'other' && onDeleteCategory && (
@@ -906,56 +993,126 @@ export default function GoalModal({
                                         )}
                                     </div>
 
+                                    {/* Create New Category Bundle UI */}
                                     {categoryMode === 'new' && (
-                                        <div className="mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                                            <input
-                                                type="text"
-                                                value={customCatText}
-                                                onChange={(e) => {
-                                                    const text = e.target.value;
-                                                    setCustomCatText(text);
-                                                    setForm(prev => ({ ...prev, category: text.trim() || 'other' }));
-                                                }}
-                                                placeholder={isIndo ? "Ketik nama kategori (contoh: Bisnis, Skripsi, YouTube)..." : "Type category name (e.g. Business, Thesis, YouTube)..."}
-                                                className="w-full bg-slate-50 dark:bg-slate-800/80 border border-indigo-300 dark:border-indigo-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none"
-                                                autoFocus
-                                            />
+                                        <div className="mt-3 p-3.5 bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/80 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1">
+                                                    {isIndo ? 'Nama Kategori Baru' : 'New Category Name'} *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={customCatText}
+                                                    onChange={(e) => handleNewCategoryChange(e.target.value, newCatIcon, newCatColor)}
+                                                    placeholder={isIndo ? "Contoh: Bisnis, Skripsi, YouTube, Portofolio..." : "E.g. Business, Thesis, YouTube, Portfolio..."}
+                                                    className="w-full bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 outline-none shadow-xs"
+                                                    autoFocus
+                                                />
+                                            </div>
+
+                                            {/* Sepaket Ikon & Warna Kategori */}
+                                            <div className="pt-2 border-t border-indigo-100 dark:border-indigo-900/50 space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[11px] font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+                                                        <Sparkles size={13} />
+                                                        {isIndo ? 'Atur Sepaket: Ikon & Warna Kategori' : 'Bundle: Category Icon & Color'}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                                        {isIndo ? 'Otomatis ke target yang memilih kategori ini' : 'Auto-applies to goals in this category'}
+                                                    </span>
+                                                </div>
+
+                                                <div className="flex items-center gap-3">
+                                                    {/* Category Icon Picker */}
+                                                    <div className="relative">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowNewCatIconPicker(!showNewCatIconPicker)}
+                                                            title={isIndo ? "Pilih ikon untuk kategori ini" : "Choose icon for this category"}
+                                                            className="w-11 h-11 flex items-center justify-center text-xl bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 rounded-xl shadow-xs transition hover:scale-105 active:scale-95"
+                                                        >
+                                                            <span>{newCatIcon}</span>
+                                                        </button>
+
+                                                        {showNewCatIconPicker && (
+                                                            <>
+                                                                <div className="fixed inset-0 z-40" onClick={() => setShowNewCatIconPicker(false)} />
+                                                                <div className="absolute left-0 bottom-full mb-2 z-50 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl w-64 animate-in fade-in zoom-in-95">
+                                                                    <div className="grid grid-cols-6 gap-1 mb-2">
+                                                                        {goalIconPresets.map(ico => (
+                                                                            <button
+                                                                                key={ico}
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    handleNewCategoryChange(customCatText, ico, newCatColor);
+                                                                                    setShowNewCatIconPicker(false);
+                                                                                }}
+                                                                                className={`w-8 h-8 flex items-center justify-center text-lg rounded-lg transition ${
+                                                                                    newCatIcon === ico ? 'bg-indigo-100 dark:bg-indigo-950 border border-indigo-400' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                                                }`}
+                                                                            >
+                                                                                {ico}
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Category Color Swatches */}
+                                                    <div className="flex-1 flex flex-wrap items-center gap-1.5 p-1.5 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/80 rounded-xl">
+                                                        {colorOptions.map((c) => (
+                                                            <button
+                                                                key={c}
+                                                                type="button"
+                                                                onClick={() => handleNewCategoryChange(customCatText, newCatIcon, c)}
+                                                                className={`w-5 h-5 rounded-lg transition-all flex items-center justify-center ${
+                                                                    newCatColor === c ? 'ring-2 ring-indigo-500 scale-110 shadow-xs' : 'opacity-70 hover:opacity-100'
+                                                                }`}
+                                                                style={{ backgroundColor: c }}
+                                                            >
+                                                                {newCatColor === c && <CheckCircle2 className="w-3 h-3 text-white drop-shadow" />}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
 
-                                    {/* Saved Categories Chips with Delete Option */}
+                                    {/* Saved Categories Chips with Delete Option & Auto-apply on click */}
                                     {existingCustomCategories.length > 0 && (
                                         <div className="pt-2">
                                             <span className="text-[10px] font-bold text-slate-400 block mb-1.5">
-                                                {isIndo ? 'Kategori Tersimpan:' : 'Saved Categories:'}
+                                                {isIndo ? 'Kategori Tersimpan (Klik untuk pakai sepaket ikon & warna):' : 'Saved Categories (Click to apply bundle):'}
                                             </span>
                                             <div className="flex flex-wrap gap-1.5">
                                                 {existingCustomCategories.map(cat => (
                                                     <span 
-                                                        key={cat} 
+                                                        key={cat.name} 
                                                         className={`inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl text-xs font-bold border transition ${
-                                                            form.category === cat
-                                                                ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300'
-                                                                : 'bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                                                            (form.category || '').toLowerCase() === cat.name.toLowerCase()
+                                                                ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500/20 shadow-xs'
+                                                                : 'bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                                                         }`}
                                                     >
                                                         <button
                                                             type="button"
-                                                            onClick={() => {
-                                                                setCategoryMode('existing');
-                                                                setCustomCatText(cat);
-                                                                setForm(prev => ({ ...prev, category: cat }));
-                                                            }}
-                                                            className="hover:underline"
+                                                            onClick={() => handleSelectCategory(cat.name)}
+                                                            className="flex items-center gap-1.5 hover:underline"
+                                                            title={isIndo ? `Terapkan kategori "${cat.name}" beserta ikon ${cat.icon} dan warnanya` : `Apply "${cat.name}" bundled with icon ${cat.icon} and color`}
                                                         >
-                                                            🏷️ {cat}
+                                                            <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: cat.color }} />
+                                                            <span>{cat.icon}</span>
+                                                            <span>{cat.name}</span>
                                                         </button>
                                                         {onDeleteCategory && (
                                                             <button
                                                                 type="button"
-                                                                onClick={() => handleDeleteCategoryClick(cat)}
+                                                                onClick={() => handleDeleteCategoryClick(cat.name)}
                                                                 className="text-slate-400 hover:text-rose-500 p-0.5 rounded transition"
-                                                                title={isIndo ? `Hapus kategori "${cat}"` : `Delete category "${cat}"`}
+                                                                title={isIndo ? `Hapus kategori "${cat.name}"` : `Delete category "${cat.name}"`}
                                                             >
                                                                 <Trash2 size={12} />
                                                             </button>

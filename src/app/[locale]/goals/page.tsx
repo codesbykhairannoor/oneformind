@@ -24,6 +24,7 @@ import {
 import { Target, Sparkles, Plus } from 'lucide-react';
 import ExportModal from '@/components/export/ExportModal';
 import { useActiveModules } from '@/hooks/useActiveModules';
+import { saveCategoryBundle, removeCategoryBundle } from './lib/goalCategories';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -463,6 +464,14 @@ export default function GoalsPage() {
             progress_type: form.type || 'milestones'
         });
 
+        if (form.category && form.category !== 'other') {
+            saveCategoryBundle({
+                name: form.category,
+                icon: form.icon || '🎯',
+                color: form.color || '#6366f1'
+            });
+        }
+
         try {
             if (editingGoal) {
                 // Optimistic update
@@ -595,6 +604,7 @@ export default function GoalsPage() {
 
     const handleDeleteCategory = async (categoryToDelete: string) => {
         if (!categoryToDelete || categoryToDelete === 'other') return;
+        removeCategoryBundle(categoryToDelete);
 
         // Optimistically update goals state
         setGoals(prev => prev.map(g => (g.category === categoryToDelete ? { ...g, category: 'other' } : g)));
