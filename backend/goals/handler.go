@@ -33,25 +33,45 @@ type GoalMilestone struct {
 }
 
 type Goal struct {
-	ID            int             `json:"id"`
-	UserID        int             `json:"userId"`
-	Title         string          `json:"title"`
-	Category      *string         `json:"category"`
-	Type          string          `json:"type"`
-	TargetValue   float64         `json:"targetValue"`
-	CurrentValue  float64         `json:"currentValue"`
-	StartDate     *time.Time      `json:"startDate,omitempty"`
-	EndDate       *time.Time      `json:"endDate,omitempty"`
-	SpecificDays  *string         `json:"specificDays,omitempty"`
-	Status        string          `json:"status"`
-	CoverImageUrl *string         `json:"coverImageUrl"`
-	Reward        *string         `json:"reward"`
-	Priority      string          `json:"priority"`
-	Color         *string         `json:"color"`
-	ParentGoalID  *int            `json:"parentGoalId,omitempty"`
-	CreatedAt     *time.Time      `json:"createdAt"`
-	UpdatedAt     *time.Time      `json:"updatedAt"`
-	Milestones    []GoalMilestone `json:"milestones"`
+	ID                 int             `json:"id"`
+	UserID             int             `json:"userId"`
+	Title              string          `json:"title"`
+	Category           *string         `json:"category"`
+	Type               string          `json:"type"`
+	TargetValue        float64         `json:"targetValue"`
+	TargetValueSnake   float64         `json:"target_value"`
+	CurrentValue       float64         `json:"currentValue"`
+	CurrentValueSnake  float64         `json:"current_value"`
+	StartDate          *time.Time      `json:"startDate,omitempty"`
+	StartDateSnake     *time.Time      `json:"start_date,omitempty"`
+	EndDate            *time.Time      `json:"endDate,omitempty"`
+	EndDateSnake       *time.Time      `json:"end_date,omitempty"`
+	SpecificDays       *string         `json:"specificDays,omitempty"`
+	SpecificDaysSnake  *string         `json:"specific_days,omitempty"`
+	Status             string          `json:"status"`
+	CoverImageUrl      *string         `json:"coverImageUrl"`
+	CoverImageUrlSnake *string         `json:"cover_image_url,omitempty"`
+	Reward             *string         `json:"reward"`
+	Priority           string          `json:"priority"`
+	Color              *string         `json:"color"`
+	ParentGoalID       *int            `json:"parentGoalId,omitempty"`
+	ParentGoalIDSnake  *int            `json:"parent_goal_id,omitempty"`
+	CreatedAt          *time.Time      `json:"createdAt"`
+	UpdatedAt          *time.Time      `json:"updatedAt"`
+	Milestones         []GoalMilestone `json:"milestones"`
+}
+
+func syncGoalAliases(g *Goal) {
+	if g == nil {
+		return
+	}
+	g.TargetValueSnake = g.TargetValue
+	g.CurrentValueSnake = g.CurrentValue
+	g.StartDateSnake = g.StartDate
+	g.EndDateSnake = g.EndDate
+	g.SpecificDaysSnake = g.SpecificDays
+	g.CoverImageUrlSnake = g.CoverImageUrl
+	g.ParentGoalIDSnake = g.ParentGoalID
 }
 
 func sendJSON(w http.ResponseWriter, status int, data interface{}) {
@@ -203,6 +223,7 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 		g.Priority = normalizePriority(g.Priority)
 		g.Status = normalizeStatus(g.Status)
 		g.Type = normalizeType(g.Type)
+		syncGoalAliases(&g)
 		g.Milestones = []GoalMilestone{}
 		goalsMap[g.ID] = &g
 		goalIDs = append(goalIDs, g.ID)
@@ -463,6 +484,7 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		}
 	}
 
+	syncGoalAliases(&g)
 	sendJSON(w, http.StatusCreated, g)
 }
 
@@ -732,6 +754,7 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		}
 	}
 
+	syncGoalAliases(&g)
 	sendJSON(w, http.StatusOK, g)
 }
 

@@ -101,6 +101,11 @@ export default function GoalsPage() {
             const parentGoalTitle = parentGoalId ? (titleMap.get(String(parentGoalId)) || null) : null;
             const childGoalsCount = childCountMap.get(String(g.id)) || 0;
 
+            const rawGoalStartDate = g.start_date || g.startDate || meta.start_date || meta.startDate || null;
+            const rawGoalEndDate = g.end_date || g.endDate || meta.end_date || meta.endDate || null;
+            const goalStartDate = rawGoalStartDate ? String(rawGoalStartDate).split('T')[0] : null;
+            const goalEndDate = rawGoalEndDate ? String(rawGoalEndDate).split('T')[0] : null;
+
             const linkedSource = g.linked_source || meta.linked_source || 'manual';
             const linkedAccountId = g.linked_account_id ?? meta.linked_account_id ?? null;
             let linkedAccountTitle = g.linked_account_title || meta.linked_account_title || null;
@@ -145,9 +150,6 @@ export default function GoalsPage() {
 
                         // 1. Boundary filter: Only count logs on/after goal start_date (and on/before end_date)
                         // This prevents old check-ins from past months from artificially completing a new goal!
-                        const goalStartDate = g.start_date ? String(g.start_date).split('T')[0] : (meta.start_date ? String(meta.start_date).split('T')[0] : null);
-                        const goalEndDate = g.end_date ? String(g.end_date).split('T')[0] : (meta.end_date ? String(meta.end_date).split('T')[0] : null);
-
                         const validLogs = (h.logs || []).filter((l: any) => {
                             const isDone = l.status === 'completed' || l.completed || l.value === 1;
                             if (!isDone) return false;
@@ -223,8 +225,10 @@ export default function GoalsPage() {
                 obstacle: g.obstacle || meta.obstacle || '',
                 obstacle_plan: g.obstacle_plan || g.obstaclePlan || meta.obstacle_plan || '',
                 reward: g.reward || meta.reward || '',
-                start_date: g.startDate ? g.startDate.split('T')[0] : (g.start_date || ''),
-                end_date: g.endDate ? g.endDate.split('T')[0] : (g.end_date || ''),
+                startDate: goalStartDate,
+                start_date: goalStartDate || '',
+                endDate: goalEndDate,
+                end_date: goalEndDate || '',
                 cover_image_url: g.cover_image_url || g.coverImageUrl || '',
                 linked_source: linkedSource,
                 linked_account_id: linkedAccountId,
@@ -324,9 +328,8 @@ export default function GoalsPage() {
     const filteredGoals = useMemo(() => {
         return goals.filter((g) => {
             // Tab Status Filter (In Progress vs Completed)
-            const isCompleted = g.status === 'completed' || calculateGoalProgress(g) >= 100;
-            if (currentTab === 'active' && isCompleted) return false;
-            if (currentTab === 'completed' && !isCompleted) return false;
+            if (currentTab === 'active' && g.status === 'completed') return false;
+            if (currentTab === 'completed' && g.status !== 'completed') return false;
 
             // Search Query
             if (searchQuery.trim()) {
