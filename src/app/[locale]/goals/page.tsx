@@ -265,9 +265,39 @@ export default function GoalsPage() {
                         progress: calculateGoalProgress(c),
                         status: c.status
                     }));
-                    const avgProgress = Math.round(childSummaries.reduce((acc: number, c: any) => acc + c.progress, 0) / childSummaries.length);
+
+                    // Rolling Wave Cadence Denominator:
+                    // Prevents a monthly goal with only 1 weekly goal from prematurely showing 100% complete
+                    const parentHorizon = parent.time_horizon || 'yearly';
+                    const hasWeeklyChildren = childSummaries.some((c: any) => c.time_horizon === 'weekly');
+                    const hasMonthlyChildren = childSummaries.some((c: any) => c.time_horizon === 'monthly' || c.time_horizon === 'sprint');
+                    const hasQuarterlyChildren = childSummaries.some((c: any) => c.time_horizon === 'quarterly');
+
+                    let expectedDenominator = childSummaries.length;
+                    if (parentHorizon === 'monthly') {
+                        if (hasWeeklyChildren) {
+                            expectedDenominator = Math.max(4, childSummaries.length);
+                        }
+                    } else if (parentHorizon === 'quarterly') {
+                        if (hasMonthlyChildren) {
+                            expectedDenominator = Math.max(3, childSummaries.length);
+                        } else if (hasWeeklyChildren) {
+                            expectedDenominator = Math.max(12, childSummaries.length);
+                        }
+                    } else if (parentHorizon === 'yearly') {
+                        if (hasQuarterlyChildren) {
+                            expectedDenominator = Math.max(4, childSummaries.length);
+                        } else if (hasMonthlyChildren) {
+                            expectedDenominator = Math.max(12, childSummaries.length);
+                        }
+                    }
+
+                    const sumProgress = childSummaries.reduce((acc: number, c: any) => acc + c.progress, 0);
+                    const avgProgress = Math.min(100, Math.round(sumProgress / expectedDenominator));
+
                     parent.child_goals = childSummaries;
                     parent.child_goals_count = children.length;
+                    parent.child_goals_expected_count = expectedDenominator;
                     parent.child_goals_avg_progress = avgProgress;
                 }
             });

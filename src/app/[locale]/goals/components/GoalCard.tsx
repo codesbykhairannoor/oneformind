@@ -565,6 +565,11 @@ export default function GoalCard({
                                             <span className="flex items-center gap-1">
                                                 <Layers size={12} className="text-indigo-500" />
                                                 <span>{isIndo ? 'Sub-Target Pelaksana' : 'Linked Sub-Goals'}</span>
+                                                {Boolean(goal.child_goals_expected_count && goal.child_goals_expected_count > (goal.child_goals_count || 0)) && (
+                                                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">
+                                                        ({goal.child_goals_count}/{goal.child_goals_expected_count} {isIndo ? 'minggu/fase' : 'phases'})
+                                                    </span>
+                                                )}
                                             </span>
                                             <span className="font-mono text-indigo-600 dark:text-indigo-400 font-black">
                                                 {goal.child_goals_avg_progress || 0}%
