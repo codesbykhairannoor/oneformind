@@ -444,8 +444,8 @@ export default function GoalsPage() {
                         title: form.title, 
                         category: form.category, 
                         type: form.type || 'milestones',
-                        status: form.status,
-                        priority: form.priority,
+                        status: form.status || 'active',
+                        priority: form.priority || 'important',
                         time_horizon: form.time_horizon || 'yearly',
                         is_north_star: form.is_north_star,
                         parentGoalId: form.parent_goal_id ? Number(form.parent_goal_id) : null,
@@ -476,9 +476,19 @@ export default function GoalsPage() {
                 if (res.ok) {
                     await mutateGoals();
                 } else {
-                    const errData = await res.json().catch(() => ({}));
-                    console.error('Failed to update goal:', errData);
-                    alert(errData.error || (isIndo ? 'Gagal memperbarui target' : 'Failed to update goal'));
+                    const errText = await res.text().catch(() => '');
+                    let errMsg = '';
+                    try {
+                        const parsed = JSON.parse(errText);
+                        errMsg = parsed.error || parsed.message || '';
+                    } catch {
+                        errMsg = errText;
+                    }
+                    if (!errMsg) {
+                        errMsg = isIndo ? 'Gagal memperbarui target' : 'Failed to update goal';
+                    }
+                    console.error('Failed to update goal:', errMsg);
+                    alert(errMsg);
                     await mutateGoals();
                 }
             } else {
@@ -493,7 +503,7 @@ export default function GoalsPage() {
                         category: form.category, 
                         type: form.type || 'milestones',
                         status: 'active',
-                        priority: form.priority,
+                        priority: form.priority || 'important',
                         time_horizon: form.time_horizon || 'yearly',
                         is_north_star: form.is_north_star,
                         parentGoalId: form.parent_goal_id ? Number(form.parent_goal_id) : null,
@@ -529,9 +539,19 @@ export default function GoalsPage() {
                     }
                     await mutateGoals();
                 } else {
-                    const errData = await res.json().catch(() => ({}));
-                    console.error('Failed to create goal:', errData);
-                    alert(errData.error || (isIndo ? 'Gagal menyimpan target' : 'Failed to create goal'));
+                    const errText = await res.text().catch(() => '');
+                    let errMsg = '';
+                    try {
+                        const parsed = JSON.parse(errText);
+                        errMsg = parsed.error || parsed.message || '';
+                    } catch {
+                        errMsg = errText;
+                    }
+                    if (!errMsg) {
+                        errMsg = isIndo ? 'Gagal menyimpan target' : 'Failed to create goal';
+                    }
+                    console.error('Failed to create goal:', errMsg);
+                    alert(errMsg);
                     // Revert optimistic insert
                     setGoals(prev => prev.filter(g => g.id !== tempId));
                     await mutateGoals();

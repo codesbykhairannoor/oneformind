@@ -3,9 +3,11 @@ package goals
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -52,6 +54,59 @@ type Goal struct {
 	Milestones    []GoalMilestone `json:"milestones"`
 }
 
+func sendJSON(w http.ResponseWriter, status int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
+}
+
+func sendError(w http.ResponseWriter, status int, msg string) {
+	log.Printf("[goals_api] error status=%d: %s\n", status, msg)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]string{"error": msg})
+}
+
+func normalizePriority(p string) string {
+	switch strings.ToLower(strings.TrimSpace(p)) {
+	case "vital", "urgent":
+		return "vital"
+	case "optional", "low":
+		return "optional"
+	case "important", "medium", "normal", "high":
+		fallthrough
+	default:
+		return "important"
+	}
+}
+
+func normalizeStatus(s string) string {
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "completed", "done":
+		return "completed"
+	case "paused":
+		return "paused"
+	case "cancelled", "canceled":
+		return "cancelled"
+	case "active", "in_progress":
+		fallthrough
+	default:
+		return "active"
+	}
+}
+
+func normalizeType(t string) string {
+	tNorm := strings.ToLower(strings.TrimSpace(t))
+	switch tNorm {
+	case "daily", "weekly", "monthly", "quarterly", "yearly",
+		"milestones", "numeric", "currency", "boolean", "custom",
+		"vision", "specific_days", "custom_period", "habit_frequency":
+		return tNorm
+	default:
+		return "milestones"
+	}
+}
+
 func GoalsHandler(w http.ResponseWriter, r *http.Request) {
 	if dbGoals == nil {
 		initDB()
@@ -61,13 +116,13 @@ func GoalsHandler(w http.ResponseWriter, r *http.Request) {
 		userIdStr = r.URL.Query().Get("userId")
 	}
 	if userIdStr == "" {
-		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		sendError(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		sendError(w, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
 
@@ -81,7 +136,7 @@ func GoalsHandler(w http.ResponseWriter, r *http.Request) {
 	case "DELETE":
 		handleDeleteGoal(w, r, userId)
 	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		sendError(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }
 
@@ -90,7 +145,7 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 		initDB()
 	}
 	if dbGoals == nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "Database connection not available")
 		return
 	}
 
@@ -102,7 +157,8 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 		ORDER BY id DESC
 	`, userId)
 	if err != nil {
-		http.Error(w, "Failed to query goals", http.StatusInternalServerError)
+		log.Printf("[goals_api] Failed to query goals: %v\n", err)
+		sendError(w, http.StatusInternalServerError, "Failed to query goals")
 		return
 	}
 	defer rows.Close()
@@ -119,7 +175,8 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 			&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &startDate, &endDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &parentGoalID, &createdAt, &updatedAt,
 		)
 		if err != nil {
-			http.Error(w, "Failed to scan goal", http.StatusInternalServerError)
+			log.Printf("[goals_api] Failed to scan goal: %v\n", err)
+			sendError(w, http.StatusInternalServerError, "Failed to scan goal")
 			return
 		}
 		if parentGoalID.Valid {
@@ -143,6 +200,9 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 			g.UpdatedAt = &t
 		}
 
+		g.Priority = normalizePriority(g.Priority)
+		g.Status = normalizeStatus(g.Status)
+		g.Type = normalizeType(g.Type)
 		g.Milestones = []GoalMilestone{}
 		goalsMap[g.ID] = &g
 		goalIDs = append(goalIDs, g.ID)
@@ -185,13 +245,9 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 	for _, id := range goalIDs {
 		goals = append(goals, *goalsMap[id])
 	}
-	if goals == nil {
-		goals = []Goal{}
-	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
-	json.NewEncoder(w).Encode(goals)
+	sendJSON(w, http.StatusOK, goals)
 }
 
 func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
@@ -226,7 +282,14 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, "Invalid body", http.StatusBadRequest)
+		log.Printf("[goals_api] Failed to decode body: %v\n", err)
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("Format data tidak valid: %v", err))
+		return
+	}
+
+	title := strings.TrimSpace(body.Title)
+	if title == "" {
+		sendError(w, http.StatusBadRequest, "Judul target wajib diisi!")
 		return
 	}
 
@@ -252,10 +315,12 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		body.ParentGoalID = body.ParentGoalIDSnake
 	}
 
-	tType := "custom"
-	if body.Type != nil {
-		tType = *body.Type
+	rawType := "milestones"
+	if body.Type != nil && *body.Type != "" {
+		rawType = *body.Type
 	}
+	tType := normalizeType(rawType)
+
 	tTarget := 100.0
 	if body.TargetValue != nil {
 		tTarget = *body.TargetValue
@@ -264,14 +329,18 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	if body.CurrentValue != nil {
 		tCurrent = *body.CurrentValue
 	}
-	tStatus := "active"
-	if body.Status != nil {
-		tStatus = *body.Status
+
+	rawStatus := "active"
+	if body.Status != nil && *body.Status != "" {
+		rawStatus = *body.Status
 	}
-	tPriority := "medium"
-	if body.Priority != nil {
-		tPriority = *body.Priority
+	tStatus := normalizeStatus(rawStatus)
+
+	rawPriority := "important"
+	if body.Priority != nil && *body.Priority != "" {
+		rawPriority = *body.Priority
 	}
+	tPriority := normalizePriority(rawPriority)
 
 	var startDate, endDate *time.Time
 	if body.StartDate != nil && *body.StartDate != "" {
@@ -297,13 +366,17 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		initDB()
 	}
 	if dbGoals == nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "Koneksi database terputus. Silakan coba sesaat lagi.")
 		return
 	}
 
 	var parentID *int
 	if body.ParentGoalID != nil && *body.ParentGoalID > 0 {
-		parentID = body.ParentGoalID
+		var existsID int
+		err := dbGoals.QueryRow(`SELECT id FROM goals WHERE id = $1 AND user_id = $2`, *body.ParentGoalID, userId).Scan(&existsID)
+		if err == nil && existsID > 0 {
+			parentID = body.ParentGoalID
+		}
 	}
 
 	// Insert
@@ -314,7 +387,7 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		INSERT INTO goals (user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at
-	`, userId, body.Title, body.Category, tType, tTarget, tCurrent, startDate, endDate, body.SpecificDays, tStatus, body.CoverImageUrl, body.Reward, tPriority, body.Color, parentID).Scan(
+	`, userId, title, body.Category, tType, tTarget, tCurrent, startDate, endDate, body.SpecificDays, tStatus, body.CoverImageUrl, body.Reward, tPriority, body.Color, parentID).Scan(
 		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &retStartDate, &retEndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &retParentID, &retCreatedAt, &retUpdatedAt,
 	)
 	if retParentID.Valid {
@@ -339,15 +412,16 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	}
 
 	if err != nil {
-		log.Printf("Failed to insert goal: %v\n", err)
-		http.Error(w, "Failed to insert goal", http.StatusInternalServerError)
+		log.Printf("[goals_api] Failed to insert goal: %v\n", err)
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("Gagal menyimpan target ke database: %v", err))
 		return
 	}
 	g.Milestones = []GoalMilestone{}
 
 	if len(body.Milestones) > 0 {
 		for i, ms := range body.Milestones {
-			if ms.Title == "" {
+			msTitle := strings.TrimSpace(ms.Title)
+			if msTitle == "" {
 				continue
 			}
 			isComp := false
@@ -366,7 +440,7 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 				INSERT INTO goal_milestones (goal_id, title, completed, "order", created_at, updated_at)
 				VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 				RETURNING id, goal_id, title, completed, "order", target_date, created_at, updated_at
-			`, g.ID, ms.Title, isComp, ord).Scan(
+			`, g.ID, msTitle, isComp, ord).Scan(
 				&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &retTargetDate, &mCreatedAt, &mUpdatedAt,
 			)
 			if err == nil {
@@ -383,23 +457,24 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 					m.UpdatedAt = &t
 				}
 				g.Milestones = append(g.Milestones, m)
+			} else {
+				log.Printf("[goals_api] Failed to insert milestone: %v\n", err)
 			}
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(g)
+	sendJSON(w, http.StatusCreated, g)
 }
 
 func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		http.Error(w, "Missing ID", http.StatusBadRequest)
+		sendError(w, http.StatusBadRequest, "Missing ID")
 		return
 	}
 	goalId, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		sendError(w, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
@@ -428,7 +503,8 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, "Invalid body", http.StatusBadRequest)
+		log.Printf("[goals_api] Failed to decode update body: %v\n", err)
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("Format data tidak valid: %v", err))
 		return
 	}
 
@@ -458,7 +534,7 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		initDB()
 	}
 	if dbGoals == nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "Koneksi database terputus. Silakan coba sesaat lagi.")
 		return
 	}
 
@@ -466,11 +542,11 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	var existingUserId int
 	err = dbGoals.QueryRow(`SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
 	if err != nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		sendError(w, http.StatusNotFound, "Target tidak ditemukan")
 		return
 	}
 	if existingUserId != userId {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		sendError(w, http.StatusForbidden, "Akses ditolak")
 		return
 	}
 
@@ -479,9 +555,12 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	argId := 1
 
 	if body.Title != nil {
-		query += `, title = $` + strconv.Itoa(argId)
-		args = append(args, *body.Title)
-		argId++
+		trimmedTitle := strings.TrimSpace(*body.Title)
+		if trimmedTitle != "" {
+			query += `, title = $` + strconv.Itoa(argId)
+			args = append(args, trimmedTitle)
+			argId++
+		}
 	}
 	if body.Category != nil {
 		query += `, category = $` + strconv.Itoa(argId)
@@ -489,8 +568,9 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		argId++
 	}
 	if body.Type != nil {
+		normT := normalizeType(*body.Type)
 		query += `, type = $` + strconv.Itoa(argId)
-		args = append(args, *body.Type)
+		args = append(args, normT)
 		argId++
 	}
 	if body.TargetValue != nil {
@@ -504,8 +584,9 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		argId++
 	}
 	if body.Status != nil {
+		normS := normalizeStatus(*body.Status)
 		query += `, status = $` + strconv.Itoa(argId)
-		args = append(args, *body.Status)
+		args = append(args, normS)
 		argId++
 	}
 	if body.CoverImageUrl != nil {
@@ -519,8 +600,9 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		argId++
 	}
 	if body.Priority != nil {
+		normP := normalizePriority(*body.Priority)
 		query += `, priority = $` + strconv.Itoa(argId)
-		args = append(args, *body.Priority)
+		args = append(args, normP)
 		argId++
 	}
 	if body.Color != nil {
@@ -570,7 +652,13 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	if body.ParentGoalID != nil {
 		query += `, parent_goal_id = $` + strconv.Itoa(argId)
 		if *body.ParentGoalID > 0 {
-			args = append(args, *body.ParentGoalID)
+			var existsID int
+			err := dbGoals.QueryRow(`SELECT id FROM goals WHERE id = $1 AND user_id = $2`, *body.ParentGoalID, userId).Scan(&existsID)
+			if err == nil && existsID > 0 {
+				args = append(args, *body.ParentGoalID)
+			} else {
+				args = append(args, nil)
+			}
 		} else {
 			args = append(args, nil)
 		}
@@ -608,8 +696,8 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	}
 
 	if err != nil {
-		log.Printf("Failed to update goal: %v\n", err)
-		http.Error(w, "Failed to update goal", http.StatusInternalServerError)
+		log.Printf("[goals_api] Failed to update goal: %v\n", err)
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("Gagal memperbarui target: %v", err))
 		return
 	}
 
@@ -644,19 +732,18 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(g)
+	sendJSON(w, http.StatusOK, g)
 }
 
 func handleDeleteGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		http.Error(w, "Missing ID", http.StatusBadRequest)
+		sendError(w, http.StatusBadRequest, "Missing ID")
 		return
 	}
 	goalId, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		sendError(w, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
@@ -664,7 +751,7 @@ func handleDeleteGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		initDB()
 	}
 	if dbGoals == nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "Koneksi database terputus")
 		return
 	}
 
@@ -672,20 +759,20 @@ func handleDeleteGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	var existingUserId int
 	err = dbGoals.QueryRow(`SELECT user_id FROM goals WHERE id = $1`, goalId).Scan(&existingUserId)
 	if err != nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		sendError(w, http.StatusNotFound, "Target tidak ditemukan")
 		return
 	}
 	if existingUserId != userId {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		sendError(w, http.StatusForbidden, "Akses ditolak")
 		return
 	}
 
 	_, err = dbGoals.Exec(`DELETE FROM goals WHERE id = $1`, goalId)
 	if err != nil {
-		http.Error(w, "Failed to delete goal", http.StatusInternalServerError)
+		log.Printf("[goals_api] Failed to delete goal: %v\n", err)
+		sendError(w, http.StatusInternalServerError, "Gagal menghapus target")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]bool{"success": true})
+	sendJSON(w, http.StatusOK, map[string]bool{"success": true})
 }
