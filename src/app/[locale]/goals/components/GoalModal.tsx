@@ -23,6 +23,7 @@ interface GoalModalProps {
     show: boolean;
     goal?: GoalItem | null;
     allGoals?: GoalItem[];
+    defaultTimeHorizon?: string;
     onClose: () => void;
     onSave: (form: GoalItem) => void;
     onUploadImage?: (file: File) => void;
@@ -34,6 +35,7 @@ export default function GoalModal({
     show,
     goal,
     allGoals = [],
+    defaultTimeHorizon = 'weekly',
     onClose,
     onSave,
     onUploadImage,
@@ -70,6 +72,8 @@ export default function GoalModal({
         return list;
     }, [fetchedHabitsRaw, isHabitActive]);
 
+    const activeHorizon = defaultTimeHorizon && defaultTimeHorizon !== 'all' ? defaultTimeHorizon : 'weekly';
+
     const [form, setForm] = useState<GoalItem>({
         id: '',
         title: '',
@@ -78,7 +82,7 @@ export default function GoalModal({
         status: 'active',
         priority: 'important',
         category: 'other',
-        time_horizon: 'yearly',
+        time_horizon: activeHorizon,
         is_north_star: false,
         parent_goal_id: null,
         start_value: 0,
@@ -153,7 +157,7 @@ export default function GoalModal({
                 status: 'active',
                 priority: 'important',
                 category: 'other',
-                time_horizon: 'yearly',
+                time_horizon: activeHorizon,
                 is_north_star: false,
                 parent_goal_id: null,
                 start_value: 0,

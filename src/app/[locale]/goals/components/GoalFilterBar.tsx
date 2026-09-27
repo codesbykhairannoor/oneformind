@@ -53,11 +53,11 @@ export default function GoalFilterBar({
     const isIndo = locale === 'id';
 
     const timeHorizons = [
-        { id: 'all', label: isIndo ? 'Semua' : 'All' },
         { id: 'weekly', label: isIndo ? '📅 Mingguan' : '📅 Weekly' },
         { id: 'monthly', label: isIndo ? '🗓️ Bulanan' : '🗓️ Monthly' },
+        { id: 'quarterly', label: isIndo ? '📊 Kuartal' : '📊 Quarterly' },
         { id: 'yearly', label: isIndo ? '🎯 Tahunan' : '🎯 Yearly' },
-        { id: 'lifetime', label: isIndo ? '🌌 Visi' : '🌌 Vision' },
+        { id: 'all', label: isIndo ? 'Semua' : 'All' },
     ];
 
     const sortOptions = [
@@ -68,7 +68,7 @@ export default function GoalFilterBar({
         { id: 'newest', label: isIndo ? 'Paling Baru' : 'Recently Created' },
     ];
 
-    const hasActiveFilters = selectedCategory !== 'all' || selectedPriority !== 'all' || selectedTimeHorizon !== 'all' || searchQuery.trim().length > 0;
+    const hasActiveFilters = selectedCategory !== 'all' || selectedPriority !== 'all' || selectedTimeHorizon !== 'weekly' || searchQuery.trim().length > 0;
 
     return (
         <div className="space-y-3.5 w-full max-w-full min-w-0">
@@ -244,7 +244,7 @@ export default function GoalFilterBar({
                         onClick={() => {
                             setSelectedCategory('all');
                             setSelectedPriority('all');
-                            setSelectedTimeHorizon('all');
+                            setSelectedTimeHorizon('weekly');
                             setSearchQuery('');
                         }}
                         className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition shrink-0 shadow-xs"

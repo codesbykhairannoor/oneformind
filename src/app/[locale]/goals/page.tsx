@@ -41,7 +41,7 @@ export default function GoalsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [selectedPriority, setSelectedPriority] = useState('all');
-    const [selectedTimeHorizon, setSelectedTimeHorizon] = useState('all');
+    const [selectedTimeHorizon, setSelectedTimeHorizon] = useState('weekly');
     const [sortBy, setSortBy] = useState<GoalSortOption>('deadline');
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -320,8 +320,12 @@ export default function GoalsPage() {
                 const th = g.time_horizon || 'yearly';
                 if (selectedTimeHorizon === 'monthly') {
                     if (th !== 'monthly' && th !== 'sprint') return false;
+                } else if (selectedTimeHorizon === 'quarterly') {
+                    if (th !== 'quarterly') return false;
                 } else if (selectedTimeHorizon === 'yearly') {
-                    if (th !== 'yearly' && th !== 'quarterly') return false;
+                    if (th !== 'yearly') return false;
+                } else if (selectedTimeHorizon === 'weekly') {
+                    if (th !== 'weekly') return false;
                 } else {
                     if (th !== selectedTimeHorizon) return false;
                 }
@@ -881,6 +885,7 @@ export default function GoalsPage() {
                         show={isModalOpen}
                         goal={editingGoal}
                         allGoals={goals}
+                        defaultTimeHorizon={selectedTimeHorizon}
                         onClose={() => setIsModalOpen(false)}
                         onSave={handleSaveGoal}
                     />
