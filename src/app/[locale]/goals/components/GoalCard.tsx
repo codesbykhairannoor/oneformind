@@ -9,7 +9,7 @@ import {
     ChevronRight, Zap, CheckCircle2, Sparkles, Star,
     Heart, DollarSign, Briefcase, GraduationCap, Users, 
     Plane, Palette, Dumbbell, Music, Code, Camera, BookOpen, 
-    Gamepad2, ShieldAlert, Compass, Plus, Minus, Link2
+    Gamepad2, ShieldAlert, Compass, Plus, Minus, Link2, Layers
 } from 'lucide-react';
 import MilestoneItem, { Milestone } from './MilestoneItem';
 import { 
@@ -554,15 +554,64 @@ export default function GoalCard({
                             ))}
                             
                             {milestones.length === 0 && (
-                                <button
-                                    type="button"
-                                    onClick={() => !isSavingOrTemp && onAddMilestone?.(goal)}
-                                    disabled={isSavingOrTemp}
-                                    className="w-full py-3 px-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700/60 bg-slate-50/50 dark:bg-slate-800/30 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95"
-                                >
-                                    <Plus size={13} />
-                                    <span>{isIndo ? 'Tambah Checklist Langkah' : 'Add First Milestone Step'}</span>
-                                </button>
+                                goal.child_goals && goal.child_goals.length > 0 ? (
+                                    <div className="space-y-1.5 pt-1">
+                                        <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                            <span className="flex items-center gap-1">
+                                                <Layers size={12} className="text-indigo-500" />
+                                                <span>{isIndo ? 'Sub-Target Pelaksana' : 'Linked Sub-Goals'}</span>
+                                            </span>
+                                            <span className="font-mono text-indigo-600 dark:text-indigo-400 font-black">
+                                                {goal.child_goals_avg_progress || 0}%
+                                            </span>
+                                        </div>
+                                        <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-0.5 custom-scrollbar">
+                                            {goal.child_goals.map((cg) => {
+                                                const horizonLabel = cg.time_horizon === 'weekly' ? (isIndo ? 'Mingguan' : 'Weekly') :
+                                                    cg.time_horizon === 'monthly' ? (isIndo ? 'Bulanan' : 'Monthly') :
+                                                    cg.time_horizon === 'quarterly' ? (isIndo ? 'Kuartal' : 'Quarterly') : (isIndo ? 'Target' : 'Goal');
+                                                return (
+                                                    <div 
+                                                        key={cg.id}
+                                                        className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2 shadow-xs"
+                                                    >
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className="text-[8px] font-black uppercase px-1 py-0.2 rounded bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono shrink-0">
+                                                                    {horizonLabel}
+                                                                </span>
+                                                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate block">
+                                                                    {cg.title}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <div className="h-1 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                                    <div 
+                                                                        className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500"
+                                                                        style={{ width: `${Math.min(100, cg.progress || 0)}%` }}
+                                                                    />
+                                                                </div>
+                                                                <span className="text-[9px] font-bold font-mono text-slate-500 dark:text-slate-400 shrink-0">
+                                                                    {cg.progress || 0}%
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => !isSavingOrTemp && onAddMilestone?.(goal)}
+                                        disabled={isSavingOrTemp}
+                                        className="w-full py-3 px-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700/60 bg-slate-50/50 dark:bg-slate-800/30 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                                    >
+                                        <Plus size={13} />
+                                        <span>{isIndo ? 'Tambah Checklist Langkah' : 'Add First Milestone Step'}</span>
+                                    </button>
+                                )
                             )}
                         </div>
                     </div>

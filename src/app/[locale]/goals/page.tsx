@@ -87,7 +87,7 @@ export default function GoalsPage() {
             }
         });
 
-        return fetchedGoals.map((g: any) => {
+        const mappedGoals = fetchedGoals.map((g: any) => {
             // Parse specific_days / metadata
             let meta: any = {};
             const rawSpecific = g.specific_days || g.specificDays;
@@ -202,6 +202,35 @@ export default function GoalsPage() {
                 })),
             };
         });
+
+        // Pass 2: Connect Sub-Goals (Children) to Parent Goals and Compute Rollup Progress
+        const parentChildrenMap = new Map<string, any[]>();
+        mappedGoals.forEach((g: any) => {
+            if (g.parent_goal_id) {
+                const pid = String(g.parent_goal_id);
+                if (!parentChildrenMap.has(pid)) parentChildrenMap.set(pid, []);
+                parentChildrenMap.get(pid)!.push(g);
+            }
+        });
+
+        mappedGoals.forEach((parent: any) => {
+            const children = parentChildrenMap.get(String(parent.id)) || [];
+            if (children.length > 0) {
+                const childSummaries = children.map((c: any) => ({
+                    id: c.id,
+                    title: c.title,
+                    time_horizon: c.time_horizon,
+                    progress: calculateGoalProgress(c),
+                    status: c.status
+                }));
+                const avgProgress = Math.round(childSummaries.reduce((acc: number, c: any) => acc + c.progress, 0) / childSummaries.length);
+                parent.child_goals = childSummaries;
+                parent.child_goals_count = children.length;
+                parent.child_goals_avg_progress = avgProgress;
+            }
+        });
+
+        return mappedGoals;
     }, [fetchedGoals, fetchedHabits, fetchedSavings, isIndo]);
 
     const [goals, setGoals] = useState<GoalItem[]>(parsedGoals || []);

@@ -29,6 +29,8 @@ export interface GoalItem {
     parent_goal_id?: number | string | null;
     parent_goal_title?: string | null;
     child_goals_count?: number;
+    child_goals_avg_progress?: number;
+    child_goals?: { id: string | number; title: string; progress: number; time_horizon?: string; status?: string }[];
     
     // Numeric & Metric targets
     start_value?: number;
@@ -126,10 +128,14 @@ export function calculateGoalProgress(goal: GoalItem): number {
     // 3. Milestones Checklist
     const ms = goal.milestones || [];
     if (ms.length === 0) {
-        // If no manual milestones exist but habits are linked, use habit consistency!
+        // A. If no manual milestones exist but habits are linked, use habit consistency!
         if (goal.linked_habits && goal.linked_habits.length > 0) {
             const avg = goal.linked_habits.reduce((acc, h) => acc + (h.consistencyPercent || 0), 0) / goal.linked_habits.length;
             return Math.min(100, Math.max(0, Math.round(avg)));
+        }
+        // B. If no manual milestones exist but sub-goals are linked, rollup from sub-goals!
+        if (typeof goal.child_goals_avg_progress === 'number' && (goal.child_goals_count || 0) > 0) {
+            return Math.min(100, Math.max(0, Math.round(goal.child_goals_avg_progress)));
         }
         return 0;
     }
