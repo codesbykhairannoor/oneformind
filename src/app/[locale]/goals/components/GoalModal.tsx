@@ -13,7 +13,6 @@ import GoalDatePicker from './GoalDatePicker';
 import { GoalItem } from './GoalCard';
 import ModalPortal from '@/components/ModalPortal';
 import GoalModalHeader from './GoalModalHeader';
-import { archetypes } from './GoalArchetypesGrid';
 import GoalMilestonesSection from './GoalMilestonesSection';
 import { useActiveModules } from '@/hooks/useActiveModules';
 
@@ -56,21 +55,33 @@ export default function GoalModal({
     }, []);
 
     const { data: fetchedSavings } = useSWR(show && isFinanceActive ? '/api/finance/savings' : null, fetcher);
-    const { data: fetchedHabitsRaw } = useSWR(show && isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
+    const { data: fetchedHabitsRaw } = useSWR(show && isHabitActive ? '/api/habits?period=all' : null, fetcher);
 
     const uniqueHabits = useMemo(() => {
         if (!isHabitActive || !fetchedHabitsRaw || !Array.isArray(fetchedHabitsRaw)) return [];
-        const seen = new Set<string>();
-        const list: any[] = [];
+        const map = new Map<string, any>();
         fetchedHabitsRaw.forEach((h: any) => {
             if (h.isArchived || h.is_archived || h.archived) return;
             const norm = (h.name || '').trim().toLowerCase();
-            if (!norm || seen.has(norm)) return;
-            seen.add(norm);
-            list.push(h);
+            if (!norm) return;
+            if (!map.has(norm)) {
+                map.set(norm, {
+                    ...h,
+                    allIds: [h.id]
+                });
+            } else {
+                const existing = map.get(norm);
+                existing.allIds.push(h.id);
+                if (h.period === currentMonthKey) {
+                    map.set(norm, {
+                        ...h,
+                        allIds: existing.allIds
+                    });
+                }
+            }
         });
-        return list;
-    }, [fetchedHabitsRaw, isHabitActive]);
+        return Array.from(map.values());
+    }, [fetchedHabitsRaw, isHabitActive, currentMonthKey]);
 
     const activeHorizon = defaultTimeHorizon && defaultTimeHorizon !== 'all' ? defaultTimeHorizon : 'weekly';
 
@@ -106,18 +117,52 @@ export default function GoalModal({
 
     const potentialParentGoals = useMemo(() => {
         if (!allGoals || !Array.isArray(allGoals)) return [];
+        const curHorizon = form.time_horizon || 'weekly';
         return allGoals.filter(g => {
             if (form.id && String(g.id) === String(form.id)) return false;
             if (goal?.id && String(g.id) === String(goal.id)) return false;
-            return true;
+            const gHorizon = g.time_horizon || 'yearly';
+
+            if (curHorizon === 'weekly') {
+                return gHorizon === 'monthly' || gHorizon === 'sprint';
+            } else if (curHorizon === 'monthly') {
+                return gHorizon === 'quarterly' || gHorizon === 'yearly';
+            } else if (curHorizon === 'quarterly') {
+                return gHorizon === 'yearly';
+            }
+            return false;
         });
-    }, [allGoals, form.id, goal?.id]);
+    }, [allGoals, form.id, goal?.id, form.time_horizon]);
+
+    // Distinct custom categories from existing goals (excluding 'other')
+    const existingCustomCategories = useMemo(() => {
+        if (!allGoals || !Array.isArray(allGoals)) return [];
+        const set = new Set<string>();
+        allGoals.forEach(g => {
+            const cat = (g.category || '').trim();
+            if (cat && cat.toLowerCase() !== 'other') {
+                set.add(cat);
+            }
+        });
+        return Array.from(set);
+    }, [allGoals]);
+
+    const [categoryMode, setCategoryMode] = useState<'other' | 'existing' | 'new'>('other');
+    const [customCatText, setCustomCatText] = useState('');
+
+    useEffect(() => {
+        if (form.parent_goal_id) {
+            const isValidParent = potentialParentGoals.some(p => String(p.id) === String(form.parent_goal_id));
+            if (!isValidParent) {
+                setForm(prev => ({ ...prev, parent_goal_id: null }));
+            }
+        }
+    }, [form.time_horizon, potentialParentGoals]);
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [showStartPicker, setShowStartPicker] = useState(false);
     const [showEndPicker, setShowEndPicker] = useState(false);
-    const [selectedArchetype, setSelectedArchetype] = useState('other');
     const [showAdvanced, setShowAdvanced] = useState(false);
 
     useEffect(() => {
@@ -138,7 +183,18 @@ export default function GoalModal({
             parsedGoal.parent_goal_id = parsedGoal.parent_goal_id ?? parsedGoal.parentGoalId ?? null;
             setForm(parsedGoal);
             setImagePreview(goal.cover_image_url || null);
-            setSelectedArchetype(goal.category || 'other');
+            
+            const cat = parsedGoal.category || 'other';
+            if (cat === 'other') {
+                setCategoryMode('other');
+                setCustomCatText('');
+            } else if (existingCustomCategories.includes(cat)) {
+                setCategoryMode('existing');
+                setCustomCatText(cat);
+            } else {
+                setCategoryMode('new');
+                setCustomCatText(cat);
+            }
 
             // Auto-expand advanced options if goal already has WOOP psychology
             const hasAdv = Boolean(
@@ -179,24 +235,15 @@ export default function GoalModal({
                 linked_habit_ids: []
             });
             setImagePreview(null);
-            setSelectedArchetype('other');
+            setCategoryMode('other');
+            setCustomCatText('');
             setShowAdvanced(false);
         }
-    }, [goal, show, isIndo]);
+    }, [goal, show, isIndo, existingCustomCategories]);
 
     if (!show) return null;
 
-    const selectArchetype = (arch: typeof archetypes[0]) => {
-        setSelectedArchetype(arch.id);
-        setForm(prev => ({ ...prev, color: arch.color, category: arch.id }));
-    };
-
-    const currentHeaderIcon = () => {
-        const found = archetypes.find(a => a.id === form.category);
-        return found ? found.icon : Target;
-    };
-
-    const HeaderIcon = currentHeaderIcon();
+    const HeaderIcon = Target;
 
     const formatDateDisplay = (dateStr?: string | null) => {
         if (!dateStr) return isIndo ? 'Pilih Tenggat Waktu' : 'Select Deadline';
@@ -606,7 +653,6 @@ export default function GoalModal({
                                             { id: 'monthly', label: isIndo ? 'Bulanan' : 'Monthly' },
                                             { id: 'quarterly', label: isIndo ? 'Kuartal' : 'Quarter' },
                                             { id: 'yearly', label: isIndo ? 'Tahunan' : 'Yearly' },
-                                            { id: 'lifetime', label: 'Vision' },
                                         ].map((th) => (
                                             <button 
                                                 key={th.id}
@@ -653,12 +699,14 @@ export default function GoalModal({
                             </div>
 
                             {/* Row 1b: Parent Goal (Target Induk) Hierarchy Selector */}
-                            {potentialParentGoals.length > 0 && form.time_horizon !== 'lifetime' && (
+                            {form.time_horizon !== 'yearly' && (
                                 <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-1.5">
                                     <div className="flex items-center justify-between">
                                         <label className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
                                             <Link2 size={13} />
-                                            {isIndo ? '🔗 Target Induk (Parent Goal) — Bagian Dari Mana?' : '🔗 Parent Goal — Connected Vision'}
+                                            {isIndo 
+                                                ? (form.time_horizon === 'weekly' ? '🔗 Hubungkan ke Target Bulanan' : '🔗 Hubungkan ke Target Kuartal / Tahunan')
+                                                : (form.time_horizon === 'weekly' ? '🔗 Link to Monthly Goal' : '🔗 Link to Quarterly / Yearly Goal')}
                                         </label>
                                         {form.parent_goal_id && (
                                             <button
@@ -670,65 +718,113 @@ export default function GoalModal({
                                             </button>
                                         )}
                                     </div>
-                                    <select
-                                        value={form.parent_goal_id ? String(form.parent_goal_id) : ''}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            setForm(prev => ({ ...prev, parent_goal_id: val ? Number(val) : null }));
-                                        }}
-                                        className="w-full bg-white dark:bg-slate-900 border border-indigo-200/80 dark:border-indigo-800/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
-                                    >
-                                        <option value="">
-                                            {isIndo ? '🎯 Target Mandiri (Bukan sub-target / Standalone)' : '🎯 Standalone Goal (Not a sub-goal)'}
-                                        </option>
-                                        {potentialParentGoals.map(pg => {
-                                            const horizonLabel = pg.time_horizon === 'lifetime' ? 'Vision' :
-                                                pg.time_horizon === 'yearly' ? (isIndo ? 'Tahunan' : 'Yearly') :
-                                                pg.time_horizon === 'quarterly' ? (isIndo ? 'Kuartal' : 'Quarterly') :
-                                                pg.time_horizon === 'monthly' ? (isIndo ? 'Bulanan' : 'Monthly') :
-                                                (isIndo ? 'Mingguan' : 'Weekly');
-                                            return (
-                                                <option key={pg.id} value={pg.id}>
-                                                    [{horizonLabel}] {pg.title}
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
+
+                                    {potentialParentGoals.length > 0 ? (
+                                        <select
+                                            value={form.parent_goal_id ? String(form.parent_goal_id) : ''}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                setForm(prev => ({ ...prev, parent_goal_id: val ? Number(val) : null }));
+                                            }}
+                                            className="w-full bg-white dark:bg-slate-900 border border-indigo-200/80 dark:border-indigo-800/80 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
+                                        >
+                                            <option value="">
+                                                {isIndo ? '🎯 Target Mandiri (Bukan sub-target / Standalone)' : '🎯 Standalone Goal (Not a sub-goal)'}
+                                            </option>
+                                            {potentialParentGoals.map(pg => {
+                                                const horizonLabel = pg.time_horizon === 'yearly' ? (isIndo ? 'Tahunan' : 'Yearly') :
+                                                    pg.time_horizon === 'quarterly' ? (isIndo ? 'Kuartal' : 'Quarterly') :
+                                                    pg.time_horizon === 'monthly' ? (isIndo ? 'Bulanan' : 'Monthly') :
+                                                    (isIndo ? 'Mingguan' : 'Weekly');
+                                                return (
+                                                    <option key={pg.id} value={pg.id}>
+                                                        [{horizonLabel}] {pg.title}
+                                                    </option>
+                                                );
+                                            })}
+                                        </select>
+                                    ) : (
+                                        <div className="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/60 text-xs text-slate-500 dark:text-slate-400">
+                                            {form.time_horizon === 'weekly' 
+                                                ? (isIndo ? '💡 Belum ada target Bulanan aktif. Buat target bulanan terlebih dahulu jika ingin menghubungkan target mingguan ini ke target bulanan.' : '💡 No active monthly goals to connect. Create a monthly goal first.')
+                                                : (isIndo ? '💡 Belum ada target Kuartal atau Tahunan aktif. Buat target kuartal atau tahunan terlebih dahulu jika ingin menghubungkannya.' : '💡 No active quarterly or yearly goals to connect.')}
+                                        </div>
+                                    )}
+
                                     <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                                        {isIndo 
-                                            ? 'Target mingguan/bulanan dapat dihubungkan ke target tahunan/kuartal agar capaian sub-target otomatis mempercepat target induk.'
-                                            : 'Link this weekly/monthly target to a higher-level goal so sub-target achievements drive parent progression.'}
+                                        {form.time_horizon === 'weekly'
+                                            ? (isIndo ? 'Target mingguan dihubungkan ke target bulanan agar capaian mingguan otomatis mempercepat progres target bulanan.' : 'Link weekly target to a monthly goal so weekly progress drives monthly completion.')
+                                            : (isIndo ? 'Target bulanan dihubungkan ke target kuartal/tahunan agar progres bulanan otomatis mempercepat capaian target induk.' : 'Link monthly target to quarterly or yearly goals.')}
                                     </p>
                                 </div>
                             )}
 
                             {/* Row 2: Category & Color Theme */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Category Dropdown */}
+                                {/* Category Custom Creator / Selector */}
                                 <div className="space-y-1.5">
-                                    <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                        {isIndo ? 'Kategori Target (Archetype)' : 'Goal Category'}
-                                    </label>
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                            {isIndo ? 'Kategori Target' : 'Goal Category'}
+                                        </label>
+                                        {form.category !== 'other' && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setCategoryMode('other');
+                                                    setCustomCatText('');
+                                                    setForm(prev => ({ ...prev, category: 'other' }));
+                                                }}
+                                                className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                                            >
+                                                {isIndo ? 'Reset ke Lainnya (Other)' : 'Reset to Other'}
+                                            </button>
+                                        )}
+                                    </div>
+
                                     <select
-                                        value={form.category || 'other'}
+                                        value={categoryMode === 'new' ? '__new__' : (categoryMode === 'existing' ? form.category : 'other')}
                                         onChange={(e) => {
                                             const val = e.target.value;
-                                            setSelectedArchetype(val);
-                                            const matched = archetypes.find(a => a.id === val);
-                                            setForm(prev => ({
-                                                ...prev,
-                                                category: val,
-                                                color: matched?.color || prev.color
-                                            }));
+                                            if (val === 'other') {
+                                                setCategoryMode('other');
+                                                setCustomCatText('');
+                                                setForm(prev => ({ ...prev, category: 'other' }));
+                                            } else if (val === '__new__') {
+                                                setCategoryMode('new');
+                                                setCustomCatText('');
+                                                setForm(prev => ({ ...prev, category: '' }));
+                                            } else {
+                                                setCategoryMode('existing');
+                                                setCustomCatText(val);
+                                                setForm(prev => ({ ...prev, category: val }));
+                                            }
                                         }}
                                         className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
                                     >
-                                        {archetypeOptions.map((opt) => (
-                                            <option key={opt.id} value={opt.id}>
-                                                {opt.label}
-                                            </option>
+                                        <option value="other">{isIndo ? '🎯 Lainnya / Umum (Other)' : '🎯 Other / General'}</option>
+                                        {existingCustomCategories.map(cat => (
+                                            <option key={cat} value={cat}>🏷️ {cat}</option>
                                         ))}
+                                        <option value="__new__">{isIndo ? '➕ Buat Kategori Baru...' : '➕ Create New Category...'}</option>
                                     </select>
+
+                                    {categoryMode === 'new' && (
+                                        <div className="mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                                            <input
+                                                type="text"
+                                                value={customCatText}
+                                                onChange={(e) => {
+                                                    const text = e.target.value;
+                                                    setCustomCatText(text);
+                                                    setForm(prev => ({ ...prev, category: text.trim() || 'other' }));
+                                                }}
+                                                placeholder={isIndo ? "Ketik nama kategori (contoh: Bisnis, Skripsi, YouTube)..." : "Type category name (e.g. Business, Thesis, YouTube)..."}
+                                                className="w-full bg-slate-50 dark:bg-slate-800/80 border border-indigo-300 dark:border-indigo-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                                autoFocus
+                                            />
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Color Theme Selector */}
@@ -973,12 +1069,14 @@ export default function GoalModal({
 
                                         {uniqueHabits.length === 0 ? (
                                             <div className="text-xs text-slate-400 italic py-2">
-                                                {isIndo ? 'Belum ada kebiasaan aktif di bulan ini. Buat kebiasaan terlebih dahulu di tab Habits.' : 'No active habits found for this month.'}
+                                                {isIndo ? 'Belum ada kebiasaan aktif. Buat kebiasaan terlebih dahulu di tab Habits.' : 'No active habits found. Create a habit first in the Habits tab.'}
                                             </div>
                                         ) : (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
                                                 {uniqueHabits.map((h: any) => {
-                                                    const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
+                                                    const isSelected = form.linked_habit_ids?.some(id => 
+                                                        String(id) === String(h.id) || (Array.isArray(h.allIds) && h.allIds.some((aid: any) => String(id) === String(aid)))
+                                                    );
                                                     const freqBadge = (h.frequencyType === 'weekly_days' && Array.isArray(h.frequencyDays) && h.frequencyDays.length > 0)
                                                         ? `${h.frequencyDays.length}x/mgg`
                                                         : (h.frequencyCount && h.frequencyCount > 0 ? `${h.frequencyCount}x/mgg` : (isIndo ? 'Harian' : 'Daily'));
@@ -989,9 +1087,10 @@ export default function GoalModal({
                                                             onClick={() => {
                                                                 setForm(prev => {
                                                                     const currentIds = prev.linked_habit_ids || [];
-                                                                    const exists = currentIds.some(id => String(id) === String(h.id));
+                                                                    const idsToRemove = new Set([String(h.id), ...(h.allIds || []).map((aid: any) => String(aid))]);
+                                                                    const exists = currentIds.some(id => idsToRemove.has(String(id)));
                                                                     const nextIds = exists 
-                                                                        ? currentIds.filter(id => String(id) !== String(h.id))
+                                                                        ? currentIds.filter(id => !idsToRemove.has(String(id)))
                                                                         : [...currentIds, h.id];
                                                                     return { ...prev, linked_habit_ids: nextIds };
                                                                 });

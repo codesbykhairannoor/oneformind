@@ -7,7 +7,6 @@ import {
     PieChart, X, SlidersHorizontal, ArrowUpDown, 
     Star, Flame, Tag, Download
 } from 'lucide-react';
-import { archetypes } from './GoalArchetypesGrid';
 
 export type GoalViewMode = 'gallery' | 'kanban' | 'timeline' | 'wheel_of_life';
 export type GoalSortOption = 'deadline' | 'progress_desc' | 'progress_asc' | 'priority' | 'newest';
@@ -69,6 +68,35 @@ export default function GoalFilterBar({
     ];
 
     const hasActiveFilters = selectedCategory !== 'all' || selectedPriority !== 'all' || selectedTimeHorizon !== 'weekly' || searchQuery.trim().length > 0;
+
+    const displayCategories = React.useMemo(() => {
+        const list: { id: string; label: string; count: number }[] = [];
+
+        // Always include 'other' if it has goals or is selected
+        const otherCount = categoryCounts['other'] || 0;
+        if (otherCount > 0 || selectedCategory === 'other') {
+            list.push({
+                id: 'other',
+                label: isIndo ? '🎯 Lainnya' : '🎯 Other',
+                count: otherCount
+            });
+        }
+
+        // Include any custom categories from categoryCounts
+        Object.entries(categoryCounts).forEach(([catId, count]) => {
+            if (catId === 'other' || catId === 'all') return;
+            if (count > 0 || selectedCategory === catId) {
+                const label = catId.charAt(0).toUpperCase() + catId.slice(1);
+                list.push({
+                    id: catId,
+                    label: `🏷️ ${label}`,
+                    count
+                });
+            }
+        });
+
+        return list;
+    }, [categoryCounts, selectedCategory, isIndo]);
 
     return (
         <div className="space-y-3.5 w-full max-w-full min-w-0">
@@ -268,28 +296,24 @@ export default function GoalFilterBar({
                     <span className="text-[10px] font-mono opacity-60">({totalCount})</span>
                 </button>
 
-                {archetypes.map((arch) => {
-                    const count = categoryCounts[arch.id] || 0;
-                    if (count === 0 && selectedCategory !== arch.id) return null;
-                    const ArchIcon = arch.icon;
-                    const isSelected = selectedCategory === arch.id;
+                {displayCategories.map((cat) => {
+                    const isSelected = selectedCategory === cat.id;
 
                     return (
                         <button
-                            key={arch.id}
+                            key={cat.id}
                             type="button"
-                            onClick={() => setSelectedCategory(isSelected ? 'all' : arch.id)}
+                            onClick={() => setSelectedCategory(isSelected ? 'all' : cat.id)}
                             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 border ${
                                 isSelected
                                     ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-700/60 text-indigo-700 dark:text-indigo-300 shadow-sm ring-2 ring-indigo-500/20'
                                     : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                             }`}
                         >
-                            <ArchIcon size={12} style={{ color: arch.color }} />
-                            <span>{arch.label}</span>
-                            {count > 0 && (
+                            <span>{cat.label}</span>
+                            {cat.count > 0 && (
                                 <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
-                                    ({count})
+                                    ({cat.count})
                                 </span>
                             )}
                         </button>

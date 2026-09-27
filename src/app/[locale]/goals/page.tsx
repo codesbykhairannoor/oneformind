@@ -62,7 +62,7 @@ export default function GoalsPage() {
     }, []);
 
     const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
-    const { data: fetchedHabits, mutate: mutateHabits } = useSWR(isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
+    const { data: fetchedHabits, mutate: mutateHabits } = useSWR(isHabitActive ? '/api/habits?period=all' : null, fetcher);
     const { data: fetchedSavings } = useSWR(isFinanceActive ? '/api/finance/savings' : null, fetcher);
 
     const parsedGoals = useMemo(() => {
@@ -124,10 +124,20 @@ export default function GoalsPage() {
             }
 
             const linkedHabits: any[] = [];
-            const seenHabitNames = new Set<string>();
             const todayStr = new Date().toISOString().split('T')[0];
 
             if (isHabitActive && fetchedHabits && Array.isArray(fetchedHabits)) {
+                // Collect linked habit names from linkedHabitIds
+                const linkedHabitIdsSet = new Set(linkedHabitIds.map((id: any) => String(id)));
+                const linkedHabitNamesSet = new Set<string>();
+                fetchedHabits.forEach((fh: any) => {
+                    if (linkedHabitIdsSet.has(String(fh.id))) {
+                        const n = (fh.name || '').trim().toLowerCase();
+                        if (n) linkedHabitNamesSet.add(n);
+                    }
+                });
+
+                const seenHabitNames = new Set<string>();
                 fetchedHabits.forEach((h: any) => {
                     if (h.isArchived || h.is_archived || h.archived) return;
 
@@ -137,36 +147,51 @@ export default function GoalsPage() {
                     } else if (h.status && typeof h.status === 'object') {
                         hMeta = h.status;
                     }
-                    if (hMeta.syncedTabs && Array.isArray(hMeta.syncedTabs) && !hMeta.syncedTabs.includes('goal')) {
-                        return;
-                    }
-                    const isExplicitlyLinked = linkedHabitIds.some(id => String(id) === String(h.id));
+
+                    const norm = (h.name || '').trim().toLowerCase();
+                    const isExplicitlyLinked = linkedHabitIdsSet.has(String(h.id)) || (norm && linkedHabitNamesSet.has(norm));
                     const isMatched = isExplicitlyLinked ||
                                       (hMeta.goalId && String(hMeta.goalId) === String(g.id)) ||
                                       (hMeta.goalTitle && hMeta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
-                    const norm = (h.name || '').trim().toLowerCase();
+
                     if (isMatched && !seenHabitNames.has(norm)) {
                         seenHabitNames.add(norm);
 
-                        // 1. Boundary filter: Only count logs on/after goal start_date (and on/before end_date)
-                        // This prevents old check-ins from past months from artificially completing a new goal!
-                        const validLogs = (h.logs || []).filter((l: any) => {
+                        // Find all instances of this habit across periods to aggregate logs and select primary instance
+                        const matchingInstances = fetchedHabits.filter((fh: any) => (fh.name || '').trim().toLowerCase() === norm);
+                        const primaryInstance = matchingInstances.find((fh: any) => fh.period === currentMonthKey) || matchingInstances[matchingInstances.length - 1] || h;
+
+                        // Aggregate logs across all periods for this habit
+                        const allHabitLogs: any[] = [];
+                        matchingInstances.forEach((inst: any) => {
+                            if (Array.isArray(inst.logs)) {
+                                allHabitLogs.push(...inst.logs);
+                            }
+                        });
+
+                        // 1. Boundary filter: Only count logs on/after goal start_date (and on/before end_date), de-duplicated by date
+                        const seenDates = new Set<string>();
+                        const validLogs = allHabitLogs.filter((l: any) => {
                             const isDone = l.status === 'completed' || l.completed || l.value === 1;
                             if (!isDone) return false;
                             const logDate = l.date ? String(l.date).split('T')[0] : '';
-                            if (!logDate) return false;
+                            if (!logDate || seenDates.has(logDate)) return false;
                             if (goalStartDate && logDate < goalStartDate) return false;
                             if (goalEndDate && logDate > goalEndDate) return false;
+                            seenDates.add(logDate);
                             return true;
                         });
 
                         const completedCheckIns = validLogs.length;
-                        const isCompletedToday = (h.logs || []).some((l: any) => l.date === todayStr && (l.status === 'completed' || l.completed || l.value === 1));
+                        const isCompletedToday = allHabitLogs.some((l: any) => {
+                            const logDate = l.date ? String(l.date).split('T')[0] : '';
+                            return logDate === todayStr && (l.status === 'completed' || l.completed || l.value === 1);
+                        });
 
                         // 2. Denominator: How many check-ins needed to reach 100%?
-                        const freqType = h.frequencyType || hMeta.frequencyType || 'daily';
-                        const freqDays = Array.isArray(h.frequencyDays) ? h.frequencyDays : (Array.isArray(hMeta.frequencyDays) ? hMeta.frequencyDays : []);
-                        const freqCount = Number(h.frequencyCount || hMeta.frequencyCount) || (freqDays.length > 0 ? freqDays.length : 7);
+                        const freqType = primaryInstance.frequencyType || hMeta.frequencyType || 'daily';
+                        const freqDays = Array.isArray(primaryInstance.frequencyDays) ? primaryInstance.frequencyDays : (Array.isArray(hMeta.frequencyDays) ? hMeta.frequencyDays : []);
+                        const freqCount = Number(primaryInstance.frequencyCount || hMeta.frequencyCount) || (freqDays.length > 0 ? freqDays.length : 7);
                         const timeHorizon = g.time_horizon || g.timeHorizon || meta.time_horizon || 'monthly';
 
                         let targetCheckIns = 30;
@@ -181,16 +206,16 @@ export default function GoalsPage() {
                         } else if (timeHorizon === 'yearly') {
                             targetCheckIns = (freqType === 'weekly_days' || freqType === 'weekly_count') ? Math.max(1, freqCount * 52) : 365;
                         } else {
-                            targetCheckIns = Number(h.monthlyTarget) || 30;
+                            targetCheckIns = Number(primaryInstance.monthlyTarget) || 30;
                         }
 
                         const consistency = Math.min(100, Math.round((completedCheckIns / targetCheckIns) * 100));
 
                         linkedHabits.push({
-                            id: h.id,
-                            name: h.name,
-                            icon: h.icon || '🌱',
-                            color: h.color,
+                            id: primaryInstance.id,
+                            name: primaryInstance.name,
+                            icon: primaryInstance.icon || '🌱',
+                            color: primaryInstance.color,
                             consistencyPercent: consistency,
                             streak: completedCheckIns,
                             completedToday: isCompletedToday,
