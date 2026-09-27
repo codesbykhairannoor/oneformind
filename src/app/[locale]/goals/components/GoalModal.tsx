@@ -858,7 +858,12 @@ export default function GoalModal({
 
                                     <button
                                         type="button"
-                                        onClick={() => setForm(prev => ({ ...prev, type: 'habit_frequency' }))}
+                                        onClick={() => setForm(prev => ({ 
+                                            ...prev, 
+                                            type: 'habit_frequency',
+                                            target_value: prev.target_value && prev.target_value > 0 ? prev.target_value : 30,
+                                            unit: isIndo ? 'centang' : 'checks'
+                                        }))}
                                         className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                                             form.type === 'habit_frequency'
                                                 ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700'
@@ -881,21 +886,90 @@ export default function GoalModal({
 
                                 {/* Content B: Hubungkan ke Habit */}
                                 {form.type === 'habit_frequency' && isHabitActive && (
-                                    <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/70 dark:border-indigo-800/60 space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                                                <Sparkles size={14} />
-                                                {isIndo ? 'Pilih Kebiasaan Penggerak Utama' : 'Select Primary Supporting Habits'}
-                                            </span>
-                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
-                                                {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'selected'}
-                                            </span>
+                                    <div className="p-4 sm:p-5 rounded-3xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/70 dark:border-indigo-800/60 space-y-4">
+                                        
+                                        {/* B.1. Pengaturan Target Jumlah Centang (Opsi Berapa Kali Centang) */}
+                                        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/60 shadow-xs space-y-3">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                <div>
+                                                    <label className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
+                                                        <Target size={14} className="text-indigo-500" />
+                                                        {isIndo ? 'Target Jumlah Centang Habit Dibutuhkan' : 'Habit Check-Ins Target Required'}
+                                                    </label>
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                                                        {isIndo 
+                                                            ? 'Berapa kali centang kebiasaan yang harus tercapai agar target ini 100% selesai?'
+                                                            : 'How many total habit check-ins are required to achieve 100% completion?'}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2 self-start sm:self-auto">
+                                                    <input 
+                                                        type="number"
+                                                        min="1"
+                                                        value={form.target_value || 30}
+                                                        onChange={(e) => setForm(prev => ({ 
+                                                            ...prev, 
+                                                            target_value: Math.max(1, Number(e.target.value)),
+                                                            unit: isIndo ? 'centang' : 'checks'
+                                                        }))}
+                                                        className="w-20 bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-300 dark:border-indigo-800 rounded-xl px-2.5 py-1.5 text-sm font-black text-indigo-700 dark:text-indigo-300 font-mono text-center focus:ring-2 focus:ring-indigo-500 outline-none"
+                                                    />
+                                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                        {isIndo ? 'kali centang' : 'checks'}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Pilihan Preset Cepat */}
+                                            <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                                                <span className="text-[10px] font-bold text-slate-400 mr-1">
+                                                    {isIndo ? 'Preset Cepat:' : 'Quick Presets:'}
+                                                </span>
+                                                {[
+                                                    { count: 7, label: isIndo ? '7x (1 Mgg)' : '7x (1 Wk)' },
+                                                    { count: 14, label: isIndo ? '14x (2 Mgg)' : '14x (2 Wks)' },
+                                                    { count: 30, label: isIndo ? '30x (1 Bulan)' : '30x (1 Mo)' },
+                                                    { count: 60, label: isIndo ? '60x (2 Bulan)' : '60x (2 Mos)' },
+                                                    { count: 90, label: isIndo ? '90x (1 Kuartal)' : '90x (1 Qtr)' },
+                                                    { count: 100, label: '100x' }
+                                                ].map((preset) => (
+                                                    <button
+                                                        key={preset.count}
+                                                        type="button"
+                                                        onClick={() => setForm(prev => ({ 
+                                                            ...prev, 
+                                                            target_value: preset.count,
+                                                            unit: isIndo ? 'centang' : 'checks'
+                                                        }))}
+                                                        className={`px-2.5 py-1 rounded-xl text-[10px] font-bold transition-all border ${
+                                                            Number(form.target_value) === preset.count
+                                                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                                                                : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-400'
+                                                        }`}
+                                                    >
+                                                        {preset.label}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                                            {isIndo 
-                                                ? '🎯 Target ini otomatis digerakkan oleh tingkat konsistensi kebiasaan harian Anda. Centang di habit tracker langsung menaikkan capaian target ini!'
-                                                : '🎯 This goal is directly driven by your daily habits. Ticking off habits each day directly pushes this goal forward!'}
-                                        </p>
+
+                                        {/* B.2. Pilih Kebiasaan Penggerak Utama */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                                    <Sparkles size={14} />
+                                                    {isIndo ? 'Pilih Kebiasaan Penggerak Utama' : 'Select Primary Supporting Habits'}
+                                                </span>
+                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
+                                                    {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'selected'}
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                                                {isIndo 
+                                                    ? '🎯 Centang harian pada kebiasaan yang dipilih otomatis diakumulasikan terhadap target centang di atas dalam rentang tanggal target.'
+                                                    : '🎯 Daily check-ins on selected habits will accumulate toward the check-in target above within the goal date window.'}
+                                            </p>
+                                        </div>
 
                                         {uniqueHabits.length === 0 ? (
                                             <div className="text-xs text-slate-400 italic py-2">

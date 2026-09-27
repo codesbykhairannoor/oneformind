@@ -3,6 +3,7 @@ package goals
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -195,21 +196,28 @@ func handleGetGoals(w http.ResponseWriter, r *http.Request, userId int) {
 
 func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	var body struct {
-		Title         string   `json:"title"`
-		Category      *string  `json:"category"`
-		Type          *string  `json:"type"`
-		TargetValue   *float64 `json:"targetValue"`
-		CurrentValue  *float64 `json:"currentValue"`
-		StartDate     *string  `json:"startDate"`
-		EndDate       *string  `json:"endDate"`
-		SpecificDays  *string  `json:"specificDays"`
-		Status        *string  `json:"status"`
-		CoverImageUrl *string  `json:"coverImageUrl"`
-		Reward        *string  `json:"reward"`
-		Priority      *string  `json:"priority"`
-		Color         *string  `json:"color"`
-		ParentGoalID  *int     `json:"parentGoalId"`
-		Milestones    []struct {
+		Title              string   `json:"title"`
+		Category           *string  `json:"category"`
+		Type               *string  `json:"type"`
+		TargetValue        *float64 `json:"targetValue"`
+		TargetValueSnake   *float64 `json:"target_value"`
+		CurrentValue       *float64 `json:"currentValue"`
+		CurrentValueSnake  *float64 `json:"current_value"`
+		StartDate          *string  `json:"startDate"`
+		StartDateSnake     *string  `json:"start_date"`
+		EndDate            *string  `json:"endDate"`
+		EndDateSnake       *string  `json:"end_date"`
+		SpecificDays       *string  `json:"specificDays"`
+		SpecificDaysSnake  *string  `json:"specific_days"`
+		Status             *string  `json:"status"`
+		CoverImageUrl      *string  `json:"coverImageUrl"`
+		CoverImageUrlSnake *string  `json:"cover_image_url"`
+		Reward             *string  `json:"reward"`
+		Priority           *string  `json:"priority"`
+		Color              *string  `json:"color"`
+		ParentGoalID       *int     `json:"parentGoalId"`
+		ParentGoalIDSnake  *int     `json:"parent_goal_id"`
+		Milestones         []struct {
 			Title       string `json:"title"`
 			Completed   *bool  `json:"completed"`
 			IsCompleted *bool  `json:"is_completed"`
@@ -220,6 +228,28 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, "Invalid body", http.StatusBadRequest)
 		return
+	}
+
+	if body.TargetValue == nil && body.TargetValueSnake != nil {
+		body.TargetValue = body.TargetValueSnake
+	}
+	if body.CurrentValue == nil && body.CurrentValueSnake != nil {
+		body.CurrentValue = body.CurrentValueSnake
+	}
+	if body.StartDate == nil && body.StartDateSnake != nil {
+		body.StartDate = body.StartDateSnake
+	}
+	if body.EndDate == nil && body.EndDateSnake != nil {
+		body.EndDate = body.EndDateSnake
+	}
+	if body.SpecificDays == nil && body.SpecificDaysSnake != nil {
+		body.SpecificDays = body.SpecificDaysSnake
+	}
+	if body.CoverImageUrl == nil && body.CoverImageUrlSnake != nil {
+		body.CoverImageUrl = body.CoverImageUrlSnake
+	}
+	if body.ParentGoalID == nil && body.ParentGoalIDSnake != nil {
+		body.ParentGoalID = body.ParentGoalIDSnake
 	}
 
 	tType := "custom"
@@ -279,19 +309,37 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	// Insert
 	var g Goal
 	var retParentID sql.NullInt64
+	var retStartDate, retEndDate, retCreatedAt, retUpdatedAt sql.NullTime
 	err := dbGoals.QueryRow(`
 		INSERT INTO goals (user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id, user_id, title, category, type, target_value, current_value, start_date, end_date, specific_days, status, cover_image_url, reward, priority, color, parent_goal_id, created_at, updated_at
 	`, userId, body.Title, body.Category, tType, tTarget, tCurrent, startDate, endDate, body.SpecificDays, tStatus, body.CoverImageUrl, body.Reward, tPriority, body.Color, parentID).Scan(
-		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &retParentID, &g.CreatedAt, &g.UpdatedAt,
+		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &retStartDate, &retEndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &retParentID, &retCreatedAt, &retUpdatedAt,
 	)
 	if retParentID.Valid {
 		v := int(retParentID.Int64)
 		g.ParentGoalID = &v
 	}
+	if retStartDate.Valid {
+		t := retStartDate.Time
+		g.StartDate = &t
+	}
+	if retEndDate.Valid {
+		t := retEndDate.Time
+		g.EndDate = &t
+	}
+	if retCreatedAt.Valid {
+		t := retCreatedAt.Time
+		g.CreatedAt = &t
+	}
+	if retUpdatedAt.Valid {
+		t := retUpdatedAt.Time
+		g.UpdatedAt = &t
+	}
 
 	if err != nil {
+		log.Printf("Failed to insert goal: %v\n", err)
 		http.Error(w, "Failed to insert goal", http.StatusInternalServerError)
 		return
 	}
@@ -313,14 +361,27 @@ func handleCreateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 				ord = *ms.Order
 			}
 			var m GoalMilestone
+			var retTargetDate, mCreatedAt, mUpdatedAt sql.NullTime
 			err := dbGoals.QueryRow(`
 				INSERT INTO goal_milestones (goal_id, title, completed, "order", created_at, updated_at)
 				VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 				RETURNING id, goal_id, title, completed, "order", target_date, created_at, updated_at
 			`, g.ID, ms.Title, isComp, ord).Scan(
-				&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &m.TargetDate, &m.CreatedAt, &m.UpdatedAt,
+				&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &retTargetDate, &mCreatedAt, &mUpdatedAt,
 			)
 			if err == nil {
+				if retTargetDate.Valid {
+					t := retTargetDate.Time
+					m.TargetDate = &t
+				}
+				if mCreatedAt.Valid {
+					t := mCreatedAt.Time
+					m.CreatedAt = &t
+				}
+				if mUpdatedAt.Valid {
+					t := mUpdatedAt.Time
+					m.UpdatedAt = &t
+				}
 				g.Milestones = append(g.Milestones, m)
 			}
 		}
@@ -343,25 +404,54 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 	}
 
 	var body struct {
-		Title         *string  `json:"title"`
-		Category      *string  `json:"category"`
-		Type          *string  `json:"type"`
-		TargetValue   *float64 `json:"targetValue"`
-		CurrentValue  *float64 `json:"currentValue"`
-		StartDate     *string  `json:"startDate"`
-		EndDate       *string  `json:"endDate"`
-		SpecificDays  *string  `json:"specificDays"`
-		Status        *string  `json:"status"`
-		CoverImageUrl *string  `json:"coverImageUrl"`
-		Reward        *string  `json:"reward"`
-		Priority      *string  `json:"priority"`
-		Color         *string  `json:"color"`
-		ParentGoalID  *int     `json:"parentGoalId"`
+		Title              *string  `json:"title"`
+		Category           *string  `json:"category"`
+		Type               *string  `json:"type"`
+		TargetValue        *float64 `json:"targetValue"`
+		TargetValueSnake   *float64 `json:"target_value"`
+		CurrentValue       *float64 `json:"currentValue"`
+		CurrentValueSnake  *float64 `json:"current_value"`
+		StartDate          *string  `json:"startDate"`
+		StartDateSnake     *string  `json:"start_date"`
+		EndDate            *string  `json:"endDate"`
+		EndDateSnake       *string  `json:"end_date"`
+		SpecificDays       *string  `json:"specificDays"`
+		SpecificDaysSnake  *string  `json:"specific_days"`
+		Status             *string  `json:"status"`
+		CoverImageUrl      *string  `json:"coverImageUrl"`
+		CoverImageUrlSnake *string  `json:"cover_image_url"`
+		Reward             *string  `json:"reward"`
+		Priority           *string  `json:"priority"`
+		Color              *string  `json:"color"`
+		ParentGoalID       *int     `json:"parentGoalId"`
+		ParentGoalIDSnake  *int     `json:"parent_goal_id"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, "Invalid body", http.StatusBadRequest)
 		return
+	}
+
+	if body.TargetValue == nil && body.TargetValueSnake != nil {
+		body.TargetValue = body.TargetValueSnake
+	}
+	if body.CurrentValue == nil && body.CurrentValueSnake != nil {
+		body.CurrentValue = body.CurrentValueSnake
+	}
+	if body.StartDate == nil && body.StartDateSnake != nil {
+		body.StartDate = body.StartDateSnake
+	}
+	if body.EndDate == nil && body.EndDateSnake != nil {
+		body.EndDate = body.EndDateSnake
+	}
+	if body.SpecificDays == nil && body.SpecificDaysSnake != nil {
+		body.SpecificDays = body.SpecificDaysSnake
+	}
+	if body.CoverImageUrl == nil && body.CoverImageUrlSnake != nil {
+		body.CoverImageUrl = body.CoverImageUrlSnake
+	}
+	if body.ParentGoalID == nil && body.ParentGoalIDSnake != nil {
+		body.ParentGoalID = body.ParentGoalIDSnake
 	}
 
 	if dbGoals == nil {
@@ -492,15 +582,33 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 
 	var g Goal
 	var retParentID sql.NullInt64
+	var retStartDate, retEndDate, retCreatedAt, retUpdatedAt sql.NullTime
 	err = dbGoals.QueryRow(query, args...).Scan(
-		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &g.StartDate, &g.EndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &retParentID, &g.CreatedAt, &g.UpdatedAt,
+		&g.ID, &g.UserID, &g.Title, &g.Category, &g.Type, &g.TargetValue, &g.CurrentValue, &retStartDate, &retEndDate, &g.SpecificDays, &g.Status, &g.CoverImageUrl, &g.Reward, &g.Priority, &g.Color, &retParentID, &retCreatedAt, &retUpdatedAt,
 	)
 	if retParentID.Valid {
 		v := int(retParentID.Int64)
 		g.ParentGoalID = &v
 	}
+	if retStartDate.Valid {
+		t := retStartDate.Time
+		g.StartDate = &t
+	}
+	if retEndDate.Valid {
+		t := retEndDate.Time
+		g.EndDate = &t
+	}
+	if retCreatedAt.Valid {
+		t := retCreatedAt.Time
+		g.CreatedAt = &t
+	}
+	if retUpdatedAt.Valid {
+		t := retUpdatedAt.Time
+		g.UpdatedAt = &t
+	}
 
 	if err != nil {
+		log.Printf("Failed to update goal: %v\n", err)
 		http.Error(w, "Failed to update goal", http.StatusInternalServerError)
 		return
 	}
@@ -517,7 +625,20 @@ func handleUpdateGoal(w http.ResponseWriter, r *http.Request, userId int) {
 		defer mRows.Close()
 		for mRows.Next() {
 			var m GoalMilestone
-			if err := mRows.Scan(&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &m.TargetDate, &m.CreatedAt, &m.UpdatedAt); err == nil {
+			var mTargetDate, mCreated, mUpdated sql.NullTime
+			if err := mRows.Scan(&m.ID, &m.GoalID, &m.Title, &m.Completed, &m.Order, &mTargetDate, &mCreated, &mUpdated); err == nil {
+				if mTargetDate.Valid {
+					t := mTargetDate.Time
+					m.TargetDate = &t
+				}
+				if mCreated.Valid {
+					t := mCreated.Time
+					m.CreatedAt = &t
+				}
+				if mUpdated.Valid {
+					t := mUpdated.Time
+					m.UpdatedAt = &t
+				}
 				g.Milestones = append(g.Milestones, m)
 			}
 		}
