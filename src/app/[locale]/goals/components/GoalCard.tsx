@@ -69,6 +69,11 @@ export default function GoalCard({
     const milestones = goal.milestones || [];
     const themeColor = goal.color || '#6366f1';
 
+    const hasLinkedHabits = Boolean(goal.linked_habits && goal.linked_habits.length > 0);
+    const hasMilestones = Boolean(milestones && milestones.length > 0);
+    const isHabitDriven = goal.type === 'habit_frequency' || (hasLinkedHabits && !hasMilestones);
+    const isMilestoneDriven = (goal.type === 'milestones' || (!goal.type && !isHabitDriven)) && goal.type !== 'numeric' && goal.type !== 'currency' && goal.type !== 'boolean';
+
     const formatDateDisplay = (dateStr?: string | null) => {
         if (!dateStr) return null;
         try {
@@ -322,91 +327,89 @@ export default function GoalCard({
                 )}
 
                 {/* 3b. Interactive Habit Engine Steps (Leading Measures) */}
-                {isHabitActive && (
-                    <>
-                        {goal.linked_habits && goal.linked_habits.length > 0 ? (
-                            <div className="space-y-2 pt-1">
-                                <div className="flex items-center justify-between px-0.5">
-                                    <h4 className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
-                                        <Sparkles size={12} className="text-indigo-500" />
-                                        <span>{isIndo ? 'Rutinitas Pelaksana (Habit Steps)' : 'Habit Routine Steps'}</span>
-                                    </h4>
-                                    <Link 
-                                        href={`/${locale}/habits`}
-                                        className="text-[9px] font-bold text-slate-400 hover:text-indigo-500 transition flex items-center gap-0.5"
-                                    >
-                                        <span>{isIndo ? 'Tracker' : 'Tracker'}</span>
-                                        <span>↗</span>
-                                    </Link>
-                                </div>
+                {isHabitActive && (isHabitDriven || hasLinkedHabits) && (
+                    <div className="space-y-2 pt-1">
+                        <div className="flex items-center justify-between px-0.5">
+                            <h4 className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <Sparkles size={12} className="text-indigo-500" />
+                                <span>{isIndo ? 'Rutinitas Pelaksana (Habit Steps)' : 'Habit Routine Steps'}</span>
+                            </h4>
+                            <Link 
+                                href={`/${locale}/habits`}
+                                className="text-[9px] font-bold text-slate-400 hover:text-indigo-500 transition flex items-center gap-0.5"
+                            >
+                                <span>{isIndo ? 'Tracker' : 'Tracker'}</span>
+                                <span>↗</span>
+                            </Link>
+                        </div>
 
-                                <div className="space-y-2">
-                                    {goal.linked_habits.map(h => (
-                                        <div 
-                                            key={h.id}
-                                            className="p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 transition-all hover:border-indigo-300 dark:hover:border-indigo-700/60 shadow-xs"
-                                        >
-                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                                <span className="w-8 h-8 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-sm shadow-xs shrink-0">
-                                                    {h.icon || '🌱'}
-                                                </span>
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                                        <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate block">
-                                                            {h.name}
+                        {hasLinkedHabits ? (
+                            <div className="space-y-2">
+                                {goal.linked_habits!.map(h => (
+                                    <div 
+                                        key={h.id}
+                                        className="p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 transition-all hover:border-indigo-300 dark:hover:border-indigo-700/60 shadow-xs"
+                                    >
+                                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                            <span className="w-8 h-8 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-sm shadow-xs shrink-0">
+                                                {h.icon || '🌱'}
+                                            </span>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-1.5 flex-wrap">
+                                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate block">
+                                                        {h.name}
+                                                    </span>
+                                                    {h.streak > 0 && (
+                                                        <span className="px-1.5 py-0.2 rounded-md text-[9px] font-black bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/60 font-mono shrink-0">
+                                                            🔥 {h.streak}d
                                                         </span>
-                                                        {h.streak > 0 && (
-                                                            <span className="px-1.5 py-0.2 rounded-md text-[9px] font-black bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/60 font-mono shrink-0">
-                                                                🔥 {h.streak}d
-                                                            </span>
-                                                        )}
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <div className="h-1.5 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                        <div 
+                                                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
+                                                            style={{ width: `${Math.min(100, h.consistencyPercent || 0)}%` }}
+                                                        />
                                                     </div>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <div className="h-1.5 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                                            <div 
-                                                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
-                                                                style={{ width: `${Math.min(100, h.consistencyPercent || 0)}%` }}
-                                                            />
-                                                        </div>
-                                                        <span className="text-[10px] font-black font-mono text-indigo-600 dark:text-indigo-400 shrink-0">
-                                                            {h.consistencyPercent || 0}%
-                                                        </span>
-                                                    </div>
+                                                    <span className="text-[10px] font-black font-mono text-indigo-600 dark:text-indigo-400 shrink-0">
+                                                        {h.consistencyPercent || 0}%
+                                                    </span>
                                                 </div>
                                             </div>
-
-                                            {/* Actionable Today's Checkbox */}
-                                            <button
-                                                type="button"
-                                                onClick={() => !isSavingOrTemp && onToggleHabitToday?.(h.id, Boolean(h.completedToday))}
-                                                disabled={isSavingOrTemp}
-                                                className={`px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wide transition-all active:scale-95 flex items-center gap-1.5 shrink-0 shadow-xs border ${
-                                                    h.completedToday
-                                                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-emerald-500/20'
-                                                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 dark:hover:border-emerald-500'
-                                                }`}
-                                                title={h.completedToday ? (isIndo ? 'Selesai hari ini! Klik untuk batalkan' : 'Done today! Click to undo') : (isIndo ? 'Klik untuk selesaikan hari ini' : 'Click to complete today')}
-                                            >
-                                                <CheckCircle2 className={`w-3.5 h-3.5 ${h.completedToday ? 'text-white' : 'text-slate-400'}`} />
-                                                <span>{h.completedToday ? (isIndo ? 'Selesai Hari Ini' : 'Done Today') : (isIndo ? 'Centang Hari Ini' : 'Check Today')}</span>
-                                            </button>
                                         </div>
-                                    ))}
-                                </div>
+
+                                        {/* Actionable Today's Checkbox */}
+                                        <button
+                                            type="button"
+                                            onClick={() => !isSavingOrTemp && onToggleHabitToday?.(h.id, Boolean(h.completedToday))}
+                                            disabled={isSavingOrTemp}
+                                            className={`px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wide transition-all active:scale-95 flex items-center gap-1.5 shrink-0 shadow-xs border ${
+                                                h.completedToday
+                                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-emerald-500/20'
+                                                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 dark:hover:border-emerald-500'
+                                            }`}
+                                            title={h.completedToday ? (isIndo ? 'Selesai hari ini! Klik untuk batalkan' : 'Done today! Click to undo') : (isIndo ? 'Klik untuk selesaikan hari ini' : 'Click to complete today')}
+                                        >
+                                            <CheckCircle2 className={`w-3.5 h-3.5 ${h.completedToday ? 'text-white' : 'text-slate-400'}`} />
+                                            <span>{h.completedToday ? (isIndo ? 'Selesai Hari Ini' : 'Done Today') : (isIndo ? 'Centang Hari Ini' : 'Check Today')}</span>
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         ) : (
                             !isSavingOrTemp && onEdit && goal.status !== 'completed' && (
                                 <button
                                     type="button"
                                     onClick={() => onEdit(goal)}
-                                    className="w-full py-1.5 px-2.5 rounded-xl border border-dashed border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/40 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-[10px] font-bold flex items-center justify-center gap-1.5 transition group/habit"
+                                    className="w-full py-2.5 px-3 rounded-2xl border border-dashed border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100/50 dark:hover:bg-indigo-900/30 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95"
                                 >
-                                    <Sparkles className="w-3 h-3 group-hover/habit:scale-110 transition-transform text-indigo-500" />
-                                    <span>{isIndo ? '+ Hubungkan Habit Pendorong' : '+ Connect Habit Engine'}</span>
+                                    <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                                    <span>{isIndo ? '+ Hubungkan Kebiasaan Penggerak' : '+ Select Supporting Habits'}</span>
                                 </button>
                             )
                         )}
-                    </>
+                    </div>
                 )}
 
                 {/* 4. DYNAMIC TARGET TYPES */}
@@ -519,7 +522,7 @@ export default function GoalCard({
                 )}
 
                 {/* C. Milestones Target Type (Checklist OKR) */}
-                {(goal.type === 'milestones' || !goal.type) && (
+                {isMilestoneDriven && (
                     <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between px-1">
                             <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
@@ -551,32 +554,15 @@ export default function GoalCard({
                             ))}
                             
                             {milestones.length === 0 && (
-                                goal.linked_habits && goal.linked_habits.length > 0 ? (
-                                    <div className="p-3 rounded-2xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100/80 dark:border-indigo-900/40 text-center space-y-1">
-                                        <p className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300">
-                                            {isIndo 
-                                                ? '🌱 Progres target ini bergerak otomatis lewat rutinitas kebiasaan di atas.' 
-                                                : '🌱 Progress is driven directly by your habit routine above.'}
-                                        </p>
-                                        <button
-                                            type="button"
-                                            onClick={() => !isSavingOrTemp && onAddMilestone?.(goal)}
-                                            className="text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 hover:underline inline-block"
-                                        >
-                                            {isIndo ? '+ Tambah Checklist Manual (Opsional)' : '+ Add Manual Step (Optional)'}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        type="button"
-                                        onClick={() => !isSavingOrTemp && onAddMilestone?.(goal)}
-                                        disabled={isSavingOrTemp}
-                                        className="w-full py-3 px-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700/60 bg-slate-50/50 dark:bg-slate-800/30 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95"
-                                    >
-                                        <Plus size={13} />
-                                        <span>{isIndo ? 'Tambah Checklist Langkah' : 'Add First Milestone Step'}</span>
-                                    </button>
-                                )
+                                <button
+                                    type="button"
+                                    onClick={() => !isSavingOrTemp && onAddMilestone?.(goal)}
+                                    disabled={isSavingOrTemp}
+                                    className="w-full py-3 px-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700/60 bg-slate-50/50 dark:bg-slate-800/30 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                                >
+                                    <Plus size={13} />
+                                    <span>{isIndo ? 'Tambah Checklist Langkah' : 'Add First Milestone Step'}</span>
+                                </button>
                             )}
                         </div>
                     </div>

@@ -136,13 +136,12 @@ export default function GoalModal({
             setImagePreview(goal.cover_image_url || null);
             setSelectedArchetype(goal.category || 'other');
 
-            // Auto-expand advanced options if goal already has WOOP or linked habits
+            // Auto-expand advanced options if goal already has WOOP psychology
             const hasAdv = Boolean(
                 parsedGoal.core_why ||
                 parsedGoal.obstacle ||
                 parsedGoal.obstacle_plan ||
-                parsedGoal.reward ||
-                (parsedGoal.linked_habit_ids && parsedGoal.linked_habit_ids.length > 0)
+                parsedGoal.reward
             );
             setShowAdvanced(hasAdv);
         } else {
@@ -315,8 +314,7 @@ export default function GoalModal({
         form.core_why || 
         form.obstacle || 
         form.obstacle_plan || 
-        form.reward || 
-        (form.linked_habit_ids && form.linked_habit_ids.length > 0)
+        form.reward
     );
 
     return (
@@ -411,74 +409,7 @@ export default function GoalModal({
                             </div>
                         </div>
 
-                        {/* 2b. Habit-Driven Target Dynamic Selector */}
-                        {form.type === 'habit_frequency' && isHabitActive && (
-                            <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/70 dark:border-indigo-800/60 space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                                        <Sparkles size={14} />
-                                        {isIndo ? 'Hubungkan Kebiasaan Penggerak (Auto-Sync Progres)' : 'Link Supporting Habits (Auto-Sync Progress)'}
-                                    </span>
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
-                                        {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'selected'}
-                                    </span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                                    {isIndo 
-                                        ? '🎯 Progres target ini dihitung otomatis secara live dari tingkat konsistensi kebiasaan yang Anda pilih. Centang di habit tracker harian akan langsung menggerakkan capaian target ini!'
-                                        : '🎯 Progress for this goal is calculated live from your habit consistency. Ticking off habits each day directly pushes this goal forward!'}
-                                </p>
 
-                                {uniqueHabits.length === 0 ? (
-                                    <div className="text-xs text-slate-400 italic py-2">
-                                        {isIndo ? 'Belum ada kebiasaan aktif di bulan ini. Buat kebiasaan terlebih dahulu di tab Habits.' : 'No active habits found for this month.'}
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
-                                        {uniqueHabits.map((h: any) => {
-                                            const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
-                                            const freqBadge = (h.frequencyType === 'weekly_days' && Array.isArray(h.frequencyDays) && h.frequencyDays.length > 0)
-                                                ? `${h.frequencyDays.length}x/mgg`
-                                                : (h.frequencyCount && h.frequencyCount > 0 ? `${h.frequencyCount}x/mgg` : (isIndo ? 'Harian' : 'Daily'));
-                                            return (
-                                                <button
-                                                    key={h.id}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setForm(prev => {
-                                                            const currentIds = prev.linked_habit_ids || [];
-                                                            const exists = currentIds.some(id => String(id) === String(h.id));
-                                                            const nextIds = exists 
-                                                                ? currentIds.filter(id => String(id) !== String(h.id))
-                                                                : [...currentIds, h.id];
-                                                            return { ...prev, linked_habit_ids: nextIds };
-                                                        });
-                                                    }}
-                                                    className={`p-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
-                                                        isSelected
-                                                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-400/40'
-                                                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500/50 hover:bg-indigo-50/20'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center gap-2 min-w-0">
-                                                        <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
-                                                        <div className="min-w-0">
-                                                            <span className="truncate text-xs font-bold block">{h.name}</span>
-                                                            <span className={`text-[9px] font-black uppercase tracking-wider block ${
-                                                                isSelected ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'
-                                                            }`}>
-                                                                ⚡ {freqBadge}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        )}
 
                         {/* 3. Numeric / Metric Dynamic Inputs */}
                         {form.type === 'numeric' && (
@@ -892,73 +823,82 @@ export default function GoalModal({
 
                         </div>
 
-                        {/* 6. Milestones Section (Prominently accessible right here) */}
-                        {form.type === 'milestones' && (
-                            <div className="pt-2">
-                                <GoalMilestonesSection
-                                    form={form}
-                                    setForm={setForm}
-                                    t={() => ''}
-                                />
-                            </div>
-                        )}
-
-                        {/* 7. Collapsible Advanced Options Accordion */}
-                        <div className="pt-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowAdvanced(!showAdvanced)}
-                                className="w-full py-3.5 px-5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/60 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all flex items-center justify-between group shadow-sm"
-                            >
-                                <div className="flex items-center gap-2.5">
-                                    <SlidersHorizontal size={15} className="text-indigo-500 group-hover:rotate-45 transition-transform" />
-                                    <div className="text-left">
-                                        <span className="text-xs font-black text-slate-700 dark:text-slate-200 block">
-                                            {isIndo ? '⚙️ Opsi Lanjutan & Psikologi (Opsional)' : '⚙️ Advanced Options & Psychology (Optional)'}
-                                        </span>
-                                        <span className="text-[10px] text-slate-400 block font-normal">
-                                            {isIndo ? 'Kebiasaan pendorong & psikologi pencapaian (WOOP)' : 'Supporting habit engine & WOOP psychology'}
-                                        </span>
-                                    </div>
-                                    {hasAdvancedData && !showAdvanced && (
-                                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                                            {isIndo ? 'Terisi' : 'Configured'}
-                                        </span>
-                                    )}
+                        {/* 6. Eksekusi Target: Pilihan antara Checklist Langkah vs Hubungkan ke Habit */}
+                        {(form.type === 'milestones' || form.type === 'habit_frequency') && (
+                            <div className="pt-2 space-y-3">
+                                <div className="flex items-center justify-between px-1">
+                                    <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                        {isIndo ? 'Pilih Metode Eksekusi Target' : 'Select Target Execution Method'}
+                                    </label>
+                                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-800/50 font-mono">
+                                        {form.type === 'milestones' 
+                                            ? (isIndo ? `📋 ${form.milestones?.length || 0} Langkah` : `📋 ${form.milestones?.length || 0} Steps`)
+                                            : (isIndo ? `🌱 ${form.linked_habit_ids?.length || 0} Habit Terpilih` : `🌱 ${form.linked_habit_ids?.length || 0} Habits Selected`)}
+                                    </span>
                                 </div>
-                                <div className="flex items-center gap-1.5 text-slate-400">
-                                    <span className="text-[11px] font-bold">{showAdvanced ? (isIndo ? 'Tutup' : 'Collapse') : (isIndo ? 'Buka' : 'Expand')}</span>
-                                    {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                </div>
-                            </button>
 
-                            {showAdvanced && (
-                                <div className="mt-4 p-5 rounded-3xl bg-slate-50/70 dark:bg-slate-900/30 border border-slate-200/80 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
-                                    
-                                    {/* Advanced Item 1: Supporting Habit Engine (Leading Measures) */}
-                                    {isHabitActive && (
-                                    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-2.5">
+                                {/* 2-Option Segmented Selector */}
+                                <div className="grid grid-cols-2 p-1.5 bg-slate-100 dark:bg-slate-800/60 rounded-2xl gap-1.5 border border-slate-200/80 dark:border-slate-700/80 shadow-inner">
+                                    <button
+                                        type="button"
+                                        onClick={() => setForm(prev => ({ ...prev, type: 'milestones' }))}
+                                        className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                            form.type === 'milestones'
+                                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700'
+                                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        <ListTodo size={15} className={form.type === 'milestones' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} />
+                                        <span className="font-black tracking-tight">{isIndo ? '📋 Checklist Langkah' : '📋 Milestone Steps'}</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setForm(prev => ({ ...prev, type: 'habit_frequency' }))}
+                                        className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                            form.type === 'habit_frequency'
+                                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700'
+                                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        <Sparkles size={15} className={form.type === 'habit_frequency' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} />
+                                        <span className="font-black tracking-tight">{isIndo ? '🌱 Hubungkan ke Habit' : '🌱 Connect to Habits'}</span>
+                                    </button>
+                                </div>
+
+                                {/* Content A: Checklist Langkah */}
+                                {form.type === 'milestones' && (
+                                    <GoalMilestonesSection
+                                        form={form}
+                                        setForm={setForm}
+                                        t={() => ''}
+                                    />
+                                )}
+
+                                {/* Content B: Hubungkan ke Habit */}
+                                {form.type === 'habit_frequency' && isHabitActive && (
+                                    <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/70 dark:border-indigo-800/60 space-y-3">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                            <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                                                 <Sparkles size={14} />
-                                                {isIndo ? '🌱 Mesin Kebiasaan Pendorong (Leading Measures)' : '🌱 Supporting Habit Engine'}
+                                                {isIndo ? 'Pilih Kebiasaan Penggerak Utama' : 'Select Primary Supporting Habits'}
                                             </span>
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
-                                                {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'linked'}
+                                                {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'selected'}
                                             </span>
                                         </div>
-                                        <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
                                             {isIndo 
-                                                ? 'Hubungkan kebiasaan harian atau sprint mingguan (misal 3x/minggu) yang menjadi mesin pendorong utama target ini.' 
-                                                : 'Link active daily habits or weekly sprint routines (e.g. 3x/week) that act as the leading measures directly powering this goal.'}
+                                                ? '🎯 Target ini otomatis digerakkan oleh tingkat konsistensi kebiasaan harian Anda. Centang di habit tracker langsung menaikkan capaian target ini!'
+                                                : '🎯 This goal is directly driven by your daily habits. Ticking off habits each day directly pushes this goal forward!'}
                                         </p>
 
                                         {uniqueHabits.length === 0 ? (
-                                            <div className="text-xs text-slate-400 italic py-1.5">
-                                                {isIndo ? 'Belum ada kebiasaan aktif di bulan ini.' : 'No active habits found for this month.'}
+                                            <div className="text-xs text-slate-400 italic py-2">
+                                                {isIndo ? 'Belum ada kebiasaan aktif di bulan ini. Buat kebiasaan terlebih dahulu di tab Habits.' : 'No active habits found for this month.'}
                                             </div>
                                         ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[170px] overflow-y-auto pr-1 custom-scrollbar">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
                                                 {uniqueHabits.map((h: any) => {
                                                     const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
                                                     const freqBadge = (h.frequencyType === 'weekly_days' && Array.isArray(h.frequencyDays) && h.frequencyDays.length > 0)
@@ -978,33 +918,69 @@ export default function GoalModal({
                                                                     return { ...prev, linked_habit_ids: nextIds };
                                                                 });
                                                             }}
-                                                            className={`p-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
+                                                            className={`p-3 rounded-2xl text-xs font-bold transition-all flex items-center justify-between gap-2 text-left active:scale-95 border ${
                                                                 isSelected
-                                                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-400/40'
-                                                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500/50 hover:bg-indigo-50/20 dark:hover:bg-slate-700'
+                                                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-400/40'
+                                                                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500/50 hover:bg-indigo-50/20'
                                                             }`}
                                                         >
-                                                            <div className="flex items-center gap-2 min-w-0">
-                                                                <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
+                                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                                <span className="w-8 h-8 rounded-xl bg-white/20 dark:bg-slate-800/80 flex items-center justify-center text-sm shrink-0">
+                                                                    {h.icon || '🌱'}
+                                                                </span>
                                                                 <div className="min-w-0">
                                                                     <span className="truncate text-xs font-bold block">{h.name}</span>
-                                                                    <span className={`text-[9px] font-black uppercase tracking-wider block ${
+                                                                    <span className={`text-[10px] font-black uppercase tracking-wider block ${
                                                                         isSelected ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'
                                                                     }`}>
                                                                         ⚡ {freqBadge}
                                                                     </span>
                                                                 </div>
                                                             </div>
-                                                            {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
+                                                            {isSelected && <CheckCircle2 size={16} className="shrink-0 text-white" />}
                                                         </button>
                                                     );
                                                 })}
                                             </div>
                                         )}
                                     </div>
-                                    )}
+                                )}
+                            </div>
+                        )}
 
-                                    {/* Advanced Item 2: Psychological & WOOP Fields */}
+                        {/* 7. Collapsible Advanced Options Accordion */}
+                        <div className="pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowAdvanced(!showAdvanced)}
+                                className="w-full py-3.5 px-5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/60 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all flex items-center justify-between group shadow-sm"
+                            >
+                                <div className="flex items-center gap-2.5">
+                                    <SlidersHorizontal size={15} className="text-indigo-500 group-hover:rotate-45 transition-transform" />
+                                    <div className="text-left">
+                                        <span className="text-xs font-black text-slate-700 dark:text-slate-200 block">
+                                            {isIndo ? '⚙️ Opsi Lanjutan & Psikologi (Opsional)' : '⚙️ Advanced Options & Psychology (Optional)'}
+                                        </span>
+                                        <span className="text-[10px] text-slate-400 block font-normal">
+                                            {isIndo ? 'Psikologi pencapaian & motivasi (WOOP)' : 'WOOP psychology & motivation'}
+                                        </span>
+                                    </div>
+                                    {hasAdvancedData && !showAdvanced && (
+                                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                                            {isIndo ? 'Terisi' : 'Configured'}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-1.5 text-slate-400">
+                                    <span className="text-[11px] font-bold">{showAdvanced ? (isIndo ? 'Tutup' : 'Collapse') : (isIndo ? 'Buka' : 'Expand')}</span>
+                                    {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                </div>
+                            </button>
+
+                            {showAdvanced && (
+                                <div className="mt-4 p-5 rounded-3xl bg-slate-50/70 dark:bg-slate-900/30 border border-slate-200/80 dark:border-slate-800 space-y-6 animate-in fade-in duration-200">
+                                    
+                                    {/* Advanced Item: Psychological & WOOP Fields */}
                                     <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-3.5">
                                         <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                                             <Compass size={15} />
