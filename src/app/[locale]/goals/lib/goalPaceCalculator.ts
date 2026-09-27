@@ -66,6 +66,9 @@ export interface LinkedHabitEngine {
     color?: string;
     consistencyPercent: number;
     streak: number;
+    completedToday?: boolean;
+    frequencyType?: string;
+    frequencyDays?: number[];
 }
 
 export interface GoalPaceResult {
@@ -90,7 +93,21 @@ export function calculateGoalProgress(goal: GoalItem): number {
 
     const gType = goal.type || 'milestones';
 
-    if (gType === 'numeric' || gType === 'currency' || gType === 'habit_frequency') {
+    // 1. Habit-Driven Target Type
+    if (gType === 'habit_frequency' || gType === 'habit') {
+        if (goal.linked_habits && goal.linked_habits.length > 0) {
+            const avg = goal.linked_habits.reduce((acc, h) => acc + (h.consistencyPercent || 0), 0) / goal.linked_habits.length;
+            return Math.min(100, Math.max(0, Math.round(avg)));
+        }
+        const start = Number(goal.start_value) || 0;
+        const target = Number(goal.target_value) || 100;
+        const current = Number(goal.current_value) || 0;
+        if (target <= start) return current >= target ? 100 : 0;
+        return Math.min(100, Math.max(0, Math.round(((current - start) / (target - start)) * 100)));
+    }
+
+    // 2. Numeric & Currency
+    if (gType === 'numeric' || gType === 'currency') {
         const start = Number(goal.start_value) || 0;
         const target = Number(goal.target_value) || 0;
         const current = Number(goal.current_value) || 0;
@@ -106,9 +123,16 @@ export function calculateGoalProgress(goal: GoalItem): number {
         return goal.status === 'completed' ? 100 : 0;
     }
 
-    // Default: Milestones
+    // 3. Milestones Checklist
     const ms = goal.milestones || [];
-    if (ms.length === 0) return 0;
+    if (ms.length === 0) {
+        // If no manual milestones exist but habits are linked, use habit consistency!
+        if (goal.linked_habits && goal.linked_habits.length > 0) {
+            const avg = goal.linked_habits.reduce((acc, h) => acc + (h.consistencyPercent || 0), 0) / goal.linked_habits.length;
+            return Math.min(100, Math.max(0, Math.round(avg)));
+        }
+        return 0;
+    }
 
     // Check if weighted
     const hasCustomWeights = ms.some(m => typeof m.weight === 'number' && m.weight > 0);

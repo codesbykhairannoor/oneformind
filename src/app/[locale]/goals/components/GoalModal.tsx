@@ -287,6 +287,7 @@ export default function GoalModal({
 
     const targetTypes = [
         { id: 'milestones', label: isIndo ? 'Langkah / OKR' : 'Milestones', shortLabel: isIndo ? 'Langkah' : 'Steps', icon: ListTodo },
+        { id: 'habit_frequency', label: isIndo ? 'Rutinitas Habit' : 'Habit Driven', shortLabel: isIndo ? 'Habit' : 'Habit', icon: Sparkles },
         { id: 'numeric', label: isIndo ? 'Hitung Angka' : 'Numeric', shortLabel: isIndo ? 'Angka' : 'Numeric', icon: Hash },
         { id: 'currency', label: isIndo ? 'Finansial (Rp/$)' : 'Financial', shortLabel: isIndo ? 'Finansial' : 'Finance', icon: DollarSign },
         { id: 'boolean', label: isIndo ? 'Sederhana' : 'Simple', shortLabel: isIndo ? 'Sederhana' : 'Simple', icon: CheckSquare },
@@ -380,6 +381,7 @@ export default function GoalModal({
                                 </label>
                                 <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-800/50">
                                     {form.type === 'milestones' ? (isIndo ? '📋 Checklist Langkah' : '📋 Steps Checklist') :
+                                     form.type === 'habit_frequency' ? (isIndo ? '🌱 Otomatis dari Habit' : '🌱 Habit Auto-Sync') :
                                      form.type === 'numeric' ? (isIndo ? '🔢 Hitungan Angka' : '🔢 Numeric Counter') :
                                      form.type === 'currency' ? (isIndo ? '💰 Target Keuangan' : '💰 Financial Target') :
                                      (isIndo ? '✅ Sekali Selesai' : '✅ Single Milestone')}
@@ -408,6 +410,75 @@ export default function GoalModal({
                                 })}
                             </div>
                         </div>
+
+                        {/* 2b. Habit-Driven Target Dynamic Selector */}
+                        {form.type === 'habit_frequency' && isHabitActive && (
+                            <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/70 dark:border-indigo-800/60 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                        <Sparkles size={14} />
+                                        {isIndo ? 'Hubungkan Kebiasaan Penggerak (Auto-Sync Progres)' : 'Link Supporting Habits (Auto-Sync Progress)'}
+                                    </span>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-mono">
+                                        {form.linked_habit_ids?.length || 0} {isIndo ? 'terpilih' : 'selected'}
+                                    </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                                    {isIndo 
+                                        ? '🎯 Progres target ini dihitung otomatis secara live dari tingkat konsistensi kebiasaan yang Anda pilih. Centang di habit tracker harian akan langsung menggerakkan capaian target ini!'
+                                        : '🎯 Progress for this goal is calculated live from your habit consistency. Ticking off habits each day directly pushes this goal forward!'}
+                                </p>
+
+                                {uniqueHabits.length === 0 ? (
+                                    <div className="text-xs text-slate-400 italic py-2">
+                                        {isIndo ? 'Belum ada kebiasaan aktif di bulan ini. Buat kebiasaan terlebih dahulu di tab Habits.' : 'No active habits found for this month.'}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
+                                        {uniqueHabits.map((h: any) => {
+                                            const isSelected = form.linked_habit_ids?.some(id => String(id) === String(h.id));
+                                            const freqBadge = (h.frequencyType === 'weekly_days' && Array.isArray(h.frequencyDays) && h.frequencyDays.length > 0)
+                                                ? `${h.frequencyDays.length}x/mgg`
+                                                : (h.frequencyCount && h.frequencyCount > 0 ? `${h.frequencyCount}x/mgg` : (isIndo ? 'Harian' : 'Daily'));
+                                            return (
+                                                <button
+                                                    key={h.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setForm(prev => {
+                                                            const currentIds = prev.linked_habit_ids || [];
+                                                            const exists = currentIds.some(id => String(id) === String(h.id));
+                                                            const nextIds = exists 
+                                                                ? currentIds.filter(id => String(id) !== String(h.id))
+                                                                : [...currentIds, h.id];
+                                                            return { ...prev, linked_habit_ids: nextIds };
+                                                        });
+                                                    }}
+                                                    className={`p-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-1.5 text-left active:scale-95 border ${
+                                                        isSelected
+                                                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-400/40'
+                                                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500/50 hover:bg-indigo-50/20'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center gap-2 min-w-0">
+                                                        <span className="shrink-0 text-sm">{h.icon || '🌱'}</span>
+                                                        <div className="min-w-0">
+                                                            <span className="truncate text-xs font-bold block">{h.name}</span>
+                                                            <span className={`text-[9px] font-black uppercase tracking-wider block ${
+                                                                isSelected ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'
+                                                            }`}>
+                                                                ⚡ {freqBadge}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {isSelected && <CheckCircle2 size={13} className="shrink-0 text-white" />}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* 3. Numeric / Metric Dynamic Inputs */}
                         {form.type === 'numeric' && (

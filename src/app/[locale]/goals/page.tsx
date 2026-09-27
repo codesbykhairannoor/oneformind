@@ -62,7 +62,7 @@ export default function GoalsPage() {
     }, []);
 
     const { data: fetchedGoals, mutate: mutateGoals } = useSWR('/api/goals', fetcher);
-    const { data: fetchedHabits } = useSWR(isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
+    const { data: fetchedHabits, mutate: mutateHabits } = useSWR(isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
     const { data: fetchedSavings } = useSWR(isFinanceActive ? '/api/finance/savings' : null, fetcher);
 
     const parsedGoals = useMemo(() => {
@@ -120,6 +120,8 @@ export default function GoalsPage() {
 
             const linkedHabits: any[] = [];
             const seenHabitNames = new Set<string>();
+            const todayStr = new Date().toISOString().split('T')[0];
+
             if (isHabitActive && fetchedHabits && Array.isArray(fetchedHabits)) {
                 fetchedHabits.forEach((h: any) => {
                     if (h.isArchived || h.is_archived || h.archived) return;
@@ -141,6 +143,7 @@ export default function GoalsPage() {
                     if (isMatched && !seenHabitNames.has(norm)) {
                         seenHabitNames.add(norm);
                         const completedDays = (h.logs || []).filter((l: any) => l.status === 'completed' || l.completed || l.value === 1).length;
+                        const isCompletedToday = (h.logs || []).some((l: any) => l.date === todayStr && (l.status === 'completed' || l.completed || l.value === 1));
                         const target = Number(h.monthlyTarget) || 30;
                         const consistency = Math.min(100, Math.round((completedDays / target) * 100));
                         linkedHabits.push({
@@ -149,7 +152,10 @@ export default function GoalsPage() {
                             icon: h.icon || '🌱',
                             color: h.color,
                             consistencyPercent: consistency,
-                            streak: completedDays
+                            streak: completedDays,
+                            completedToday: isCompletedToday,
+                            frequencyType: h.frequencyType || hMeta.frequencyType,
+                            frequencyDays: h.frequencyDays || hMeta.frequencyDays
                         });
                     }
                 });
@@ -604,6 +610,45 @@ export default function GoalsPage() {
         }
     };
 
+    const handleToggleHabitToday = async (habitId: number | string, currentDone: boolean) => {
+        const nextDone = !currentDone;
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // Optimistic UI update across all goals that link this habit
+        setGoals(prev => prev.map(g => {
+            if (!g.linked_habits || g.linked_habits.length === 0) return g;
+            const updatedHabits = g.linked_habits.map(h => {
+                if (String(h.id) === String(habitId)) {
+                    const newStreak = nextDone ? (h.streak || 0) + 1 : Math.max(0, (h.streak || 0) - 1);
+                    return {
+                        ...h,
+                        completedToday: nextDone,
+                        streak: newStreak
+                    };
+                }
+                return h;
+            });
+            return { ...g, linked_habits: updatedHabits };
+        }));
+
+        try {
+            await fetch(`/api/habits/${habitId}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: todayStr,
+                    status: nextDone ? 'completed' : 'empty'
+                })
+            });
+            mutateHabits();
+            mutateGoals();
+        } catch (e) {
+            console.error('Failed to toggle habit log from goal card', e);
+            mutateHabits();
+            mutateGoals();
+        }
+    };
+
     if (!hasMounted) {
         return (
             <AuthenticatedLayout>
@@ -722,6 +767,7 @@ export default function GoalsPage() {
                                                     onMarkAsActive={handleMarkAsActive}
                                                     onToggleNorthStar={handleToggleNorthStar}
                                                     onQuickIncrement={handleQuickIncrement}
+                                                    onToggleHabitToday={handleToggleHabitToday}
                                                 />
                                             ))}
                                         </div>
