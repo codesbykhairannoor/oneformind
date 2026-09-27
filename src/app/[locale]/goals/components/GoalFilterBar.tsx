@@ -328,9 +328,7 @@ export default function GoalFilterBar({
                                     type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        if (window.confirm(isIndo ? `Apakah Anda yakin ingin menghapus kategori "${cat.id}"? Semua target dengan kategori ini akan diubah ke kategori "Lainnya / Umum".` : `Are you sure you want to delete category "${cat.id}"? All goals in this category will be moved to "Other / General".`)) {
-                                            onDeleteCategory(cat.id);
-                                        }
+                                        onDeleteCategory(cat.id);
                                     }}
                                     className="p-0.5 rounded-md hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-500 transition ml-0.5"
                                     title={isIndo ? `Hapus kategori "${cat.id}"` : `Delete category "${cat.id}"`}

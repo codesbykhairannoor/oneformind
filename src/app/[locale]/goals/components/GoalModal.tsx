@@ -362,18 +362,12 @@ export default function GoalModal({
 
     const handleDeleteCategoryClick = (catName?: string | null) => {
         if (!catName || catName === 'other') return;
-        const confirmMsg = isIndo 
-            ? `Apakah Anda yakin ingin menghapus kategori "${catName}"? Semua target dengan kategori ini akan dipindahkan ke kategori "Lainnya / Umum".`
-            : `Are you sure you want to delete category "${catName}"? All goals in this category will be moved to "Other / General".`;
-        
-        if (window.confirm(confirmMsg)) {
-            if (form.category === catName) {
-                setForm(prev => ({ ...prev, category: 'other' }));
-                setCategoryMode('other');
-                setCustomCatText('');
-            }
-            onDeleteCategory?.(catName);
+        if (form.category === catName) {
+            setForm(prev => ({ ...prev, category: 'other' }));
+            setCategoryMode('other');
+            setCustomCatText('');
         }
+        onDeleteCategory?.(catName);
     };
 
     const hasAdvancedData = Boolean(
