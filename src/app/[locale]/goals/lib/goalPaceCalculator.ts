@@ -71,6 +71,8 @@ export interface LinkedHabitEngine {
     completedToday?: boolean;
     frequencyType?: string;
     frequencyDays?: number[];
+    completedCount?: number;
+    targetCount?: number;
 }
 
 export interface GoalPaceResult {

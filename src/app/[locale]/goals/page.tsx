@@ -142,20 +142,60 @@ export default function GoalsPage() {
                     const norm = (h.name || '').trim().toLowerCase();
                     if (isMatched && !seenHabitNames.has(norm)) {
                         seenHabitNames.add(norm);
-                        const completedDays = (h.logs || []).filter((l: any) => l.status === 'completed' || l.completed || l.value === 1).length;
+
+                        // 1. Boundary filter: Only count logs on/after goal start_date (and on/before end_date)
+                        // This prevents old check-ins from past months from artificially completing a new goal!
+                        const goalStartDate = g.start_date ? String(g.start_date).split('T')[0] : (meta.start_date ? String(meta.start_date).split('T')[0] : null);
+                        const goalEndDate = g.end_date ? String(g.end_date).split('T')[0] : (meta.end_date ? String(meta.end_date).split('T')[0] : null);
+
+                        const validLogs = (h.logs || []).filter((l: any) => {
+                            const isDone = l.status === 'completed' || l.completed || l.value === 1;
+                            if (!isDone) return false;
+                            const logDate = l.date ? String(l.date).split('T')[0] : '';
+                            if (!logDate) return false;
+                            if (goalStartDate && logDate < goalStartDate) return false;
+                            if (goalEndDate && logDate > goalEndDate) return false;
+                            return true;
+                        });
+
+                        const completedCheckIns = validLogs.length;
                         const isCompletedToday = (h.logs || []).some((l: any) => l.date === todayStr && (l.status === 'completed' || l.completed || l.value === 1));
-                        const target = Number(h.monthlyTarget) || 30;
-                        const consistency = Math.min(100, Math.round((completedDays / target) * 100));
+
+                        // 2. Denominator: How many check-ins needed to reach 100%?
+                        const freqType = h.frequencyType || hMeta.frequencyType || 'daily';
+                        const freqDays = Array.isArray(h.frequencyDays) ? h.frequencyDays : (Array.isArray(hMeta.frequencyDays) ? hMeta.frequencyDays : []);
+                        const freqCount = Number(h.frequencyCount || hMeta.frequencyCount) || (freqDays.length > 0 ? freqDays.length : 7);
+                        const timeHorizon = g.time_horizon || g.timeHorizon || meta.time_horizon || 'monthly';
+
+                        let targetCheckIns = 30;
+                        if (g.type === 'habit_frequency' && Number(g.target_value) > 0) {
+                            targetCheckIns = Number(g.target_value);
+                        } else if (timeHorizon === 'weekly') {
+                            targetCheckIns = (freqType === 'weekly_days' || freqType === 'weekly_count') ? Math.max(1, freqCount) : 7;
+                        } else if (timeHorizon === 'monthly') {
+                            targetCheckIns = (freqType === 'weekly_days' || freqType === 'weekly_count') ? Math.max(1, freqCount * 4) : 30;
+                        } else if (timeHorizon === 'quarterly') {
+                            targetCheckIns = (freqType === 'weekly_days' || freqType === 'weekly_count') ? Math.max(1, freqCount * 12) : 90;
+                        } else if (timeHorizon === 'yearly') {
+                            targetCheckIns = (freqType === 'weekly_days' || freqType === 'weekly_count') ? Math.max(1, freqCount * 52) : 365;
+                        } else {
+                            targetCheckIns = Number(h.monthlyTarget) || 30;
+                        }
+
+                        const consistency = Math.min(100, Math.round((completedCheckIns / targetCheckIns) * 100));
+
                         linkedHabits.push({
                             id: h.id,
                             name: h.name,
                             icon: h.icon || '🌱',
                             color: h.color,
                             consistencyPercent: consistency,
-                            streak: completedDays,
+                            streak: completedCheckIns,
                             completedToday: isCompletedToday,
-                            frequencyType: h.frequencyType || hMeta.frequencyType,
-                            frequencyDays: h.frequencyDays || hMeta.frequencyDays
+                            frequencyType: freqType,
+                            frequencyDays: freqDays,
+                            completedCount: completedCheckIns,
+                            targetCount: targetCheckIns
                         });
                     }
                 });

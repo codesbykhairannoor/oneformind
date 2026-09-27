@@ -364,6 +364,11 @@ export default function GoalCard({
                                                             🔥 {h.streak}d
                                                         </span>
                                                     )}
+                                                    {Boolean(h.targetCount) && (
+                                                        <span className="px-1.5 py-0.2 rounded-md text-[9px] font-black bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/60 font-mono shrink-0">
+                                                            ⚡ {h.completedCount || 0}/{h.targetCount} {isIndo ? 'centang' : 'checks'}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <div className="flex items-center gap-2 mt-1">
                                                     <div className="h-1.5 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
