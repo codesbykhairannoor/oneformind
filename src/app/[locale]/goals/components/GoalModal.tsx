@@ -7,7 +7,7 @@ import {
     Target, Calendar, Award, Zap, CheckCircle2, Star, 
     Hash, DollarSign, ListTodo, CheckSquare, Compass, 
     ShieldAlert, Sparkles, Link2, SlidersHorizontal,
-    ChevronDown, ChevronUp, Palette, PaletteIcon
+    ChevronDown, ChevronUp, Palette, PaletteIcon, Trash2
 } from 'lucide-react';
 import GoalDatePicker from './GoalDatePicker';
 import { GoalItem } from './GoalCard';
@@ -26,6 +26,7 @@ interface GoalModalProps {
     onClose: () => void;
     onSave: (form: GoalItem) => void;
     onUploadImage?: (file: File) => void;
+    onDeleteCategory?: (category: string) => void;
     processing?: boolean;
     errors?: Record<string, string>;
 }
@@ -38,6 +39,7 @@ export default function GoalModal({
     onClose,
     onSave,
     onUploadImage,
+    onDeleteCategory,
     processing = false,
     errors = {}
 }: GoalModalProps) {
@@ -85,9 +87,12 @@ export default function GoalModal({
 
     const activeHorizon = defaultTimeHorizon && defaultTimeHorizon !== 'all' ? defaultTimeHorizon : 'weekly';
 
+    const [showIconPicker, setShowIconPicker] = useState(false);
+
     const [form, setForm] = useState<GoalItem>({
         id: '',
         title: '',
+        icon: '🎯',
         color: '#6366f1',
         type: 'milestones',
         status: 'active',
@@ -168,21 +173,25 @@ export default function GoalModal({
     useEffect(() => {
         if (goal) {
             const parsedGoal = JSON.parse(JSON.stringify(goal));
+            let meta: any = {};
             if (goal.specific_days && typeof goal.specific_days === 'string') {
                 try {
-                    const meta = JSON.parse(goal.specific_days);
+                    meta = JSON.parse(goal.specific_days);
                     if (meta.linked_source && !parsedGoal.linked_source) parsedGoal.linked_source = meta.linked_source;
                     if (meta.linked_account_id && !parsedGoal.linked_account_id) parsedGoal.linked_account_id = meta.linked_account_id;
                     if (meta.linked_account_title && !parsedGoal.linked_account_title) parsedGoal.linked_account_title = meta.linked_account_title;
                     if (Array.isArray(meta.linked_habit_ids) && (!parsedGoal.linked_habit_ids || parsedGoal.linked_habit_ids.length === 0)) {
                         parsedGoal.linked_habit_ids = meta.linked_habit_ids;
                     }
+                    if (meta.icon && !parsedGoal.icon) parsedGoal.icon = meta.icon;
                 } catch {}
             }
+            if (!parsedGoal.icon) parsedGoal.icon = '🎯';
             if (!parsedGoal.linked_habit_ids) parsedGoal.linked_habit_ids = [];
             parsedGoal.parent_goal_id = parsedGoal.parent_goal_id ?? parsedGoal.parentGoalId ?? null;
             setForm(parsedGoal);
             setImagePreview(goal.cover_image_url || null);
+            setShowIconPicker(false);
             
             const cat = parsedGoal.category || 'other';
             if (cat === 'other') {
@@ -208,6 +217,7 @@ export default function GoalModal({
             setForm({
                 id: '',
                 title: '',
+                icon: '🎯',
                 color: '#6366f1',
                 type: 'milestones',
                 status: 'active',
@@ -235,6 +245,7 @@ export default function GoalModal({
                 linked_habit_ids: []
             });
             setImagePreview(null);
+            setShowIconPicker(false);
             setCategoryMode('other');
             setCustomCatText('');
             setShowAdvanced(false);
@@ -343,23 +354,27 @@ export default function GoalModal({
         { id: 'boolean', label: isIndo ? 'Sederhana' : 'Simple', shortLabel: isIndo ? 'Sederhana' : 'Simple', icon: CheckSquare },
     ];
 
-    const archetypeOptions = [
-        { id: 'career', label: isIndo ? '💼 Karier & Pekerjaan' : '💼 Career & Work' },
-        { id: 'wealth', label: isIndo ? '💰 Keuangan & Investasi' : '💰 Wealth & Finance' },
-        { id: 'learning', label: isIndo ? '🎓 Belajar & Pendidikan' : '🎓 Learning & Education' },
-        { id: 'fitness', label: isIndo ? '🏋️ Fitness & Olahraga' : '🏋️ Fitness & Gym' },
-        { id: 'health', label: isIndo ? '❤️ Kesehatan Fisik & Mental' : '❤️ Health & Wellness' },
-        { id: 'spiritual', label: isIndo ? '✨ Spiritual & Ibadah' : '✨ Spiritual & Faith' },
-        { id: 'coding', label: isIndo ? '💻 Coding & Proyek' : '💻 Coding & Tech' },
-        { id: 'creative', label: isIndo ? '🎨 Kreatif & Seni' : '🎨 Creative & Arts' },
-        { id: 'reading', label: isIndo ? '📖 Membaca Buku' : '📖 Reading Books' },
-        { id: 'social', label: isIndo ? '👥 Sosial & Relasi' : '👥 Social & Networking' },
-        { id: 'travel', label: isIndo ? '✈️ Traveling & Petualangan' : '✈️ Travel & Adventure' },
-        { id: 'music', label: isIndo ? '🎵 Musik & Instrumen' : '🎵 Music' },
-        { id: 'photography', label: isIndo ? '📷 Fotografi' : '📷 Photography' },
-        { id: 'gaming', label: isIndo ? '🎮 Gaming & Hiburan' : '🎮 Gaming & Entertainment' },
-        { id: 'other', label: isIndo ? '🎯 Lainnya / Umum' : '🎯 Other / General' },
+    const goalIconPresets = [
+        '🎯', '🚀', '⭐', '🏆', '🔥', '💡', '💰', '💼', 
+        '📚', '🏋️', '🧘', '💻', '🎨', '✈️', '❤️', '🌱', 
+        '🎓', '💎', '🔑', '📈', '⚡', '🎵', '🏠', '✨'
     ];
+
+    const handleDeleteCategoryClick = (catName?: string | null) => {
+        if (!catName || catName === 'other') return;
+        const confirmMsg = isIndo 
+            ? `Apakah Anda yakin ingin menghapus kategori "${catName}"? Semua target dengan kategori ini akan dipindahkan ke kategori "Lainnya / Umum".`
+            : `Are you sure you want to delete category "${catName}"? All goals in this category will be moved to "Other / General".`;
+        
+        if (window.confirm(confirmMsg)) {
+            if (form.category === catName) {
+                setForm(prev => ({ ...prev, category: 'other' }));
+                setCategoryMode('other');
+                setCustomCatText('');
+            }
+            onDeleteCategory?.(catName);
+        }
+    };
 
     const hasAdvancedData = Boolean(
         form.core_why || 
@@ -392,11 +407,11 @@ export default function GoalModal({
                     {/* Modal Form Scrollable Area */}
                     <div className="p-5 sm:p-7 md:p-8 overflow-y-auto custom-scrollbar space-y-6 pb-28">
                         
-                        {/* 1. Goal Title & North Star Pinning */}
+                        {/* 1. Goal Title, Icon & North Star Pinning */}
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <label className="text-[11px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                    {isIndo ? 'Judul Target / Visi Impian' : 'Goal Title / Vision'} *
+                                    {isIndo ? 'Ikon & Judul Target' : 'Goal Icon & Title'} *
                                 </label>
 
                                 <button
@@ -413,13 +428,88 @@ export default function GoalModal({
                                 </button>
                             </div>
 
-                            <input 
-                                type="text"
-                                value={form.title}
-                                onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-                                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3.5 text-slate-800 dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-400 transition text-base shadow-sm"
-                                placeholder={isIndo ? 'Contoh: Baca 24 Buku Tahun Ini / Kumpul Dana Darurat 50jt...' : 'E.g. Read 24 Books This Year / Save $10k Emergency Fund...'} 
-                            />
+                            <div className="flex items-center gap-2.5 relative">
+                                {/* Interactive Icon Picker Button */}
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowIconPicker(!showIconPicker)}
+                                        title={isIndo ? "Klik untuk ganti ikon target" : "Click to change goal icon"}
+                                        className="w-13 h-13 min-w-[3.25rem] min-h-[3.25rem] flex items-center justify-center text-2xl bg-slate-50 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 rounded-2xl shadow-sm transition hover:scale-105 active:scale-95 group"
+                                    >
+                                        <span className="drop-shadow-xs group-hover:scale-110 transition-transform">{form.icon || '🎯'}</span>
+                                    </button>
+
+                                    {/* Icon Picker Popover */}
+                                    {showIconPicker && (
+                                        <>
+                                            <div 
+                                                className="fixed inset-0 z-40" 
+                                                onClick={() => setShowIconPicker(false)} 
+                                            />
+                                            <div className="absolute left-0 top-full mt-2 z-50 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-64 sm:w-72 animate-in fade-in zoom-in-95 duration-150">
+                                                <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-slate-800">
+                                                    <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider">
+                                                        {isIndo ? 'Pilih Ikon Target' : 'Select Goal Icon'}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowIconPicker(false)}
+                                                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+
+                                                {/* Presets Grid */}
+                                                <div className="grid grid-cols-6 gap-1.5 mb-2.5">
+                                                    {goalIconPresets.map((ico) => (
+                                                        <button
+                                                            key={ico}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setForm(prev => ({ ...prev, icon: ico }));
+                                                                setShowIconPicker(false);
+                                                            }}
+                                                            className={`w-9 h-9 flex items-center justify-center text-xl rounded-xl transition ${
+                                                                (form.icon || '🎯') === ico
+                                                                    ? 'bg-indigo-100 dark:bg-indigo-950 border border-indigo-400 scale-105 shadow-xs'
+                                                                    : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                            }`}
+                                                        >
+                                                            {ico}
+                                                        </button>
+                                                    ))}
+                                                </div>
+
+                                                {/* Custom Emoji Input */}
+                                                <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                                                    <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                                                        {isIndo ? 'Atau ketik emoji sendiri:' : 'Or type custom emoji:'}
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        maxLength={2}
+                                                        value={form.icon || ''}
+                                                        onChange={(e) => setForm(prev => ({ ...prev, icon: e.target.value || '🎯' }))}
+                                                        placeholder="🎯"
+                                                        className="w-full text-center text-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-1 font-bold outline-none focus:border-indigo-500"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Title Input */}
+                                <input 
+                                    type="text"
+                                    value={form.title}
+                                    onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
+                                    className="flex-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3.5 text-slate-800 dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-400 transition text-base shadow-sm"
+                                    placeholder={isIndo ? 'Contoh: Baca 24 Buku Tahun Ini / Kumpul Dana Darurat 50jt...' : 'E.g. Read 24 Books This Year / Save $10k Emergency Fund...'} 
+                                />
+                            </div>
                         </div>
 
                         {/* 2. Target Type Selector (Compact 1-line segmented bar) */}
@@ -782,32 +872,45 @@ export default function GoalModal({
                                         )}
                                     </div>
 
-                                    <select
-                                        value={categoryMode === 'new' ? '__new__' : (categoryMode === 'existing' ? form.category : 'other')}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            if (val === 'other') {
-                                                setCategoryMode('other');
-                                                setCustomCatText('');
-                                                setForm(prev => ({ ...prev, category: 'other' }));
-                                            } else if (val === '__new__') {
-                                                setCategoryMode('new');
-                                                setCustomCatText('');
-                                                setForm(prev => ({ ...prev, category: '' }));
-                                            } else {
-                                                setCategoryMode('existing');
-                                                setCustomCatText(val);
-                                                setForm(prev => ({ ...prev, category: val }));
-                                            }
-                                        }}
-                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
-                                    >
-                                        <option value="other">{isIndo ? '🎯 Lainnya / Umum (Other)' : '🎯 Other / General'}</option>
-                                        {existingCustomCategories.map(cat => (
-                                            <option key={cat} value={cat}>🏷️ {cat}</option>
-                                        ))}
-                                        <option value="__new__">{isIndo ? '➕ Buat Kategori Baru...' : '➕ Create New Category...'}</option>
-                                    </select>
+                                    <div className="flex items-center gap-2">
+                                        <select
+                                            value={categoryMode === 'new' ? '__new__' : (categoryMode === 'existing' ? form.category : 'other')}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val === 'other') {
+                                                    setCategoryMode('other');
+                                                    setCustomCatText('');
+                                                    setForm(prev => ({ ...prev, category: 'other' }));
+                                                } else if (val === '__new__') {
+                                                    setCategoryMode('new');
+                                                    setCustomCatText('');
+                                                    setForm(prev => ({ ...prev, category: '' }));
+                                                } else {
+                                                    setCategoryMode('existing');
+                                                    setCustomCatText(val);
+                                                    setForm(prev => ({ ...prev, category: val }));
+                                                }
+                                            }}
+                                            className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 text-xs font-bold text-slate-800 dark:text-white focus:ring-4 focus:ring-indigo-500/10 transition shadow-sm outline-none"
+                                        >
+                                            <option value="other">{isIndo ? '🎯 Lainnya / Umum (Other)' : '🎯 Other / General'}</option>
+                                            {existingCustomCategories.map(cat => (
+                                                <option key={cat} value={cat}>🏷️ {cat}</option>
+                                            ))}
+                                            <option value="__new__">{isIndo ? '➕ Buat Kategori Baru...' : '➕ Create New Category...'}</option>
+                                        </select>
+
+                                        {categoryMode === 'existing' && form.category && form.category !== 'other' && onDeleteCategory && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteCategoryClick(form.category)}
+                                                className="p-2.5 rounded-2xl text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/50 transition shadow-xs flex-shrink-0"
+                                                title={isIndo ? `Hapus kategori "${form.category}"` : `Delete category "${form.category}"`}
+                                            >
+                                                <Trash2 size={15} />
+                                            </button>
+                                        )}
+                                    </div>
 
                                     {categoryMode === 'new' && (
                                         <div className="mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
@@ -823,6 +926,49 @@ export default function GoalModal({
                                                 className="w-full bg-slate-50 dark:bg-slate-800/80 border border-indigo-300 dark:border-indigo-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none"
                                                 autoFocus
                                             />
+                                        </div>
+                                    )}
+
+                                    {/* Saved Categories Chips with Delete Option */}
+                                    {existingCustomCategories.length > 0 && (
+                                        <div className="pt-2">
+                                            <span className="text-[10px] font-bold text-slate-400 block mb-1.5">
+                                                {isIndo ? 'Kategori Tersimpan:' : 'Saved Categories:'}
+                                            </span>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {existingCustomCategories.map(cat => (
+                                                    <span 
+                                                        key={cat} 
+                                                        className={`inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl text-xs font-bold border transition ${
+                                                            form.category === cat
+                                                                ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300'
+                                                                : 'bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                                                        }`}
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setCategoryMode('existing');
+                                                                setCustomCatText(cat);
+                                                                setForm(prev => ({ ...prev, category: cat }));
+                                                            }}
+                                                            className="hover:underline"
+                                                        >
+                                                            🏷️ {cat}
+                                                        </button>
+                                                        {onDeleteCategory && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleDeleteCategoryClick(cat)}
+                                                                className="text-slate-400 hover:text-rose-500 p-0.5 rounded transition"
+                                                                title={isIndo ? `Hapus kategori "${cat}"` : `Delete category "${cat}"`}
+                                                            >
+                                                                <Trash2 size={12} />
+                                                            </button>
+                                                        )}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>

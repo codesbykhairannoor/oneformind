@@ -231,6 +231,7 @@ export default function GoalsPage() {
             return {
                 id: g.id,
                 title: g.title,
+                icon: meta.icon || g.icon || '🎯',
                 color: g.color || '#6366f1',
                 type: g.type || 'milestones',
                 status: g.status || 'active',
@@ -444,6 +445,7 @@ export default function GoalsPage() {
     const handleSaveGoal = async (form: GoalItem) => {
         setIsModalOpen(false);
         const specificMetadata = JSON.stringify({
+            icon: form.icon || '🎯',
             start_value: form.start_value,
             unit: form.unit,
             currency: form.currency,
@@ -464,7 +466,7 @@ export default function GoalsPage() {
         try {
             if (editingGoal) {
                 // Optimistic update
-                setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form, specific_days: specificMetadata } : g));
+                setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...g, ...form, icon: form.icon || '🎯', specific_days: specificMetadata } : g));
                 const res = await fetch(`/api/goals/${editingGoal.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -522,7 +524,7 @@ export default function GoalsPage() {
             } else {
                 // Optimistic update
                 const tempId = Date.now();
-                setGoals(prev => [{ ...form, id: tempId, milestones: form.milestones || [], status: 'active', specific_days: specificMetadata }, ...prev]);
+                setGoals(prev => [{ ...form, id: tempId, icon: form.icon || '🎯', milestones: form.milestones || [], status: 'active', specific_days: specificMetadata }, ...prev]);
                 const res = await fetch('/api/goals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -563,7 +565,7 @@ export default function GoalsPage() {
                 if (res.ok) {
                     const saved = await res.json().catch(() => null);
                     if (saved && saved.id) {
-                        setGoals(prev => prev.map(g => g.id === tempId ? { ...g, ...saved, milestones: saved.milestones || form.milestones || [] } : g));
+                        setGoals(prev => prev.map(g => g.id === tempId ? { ...g, ...saved, icon: form.icon || '🎯', milestones: saved.milestones || form.milestones || [] } : g));
                     }
                     await mutateGoals();
                 } else {
@@ -587,6 +589,36 @@ export default function GoalsPage() {
             }
         } catch (error) {
             console.error('Failed to save goal:', error);
+            await mutateGoals();
+        }
+    };
+
+    const handleDeleteCategory = async (categoryToDelete: string) => {
+        if (!categoryToDelete || categoryToDelete === 'other') return;
+
+        // Optimistically update goals state
+        setGoals(prev => prev.map(g => (g.category === categoryToDelete ? { ...g, category: 'other' } : g)));
+
+        if (selectedCategory === categoryToDelete) {
+            setSelectedCategory('all');
+        }
+
+        try {
+            const affectedGoals = (goals || []).filter(g => g.category === categoryToDelete);
+
+            await Promise.all(
+                affectedGoals.map(async (g) => {
+                    await fetch(`/api/goals/${g.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ category: 'other' })
+                    }).catch(err => console.error(`Failed to update category for goal ${g.id}:`, err));
+                })
+            );
+
+            await mutateGoals();
+        } catch (err) {
+            console.error('Failed to delete category:', err);
             await mutateGoals();
         }
     };
@@ -877,6 +909,7 @@ export default function GoalsPage() {
                             filteredCount={filteredGoals.length}
                             categoryCounts={categoryCounts}
                             onOpenExportModal={() => setIsExportOpen(true)}
+                            onDeleteCategory={handleDeleteCategory}
                         />
 
                         {/* VIEW MODE RENDERER */}
@@ -979,6 +1012,7 @@ export default function GoalsPage() {
                         defaultTimeHorizon={selectedTimeHorizon}
                         onClose={() => setIsModalOpen(false)}
                         onSave={handleSaveGoal}
+                        onDeleteCategory={handleDeleteCategory}
                     />
 
                     {/* Victory Celebration Modal */}

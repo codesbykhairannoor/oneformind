@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { 
     Search, LayoutGrid, Kanban, CalendarRange, 
     PieChart, X, SlidersHorizontal, ArrowUpDown, 
-    Star, Flame, Tag, Download
+    Star, Flame, Tag, Download, Trash2
 } from 'lucide-react';
 
 export type GoalViewMode = 'gallery' | 'kanban' | 'timeline' | 'wheel_of_life';
@@ -28,6 +28,7 @@ interface GoalFilterBarProps {
     filteredCount: number;
     categoryCounts: Record<string, number>;
     onOpenExportModal?: () => void;
+    onDeleteCategory?: (category: string) => void;
 }
 
 export default function GoalFilterBar({
@@ -46,7 +47,8 @@ export default function GoalFilterBar({
     totalCount,
     filteredCount,
     categoryCounts,
-    onOpenExportModal
+    onOpenExportModal,
+    onDeleteCategory
 }: GoalFilterBarProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
@@ -300,23 +302,43 @@ export default function GoalFilterBar({
                     const isSelected = selectedCategory === cat.id;
 
                     return (
-                        <button
+                        <div
                             key={cat.id}
-                            type="button"
-                            onClick={() => setSelectedCategory(isSelected ? 'all' : cat.id)}
                             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all shrink-0 border ${
                                 isSelected
                                     ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-700/60 text-indigo-700 dark:text-indigo-300 shadow-sm ring-2 ring-indigo-500/20'
                                     : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                             }`}
                         >
-                            <span>{cat.label}</span>
-                            {cat.count > 0 && (
-                                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
-                                    ({cat.count})
-                                </span>
+                            <button
+                                type="button"
+                                onClick={() => setSelectedCategory(isSelected ? 'all' : cat.id)}
+                                className="flex items-center gap-1.5"
+                            >
+                                <span>{cat.label}</span>
+                                {cat.count > 0 && (
+                                    <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                                        ({cat.count})
+                                    </span>
+                                )}
+                            </button>
+
+                            {cat.id !== 'other' && onDeleteCategory && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (window.confirm(isIndo ? `Apakah Anda yakin ingin menghapus kategori "${cat.id}"? Semua target dengan kategori ini akan diubah ke kategori "Lainnya / Umum".` : `Are you sure you want to delete category "${cat.id}"? All goals in this category will be moved to "Other / General".`)) {
+                                            onDeleteCategory(cat.id);
+                                        }
+                                    }}
+                                    className="p-0.5 rounded-md hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-500 transition ml-0.5"
+                                    title={isIndo ? `Hapus kategori "${cat.id}"` : `Delete category "${cat.id}"`}
+                                >
+                                    <Trash2 size={12} />
+                                </button>
                             )}
-                        </button>
+                        </div>
                     );
                 })}
             </div>

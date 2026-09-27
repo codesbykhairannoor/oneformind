@@ -43,7 +43,11 @@ export default function GoalModalHeader({
                     className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white/10"
                     style={{ backgroundImage: `linear-gradient(to bottom right, ${form.color || '#6366f1'}, #4f46e5)` }}
                 >
-                    <HeaderIcon className="w-20 h-20 stroke-[1] animate-pulse" />
+                    {form.icon ? (
+                        <span className="text-6xl drop-shadow-2xl select-none animate-in zoom-in-75 duration-300">{form.icon}</span>
+                    ) : (
+                        <HeaderIcon className="w-20 h-20 stroke-[1] animate-pulse" />
+                    )}
                 </div>
             )}
 

@@ -19,6 +19,7 @@ export interface GoalItem {
     id: number | string;
     _key?: string;
     title: string;
+    icon?: string;
     color?: string;
     type?: GoalType;
     status?: GoalStatus;

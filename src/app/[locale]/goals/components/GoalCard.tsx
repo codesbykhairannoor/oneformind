@@ -159,7 +159,11 @@ export default function GoalCard({
                 ) : (
                     <div style={meshGradientStyle} className="w-full h-full flex items-center justify-center transition-transform duration-700 relative group-hover:scale-105">
                         <div className="relative z-10 w-16 h-16 rounded-full bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/10 flex items-center justify-center text-white shadow-xl">
-                            <IconComp className="w-8 h-8 stroke-[2.5]" style={{ color: themeColor }} />
+                            {goal.icon ? (
+                                <span className="text-3xl select-none">{goal.icon}</span>
+                            ) : (
+                                <IconComp className="w-8 h-8 stroke-[2.5]" style={{ color: themeColor }} />
+                            )}
                         </div>
                     </div>
                 )}
@@ -249,10 +253,11 @@ export default function GoalCard({
                         ) : null}
                     </div>
 
-                    <h3 className={`text-lg sm:text-xl font-black truncate drop-shadow-sm transition-colors ${
+                    <h3 className={`text-lg sm:text-xl font-black truncate drop-shadow-sm transition-colors flex items-center gap-1.5 ${
                         goal.cover_image_url ? 'text-white' : 'text-slate-800 dark:text-white'
                     }`}>
-                        {goal.title}
+                        {goal.icon && <span className="shrink-0">{goal.icon}</span>}
+                        <span className="truncate">{goal.title}</span>
                     </h3>
                 </div>
             </div>
