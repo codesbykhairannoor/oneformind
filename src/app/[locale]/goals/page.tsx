@@ -253,22 +253,25 @@ export default function GoalsPage() {
             }
         });
 
-        mappedGoals.forEach((parent: any) => {
-            const children = parentChildrenMap.get(String(parent.id)) || [];
-            if (children.length > 0) {
-                const childSummaries = children.map((c: any) => ({
-                    id: c.id,
-                    title: c.title,
-                    time_horizon: c.time_horizon,
-                    progress: calculateGoalProgress(c),
-                    status: c.status
-                }));
-                const avgProgress = Math.round(childSummaries.reduce((acc: number, c: any) => acc + c.progress, 0) / childSummaries.length);
-                parent.child_goals = childSummaries;
-                parent.child_goals_count = children.length;
-                parent.child_goals_avg_progress = avgProgress;
-            }
-        });
+        // Multi-pass bottom-up convergence: ensures Weekly -> Monthly -> Quarterly -> Yearly cascade seamlessly
+        for (let iter = 0; iter < 3; iter++) {
+            mappedGoals.forEach((parent: any) => {
+                const children = parentChildrenMap.get(String(parent.id)) || [];
+                if (children.length > 0) {
+                    const childSummaries = children.map((c: any) => ({
+                        id: c.id,
+                        title: c.title,
+                        time_horizon: c.time_horizon,
+                        progress: calculateGoalProgress(c),
+                        status: c.status
+                    }));
+                    const avgProgress = Math.round(childSummaries.reduce((acc: number, c: any) => acc + c.progress, 0) / childSummaries.length);
+                    parent.child_goals = childSummaries;
+                    parent.child_goals_count = children.length;
+                    parent.child_goals_avg_progress = avgProgress;
+                }
+            });
+        }
 
         return mappedGoals;
     }, [fetchedGoals, fetchedHabits, fetchedSavings, isIndo]);
