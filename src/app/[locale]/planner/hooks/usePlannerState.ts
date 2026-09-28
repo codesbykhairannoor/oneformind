@@ -49,8 +49,9 @@ export function usePlannerState() {
     // Goals SWR sync
     const { data: rawGoals, mutate: mutateGoals } = useSWR(isGoalActive ? '/api/goals' : null, habitsFetcher);
 
-    // Habits SWR sync
-    const { data: rawHabits, mutate: mutateHabits } = useSWR(isHabitActive ? '/api/habits' : null, habitsFetcher);
+    // Habits SWR sync (Scoped to selectedDate month period)
+    const currentMonthPeriod = selectedDate ? selectedDate.slice(0, 7) : todayStr.slice(0, 7);
+    const { data: rawHabits, mutate: mutateHabits } = useSWR(isHabitActive ? `/api/habits?period=${currentMonthPeriod}` : null, habitsFetcher);
     const [scheduledHabits, setScheduledHabits] = useState<ScheduledHabitItem[]>([]);
     const [selectedHabitForModal, setSelectedHabitForModal] = useState<ScheduledHabitItem | null>(null);
 
@@ -177,6 +178,9 @@ export function usePlannerState() {
         rawHabits.forEach((h: any) => {
             // Must not be archived
             if (h.isArchived || h.is_archived) return;
+
+            // Must belong to this month
+            if (h.period && h.period !== currentMonthPeriod) return;
 
             let meta: any = {};
             if (typeof h.status === 'string' && h.status.startsWith('{')) {
@@ -825,7 +829,7 @@ export function usePlannerState() {
         handleAcceptRollover,
         handleDismissRollover,
         scheduledHabits,
-        habits: Array.isArray(rawHabits) ? rawHabits.filter((h: any) => !(h.isArchived || h.is_archived)) : [],
+        habits: Array.isArray(rawHabits) ? rawHabits.filter((h: any) => !(h.isArchived || h.is_archived) && (!h.period || h.period === currentMonthPeriod)) : [],
         handleScheduleHabit,
         toggleHabitStatus,
         selectedHabitForModal,

@@ -69,6 +69,16 @@ export default function PlannerSidebar({
     const [dailyHubTab, setDailyHubTab] = useState<'notes' | 'meals' | 'water'>('notes');
     const [sidebarTrayTab, setSidebarTrayTab] = useState<'inbox' | 'habits'>('inbox');
 
+    // Scoped habits to the active month of planner
+    const currentMonthPeriod = selectedDate ? selectedDate.slice(0, 7) : '';
+    const activeMonthHabits = React.useMemo(() => {
+        return (habits || []).filter((h: any) => {
+            if (h.isArchived || h.is_archived || h.archived) return false;
+            if (currentMonthPeriod && h.period && h.period !== currentMonthPeriod) return false;
+            return true;
+        });
+    }, [habits, currentMonthPeriod]);
+
     // Inbox Themes
     const getInboxTaskTheme = (type: number) => {
         switch (type) {
@@ -239,9 +249,9 @@ export default function PlannerSidebar({
                         }`}
                     >
                         <span>🌱 {isIndo ? 'Kebiasaan' : 'Habits'}</span>
-                        {habits.length > 0 && (
+                        {activeMonthHabits.length > 0 && (
                             <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-mono font-bold">
-                                {habits.length}
+                                {activeMonthHabits.length}
                             </span>
                         )}
                     </button>
@@ -340,7 +350,7 @@ export default function PlannerSidebar({
                 {/* TAB 2: HABITS TRAY */}
                 {sidebarTrayTab === 'habits' && (
                     <div>
-                        {habits.length === 0 ? (
+                        {activeMonthHabits.length === 0 ? (
                             <div className="text-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl bg-emerald-50/20 dark:bg-emerald-950/10 p-4">
                                 <span className="text-2xl">🌱</span>
                                 <p className="text-xs font-black text-slate-700 dark:text-slate-300 mt-1">
@@ -372,7 +382,7 @@ export default function PlannerSidebar({
                                     </Link>
                                 </div>
 
-                                {habits.map((habit: any) => {
+                                {activeMonthHabits.map((habit: any) => {
                                     // Check if completed today on selectedDate
                                     const isDone = Array.isArray(habit.logs) && habit.logs.some((l: any) => {
                                         const lDate = typeof l.date === 'string' ? l.date.split('T')[0] : '';

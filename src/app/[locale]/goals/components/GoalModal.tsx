@@ -58,32 +58,15 @@ export default function GoalModal({
     }, []);
 
     const { data: fetchedSavings } = useSWR(show && isFinanceActive ? '/api/finance/savings' : null, fetcher);
-    const { data: fetchedHabitsRaw } = useSWR(show && isHabitActive ? '/api/habits?period=all' : null, fetcher);
+    const { data: fetchedHabitsRaw } = useSWR(show && isHabitActive ? `/api/habits?period=${currentMonthKey}` : null, fetcher);
 
     const uniqueHabits = useMemo(() => {
         if (!isHabitActive || !fetchedHabitsRaw || !Array.isArray(fetchedHabitsRaw)) return [];
-        const map = new Map<string, any>();
-        fetchedHabitsRaw.forEach((h: any) => {
-            if (h.isArchived || h.is_archived || h.archived) return;
-            const norm = (h.name || '').trim().toLowerCase();
-            if (!norm) return;
-            if (!map.has(norm)) {
-                map.set(norm, {
-                    ...h,
-                    allIds: [h.id]
-                });
-            } else {
-                const existing = map.get(norm);
-                existing.allIds.push(h.id);
-                if (h.period === currentMonthKey) {
-                    map.set(norm, {
-                        ...h,
-                        allIds: existing.allIds
-                    });
-                }
-            }
+        return fetchedHabitsRaw.filter((h: any) => {
+            if (h.isArchived || h.is_archived || h.archived) return false;
+            if (h.period && h.period !== currentMonthKey) return false;
+            return true;
         });
-        return Array.from(map.values());
     }, [fetchedHabitsRaw, isHabitActive, currentMonthKey]);
 
     const activeHorizon = defaultTimeHorizon && defaultTimeHorizon !== 'all' ? defaultTimeHorizon : 'weekly';
