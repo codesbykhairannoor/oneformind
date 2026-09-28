@@ -360,25 +360,56 @@ export function usePlannerState() {
     const pendingCount = Math.max(0, totalItems - completedCount);
     const progressPercent = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
 
-    // Toggle Habit completion directly from Planner
+    // Toggle Habit completion directly from Planner (supports scheduled & tray habits)
     const toggleHabitStatus = async (habitId: number) => {
-        const target = scheduledHabits.find(h => h.id === habitId);
-        if (!target) return;
+        const schedTarget = scheduledHabits.find(h => h.id === habitId);
+        const rawTarget = Array.isArray(rawHabits) ? rawHabits.find((h: any) => h.id === habitId) : null;
+        if (!schedTarget && !rawTarget) return;
 
-        const nextCompleted = !target.completed;
+        let isCurrentlyDone = false;
+        if (schedTarget) {
+            isCurrentlyDone = schedTarget.completed;
+        } else if (rawTarget && Array.isArray(rawTarget.logs)) {
+            isCurrentlyDone = rawTarget.logs.some((l: any) => {
+                const lDate = typeof l.date === 'string' ? l.date.split('T')[0] : '';
+                return lDate === selectedDate && (l.status === 'completed' || Number(l.value) > 0);
+            });
+        }
+
+        const nextCompleted = !isCurrentlyDone;
         const nextStatus = nextCompleted ? 'completed' : 'empty';
 
-        // Optimistic UI update
-        setScheduledHabits(prev => prev.map(h => {
-            if (h.id === habitId) {
-                return {
-                    ...h,
-                    completed: nextCompleted,
-                    streak: nextCompleted ? h.streak + 1 : Math.max(0, h.streak - 1)
-                };
-            }
-            return h;
-        }));
+        // Optimistic UI update for scheduledHabits
+        if (schedTarget) {
+            setScheduledHabits(prev => prev.map(h => {
+                if (h.id === habitId) {
+                    return {
+                        ...h,
+                        completed: nextCompleted,
+                        streak: nextCompleted ? h.streak + 1 : Math.max(0, h.streak - 1)
+                    };
+                }
+                return h;
+            }));
+        }
+
+        // Optimistic UI update for rawHabits in SWR cache
+        if (rawHabits && mutateHabits) {
+            const updatedRaw = rawHabits.map((h: any) => {
+                if (h.id === habitId) {
+                    const currentLogs = Array.isArray(h.logs) ? [...h.logs] : [];
+                    const existingLogIdx = currentLogs.findIndex((l: any) => (typeof l.date === 'string' ? l.date.split('T')[0] : '') === selectedDate);
+                    if (existingLogIdx >= 0) {
+                        currentLogs[existingLogIdx] = { ...currentLogs[existingLogIdx], status: nextStatus, value: nextCompleted ? 1 : 0 };
+                    } else if (nextCompleted) {
+                        currentLogs.push({ date: selectedDate, status: nextStatus, value: 1 });
+                    }
+                    return { ...h, logs: currentLogs };
+                }
+                return h;
+            });
+            mutateHabits(updatedRaw, false);
+        }
 
         if (nextCompleted) {
             playCheckSound();
@@ -396,6 +427,7 @@ export function usePlannerState() {
                     value: nextCompleted ? 1 : 0
                 })
             });
+            await mutateHabits();
             globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
         } catch (err) {
             console.error('Failed to sync habit log from planner:', err);
@@ -498,6 +530,81 @@ export function usePlannerState() {
             globalMutate('/api/jobs');
         } catch (err) {
             console.error('Failed to update interview status:', err);
+        }
+    };
+
+    // Handle scheduling a habit onto timeline
+    const handleScheduleHabit = async (habitId: number, startTime: string) => {
+        if (!rawHabits || !Array.isArray(rawHabits)) return;
+        const habit = rawHabits.find((h: any) => h.id === habitId);
+        if (!habit) return;
+
+        let meta: any = {};
+        if (typeof habit.status === 'string' && habit.status.startsWith('{')) {
+            try { meta = JSON.parse(habit.status); } catch {}
+        } else if (typeof habit.status === 'object' && habit.status !== null) {
+            meta = { ...habit.status };
+        }
+
+        // Compute end time (+30 minutes)
+        const [sH, sM] = startTime.split(':').map(Number);
+        const totalMinutes = (isNaN(sH) ? 8 : sH) * 60 + (isNaN(sM) ? 0 : sM) + 30;
+        const endH = String(Math.floor(totalMinutes / 60) % 24).padStart(2, '0');
+        const endM = String(totalMinutes % 60).padStart(2, '0');
+        const endTime = `${endH}:${endM}`;
+
+        meta.startTime = startTime;
+        meta.endTime = endTime;
+        const currentSynced = Array.isArray(meta.syncedTabs) ? meta.syncedTabs : [];
+        if (!currentSynced.includes('planner')) {
+            meta.syncedTabs = [...currentSynced, 'planner'];
+        }
+
+        // Optimistic UI update in scheduledHabits
+        const isDone = Array.isArray(habit.logs) && habit.logs.some((l: any) => {
+            const lDate = typeof l.date === 'string' ? l.date.split('T')[0] : '';
+            return lDate === selectedDate && (l.status === 'completed' || Number(l.value) > 0);
+        });
+
+        const streakCount = Array.isArray(habit.logs) ? habit.logs.filter((l: any) => l.status === 'completed' || Number(l.value) > 0).length : 0;
+
+        const updatedItem: ScheduledHabitItem = {
+            id: habit.id,
+            name: habit.name,
+            icon: habit.icon || '🌱',
+            color: habit.color || '#10b981',
+            startTime,
+            endTime,
+            completed: isDone,
+            streak: streakCount,
+            notes: meta.notes || ''
+        };
+
+        setScheduledHabits(prev => {
+            const idx = prev.findIndex(item => item.id === habitId);
+            if (idx >= 0) {
+                return prev.map((item, i) => i === idx ? updatedItem : item);
+            }
+            return [...prev, updatedItem];
+        });
+
+        // Save to backend
+        try {
+            await fetch(`/api/habits/${habitId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: habit.name,
+                    icon: habit.icon,
+                    color: habit.color,
+                    monthlyTarget: habit.monthlyTarget || habit.monthly_target || 30,
+                    status: JSON.stringify(meta)
+                })
+            });
+            await mutateHabits();
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+        } catch (err) {
+            console.error('Failed to schedule habit on timeline:', err);
         }
     };
 
@@ -718,6 +825,8 @@ export function usePlannerState() {
         handleAcceptRollover,
         handleDismissRollover,
         scheduledHabits,
+        habits: Array.isArray(rawHabits) ? rawHabits.filter((h: any) => !(h.isArchived || h.is_archived)) : [],
+        handleScheduleHabit,
         toggleHabitStatus,
         selectedHabitForModal,
         setSelectedHabitForModal,

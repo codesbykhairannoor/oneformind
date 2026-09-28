@@ -40,6 +40,7 @@ interface PlannerTimelineProps {
     scheduledHabits?: ScheduledHabitItem[];
     onToggleHabit?: (habitId: number) => void;
     onHabitClick?: (habit: ScheduledHabitItem) => void;
+    onScheduleHabit?: (habitId: number, startTime: string) => void;
     scheduledInterviews?: ScheduledInterviewItem[];
     onInterviewClick?: (interview: ScheduledInterviewItem) => void;
     onToggleInterviewCompleted?: (jobId: string | number, roundId: string | number) => void;
@@ -69,6 +70,7 @@ export default function PlannerTimeline({
     scheduledHabits = [],
     onToggleHabit,
     onHabitClick,
+    onScheduleHabit,
     scheduledInterviews = [],
     onInterviewClick,
     onToggleInterviewCompleted,
@@ -227,6 +229,10 @@ export default function PlannerTimeline({
                 const parsed = JSON.parse(jsonStr);
                 if (parsed && parsed.type === 'INBOX_TASK' && onScheduleInboxTask) {
                     onScheduleInboxTask(parsed.id, newStartTime);
+                    return;
+                }
+                if (parsed && parsed.type === 'HABIT' && onScheduleHabit) {
+                    onScheduleHabit(Number(parsed.id), newStartTime);
                     return;
                 }
                 if (parsed && parsed.type === 'STUDY_ASSIGNMENT' && onScheduleStudyAssignment) {
@@ -763,8 +769,21 @@ export default function PlannerTimeline({
                             <div
                                 key={`habit-${habit.id}`}
                                 data-timeline-card="true"
+                                draggable
+                                onDragStart={(e) => {
+                                    e.dataTransfer.dropEffect = 'move';
+                                    e.dataTransfer.effectAllowed = 'copyMove';
+                                    e.dataTransfer.setData('application/json', JSON.stringify({
+                                        type: 'HABIT',
+                                        id: habit.id,
+                                        name: habit.name,
+                                        icon: habit.icon,
+                                        color: habit.color
+                                    }));
+                                    e.dataTransfer.setData('text/plain', habit.name);
+                                }}
                                 onClick={() => onHabitClick ? onHabitClick(habit) : (onToggleHabit && onToggleHabit(habit.id))}
-                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
+                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-grab active:cursor-grabbing overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
                                     habit.completed
                                         ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'
                                         : 'bg-emerald-50/85 dark:bg-emerald-950/25 border-emerald-300/80 dark:border-emerald-800/60 hover:border-emerald-400 dark:hover:border-emerald-700'

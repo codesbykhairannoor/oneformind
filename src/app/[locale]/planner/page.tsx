@@ -133,9 +133,9 @@ export default function PlannerPage() {
                             }`}
                         >
                             <span>📥 Hub & Timer</span>
-                            {((planner.taskInbox.length > 0) || (planner.isStudyActive && (planner.pendingStudyAssignments?.length || 0) > 0)) && (
+                            {((planner.taskInbox.length > 0) || (planner.isHabitActive && (planner.habits?.length || 0) > 0)) && (
                                 <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-mono font-bold">
-                                    {planner.taskInbox.length + (planner.isStudyActive ? (planner.pendingStudyAssignments?.length || 0) : 0)}
+                                    {planner.taskInbox.length + (planner.isHabitActive ? (planner.habits?.length || 0) : 0)}
                                 </span>
                             )}
                         </button>
@@ -158,19 +158,10 @@ export default function PlannerPage() {
                                 setWaterGlasses={planner.handleSetWaterGlasses}
                                 taskInbox={planner.taskInbox} 
                                 setTaskInbox={planner.handleSetTaskInbox}
-                                goals={planner.goals}
-                                onScheduleGoalMilestone={(milestone, goal) => planner.handleScheduleGoalMilestone(milestone, goal)}
-                                onToggleGoalMilestone={(goalId, milestoneId, completed) => planner.handleToggleGoalMilestone(goalId, milestoneId, completed)}
-                                isStudyActive={planner.isStudyActive}
-                                pendingStudyAssignments={planner.pendingStudyAssignments}
-                                onStudyClick={(study) => planner.setSelectedStudyForModal(study)}
-                                onToggleStudyCompleted={planner.toggleStudyAssignmentCompleted}
-                                onScheduleStudyModal={(study) => {
-                                    planner.openNewTaskModal(undefined, {
-                                        title: `[📚 Kuliah] ${study.course_name ? `${study.course_name}: ` : ''}${study.title}`,
-                                        type: 2
-                                    });
-                                }}
+                                habits={planner.habits}
+                                scheduledHabits={planner.scheduledHabits}
+                                onToggleHabit={planner.toggleHabitStatus}
+                                onScheduleHabit={planner.handleScheduleHabit}
                                 saveStatus={planner.saveStatus}
                                 durationMinutes={planner.durationMinutes}
                                 pomodoroTime={planner.pomodoroTime} 
@@ -196,6 +187,7 @@ export default function PlannerPage() {
                                  scheduledHabits={planner.scheduledHabits}
                                  onToggleHabit={planner.toggleHabitStatus}
                                  onHabitClick={planner.setSelectedHabitForModal}
+                                 onScheduleHabit={planner.handleScheduleHabit}
                                  scheduledInterviews={planner.scheduledInterviews}
                                  onInterviewClick={planner.setSelectedInterviewForModal}
                                  onToggleInterviewCompleted={planner.toggleInterviewCompleted}
