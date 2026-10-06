@@ -141,9 +141,9 @@ export default function FinanceHeader({
             icon={<PieChart size={18} strokeWidth={2.5} />}
             iconHref="/finance/dashboard"
             iconTitle={isIndo ? 'Overview Finansial Tahunan' : 'Annual Financial Overview'}
-            title={t('finance_plan') || (isIndo ? 'Perencanaan Finansial' : 'Finance & Budgeting')}
-            subtitle={isIndo ? 'Arus kas, anggaran bulanan & analitik kekayaan' : 'Cashflow, monthly budgeting & net worth tracking'}
-            centerContent={
+            title={isIndo ? 'Manajemen Finansial & Arus Kas' : 'Financial Plan & Cashflow'}
+            subtitle={isIndo ? 'Anggaran bulanan, pelacak pengeluaran & laporan fiskal' : 'Monthly budgets, expense tracking & cashflow reports'}
+            actions={
                 <div className="flex items-center gap-2 flex-wrap">
                     {/* Custom Month Picker */}
                     <FinanceMonthPicker 
@@ -184,10 +184,7 @@ export default function FinanceHeader({
                             </div>
                         )}
                     </div>
-                </div>
-            }
-            actions={
-                <div className="flex items-center gap-2">
+
                     {/* Export Actions */}
                     <div className="relative shrink-0">
                         <button 

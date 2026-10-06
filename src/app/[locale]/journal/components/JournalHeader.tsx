@@ -45,16 +45,16 @@ export default function JournalHeader({
                 </span>
             }
             subtitle={isIndo ? 'Ruang aman untuk menjernihkan pikiran, emosi & pola kognitif' : 'Declutter thoughts, track emotional trajectory & cognitive reframing'}
-            centerContent={
-                <div className="flex items-center gap-2.5 flex-wrap">
+            actions={
+                <div className="flex items-center gap-2 flex-wrap">
                     {/* Streak Badge */}
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-black text-xs shadow-xs">
+                    <div className="flex items-center gap-1.5 px-3 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-black text-xs shadow-xs">
                         <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-pulse" />
-                        <span>{streakDays} {isIndo ? 'Hari Beruntun' : 'Day Streak'}</span>
+                        <span>{streakDays} {isIndo ? 'Hari' : 'Days'}</span>
                     </div>
 
                     {/* Synergy Micro-pills */}
-                    <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80">
+                    <div className="hidden sm:flex items-center gap-3 px-3 h-10 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80">
                         {/* Stories count */}
                         <div className="flex items-center gap-1.5">
                             <BookOpen className="w-3.5 h-3.5 text-indigo-500" />
@@ -86,10 +86,6 @@ export default function JournalHeader({
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-            actions={
-                <div className="flex items-center gap-2">
                     {/* Export Button */}
                     {onOpenExportModal && (
                         <button

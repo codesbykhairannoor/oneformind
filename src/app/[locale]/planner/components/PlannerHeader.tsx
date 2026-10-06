@@ -62,12 +62,14 @@ export default function PlannerHeader({
     return (
         <ModuleHeader
             icon={<CheckSquare size={18} strokeWidth={2.5} />}
-            title={isIndo ? 'Daily Planner & Tugas' : 'Daily Planner & Tasks'}
+            iconHref="/planner/dashboard"
+            iconTitle={isIndo ? 'Overview Dashboard Planner' : 'Planner Dashboard Overview'}
+            title={isIndo ? 'Perencana Harian & Time-Block' : 'Daily Planner & Time-Blocking'}
             subtitle={isIndo ? 'Manajemen jadwal harian, fokus & eksekusi tugas' : 'Daily execution, focus scheduling & task breakdown'}
-            centerContent={
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 w-full md:w-auto">
+            actions={
+                <div className="flex items-center gap-2 flex-wrap">
                     {/* Date Navigation */}
-                    <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5">
+                    <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 h-10">
                         <button 
                             type="button"
                             onClick={() => navigateDate(-1)} 
@@ -89,7 +91,7 @@ export default function PlannerHeader({
                             </button>
                             
                             {isDatePickerOpen && (
-                                <div className="absolute left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 top-full mt-2 z-[100] origin-top">
+                                <div className="absolute right-0 top-full mt-2 z-[100] origin-top-right">
                                     <PlannerDatePicker 
                                         selectedDate={selectedDate}
                                         onDateChange={onDateChange}
@@ -110,35 +112,7 @@ export default function PlannerHeader({
                         </button>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="w-full sm:w-48 lg:w-56 min-w-0">
-                        <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1">
-                            <span className="flex items-center gap-1">
-                                <span>{isIndo ? 'Progres' : 'Progress'}</span>
-                                <span className="text-indigo-600 dark:text-indigo-400 font-black">({stats.percent}%)</span>
-                            </span>
-                            <div className="flex items-center gap-2">
-                                <span className="flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                    {stats.completed}
-                                </span>
-                                <span className="flex items-center gap-0.5 text-amber-500">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                                    {stats.pending}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/40 dark:border-slate-700/60">
-                            <div 
-                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out" 
-                                style={{ width: `${stats.percent}%` }} 
-                            />
-                        </div>
-                    </div>
-                </div>
-            }
-            actions={
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    {/* Export Button */}
                     {onOpenExportModal && (
                         <button 
                             type="button"
@@ -151,6 +125,7 @@ export default function PlannerHeader({
                         </button>
                     )}
 
+                    {/* Reset Board Button */}
                     <button 
                         type="button"
                         onClick={onResetBoard} 
@@ -160,6 +135,7 @@ export default function PlannerHeader({
                         <RotateCcw size={15} strokeWidth={2.5} />
                     </button>
 
+                    {/* Add Task Button */}
                     <button 
                         type="button"
                         onClick={onOpenTaskModal} 
@@ -170,6 +146,32 @@ export default function PlannerHeader({
                     </button>
                 </div>
             }
-        />
+        >
+            {/* Progress Bar Sub-row */}
+            <div className="pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1">
+                    <span className="flex items-center gap-1">
+                        <span>{isIndo ? 'Progres Hari Ini' : 'Today\'s Progress'}</span>
+                        <span className="text-indigo-600 dark:text-indigo-400 font-black">({stats.percent}%)</span>
+                    </span>
+                    <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            {stats.completed} {isIndo ? 'Selesai' : 'Completed'}
+                        </span>
+                        <span className="flex items-center gap-1 text-amber-500 font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                            {stats.pending} {isIndo ? 'Tertunda' : 'Pending'}
+                        </span>
+                    </div>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/40 dark:border-slate-700/60">
+                    <div 
+                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out" 
+                        style={{ width: `${stats.percent}%` }} 
+                    />
+                </div>
+            </div>
+        </ModuleHeader>
     );
 }

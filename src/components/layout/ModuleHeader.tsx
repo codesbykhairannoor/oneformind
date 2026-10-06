@@ -34,7 +34,7 @@ export default function ModuleHeader({
     className = ''
 }: ModuleHeaderProps) {
     const iconElement = (
-        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100/80 dark:border-indigo-800/40 flex items-center justify-center shrink-0 shadow-xs transition-colors">
+        <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100/80 dark:border-indigo-800/40 flex items-center justify-center shrink-0 shadow-xs transition-colors">
             {icon}
         </div>
     );
@@ -73,16 +73,10 @@ export default function ModuleHeader({
                         </div>
                     </div>
 
-                    {/* Center: Context Controls (Date/Period/Filters) */}
-                    {centerContent && (
-                        <div className="flex items-center gap-2 flex-wrap min-w-0 md:justify-center">
+                    {/* Right: Controls & Actions (Grouped naturally together on the right) */}
+                    {(centerContent || actions) && (
+                        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap shrink-0 justify-start md:justify-end">
                             {centerContent}
-                        </div>
-                    )}
-
-                    {/* Right: Actions & Primary CTA */}
-                    {actions && (
-                        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap shrink-0 md:justify-end">
                             {actions}
                         </div>
                     )}

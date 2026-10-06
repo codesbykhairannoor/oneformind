@@ -71,10 +71,10 @@ export default function CalendarHeader({
     return (
         <ModuleHeader
             icon={<CalendarIcon size={18} strokeWidth={2.5} />}
-            title={isIndo ? 'Kalender & Jadwal Life OS' : 'Life OS Calendar & Schedule'}
-            subtitle={isIndo ? 'Sinkronisasi agenda, meeting, target & tugas' : 'Unified schedule, meetings, targets & habits'}
-            centerContent={
-                <div className="flex items-center gap-2">
+            title={isIndo ? 'Kalender Terpadu & Jadwal' : 'Master Calendar & Schedules'}
+            subtitle={isIndo ? 'Sinkronisasi agenda harian, time-blocking tugas & deadline' : 'Unified schedule, meetings, targets & habits'}
+            actions={
+                <div className="flex items-center gap-2 flex-wrap">
                     {onGoToToday && (
                         <button
                             type="button"
@@ -107,7 +107,7 @@ export default function CalendarHeader({
                             </button>
 
                             {isOpen && (
-                                <div className="absolute left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-[70] origin-top">
+                                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-[70] origin-top-right">
                                     <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)}></div>
                                     
                                     <div className="flex items-center justify-between mb-3 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-2xl">
@@ -159,10 +159,7 @@ export default function CalendarHeader({
                             <ChevronRight size={15} />
                         </button>
                     </div>
-                </div>
-            }
-            actions={
-                <div className="flex items-center gap-2">
+
                     {/* Task Time-Blocking Drawer Trigger */}
                     {onOpenTaskDrawer && (
                         <button
