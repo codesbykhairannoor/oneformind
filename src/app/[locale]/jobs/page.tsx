@@ -158,7 +158,17 @@ export default function JobsPage() {
             // default: applied_date desc
             const dateA = a.applied_date ? new Date(a.applied_date).getTime() : 0;
             const dateB = b.applied_date ? new Date(b.applied_date).getTime() : 0;
-            return dateB - dateA;
+            if (dateB !== dateA) return dateB - dateA;
+
+            // Secondary sort: ensure temp/newest jobs stay immediately on top
+            const isTempA = typeof a.id === 'string' && a.id.startsWith('temp_');
+            const isTempB = typeof b.id === 'string' && b.id.startsWith('temp_');
+            if (isTempA && !isTempB) return -1;
+            if (!isTempA && isTempB) return 1;
+
+            const idA = Number(a.id) || 0;
+            const idB = Number(b.id) || 0;
+            return idB - idA;
         });
 
         return result;
