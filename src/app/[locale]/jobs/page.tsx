@@ -26,6 +26,7 @@ import {
     deserializeJobPayload 
 } from './lib/jobAnalytics';
 import ExportModal from '@/components/export/ExportModal';
+import ModuleHeader from '@/components/layout/ModuleHeader';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -432,58 +433,41 @@ export default function JobsPage() {
                 <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 transition-colors duration-500">
                     
                     {/* TOP NAVBAR / SUB HEADER */}
-                    <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 relative z-40 transition-colors duration-500">
-                        <div className="w-full max-w-[1800px] mx-auto min-w-0 px-4 sm:px-6 lg:px-8 py-3.5">
-                            <div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3 md:flex-nowrap">
-                                
-                                {/* Title & Pipeline Count Badge */}
-                                <div className="flex min-w-0 flex-1 items-center gap-3 md:flex-initial">
-                                    <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
-                                        <Briefcase size={18} />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <h1 className="text-sm sm:text-base font-black uppercase tracking-tight text-slate-800 dark:text-white truncate">
-                                            {isIndo ? 'Pusat Manajemen Lamaran & Karier' : 'Job Tracker & Career Command'}
-                                        </h1>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:block">
-                                            {isIndo ? 'Pipeline Lamaran • Multi-Round Interview • ATS Optimization' : 'Application Pipeline • Interview Hub • ATS Engine'}
-                                        </p>
-                                    </div>
-                                </div>
+                    <ModuleHeader
+                        icon={<Briefcase size={18} strokeWidth={2.5} />}
+                        title={isIndo ? 'Pusat Manajemen Lamaran & Karier' : 'Job Tracker & Career Command'}
+                        subtitle={isIndo ? 'Pipeline lamaran, jadwal interview & optimasi ATS' : 'Application pipeline, interview schedule & ATS optimization'}
+                        actions={
+                            <div className="flex items-center gap-2">
+                                {/* Master CV Setup Trigger */}
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsMasterModalOpen(true)}
+                                    className="h-10 px-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all flex items-center gap-2 group relative shadow-xs"
+                                >
+                                    <Briefcase size={15} className={hasMasterCv ? 'text-emerald-500' : 'text-slate-400'} />
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200 hidden md:inline">
+                                        {hasMasterCv ? (isIndo ? 'Master CV Terhubung' : 'Master CV Connected') : (isIndo ? 'Setup Master CV' : 'Setup Master CV')}
+                                    </span>
+                                    {!hasMasterCv && (
+                                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                    )}
+                                </button>
 
-                                {/* Actions: Master CV & New Job Button */}
-                                <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                                    {/* Master CV Setup Trigger */}
-                                    <button 
-                                        type="button"
-                                        onClick={() => setIsMasterModalOpen(true)}
-                                        className="px-3.5 sm:px-4 h-11 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all flex items-center gap-2 group relative shadow-sm"
-                                    >
-                                        <Briefcase size={16} className={hasMasterCv ? 'text-emerald-500' : 'text-slate-400'} />
-                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-200 hidden md:inline">
-                                            {hasMasterCv ? (isIndo ? 'Master CV Terhubung' : 'Master CV Connected') : (isIndo ? 'Setup Master CV' : 'Setup Master CV')}
-                                        </span>
-                                        {!hasMasterCv && (
-                                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                                        )}
-                                    </button>
-
-                                    {/* New Job Spreadsheet Button */}
-                                    <button 
-                                        type="button"
-                                        onClick={handleStartAddingRow}
-                                        className="bg-indigo-600 hover:bg-indigo-700 h-11 text-white font-black px-4 sm:px-6 rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2 shrink-0"
-                                    >
-                                        <Plus size={16} strokeWidth={3} />
-                                        <span className="text-xs font-black tracking-wide">
-                                            {isIndo ? 'Tambah Lamaran' : 'Add Application'}
-                                        </span>
-                                    </button>
-                                </div>
-
+                                {/* New Job Spreadsheet Button */}
+                                <button 
+                                    type="button"
+                                    onClick={handleStartAddingRow}
+                                    className="h-10 px-4 sm:px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-1.5 shrink-0"
+                                >
+                                    <Plus size={16} strokeWidth={3} />
+                                    <span>
+                                        {isIndo ? 'Tambah Lamaran' : 'Add Application'}
+                                    </span>
+                                </button>
                             </div>
-                        </div>
-                    </div>
+                        }
+                    />
 
                     {/* MAIN CONTAINER */}
                     <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 min-w-0 transition-all duration-500">
