@@ -320,11 +320,14 @@ export default function JobTable({
             {/* ==================== DESKTOP TABLE LAYOUT (>=lg) ==================== */}
             <div className="hidden lg:block bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden">
                 <div className="overflow-x-auto custom-scrollbar min-h-[450px]">
-                    <table className="w-full text-left border-collapse min-w-[850px]">
+                    <table className="w-full text-left border-collapse min-w-[920px]">
                         <thead className="bg-slate-50/90 dark:bg-slate-950/70 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 sticky top-0 z-10 backdrop-blur-md">
                             <tr>
-                                <th className="py-3.5 px-4 sm:px-6 min-w-[180px]">
-                                    {isIndo ? 'Perusahaan & Posisi' : 'Company & Title'}
+                                <th className="py-3.5 px-4 sm:px-6 min-w-[160px]">
+                                    {isIndo ? 'Perusahaan' : 'Company'}
+                                </th>
+                                <th className="py-3.5 px-4 min-w-[170px]">
+                                    {isIndo ? 'Posisi / Role' : 'Job Title'}
                                 </th>
                                 <th className="py-3.5 px-3 min-w-[110px]">
                                     {isIndo ? 'Lokasi & Model' : 'Location & Model'}
@@ -352,33 +355,35 @@ export default function JobTable({
                             {/* INLINE QUICK ADD ROW IN TABLE */}
                             {isAddingRow && (
                                 <tr className="bg-indigo-50/50 dark:bg-indigo-950/30 border-b-2 border-indigo-500 animate-in fade-in duration-200">
-                                    {/* Company & Title Inputs */}
+                                    {/* Company Input */}
                                     <td className="py-3 px-4 sm:px-6">
-                                        <div className="space-y-1">
-                                            <input
-                                                type="text"
-                                                autoFocus
-                                                placeholder={isIndo ? 'Nama Perusahaan' : 'Company Name'}
-                                                value={newCompany}
-                                                onChange={(e) => setNewCompany(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') handleSaveNewRow();
-                                                    if (e.key === 'Escape') setIsAddingRow(false);
-                                                }}
-                                                className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                                            />
-                                            <input
-                                                type="text"
-                                                placeholder={isIndo ? 'Posisi / Role' : 'Job Title'}
-                                                value={newTitle}
-                                                onChange={(e) => setNewTitle(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') handleSaveNewRow();
-                                                    if (e.key === 'Escape') setIsAddingRow(false);
-                                                }}
-                                                className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                                            />
-                                        </div>
+                                        <input
+                                            type="text"
+                                            autoFocus
+                                            placeholder={isIndo ? 'Nama Perusahaan' : 'Company Name'}
+                                            value={newCompany}
+                                            onChange={(e) => setNewCompany(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSaveNewRow();
+                                                if (e.key === 'Escape') setIsAddingRow(false);
+                                            }}
+                                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                        />
+                                    </td>
+
+                                    {/* Title Input */}
+                                    <td className="py-3 px-4">
+                                        <input
+                                            type="text"
+                                            placeholder={isIndo ? 'Posisi / Role' : 'Job Title'}
+                                            value={newTitle}
+                                            onChange={(e) => setNewTitle(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSaveNewRow();
+                                                if (e.key === 'Escape') setIsAddingRow(false);
+                                            }}
+                                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                        />
                                     </td>
 
                                     {/* Model Selector */}
@@ -454,21 +459,23 @@ export default function JobTable({
                                         onClick={() => onEdit(job)}
                                         className="hover:bg-indigo-50/30 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
                                     >
-                                        {/* Company & Title with Avatar Initial */}
-                                        <td className="py-3.5 px-6">
-                                            <div className="flex items-center gap-3">
+                                        {/* Company with Avatar Initial */}
+                                        <td className="py-3.5 px-4 sm:px-6">
+                                            <div className="flex items-center gap-2.5 min-w-0">
                                                 <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100 dark:border-indigo-900/40 shrink-0">
                                                     {job.company ? job.company.charAt(0).toUpperCase() : '💼'}
                                                 </div>
-                                                <div className="space-y-0.5 min-w-0">
-                                                    <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider block truncate">
-                                                        {job.company}
-                                                    </span>
-                                                    <h4 className="font-black text-slate-800 dark:text-white group-hover:text-indigo-600 transition truncate">
-                                                        {job.title}
-                                                    </h4>
-                                                </div>
+                                                <span className="font-bold text-slate-800 dark:text-slate-100 text-xs truncate max-w-[140px]" title={job.company}>
+                                                    {job.company || (isIndo ? 'Perusahaan' : 'Company')}
+                                                </span>
                                             </div>
+                                        </td>
+
+                                        {/* Job Title / Role */}
+                                        <td className="py-3.5 px-4">
+                                            <h4 className="font-black text-slate-800 dark:text-white group-hover:text-indigo-600 transition truncate max-w-[180px]" title={job.title}>
+                                                {job.title}
+                                            </h4>
                                         </td>
 
                                         {/* Location & Model */}
@@ -571,7 +578,7 @@ export default function JobTable({
 
                             {jobs.length === 0 && !isAddingRow && (
                                 <tr>
-                                    <td colSpan={7} className="py-20 text-center text-slate-400">
+                                    <td colSpan={8} className="py-20 text-center text-slate-400">
                                         <span className="text-4xl block mb-2">💼</span>
                                         <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
                                             {isIndo ? 'Belum ada data lamaran kerja.' : 'No job applications found.'}
