@@ -184,26 +184,23 @@ export default function JobTable({
     const locale = useLocale();
     const isIndo = locale === 'id';
 
-    // State for Inline Table Row Quick Add (Continuous Spreadsheet Entry)
-    const [isAddingRow, setIsAddingRow] = useState(false);
+    // Permanent Spreadsheet Quick Add Row State
     const [newCompany, setNewCompany] = useState('');
     const [newTitle, setNewTitle] = useState('');
-    const [newLocation, setNewLocation] = useState('Remote');
     const [newStatus, setNewStatus] = useState('applied');
     const [newWorkModel, setNewWorkModel] = useState('remote');
 
     const companyInputRef = useRef<HTMLInputElement>(null);
     const titleInputRef = useRef<HTMLInputElement>(null);
 
-    // Sync external active trigger
+    // Sync external active trigger: focus company input immediately
     useEffect(() => {
         if (isAddingRowActive) {
-            setIsAddingRow(true);
-            setTimeout(() => {
-                companyInputRef.current?.focus();
-            }, 60);
+            companyInputRef.current?.focus();
+            companyInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (onCloseAddingRow) onCloseAddingRow();
         }
-    }, [isAddingRowActive]);
+    }, [isAddingRowActive, onCloseAddingRow]);
 
     const handleSaveNewRow = () => {
         let comp = newCompany.trim();
@@ -225,26 +222,12 @@ export default function JobTable({
             onQuickAddJob(comp, tit, newStatus, newWorkModel);
         }
 
-        // Reset inputs and keep row open for continuous spreadsheet-style data entry!
+        // Reset inputs and keep focus for continuous, non-stop spreadsheet entry!
         setNewCompany('');
         setNewTitle('');
         setTimeout(() => {
             companyInputRef.current?.focus();
-        }, 50);
-    };
-
-    const handleCloseAddRow = () => {
-        setIsAddingRow(false);
-        if (onCloseAddingRow) onCloseAddingRow();
-    };
-
-    const getWorkModelBadge = (wm?: string) => {
-        switch (wm) {
-            case 'remote': return { text: 'Remote 🌐', color: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' };
-            case 'hybrid': return { text: 'Hybrid 🏢', color: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800' };
-            case 'onsite': return { text: 'On-site 📍', color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700' };
-            default: return null;
-        }
+        }, 40);
     };
 
     return (
@@ -254,138 +237,92 @@ export default function JobTable({
             <div className="flex items-center justify-between gap-3 px-1">
                 <div className="flex items-center gap-2">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                        {isIndo ? 'Daftar Spreadsheet Lamaran' : 'Application Spreadsheet Register'}
+                        {isIndo ? 'Spreadsheet Lamaran Kerja' : 'Job Application Spreadsheet'}
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 text-xs font-mono font-black border border-indigo-100 dark:border-indigo-900/40">
                         {jobs.length}
                     </span>
                 </div>
 
-                {!isAddingRow ? (
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setIsAddingRow(true);
-                            setTimeout(() => companyInputRef.current?.focus(), 50);
-                        }}
-                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5 active:scale-95"
-                    >
-                        <Plus size={14} strokeWidth={3} />
-                        <span>{isIndo ? '+ Baris Cepat (Spreadsheet)' : '+ Add Row (Spreadsheet)'}</span>
-                    </button>
-                ) : (
-                    <button
-                        type="button"
-                        onClick={handleCloseAddRow}
-                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1"
-                    >
-                        <X size={13} />
-                        <span>{isIndo ? 'Selesai / Tutup Baris' : 'Done / Close Row'}</span>
-                    </button>
-                )}
+                <button
+                    type="button"
+                    onClick={() => {
+                        companyInputRef.current?.focus();
+                        companyInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5 active:scale-95"
+                >
+                    <Plus size={14} strokeWidth={3} />
+                    <span>{isIndo ? 'Ketik Baris Baru' : 'Add New Row'}</span>
+                </button>
             </div>
 
             {/* ==================== MOBILE CARDS LAYOUT (<lg) ==================== */}
             <div className="lg:hidden space-y-3">
 
-                {/* MOBILE QUICK ADD APPLICATION FORM (<lg) */}
-                {isAddingRow && (
-                    <div className="bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/40 dark:from-slate-900 dark:via-indigo-950/30 dark:to-slate-900 rounded-3xl p-4 sm:p-5 border-2 border-indigo-500/40 shadow-xl shadow-indigo-500/10 space-y-3.5 animate-in fade-in slide-in-from-top-3 duration-300">
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
-                                <Sparkles size={14} className="text-indigo-500" />
-                                <span>{isIndo ? 'Tambah Cepat Lamaran (Ketik Terus-Menerus)' : 'Continuous Application Entry'}</span>
-                            </span>
-                            <button
-                                type="button"
-                                onClick={handleCloseAddRow}
-                                className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white transition"
-                                title={isIndo ? 'Tutup' : 'Close'}
-                            >
-                                <X size={14} />
-                            </button>
-                        </div>
+                {/* MOBILE PERMANENT SPREADSHEET INPUT CARD (<lg) */}
+                <div className="bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/40 dark:from-slate-900 dark:via-indigo-950/30 dark:to-slate-900 rounded-3xl p-4 sm:p-5 border-2 border-indigo-500/40 shadow-xl shadow-indigo-500/10 space-y-3">
+                    <span className="text-xs font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
+                        <Sparkles size={14} className="text-indigo-500" />
+                        <span>{isIndo ? 'Ketik Cepat Lamaran (Langsung Simpan)' : 'Quick Row Entry'}</span>
+                    </span>
 
-                        <div className="space-y-2">
-                            <input
-                                type="text"
-                                autoFocus
-                                placeholder={isIndo ? 'Nama Perusahaan (cth: Google, Tokopedia)' : 'Company Name (e.g. Google)'}
-                                value={newCompany}
-                                onChange={(e) => setNewCompany(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveNewRow();
-                                    if (e.key === 'Escape') handleCloseAddRow();
-                                }}
-                                className="w-full px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
-                            />
-                            <input
-                                type="text"
-                                placeholder={isIndo ? 'Posisi / Role (cth: Frontend Engineer)' : 'Job Title / Role (e.g. Frontend Dev)'}
-                                value={newTitle}
-                                onChange={(e) => setNewTitle(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveNewRow();
-                                    if (e.key === 'Escape') handleCloseAddRow();
-                                }}
-                                className="w-full px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1">
-                                    {isIndo ? 'Model Kerja' : 'Work Model'}
-                                </label>
-                                <select
-                                    value={newWorkModel}
-                                    onChange={(e) => setNewWorkModel(e.target.value)}
-                                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
-                                >
-                                    <option value="remote">Remote 🌐</option>
-                                    <option value="hybrid">Hybrid 🏢</option>
-                                    <option value="onsite">Onsite 📍</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1">
-                                    {isIndo ? 'Status Awal' : 'Initial Status'}
-                                </label>
-                                <select
-                                    value={newStatus}
-                                    onChange={(e) => setNewStatus(e.target.value)}
-                                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
-                                >
-                                    <option value="wishlist">💭 Wishlist</option>
-                                    <option value="applied">📤 Applied</option>
-                                    <option value="interview">🎯 Interview</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 pt-1">
-                            <button
-                                type="button"
-                                onClick={handleSaveNewRow}
-                                className="flex-1 py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
-                            >
-                                <Check size={15} strokeWidth={3} />
-                                <span>{isIndo ? 'Simpan & Tambah Lagi' : 'Save & Add Another'}</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleCloseAddRow}
-                                className="py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 text-xs font-bold transition"
-                            >
-                                {isIndo ? 'Tutup' : 'Close'}
-                            </button>
-                        </div>
+                    <div className="space-y-2">
+                        <input
+                            type="text"
+                            placeholder={isIndo ? 'Nama Perusahaan (cth: Google)' : 'Company Name'}
+                            value={newCompany}
+                            onChange={(e) => setNewCompany(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveNewRow();
+                            }}
+                            className="w-full px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                        />
+                        <input
+                            type="text"
+                            placeholder={isIndo ? 'Posisi / Role (cth: Frontend)' : 'Job Title / Role'}
+                            value={newTitle}
+                            onChange={(e) => setNewTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveNewRow();
+                            }}
+                            className="w-full px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                        />
                     </div>
-                )}
+
+                    <div className="grid grid-cols-2 gap-2">
+                        <select
+                            value={newWorkModel}
+                            onChange={(e) => setNewWorkModel(e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
+                        >
+                            <option value="remote">Remote 🌐</option>
+                            <option value="hybrid">Hybrid 🏢</option>
+                            <option value="onsite">Onsite 📍</option>
+                        </select>
+
+                        <select
+                            value={newStatus}
+                            onChange={(e) => setNewStatus(e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
+                        >
+                            <option value="wishlist">💭 Wishlist</option>
+                            <option value="applied">📤 Applied</option>
+                            <option value="interview">🎯 Interview</option>
+                        </select>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={handleSaveNewRow}
+                        className="w-full py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-xs font-black shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
+                    >
+                        <Plus size={15} strokeWidth={3} />
+                        <span>{isIndo ? 'Simpan Baris & Lanjut Ketik' : 'Add & Continue'}</span>
+                    </button>
+                </div>
 
                 {jobs.map((job) => {
-                    const wmBadge = getWorkModelBadge(job.work_model);
                     const salaryFormatted = formatSalaryDisplay(job.salary_min, job.salary_max, job.salary_currency, job.salary_period, isIndo);
 
                     return (
@@ -435,23 +372,20 @@ export default function JobTable({
                                 </div>
                             </div>
 
-                            {/* Badges */}
-                            <div className="flex flex-wrap gap-1.5 items-center text-[10px] font-bold">
-                                {job.location && (
-                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                                        <MapPin size={10} />
-                                        <span>{job.location}</span>
-                                    </span>
-                                )}
-
-                                {wmBadge && (
-                                    <span className={`px-2 py-0.5 rounded-md border ${wmBadge.color}`}>
-                                        {wmBadge.text}
-                                    </span>
-                                )}
+                            {/* Model Selector & Salary */}
+                            <div className="flex flex-wrap gap-2 items-center text-xs">
+                                <select
+                                    value={job.work_model || 'remote'}
+                                    onChange={(e) => onCellChange && onCellChange(job, 'work_model', e.target.value)}
+                                    className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold border border-slate-200 dark:border-slate-700 outline-none"
+                                >
+                                    <option value="remote">Remote 🌐</option>
+                                    <option value="hybrid">Hybrid 🏢</option>
+                                    <option value="onsite">On-site 📍</option>
+                                </select>
 
                                 {(job.salary_min || job.salary_max) && (
-                                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-mono">
+                                    <span className="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-mono text-xs font-bold">
                                         💰 {salaryFormatted}
                                     </span>
                                 )}
@@ -474,7 +408,7 @@ export default function JobTable({
                             <button
                                 type="button"
                                 onClick={() => onScan(job)}
-                                className="w-full py-2.5 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition"
+                                className="w-full py-2 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition"
                             >
                                 <Sparkles size={14} />
                                 <span>{isIndo ? 'Cek Keselarasan ATS' : 'ATS Resume Match Scan'}</span>
@@ -484,10 +418,10 @@ export default function JobTable({
                 })}
 
                 {jobs.length === 0 && (
-                    <div className="py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
-                        <span className="text-4xl">💼</span>
+                    <div className="py-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
+                        <span className="text-3xl">💼</span>
                         <p className="text-xs font-bold text-slate-400">
-                            {isIndo ? 'Tidak ada data lamaran kerja.' : 'No job applications found.'}
+                            {isIndo ? 'Belum ada data lamaran kerja.' : 'No job applications found.'}
                         </p>
                     </div>
                 )}
@@ -499,14 +433,14 @@ export default function JobTable({
                     <table className="w-full text-left border-collapse min-w-[980px]">
                         <thead className="bg-slate-50/90 dark:bg-slate-950/70 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 sticky top-0 z-10 backdrop-blur-md">
                             <tr>
-                                <th className="py-3 px-4 min-w-[160px]">
+                                <th className="py-3 px-4 min-w-[170px]">
                                     {isIndo ? 'Perusahaan' : 'Company'}
                                 </th>
                                 <th className="py-3 px-4 min-w-[170px]">
                                     {isIndo ? 'Posisi / Role' : 'Job Title'}
                                 </th>
                                 <th className="py-3 px-3 min-w-[130px]">
-                                    {isIndo ? 'Lokasi & Model' : 'Location & Model'}
+                                    {isIndo ? 'Model Kerja' : 'Work Model'}
                                 </th>
                                 <th className="py-3 px-3 min-w-[130px]">
                                     {isIndo ? 'Kompensasi Gaji' : 'Salary Range'}
@@ -520,7 +454,7 @@ export default function JobTable({
                                 <th className="py-3 px-2 min-w-[80px] text-center">
                                     {isIndo ? 'Interview' : 'Interviews'}
                                 </th>
-                                <th className="py-3 px-3 text-center min-w-[110px] w-[120px] shrink-0">
+                                <th className="py-3 px-3 text-center min-w-[100px] w-[110px] shrink-0">
                                     {isIndo ? 'Aksi' : 'Actions'}
                                 </th>
                             </tr>
@@ -528,113 +462,94 @@ export default function JobTable({
 
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
                             
-                            {/* INLINE QUICK ADD ROW IN TABLE (SPREADSHEET RAPID ENTRY) */}
-                            {isAddingRow && (
-                                <tr className="bg-indigo-50/60 dark:bg-indigo-950/40 border-b-2 border-indigo-500 animate-in fade-in duration-200">
-                                    {/* Company Input */}
-                                    <td className="py-2.5 px-3 sm:px-4">
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs shrink-0 border border-indigo-200 dark:border-indigo-800">
-                                                    {newCompany ? newCompany.charAt(0).toUpperCase() : '💼'}
-                                                </div>
-                                                <input
-                                                    ref={companyInputRef}
-                                                    type="text"
-                                                    autoFocus
-                                                    placeholder={isIndo ? 'Nama Perusahaan (cth: Google)' : 'Company Name'}
-                                                    value={newCompany}
-                                                    onChange={(e) => setNewCompany(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') handleSaveNewRow();
-                                                        if (e.key === 'Escape') handleCloseAddRow();
-                                                    }}
-                                                    className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
-                                                />
-                                            </div>
-                                            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block pl-9">
-                                                ↵ Enter: Simpan & Lanjut Baris Baru
-                                            </span>
+                            {/* PERMANENT INLINE QUICK ADD ROW (PURE SPREADSHEET ENTRY, ZERO CLOSE) */}
+                            <tr className="bg-indigo-50/40 dark:bg-indigo-950/30 border-b-2 border-indigo-500/50">
+                                {/* Company Input (Clean spreadsheet cell, no redundant hint text) */}
+                                <td className="py-2 px-3 sm:px-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs shrink-0 border border-indigo-200 dark:border-indigo-800">
+                                            {newCompany ? newCompany.charAt(0).toUpperCase() : '💼'}
                                         </div>
-                                    </td>
-
-                                    {/* Title Input */}
-                                    <td className="py-2.5 px-3 sm:px-4">
                                         <input
-                                            ref={titleInputRef}
+                                            ref={companyInputRef}
                                             type="text"
-                                            placeholder={isIndo ? 'Posisi / Role (cth: Frontend)' : 'Job Title'}
-                                            value={newTitle}
-                                            onChange={(e) => setNewTitle(e.target.value)}
+                                            placeholder={isIndo ? 'Nama Perusahaan' : 'Company Name'}
+                                            value={newCompany}
+                                            onChange={(e) => setNewCompany(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') handleSaveNewRow();
-                                                if (e.key === 'Escape') handleCloseAddRow();
                                             }}
-                                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
+                                            className="w-full px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
                                         />
-                                    </td>
+                                    </div>
+                                </td>
 
-                                    {/* Model & Location Selector */}
-                                    <td className="py-2.5 px-3">
-                                        <select
-                                            value={newWorkModel}
-                                            onChange={(e) => setNewWorkModel(e.target.value)}
-                                            className="px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none"
-                                        >
-                                            <option value="remote">Remote 🌐</option>
-                                            <option value="hybrid">Hybrid 🏢</option>
-                                            <option value="onsite">Onsite 📍</option>
-                                        </select>
-                                    </td>
+                                {/* Title Input */}
+                                <td className="py-2 px-3 sm:px-4">
+                                    <input
+                                        ref={titleInputRef}
+                                        type="text"
+                                        placeholder={isIndo ? 'Posisi / Role' : 'Job Title'}
+                                        value={newTitle}
+                                        onChange={(e) => setNewTitle(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') handleSaveNewRow();
+                                        }}
+                                        className="w-full px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
+                                    />
+                                </td>
 
-                                    {/* Salary Placeholder */}
-                                    <td className="py-2.5 px-3 text-slate-400 italic text-[11px]">
-                                        {isIndo ? 'Atur di sel tabel' : 'Set in cell'}
-                                    </td>
+                                {/* Model Selector (Clean single dropdown matching table rows) */}
+                                <td className="py-2 px-3">
+                                    <select
+                                        value={newWorkModel}
+                                        onChange={(e) => setNewWorkModel(e.target.value)}
+                                        className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
+                                    >
+                                        <option value="remote">Remote 🌐</option>
+                                        <option value="hybrid">Hybrid 🏢</option>
+                                        <option value="onsite">Onsite 📍</option>
+                                    </select>
+                                </td>
 
-                                    {/* Date */}
-                                    <td className="py-2.5 px-3 font-mono text-slate-500">
-                                        {new Date().toISOString().split('T')[0]}
-                                    </td>
+                                {/* Salary Placeholder */}
+                                <td className="py-2 px-3 text-slate-400 italic text-[11px]">
+                                    {isIndo ? 'Atur di sel' : 'Set in cell'}
+                                </td>
 
-                                    {/* Status Selector */}
-                                    <td className="py-2.5 px-3">
-                                        <select
-                                            value={newStatus}
-                                            onChange={(e) => setNewStatus(e.target.value)}
-                                            className="px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none"
-                                        >
-                                            <option value="wishlist">💭 Wishlist</option>
-                                            <option value="applied">📤 Applied</option>
-                                            <option value="interview">🎯 Interview</option>
-                                        </select>
-                                    </td>
+                                {/* Date */}
+                                <td className="py-2 px-3 font-mono text-slate-500">
+                                    {new Date().toISOString().split('T')[0]}
+                                </td>
 
-                                    <td className="py-2.5 px-2 text-center text-slate-400">-</td>
+                                {/* Status Selector */}
+                                <td className="py-2 px-3">
+                                    <select
+                                        value={newStatus}
+                                        onChange={(e) => setNewStatus(e.target.value)}
+                                        className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none shadow-xs"
+                                    >
+                                        <option value="wishlist">💭 Wishlist</option>
+                                        <option value="applied">📤 Applied</option>
+                                        <option value="interview">🎯 Interview</option>
+                                    </select>
+                                </td>
 
-                                    {/* Save / Cancel buttons */}
-                                    <td className="py-2.5 px-3 text-center min-w-[100px] w-[110px] shrink-0">
-                                        <div className="flex items-center justify-center gap-1.5 shrink-0">
-                                            <button
-                                                type="button"
-                                                onClick={handleSaveNewRow}
-                                                className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center shadow-md transition shrink-0"
-                                                title={isIndo ? 'Simpan & Tambah Baris Berikutnya' : 'Save & Add Next Row'}
-                                            >
-                                                <Check size={16} strokeWidth={3} />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={handleCloseAddRow}
-                                                className="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition shrink-0"
-                                                title={isIndo ? 'Selesai / Tutup' : 'Done / Close'}
-                                            >
-                                                <X size={16} strokeWidth={2.5} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
+                                <td className="py-2 px-2 text-center text-slate-400">-</td>
+
+                                {/* Save Button (NO CLOSE OPTION, JUST ENTER OR CLICK TO CONTINUOUSLY ADD) */}
+                                <td className="py-2 px-3 text-center min-w-[100px] w-[110px] shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={handleSaveNewRow}
+                                        className="w-full py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-sm transition"
+                                        title={isIndo ? 'Simpan Baris & Lanjut Ketik' : 'Save & Continue'}
+                                    >
+                                        <Check size={14} strokeWidth={3} />
+                                        <span>{isIndo ? 'Tambah' : 'Add'}</span>
+                                    </button>
+                                </td>
+                            </tr>
 
                             {jobs.map((job) => {
                                 const roundCount = job.interview_rounds?.length || 0;
@@ -669,25 +584,17 @@ export default function JobTable({
                                             />
                                         </td>
 
-                                        {/* Location & Model (Inline Spreadsheet Cells) */}
+                                        {/* Model Selector (CLEAN SINGLE SELECTOR, ZERO OVERLAPPING) */}
                                         <td className="py-2 px-3" onClick={(e) => e.stopPropagation()}>
-                                            <div className="space-y-1 min-w-[120px]">
-                                                <InlineSpreadsheetCell
-                                                    value={job.location || ''}
-                                                    placeholder={isIndo ? 'Lokasi' : 'Location'}
-                                                    onSave={(val) => onCellChange && onCellChange(job, 'location', val)}
-                                                    textClassName="font-bold text-slate-700 dark:text-slate-200 text-xs"
-                                                />
-                                                <select
-                                                    value={job.work_model || 'remote'}
-                                                    onChange={(e) => onCellChange && onCellChange(job, 'work_model', e.target.value)}
-                                                    className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 outline-none cursor-pointer hover:border-indigo-400 transition"
-                                                >
-                                                    <option value="remote">Remote 🌐</option>
-                                                    <option value="hybrid">Hybrid 🏢</option>
-                                                    <option value="onsite">On-site 📍</option>
-                                                </select>
-                                            </div>
+                                            <select
+                                                value={job.work_model || 'remote'}
+                                                onChange={(e) => onCellChange && onCellChange(job, 'work_model', e.target.value)}
+                                                className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer hover:border-indigo-400 transition shadow-xs"
+                                            >
+                                                <option value="remote">Remote 🌐</option>
+                                                <option value="hybrid">Hybrid 🏢</option>
+                                                <option value="onsite">On-site 📍</option>
+                                            </select>
                                         </td>
 
                                         {/* Salary Range (Spreadsheet Inline Editable Cell) */}
@@ -746,7 +653,7 @@ export default function JobTable({
                                         </td>
 
                                         {/* Actions */}
-                                        <td className="py-2 px-3 text-center min-w-[110px] w-[120px] shrink-0" onClick={(e) => e.stopPropagation()}>
+                                        <td className="py-2 px-3 text-center min-w-[100px] w-[110px] shrink-0" onClick={(e) => e.stopPropagation()}>
                                             <div className="flex items-center justify-center gap-1">
                                                 <button
                                                     type="button"
@@ -781,43 +688,20 @@ export default function JobTable({
                                 );
                             })}
 
-                            {jobs.length === 0 && !isAddingRow && (
-                                <tr>
-                                    <td colSpan={8} className="py-20 text-center text-slate-400">
-                                        <div className="max-w-xs mx-auto space-y-3">
-                                            <span className="text-3xl block">📑</span>
-                                            <p className="text-xs font-bold">
-                                                {isIndo ? 'Belum ada data lamaran di spreadsheet.' : 'No applications in spreadsheet yet.'}
-                                            </p>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setIsAddingRow(true);
-                                                    setTimeout(() => companyInputRef.current?.focus(), 50);
-                                                }}
-                                                className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition"
-                                            >
-                                                {isIndo ? '+ Tambah Baris Pertama' : '+ Add First Row'}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-
-                            {/* BOTTOM ROW SPREADSHEET RAPID TRIGGER */}
-                            {jobs.length > 0 && !isAddingRow && (
+                            {/* BOTTOM ROW SPREADSHEET TRIGGER (NO DOUBLE PLUS) */}
+                            {jobs.length > 0 && (
                                 <tr>
                                     <td colSpan={8} className="py-2.5 px-6 bg-slate-50/50 dark:bg-slate-950/40 border-t border-slate-100 dark:border-slate-800/80">
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setIsAddingRow(true);
-                                                setTimeout(() => companyInputRef.current?.focus(), 80);
+                                                companyInputRef.current?.focus();
+                                                companyInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                             }}
                                             className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1.5 transition py-1 px-2.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
                                         >
                                             <Plus size={14} strokeWidth={3} />
-                                            <span>{isIndo ? '+ Tambah Baris Baru (Mode Spreadsheet)' : '+ Add Row (Spreadsheet Mode)'}</span>
+                                            <span>{isIndo ? 'Ketik Baris Baru di Atas' : 'Add New Row'}</span>
                                         </button>
                                     </td>
                                 </tr>
