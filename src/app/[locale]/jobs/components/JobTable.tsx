@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { 
     Sparkles, Trash2, Edit3, MapPin, 
@@ -17,7 +17,73 @@ interface JobTableProps {
     onDelete: (jobOrId: JobRowItem | number | string) => void;
     onScan: (job: JobRowItem) => void;
     onStatusChange: (job: JobRowItem, newStatus: string) => void;
+    onCellChange?: (job: JobRowItem, field: 'company' | 'title', value: string) => void;
     onQuickAddJob?: (company: string, title: string, status: string, workModel: string) => void;
+}
+
+/**
+ * Clean Spreadsheet-Style Inline Editable Cell
+ */
+function InlineSpreadsheetCell({
+    value,
+    placeholder,
+    onSave,
+    textClassName = "",
+    icon,
+}: {
+    value: string;
+    placeholder?: string;
+    onSave?: (val: string) => void;
+    textClassName?: string;
+    icon?: React.ReactNode;
+}) {
+    const [currentVal, setCurrentVal] = useState(value);
+    const [isFocused, setIsFocused] = useState(false);
+
+    useEffect(() => {
+        setCurrentVal(value);
+    }, [value]);
+
+    const handleCommit = () => {
+        setIsFocused(false);
+        const trimmed = currentVal.trim();
+        if (onSave && trimmed !== value) {
+            onSave(trimmed);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.currentTarget.blur();
+        } else if (e.key === 'Escape') {
+            setCurrentVal(value);
+            e.currentTarget.blur();
+        }
+    };
+
+    return (
+        <div 
+            className="flex items-center gap-2.5 min-w-0 w-full"
+            onClick={(e) => e.stopPropagation()}
+        >
+            {icon}
+            <input
+                type="text"
+                value={currentVal}
+                placeholder={placeholder}
+                onFocus={() => setIsFocused(true)}
+                onBlur={handleCommit}
+                onChange={(e) => setCurrentVal(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className={`w-full bg-transparent px-2.5 py-1.5 rounded-xl transition-all truncate outline-none ${
+                    isFocused 
+                        ? 'bg-white dark:bg-slate-950 border border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs' 
+                        : 'border border-transparent hover:border-slate-300 dark:hover:border-slate-700/80 hover:bg-slate-100/60 dark:hover:bg-slate-800/50'
+                } ${textClassName}`}
+                title={currentVal || placeholder}
+            />
+        </div>
+    );
 }
 
 export default function JobTable({ 
@@ -26,21 +92,23 @@ export default function JobTable({
     onDelete, 
     onScan, 
     onStatusChange,
+    onCellChange,
     onQuickAddJob
 }: JobTableProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
 
-    // State for Inline Table Row Quick Add
+    // State for Inline Table Row Quick Add (Continuous Spreadsheet Entry)
     const [isAddingRow, setIsAddingRow] = useState(false);
     const [newCompany, setNewCompany] = useState('');
     const [newTitle, setNewTitle] = useState('');
     const [newStatus, setNewStatus] = useState('applied');
     const [newWorkModel, setNewWorkModel] = useState('remote');
 
-    const handleSaveNewRow = () => {
-        if (!newCompany.trim() && !newTitle.trim()) return;
+    const companyInputRef = useRef<HTMLInputElement>(null);
+    const titleInputRef = useRef<HTMLInputElement>(null);
 
+    const handleSaveNewRow = () => {
         let comp = newCompany.trim();
         let tit = newTitle.trim();
 
@@ -60,9 +128,12 @@ export default function JobTable({
             onQuickAddJob(comp, tit, newStatus, newWorkModel);
         }
 
+        // Reset inputs and keep row open for continuous spreadsheet-style data entry!
         setNewCompany('');
         setNewTitle('');
-        setIsAddingRow(false);
+        setTimeout(() => {
+            companyInputRef.current?.focus();
+        }, 50);
     };
 
     const getWorkModelBadge = (wm?: string) => {
@@ -352,42 +423,54 @@ export default function JobTable({
 
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
                             
-                            {/* INLINE QUICK ADD ROW IN TABLE */}
+                            {/* INLINE QUICK ADD ROW IN TABLE (SPREADSHEET RAPID ENTRY) */}
                             {isAddingRow && (
-                                <tr className="bg-indigo-50/50 dark:bg-indigo-950/30 border-b-2 border-indigo-500 animate-in fade-in duration-200">
+                                <tr className="bg-indigo-50/60 dark:bg-indigo-950/40 border-b-2 border-indigo-500 animate-in fade-in duration-200">
                                     {/* Company Input */}
-                                    <td className="py-3 px-4 sm:px-6">
-                                        <input
-                                            type="text"
-                                            autoFocus
-                                            placeholder={isIndo ? 'Nama Perusahaan' : 'Company Name'}
-                                            value={newCompany}
-                                            onChange={(e) => setNewCompany(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') handleSaveNewRow();
-                                                if (e.key === 'Escape') setIsAddingRow(false);
-                                            }}
-                                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                                        />
+                                    <td className="py-2.5 px-3 sm:px-4">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs shrink-0 border border-indigo-200 dark:border-indigo-800">
+                                                    {newCompany ? newCompany.charAt(0).toUpperCase() : '💼'}
+                                                </div>
+                                                <input
+                                                    ref={companyInputRef}
+                                                    type="text"
+                                                    autoFocus
+                                                    placeholder={isIndo ? 'Nama Perusahaan (cth: Google)' : 'Company Name'}
+                                                    value={newCompany}
+                                                    onChange={(e) => setNewCompany(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') handleSaveNewRow();
+                                                        if (e.key === 'Escape') setIsAddingRow(false);
+                                                    }}
+                                                    className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
+                                                />
+                                            </div>
+                                            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block pl-9">
+                                                ↵ Enter: Simpan & Lanjut Baris Baru
+                                            </span>
+                                        </div>
                                     </td>
 
                                     {/* Title Input */}
-                                    <td className="py-3 px-4">
+                                    <td className="py-2.5 px-3 sm:px-4">
                                         <input
+                                            ref={titleInputRef}
                                             type="text"
-                                            placeholder={isIndo ? 'Posisi / Role' : 'Job Title'}
+                                            placeholder={isIndo ? 'Posisi / Role (cth: Frontend)' : 'Job Title'}
                                             value={newTitle}
                                             onChange={(e) => setNewTitle(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') handleSaveNewRow();
                                                 if (e.key === 'Escape') setIsAddingRow(false);
                                             }}
-                                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
                                         />
                                     </td>
 
                                     {/* Model Selector */}
-                                    <td className="py-3 px-3">
+                                    <td className="py-2.5 px-3">
                                         <select
                                             value={newWorkModel}
                                             onChange={(e) => setNewWorkModel(e.target.value)}
@@ -400,17 +483,17 @@ export default function JobTable({
                                     </td>
 
                                     {/* Salary Placeholder */}
-                                    <td className="py-3 px-3 text-slate-400 italic text-[11px]">
-                                        {isIndo ? 'Edit setelah simpan' : 'Set in details'}
+                                    <td className="py-2.5 px-3 text-slate-400 italic text-[11px]">
+                                        {isIndo ? 'Atur di detail' : 'Set in details'}
                                     </td>
 
                                     {/* Date */}
-                                    <td className="py-3 px-3 font-mono text-slate-500">
+                                    <td className="py-2.5 px-3 font-mono text-slate-500">
                                         {new Date().toISOString().split('T')[0]}
                                     </td>
 
                                     {/* Status Selector */}
-                                    <td className="py-3 px-3">
+                                    <td className="py-2.5 px-3">
                                         <select
                                             value={newStatus}
                                             onChange={(e) => setNewStatus(e.target.value)}
@@ -422,16 +505,16 @@ export default function JobTable({
                                         </select>
                                     </td>
 
-                                    <td className="py-3 px-2 text-center text-slate-400">-</td>
+                                    <td className="py-2.5 px-2 text-center text-slate-400">-</td>
 
                                     {/* Save / Cancel buttons */}
-                                    <td className="py-3 px-3 text-center min-w-[100px] w-[110px] shrink-0">
+                                    <td className="py-2.5 px-3 text-center min-w-[100px] w-[110px] shrink-0">
                                         <div className="flex items-center justify-center gap-1.5 shrink-0">
                                             <button
                                                 type="button"
                                                 onClick={handleSaveNewRow}
                                                 className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center shadow-md transition shrink-0"
-                                                title={isIndo ? 'Simpan Lamaran' : 'Save Application'}
+                                                title={isIndo ? 'Simpan & Tambah Baris Berikutnya' : 'Save & Add Next Row'}
                                             >
                                                 <Check size={16} strokeWidth={3} />
                                             </button>
@@ -439,7 +522,7 @@ export default function JobTable({
                                                 type="button"
                                                 onClick={() => setIsAddingRow(false)}
                                                 className="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition shrink-0"
-                                                title={isIndo ? 'Batal' : 'Cancel'}
+                                                title={isIndo ? 'Selesai / Tutup' : 'Done / Close'}
                                             >
                                                 <X size={16} strokeWidth={2.5} />
                                             </button>
@@ -459,23 +542,29 @@ export default function JobTable({
                                         onClick={() => onEdit(job)}
                                         className="hover:bg-indigo-50/30 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
                                     >
-                                        {/* Company with Avatar Initial */}
-                                        <td className="py-3.5 px-4 sm:px-6">
-                                            <div className="flex items-center gap-2.5 min-w-0">
-                                                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100 dark:border-indigo-900/40 shrink-0">
-                                                    {job.company ? job.company.charAt(0).toUpperCase() : '💼'}
-                                                </div>
-                                                <span className="font-bold text-slate-800 dark:text-slate-100 text-xs truncate max-w-[140px]" title={job.company}>
-                                                    {job.company || (isIndo ? 'Perusahaan' : 'Company')}
-                                                </span>
-                                            </div>
+                                        {/* Company with Avatar Initial (Spreadsheet Cell) */}
+                                        <td className="py-2 px-3 sm:px-4">
+                                            <InlineSpreadsheetCell
+                                                value={job.company}
+                                                placeholder={isIndo ? 'Perusahaan' : 'Company'}
+                                                onSave={(val) => onCellChange && onCellChange(job, 'company', val)}
+                                                textClassName="font-bold text-slate-800 dark:text-slate-100 text-xs"
+                                                icon={
+                                                    <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100 dark:border-indigo-900/40 shrink-0">
+                                                        {job.company ? job.company.charAt(0).toUpperCase() : '💼'}
+                                                    </div>
+                                                }
+                                            />
                                         </td>
 
-                                        {/* Job Title / Role */}
-                                        <td className="py-3.5 px-4">
-                                            <h4 className="font-black text-slate-800 dark:text-white group-hover:text-indigo-600 transition truncate max-w-[180px]" title={job.title}>
-                                                {job.title}
-                                            </h4>
+                                        {/* Job Title / Role (Spreadsheet Cell) */}
+                                        <td className="py-2 px-3 sm:px-4">
+                                            <InlineSpreadsheetCell
+                                                value={job.title}
+                                                placeholder={isIndo ? 'Posisi / Role' : 'Job Title'}
+                                                onSave={(val) => onCellChange && onCellChange(job, 'title', val)}
+                                                textClassName="font-black text-slate-800 dark:text-white text-xs group-hover:text-indigo-600"
+                                            />
                                         </td>
 
                                         {/* Location & Model */}
@@ -586,6 +675,25 @@ export default function JobTable({
                                         <p className="text-xs text-slate-400 mt-1">
                                             {isIndo ? 'Gunakan bar input di atas atau klik tombol Tambah Baris Baru.' : 'Use the quick add bar above or click Add Row.'}
                                         </p>
+                                    </td>
+                                </tr>
+                            )}
+
+                            {/* BOTTOM ROW SPREADSHEET RAPID TRIGGER */}
+                            {jobs.length > 0 && !isAddingRow && (
+                                <tr>
+                                    <td colSpan={8} className="py-2.5 px-6 bg-slate-50/50 dark:bg-slate-950/40 border-t border-slate-100 dark:border-slate-800/80">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsAddingRow(true);
+                                                setTimeout(() => companyInputRef.current?.focus(), 80);
+                                            }}
+                                            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1.5 transition py-1 px-2.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
+                                        >
+                                            <Plus size={14} strokeWidth={3} />
+                                            <span>{isIndo ? '+ Tambah Baris Baru (Mode Spreadsheet)' : '+ Add Row (Spreadsheet Mode)'}</span>
+                                        </button>
                                     </td>
                                 </tr>
                             )}

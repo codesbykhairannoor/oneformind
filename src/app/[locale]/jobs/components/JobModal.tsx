@@ -104,11 +104,41 @@ export default function JobModal({
     if (!show) return null;
 
     const handleSave = () => {
-        if (!form.company?.trim() || !form.title?.trim()) {
-            alert(isIndo ? 'Nama Perusahaan & Posisi wajib diisi!' : 'Company name and Job title are required!');
-            return;
-        }
-        onSave(form);
+        const comp = form.company?.trim() || (isIndo ? 'Perusahaan Target' : 'Target Company');
+        const tit = form.title?.trim() || (isIndo ? 'Posisi Lamaran' : 'Job Title');
+        onSave({ ...form, company: comp, title: tit });
+    };
+
+    const handleSaveAndAddAnother = () => {
+        const comp = form.company?.trim() || (isIndo ? 'Perusahaan Target' : 'Target Company');
+        const tit = form.title?.trim() || (isIndo ? 'Posisi Lamaran' : 'Job Title');
+        onSave({ ...form, company: comp, title: tit });
+        setForm({
+            id: '',
+            company: '',
+            title: '',
+            location: 'Remote',
+            applied_date: new Date().toISOString().split('T')[0],
+            status: 'applied',
+            work_model: 'remote',
+            job_type: 'fulltime',
+            salary_min: null,
+            salary_max: null,
+            salary_currency: 'IDR',
+            salary_period: 'monthly',
+            benefits: '',
+            recruiter_name: '',
+            recruiter_email: '',
+            recruiter_linkedin: '',
+            follow_up_date: null,
+            follow_up_status: 'pending',
+            interview_rounds: [],
+            star_situation: '',
+            star_task: '',
+            star_action: '',
+            star_result: '',
+            notes: ''
+        });
     };
 
     // Interview Round Helpers
@@ -778,6 +808,16 @@ export default function JobModal({
                                     <span>ATS Scan</span>
                                 </button>
                             )}
+
+                            <button
+                                type="button"
+                                onClick={handleSaveAndAddAnother}
+                                title={isIndo ? 'Simpan lamaran ini dan buka form baru tanpa menutup popup' : 'Save and immediately add another'}
+                                className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 active:scale-95"
+                            >
+                                <Plus size={14} />
+                                <span>{isIndo ? 'Simpan & Tambah Lagi' : 'Save & Add Another'}</span>
+                            </button>
 
                             <button
                                 type="button"

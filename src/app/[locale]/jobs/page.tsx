@@ -376,6 +376,29 @@ export default function JobsPage() {
         }
     };
 
+    const handleInlineCellUpdate = async (job: JobRowItem, field: 'company' | 'title', value: string) => {
+        const val = value.trim();
+        if (job[field] === val) return;
+        const fallback = field === 'company' 
+            ? (isIndo ? 'Perusahaan Target' : 'Target Company') 
+            : (isIndo ? 'Posisi Lamaran' : 'Job Title');
+        const updated: JobRowItem = { ...job, [field]: val || fallback };
+
+        setJobs(prev => prev.map(j => j.id === job.id ? updated : j));
+
+        try {
+            const payload = serializeJobPayload(updated);
+            await fetch(`/api/jobs/${job.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            mutateJobs();
+        } catch (err) {
+            console.error('Failed to update job cell:', err);
+        }
+    };
+
     const handleRequestDelete = (jobOrId: JobRowItem | number | string) => {
         if (typeof jobOrId === 'object' && jobOrId !== null) {
             setJobToDelete(jobOrId);
@@ -535,6 +558,7 @@ export default function JobsPage() {
                                 onDelete={handleRequestDelete}
                                 onScan={handleOpenScan}
                                 onStatusChange={handleStatusChange}
+                                onCellChange={handleInlineCellUpdate}
                                 onQuickAddJob={(comp, tit, st, wm) => handleQuickAddJob(comp, tit, st, wm)}
                             />
                         )}
