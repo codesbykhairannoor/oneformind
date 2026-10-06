@@ -16,7 +16,6 @@ import JobFilterBar, { JobFilterParams, JobViewMode } from './components/JobFilt
 import JobTable from './components/JobTable';
 import JobInterviewsCalendarView from './components/JobInterviewsCalendarView';
 import JobOfferComparisonModal from './components/JobOfferComparisonModal';
-import JobModal from './components/JobModal';
 import JobDetailDrawer from './components/JobDetailDrawer';
 import MasterCvModal from './components/MasterCvModal';
 import ResumeAiModal from './components/ResumeAiModal';
@@ -68,9 +67,8 @@ export default function JobsPage() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [selectedJobForDrawer, setSelectedJobForDrawer] = useState<JobRowItem | null>(null);
 
-    // Full Modal state (For comprehensive editing)
-    const [isJobModalOpen, setIsJobModalOpen] = useState(false);
-    const [selectedJobForEdit, setSelectedJobForEdit] = useState<JobRowItem | null>(null);
+    // Spreadsheet Inline Adding Row Trigger
+    const [isAddingRowActive, setIsAddingRowActive] = useState(false);
     
     const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
     const [isAiModalOpen, setIsAiModalOpen] = useState(false);
@@ -172,40 +170,8 @@ export default function JobsPage() {
         setIsDrawerOpen(true);
     };
 
-    const handleOpenCreateModal = (defaultStatus = 'applied') => {
-        setSelectedJobForEdit({
-            id: '',
-            company: '',
-            title: '',
-            location: 'Remote',
-            applied_date: new Date().toISOString().split('T')[0],
-            status: defaultStatus,
-            work_model: 'remote',
-            job_type: 'fulltime',
-            salary_min: null,
-            salary_max: null,
-            salary_currency: 'IDR',
-            salary_period: 'monthly',
-            benefits: '',
-            recruiter_name: '',
-            recruiter_email: '',
-            recruiter_linkedin: '',
-            follow_up_date: null,
-            follow_up_status: 'pending',
-            interview_rounds: [],
-            star_situation: '',
-            star_task: '',
-            star_action: '',
-            star_result: '',
-            notes: ''
-        });
-        setIsJobModalOpen(true);
-    };
-
-    const handleOpenEditModal = (job: JobRowItem) => {
-        setIsDrawerOpen(false);
-        setSelectedJobForEdit(job);
-        setIsJobModalOpen(true);
+    const handleStartAddingRow = () => {
+        setIsAddingRowActive(true);
     };
 
     // Cross-Module Life OS: Auto-Complete Job Application Habit
@@ -310,7 +276,6 @@ export default function JobsPage() {
     };
 
     const handleSaveJob = async (jobForm: JobRowItem) => {
-        setIsJobModalOpen(false);
         setIsDrawerOpen(false);
 
         const isNew = !jobForm.id || String(jobForm.id).startsWith('temp_');
@@ -376,13 +341,20 @@ export default function JobsPage() {
         }
     };
 
-    const handleInlineCellUpdate = async (job: JobRowItem, field: 'company' | 'title', value: string) => {
-        const val = value.trim();
-        if (job[field] === val) return;
-        const fallback = field === 'company' 
-            ? (isIndo ? 'Perusahaan Target' : 'Target Company') 
-            : (isIndo ? 'Posisi Lamaran' : 'Job Title');
-        const updated: JobRowItem = { ...job, [field]: val || fallback };
+    const handleInlineCellUpdate = async (job: JobRowItem, field: keyof JobRowItem, value: any) => {
+        if (job[field] === value) return;
+        let finalVal = value;
+        if (typeof value === 'string') {
+            const val = value.trim();
+            if (field === 'company') {
+                finalVal = val || (isIndo ? 'Perusahaan Target' : 'Target Company');
+            } else if (field === 'title') {
+                finalVal = val || (isIndo ? 'Posisi Lamaran' : 'Job Title');
+            } else {
+                finalVal = val;
+            }
+        }
+        const updated: JobRowItem = { ...job, [field]: finalVal };
 
         setJobs(prev => prev.map(j => j.id === job.id ? updated : j));
 
@@ -494,15 +466,15 @@ export default function JobsPage() {
                                         )}
                                     </button>
 
-                                    {/* New Job Full Modal Button */}
+                                    {/* New Job Spreadsheet Button */}
                                     <button 
                                         type="button"
-                                        onClick={() => handleOpenCreateModal('applied')}
+                                        onClick={handleStartAddingRow}
                                         className="bg-indigo-600 hover:bg-indigo-700 h-11 text-white font-black px-4 sm:px-6 rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2 shrink-0"
                                     >
                                         <Plus size={16} strokeWidth={3} />
                                         <span className="text-xs font-black tracking-wide">
-                                            {isIndo ? 'Tambah Lamaran' : 'New Application'}
+                                            {isIndo ? 'Tambah Lamaran' : 'Add Application'}
                                         </span>
                                     </button>
                                 </div>
@@ -550,7 +522,7 @@ export default function JobsPage() {
                             onOpenExportModal={() => setIsExportOpen(true)}
                         />
 
-                        {/* ================= VIEW 1: TABLE VIEW (PRIMARY COMMAND REGISTER) ================= */}
+                        {/* ================= VIEW 1: TABLE VIEW (SPREADSHEET REGISTER) ================= */}
                         {viewMode === 'table' && (
                             <JobTable
                                 jobs={filteredJobs}
@@ -560,6 +532,8 @@ export default function JobsPage() {
                                 onStatusChange={handleStatusChange}
                                 onCellChange={handleInlineCellUpdate}
                                 onQuickAddJob={(comp, tit, st, wm) => handleQuickAddJob(comp, tit, st, wm)}
+                                isAddingRowActive={isAddingRowActive}
+                                onCloseAddingRow={() => setIsAddingRowActive(false)}
                             />
                         )}
 
@@ -585,22 +559,11 @@ export default function JobsPage() {
 
                     {/* MODALS & DRAWERS */}
                     
-                    {/* Fast Slide-Over Drawer Inspector */}
+                    {/* Fast Slide-Over Drawer Inspector (Notion / Linear Style) */}
                     <JobDetailDrawer
                         show={isDrawerOpen}
                         job={selectedJobForDrawer}
                         onClose={() => setIsDrawerOpen(false)}
-                        onSave={handleSaveJob}
-                        onDelete={handleRequestDelete}
-                        onScanATS={handleOpenScan}
-                        onOpenFullModal={handleOpenEditModal}
-                    />
-
-                    {/* Full Create / Edit Job Modal */}
-                    <JobModal
-                        show={isJobModalOpen}
-                        job={selectedJobForEdit}
-                        onClose={() => setIsJobModalOpen(false)}
                         onSave={handleSaveJob}
                         onDelete={handleRequestDelete}
                         onScanATS={handleOpenScan}
