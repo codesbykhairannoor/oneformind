@@ -15,12 +15,13 @@ interface GoalGridProps {
     onDeleteMilestone?: (goal: GoalItem, mId: number | string | null | undefined) => void;
     onCompleteGoal?: (goal: GoalItem) => void;
     onMarkAsActive?: (goal: GoalItem) => void;
+    onOpenNotes?: (goal: GoalItem) => void;
 }
 
 export default function GoalGrid({
     goals, onEdit, onDelete, onToggleMilestone,
     onAddMilestone, onSaveMilestone, onDeleteMilestone,
-    onCompleteGoal, onMarkAsActive
+    onCompleteGoal, onMarkAsActive, onOpenNotes
 }: GoalGridProps) {
     const t = useTranslations();
 
@@ -33,6 +34,7 @@ export default function GoalGrid({
                     goal={goal}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onOpenNotes={onOpenNotes}
                     onToggleMilestone={onToggleMilestone}
                     onAddMilestone={onAddMilestone}
                     onSaveMilestone={onSaveMilestone}

@@ -4,7 +4,7 @@ import React from 'react';
 import { useLocale } from 'next-intl';
 import { 
     Plus, CheckCircle2, AlertTriangle, PlayCircle, 
-    Sparkles, Edit3, Trash2, ArrowRight, Zap, Target
+    Sparkles, Edit3, Trash2, ArrowRight, Zap, Target, FileText
 } from 'lucide-react';
 import { GoalItem, calculateGoalProgress, calculateGoalPace } from '../lib/goalPaceCalculator';
 
@@ -12,6 +12,7 @@ interface GoalKanbanViewProps {
     goals: GoalItem[];
     onEdit: (goal: GoalItem) => void;
     onDelete: (id: number | string) => void;
+    onOpenNotes?: (goal: GoalItem) => void;
     onQuickIncrement?: (goal: GoalItem, delta: number) => void;
     onCompleteGoal: (goal: GoalItem) => void;
     onMarkAsActive: (goal: GoalItem) => void;
@@ -22,6 +23,7 @@ export default function GoalKanbanView({
     goals,
     onEdit,
     onDelete,
+    onOpenNotes,
     onQuickIncrement,
     onCompleteGoal,
     onMarkAsActive,
@@ -128,6 +130,14 @@ export default function GoalKanbanView({
                                             </div>
 
                                             <div className="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onOpenNotes?.(goal)}
+                                                    className={`p-1 rounded-lg ${goal.notes ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60' : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                                                    title={isIndo ? 'Catatan & Refleksi' : 'Notes & Reflection'}
+                                                >
+                                                    <FileText size={13} />
+                                                </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onEdit(goal)}

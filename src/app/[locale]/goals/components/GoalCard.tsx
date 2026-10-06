@@ -9,7 +9,8 @@ import {
     ChevronRight, Zap, CheckCircle2, Sparkles, Star,
     Heart, DollarSign, Briefcase, GraduationCap, Users, 
     Plane, Palette, Dumbbell, Music, Code, Camera, BookOpen, 
-    Gamepad2, ShieldAlert, Compass, Plus, Minus, Link2, Layers
+    Gamepad2, ShieldAlert, Compass, Plus, Minus, Link2, Layers,
+    FileText
 } from 'lucide-react';
 import MilestoneItem, { Milestone } from './MilestoneItem';
 import { 
@@ -27,6 +28,7 @@ interface GoalCardProps {
     goal: GoalItem;
     onEdit?: (goal: GoalItem) => void;
     onDelete?: (id: number | string) => void;
+    onOpenNotes?: (goal: GoalItem) => void;
     onToggleMilestone?: (goal: GoalItem, m: Milestone) => void;
     onAddMilestone?: (goal: GoalItem) => void;
     onSaveMilestone?: (goal: GoalItem, data: Milestone) => void;
@@ -44,6 +46,7 @@ export default function GoalCard({
     goal,
     onEdit,
     onDelete,
+    onOpenNotes,
     onToggleMilestone,
     onAddMilestone,
     onSaveMilestone,
@@ -184,8 +187,25 @@ export default function GoalCard({
                     </button>
                 </div>
 
-                {/* Edit & Delete Actions in Top Right */}
+                {/* Notes, Edit & Delete Actions in Top Right */}
                 <div className="absolute top-4 right-4 flex gap-1.5 z-20">
+                    <button 
+                        type="button"
+                        onClick={() => !isSavingOrTemp && onOpenNotes?.(goal)} 
+                        className={`w-8 h-8 rounded-full border text-white flex items-center justify-center transition-all shadow-md relative ${
+                            isSavingOrTemp 
+                                ? 'bg-white/10 cursor-not-allowed opacity-50' 
+                                : goal.notes 
+                                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-indigo-500/30' 
+                                    : 'bg-black/40 border-white/20 hover:bg-white hover:text-indigo-600'
+                        }`}
+                        title={isIndo ? "Catatan & Refleksi Target" : "Goal Notes & Reflection"}
+                    >
+                        <FileText className="w-3.5 h-3.5" />
+                        {goal.notes && (
+                            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-white" />
+                        )}
+                    </button>
                     <button 
                         type="button"
                         onClick={() => !isSavingOrTemp && onEdit?.(goal)} 
@@ -632,7 +652,30 @@ export default function GoalCard({
                     </div>
                 )}
 
-                {/* 5. PSYCHOLOGICAL "THE WHY" & WOOP ACCORDION */}
+                {/* 5. NOTES & REFLECTION BUTTON */}
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                        type="button"
+                        onClick={() => onOpenNotes?.(goal)}
+                        className="w-full py-2 px-3 rounded-xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-100/60 dark:hover:bg-indigo-900/40 transition flex items-center justify-between text-xs font-bold text-indigo-700 dark:text-indigo-300 group/notes"
+                    >
+                        <span className="flex items-center gap-1.5 min-w-0">
+                            <FileText size={13} className="text-indigo-500 shrink-0" />
+                            <span className="truncate">{isIndo ? 'Catatan & Log Refleksi' : 'Notes & Reflection Log'}</span>
+                        </span>
+                        <span className="text-[10px] font-black uppercase text-indigo-500 flex items-center gap-1 group-hover/notes:translate-x-0.5 transition-transform shrink-0">
+                            <span>{goal.notes ? (isIndo ? 'Lihat / Edit' : 'View / Edit') : (isIndo ? '+ Tulis' : '+ Write')}</span>
+                            <ChevronRight size={11} />
+                        </span>
+                    </button>
+                    {goal.notes && (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 italic px-1 pt-1">
+                            "{goal.notes}"
+                        </p>
+                    )}
+                </div>
+
+                {/* 6. PSYCHOLOGICAL "THE WHY" & WOOP ACCORDION */}
                 {(goal.core_why || goal.obstacle || goal.reward) && (
                     <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
                         <button

@@ -46,6 +46,7 @@ export interface GoalItem {
     obstacle?: string;
     obstacle_plan?: string;
     reward?: string;
+    notes?: string;
     
     // Dates & Visuals
     start_date?: string | null;

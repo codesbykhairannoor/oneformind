@@ -14,6 +14,7 @@ import GoalTimelineView from './components/GoalTimelineView';
 import GoalWheelOfLifeView from './components/GoalWheelOfLifeView';
 import GoalCelebrationModal from './components/GoalCelebrationModal';
 import GoalDeleteModal from './components/GoalDeleteModal';
+import GoalNotesModal from './components/GoalNotesModal';
 import GatedPage from '@/components/GatedPage';
 import { Milestone } from './components/MilestoneItem';
 import { 
@@ -54,6 +55,9 @@ export default function GoalsPage() {
 
     const [celebratingGoal, setCelebratingGoal] = useState<GoalItem | null>(null);
     const [isCelebrationOpen, setIsCelebrationOpen] = useState(false);
+
+    // Notes & Reflection Modal state
+    const [notesGoal, setNotesGoal] = useState<GoalItem | null>(null);
 
     const [hasMounted, setHasMounted] = useState(false);
 
@@ -252,6 +256,7 @@ export default function GoalsPage() {
                 obstacle: g.obstacle || meta.obstacle || '',
                 obstacle_plan: g.obstacle_plan || g.obstaclePlan || meta.obstacle_plan || '',
                 reward: g.reward || meta.reward || '',
+                notes: g.notes || meta.notes || '',
                 startDate: goalStartDate,
                 start_date: goalStartDate || '',
                 endDate: goalEndDate,
@@ -461,6 +466,7 @@ export default function GoalsPage() {
             obstacle: form.obstacle || '',
             obstacle_plan: form.obstacle_plan || '',
             reward: form.reward || '',
+            notes: form.notes || '',
             progress_type: form.type || 'milestones'
         });
 
@@ -599,6 +605,61 @@ export default function GoalsPage() {
         } catch (error) {
             console.error('Failed to save goal:', error);
             await mutateGoals();
+        }
+    };
+
+    const handleSaveGoalNotes = async (
+        targetGoal: GoalItem, 
+        updatedNotes: string, 
+        updatedWoop?: { core_why?: string; obstacle?: string; obstacle_plan?: string; reward?: string }
+    ) => {
+        // Optimistically update goals state
+        setGoals(prev => prev.map(g => {
+            if (String(g.id) !== String(targetGoal.id)) return g;
+            return {
+                ...g,
+                notes: updatedNotes,
+                ...(updatedWoop ? updatedWoop : {})
+            };
+        }));
+        setNotesGoal(prev => prev && String(prev.id) === String(targetGoal.id) ? {
+            ...prev,
+            notes: updatedNotes,
+            ...(updatedWoop ? updatedWoop : {})
+        } : prev);
+
+        let meta: any = {};
+        if (targetGoal.specific_days && typeof targetGoal.specific_days === 'string') {
+            try { meta = JSON.parse(targetGoal.specific_days); } catch {}
+        } else if (targetGoal.specific_days && typeof targetGoal.specific_days === 'object') {
+            meta = Object.assign({}, targetGoal.specific_days as Record<string, any>);
+        }
+        meta.notes = updatedNotes;
+        if (updatedWoop?.core_why !== undefined) meta.core_why = updatedWoop.core_why;
+        if (updatedWoop?.obstacle !== undefined) meta.obstacle = updatedWoop.obstacle;
+        if (updatedWoop?.obstacle_plan !== undefined) meta.obstacle_plan = updatedWoop.obstacle_plan;
+        if (updatedWoop?.reward !== undefined) meta.reward = updatedWoop.reward;
+
+        const specificMetadata = JSON.stringify(meta);
+
+        try {
+            await fetch(`/api/goals/${targetGoal.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: targetGoal.title,
+                    notes: updatedNotes,
+                    core_why: updatedWoop?.core_why ?? targetGoal.core_why,
+                    obstacle: updatedWoop?.obstacle ?? targetGoal.obstacle,
+                    obstacle_plan: updatedWoop?.obstacle_plan ?? targetGoal.obstacle_plan,
+                    reward: updatedWoop?.reward ?? targetGoal.reward,
+                    specificDays: specificMetadata,
+                    specific_days: specificMetadata
+                })
+            });
+            await mutateGoals();
+        } catch (err) {
+            console.error('Failed to update goal notes:', err);
         }
     };
 
@@ -966,6 +1027,7 @@ export default function GoalsPage() {
                                                     goal={goal}
                                                     onEdit={handleOpenEditModal}
                                                     onDelete={handleRequestDeleteGoal}
+                                                    onOpenNotes={setNotesGoal}
                                                     onSaveMilestone={handleSaveMilestone}
                                                     onAddMilestone={handleAddMilestone}
                                                     onToggleMilestone={handleToggleMilestone}
@@ -987,6 +1049,7 @@ export default function GoalsPage() {
                                         goals={filteredGoals}
                                         onEdit={handleOpenEditModal}
                                         onDelete={handleRequestDeleteGoal}
+                                        onOpenNotes={setNotesGoal}
                                         onQuickIncrement={handleQuickIncrement}
                                         onCompleteGoal={handleCompleteGoal}
                                         onMarkAsActive={handleMarkAsActive}
@@ -1023,6 +1086,14 @@ export default function GoalsPage() {
                         onClose={() => setIsModalOpen(false)}
                         onSave={handleSaveGoal}
                         onDeleteCategory={handleDeleteCategory}
+                    />
+
+                    {/* Goal Notes & Reflection Modal (with Journal Sync) */}
+                    <GoalNotesModal
+                        isOpen={Boolean(notesGoal)}
+                        onClose={() => setNotesGoal(null)}
+                        goal={notesGoal}
+                        onSaveNotes={handleSaveGoalNotes}
                     />
 
                     {/* Victory Celebration Modal */}
