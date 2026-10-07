@@ -110,6 +110,10 @@ export function useHabitActions({
                 nextStatus = 'completed';
             }
         } else {
+            // Guard: If current status is rest or skipped, protect from accidental toggle to empty
+            if (currentStatus === 'rest' || currentStatus === 'skipped') {
+                return;
+            }
             if (!currentStatus || currentStatus === 'empty') {
                 nextStatus = habit.habitType === 'negative' ? 'relapse' : 'completed';
             } else {
@@ -656,6 +660,25 @@ export function useHabitActions({
         }
     };
 
+    const handleGraduateHabit = async (habitId: number) => {
+        playCheckSound();
+        setHabits(prev => prev.filter(h => h.id !== habitId));
+        try {
+            await fetch(`/api/habits/${habitId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    status: 'graduated',
+                    is_archived: true
+                })
+            });
+            if (mutateHabits) await mutateHabits();
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'), undefined, { revalidate: true });
+        } catch (err) {
+            console.error('Failed to graduate habit:', err);
+        }
+    };
+
     return {
         isSubmitting,
         toggleStatus,
@@ -664,6 +687,7 @@ export function useHabitActions({
         submitSingleHabit,
         submitBatchHabits,
         executeDelete,
-        handleCopyPreviousHabits
+        handleCopyPreviousHabits,
+        handleGraduateHabit
     };
 }

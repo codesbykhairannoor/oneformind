@@ -258,7 +258,17 @@ export default function HabitMobileView({
                                     })() : (
                                         <button
                                             type="button"
-                                            onClick={() => onToggleStatus(habit.id, selectedMobileDate)}
+                                            onClick={() => {
+                                                if ((isRest || dayInfo.status === 'skipped') && onOpenNoteModal) {
+                                                    onOpenNoteModal({
+                                                        habit,
+                                                        dateStr: selectedMobileDate,
+                                                        notes: dayInfo.notes || ''
+                                                    });
+                                                    return;
+                                                }
+                                                onToggleStatus(habit.id, selectedMobileDate);
+                                            }}
                                             className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all active:scale-90 cursor-pointer ${
                                                 isDone
                                                     ? 'shadow-md shadow-indigo-100 dark:shadow-none text-white'

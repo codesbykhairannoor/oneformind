@@ -437,6 +437,8 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
                     onSubmitSingleHabit={actions.submitSingleHabit}
                     onExecuteDelete={actions.executeDelete}
                     onEditHabit={form.editHabit}
+                    activeHabits={habits}
+                    onGraduateHabit={actions.handleGraduateHabit}
                 />
 
                 {/* EXPORT DATA MODAL */}

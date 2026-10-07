@@ -34,9 +34,10 @@ interface HabitDetailModalProps {
     onClose: () => void;
     locale: string;
     onEditHabit?: (habit: HabitItem) => void;
+    onGraduateHabit?: (habitId: number) => void;
 }
 
-export default function HabitDetailModal({ habit, isOpen, onClose, locale, onEditHabit }: HabitDetailModalProps) {
+export default function HabitDetailModal({ habit, isOpen, onClose, locale, onEditHabit, onGraduateHabit }: HabitDetailModalProps) {
     if (!isOpen || !habit) return null;
 
     const isIndo = locale === 'id';
@@ -916,10 +917,25 @@ export default function HabitDetailModal({ habit, isOpen, onClose, locale, onEdi
                     </div>
 
                     {/* Footer */}
-                    <div className="px-6 md:px-8 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end shrink-0">
+                    <div className="px-6 md:px-8 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 shrink-0">
+                        {onGraduateHabit && !habit.isGraduated && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (window.confirm(isIndo ? `Luluskan "${habit.name}" dan simpan ke Hall of Fame? Kebiasaan ini akan dipensiunkan dengan rekor kehormatan.` : `Graduate "${habit.name}" to the Hall of Fame?`)) {
+                                        onGraduateHabit(habit.id);
+                                        onClose();
+                                    }
+                                }}
+                                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                            >
+                                <Trophy size={14} className="text-amber-200" />
+                                <span>{isIndo ? 'Luluskan ke Hall of Fame 🎓' : 'Graduate to Hall of Fame 🎓'}</span>
+                            </button>
+                        )}
                         <button
                             onClick={onClose}
-                            className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-xs rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                            className="ml-auto px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black text-xs rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
                         >
                             {isIndo ? 'Tutup' : 'Close'}
                         </button>

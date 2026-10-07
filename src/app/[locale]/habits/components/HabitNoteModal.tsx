@@ -243,6 +243,31 @@ export default function HabitNoteModal({
                         </div>
                     )}
 
+                    {currentLogStatus === 'skipped' && (
+                        <div className="mb-4 p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                            <div className="flex items-center gap-2.5 text-xs font-black text-slate-800 dark:text-slate-200 text-left">
+                                <Pause size={18} className="text-slate-500 shrink-0" />
+                                <div>
+                                    <p className="leading-tight">{isIndo ? 'Hari ini dilewati (⏸️)' : 'Skipped today (⏸️)'}</p>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                                        {isIndo ? 'Ingin membatalkan status lewati?' : 'Want to cancel skipped status?'}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onSave(habit.id, dateStr, '', 'empty', false, calculatedTargetDates);
+                                    onClose();
+                                }}
+                                className="px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs shadow-xs transition active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer"
+                            >
+                                <RotateCcw size={13} />
+                                <span>{isIndo ? 'Batalkan Lewati' : 'Cancel Skip'}</span>
+                            </button>
+                        </div>
+                    )}
+
                     {/* Form */}
                     <form onSubmit={handleSave} className="space-y-5">
                         

@@ -214,17 +214,27 @@ export default function HabitMatrixTable({
                                                 return (
                                                     <button
                                                         type="button"
-                                                        onClick={() => onOpenNumericPopover({
-                                                            habitId: habit.id,
-                                                            habitName: habit.name,
-                                                            habitIcon: habit.icon,
-                                                            habitColor: habit.color,
-                                                            dateStr: day.dateString,
-                                                            currentVal: habitVal,
-                                                            targetVal: target,
-                                                            unit: habit.unit || '',
-                                                            currentNotes: info.notes || ''
-                                                        })}
+                                                        onClick={() => {
+                                                            if (isRest) {
+                                                                onOpenNoteModal({
+                                                                    habit,
+                                                                    dateStr: day.dateString,
+                                                                    notes: info.notes || ''
+                                                                });
+                                                                return;
+                                                            }
+                                                            onOpenNumericPopover({
+                                                                habitId: habit.id,
+                                                                habitName: habit.name,
+                                                                habitIcon: habit.icon,
+                                                                habitColor: habit.color,
+                                                                dateStr: day.dateString,
+                                                                currentVal: habitVal,
+                                                                targetVal: target,
+                                                                unit: habit.unit || '',
+                                                                currentNotes: info.notes || ''
+                                                            });
+                                                        }}
                                                         onContextMenu={(e) => {
                                                             e.preventDefault();
                                                             if (day.isFuture) return;
@@ -273,6 +283,14 @@ export default function HabitMatrixTable({
                                                 <button
                                                     type="button"
                                                     onClick={() => {
+                                                        if (isRest || isSkipped) {
+                                                            onOpenNoteModal({
+                                                                habit,
+                                                                dateStr: day.dateString,
+                                                                notes: info.notes || ''
+                                                            });
+                                                            return;
+                                                        }
                                                         onToggleStatus(habit.id, day.dateString);
                                                     }}
                                                     onContextMenu={(e) => {
@@ -289,10 +307,12 @@ export default function HabitMatrixTable({
                                                         day.isFuture 
                                                             ? (isIndo ? 'Tanggal mendatang' : 'Future date')
                                                             : isRest 
-                                                            ? (isIndo ? 'Hari Istirahat (☕) • Klik kiri untuk batalkan istirahat, atau klik kanan untuk ubah/batalkan' : 'Rest Day (☕) • Left-click to cancel rest, or right-click to edit/cancel')
+                                                            ? (isIndo ? 'Hari Istirahat (☕) • Klik untuk catatan / klik kanan untuk opsi' : 'Rest Day (☕) • Click for notes / right-click for options')
+                                                            : isSkipped
+                                                            ? (isIndo ? 'Hari Dilewati (⏸️) • Klik untuk catatan / klik kanan untuk opsi' : 'Skipped Day (⏸️) • Click for notes / right-click for options')
                                                             : isDone 
-                                                            ? (isIndo ? 'Selesai (✓) • Klik kiri untuk batalkan centang, atau klik kanan untuk Istirahat / Catatan' : 'Completed (✓) • Left-click to uncheck, or right-click for Rest / Notes')
-                                                            : (isIndo ? 'Klik kiri: Centang • Klik kanan: Mode Istirahat (☕) / Deload Week' : 'Left-click: Complete • Right-click: Rest Mode (☕) / Deload Week')
+                                                            ? (isIndo ? 'Selesai (✓) • Klik kiri untuk batalkan centang, atau klik kanan untuk opsi' : 'Completed (✓) • Left-click to uncheck, or right-click for options')
+                                                            : (isIndo ? 'Klik kiri: Centang • Klik kanan: Mode Istirahat (☕) / Lewati' : 'Left-click: Complete • Right-click: Rest Mode (☕) / Skip')
                                                     }
                                                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${
                                                         isDone

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
-import { useRouter, usePathname } from '@/i18n/routing';
 
 // PERF: In-memory cache to store loaded translation dictionaries.
 // Prevents redundant network requests or dynamic imports on subsequent language switches.
@@ -96,9 +95,6 @@ function LocaleSwitcherListener({
   setLocale: (l: string) => void;
   setMessages: (m: Messages) => void;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-
   useEffect(() => {
     const handleSwitch = (e: CustomEvent<{ locale: string }>) => {
       const newLocale = e.detail.locale;
@@ -114,13 +110,32 @@ function LocaleSwitcherListener({
           });
         }
 
-        localStorage.setItem('tranvas_locale', newLocale);
-        document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
+        try {
+          localStorage.setItem('tranvas_locale', newLocale);
+          document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
+          document.documentElement.lang = newLocale;
 
-        // Update URL prefix smoothly without page reload or scroll disruption
-        const currentSearch = window.location.search;
-        const currentHash = window.location.hash;
-        router.replace(`${pathname}${currentSearch}${currentHash}`, { locale: newLocale, scroll: false });
+          // Update URL in browser address bar smoothly without triggering Next.js RSC route transition/refresh
+          if (typeof window !== 'undefined') {
+            const currentPath = window.location.pathname;
+            let targetPath = currentPath;
+            if (newLocale === 'id') {
+              if (!currentPath.startsWith('/id')) {
+                targetPath = currentPath === '/' ? '/id' : `/id${currentPath}`;
+              }
+            } else {
+              if (currentPath.startsWith('/id')) {
+                const stripped = currentPath.replace(/^\/id(\/|$)/, '/');
+                targetPath = stripped || '/';
+              }
+            }
+            const currentSearch = window.location.search;
+            const currentHash = window.location.hash;
+            window.history.replaceState(window.history.state, '', `${targetPath}${currentSearch}${currentHash}`);
+          }
+        } catch (err) {
+          console.error('Error switching locale:', err);
+        }
       }
     };
 
@@ -128,7 +143,7 @@ function LocaleSwitcherListener({
     return () => {
       window.removeEventListener('switch-locale' as any, handleSwitch);
     };
-  }, [locale, pathname, router, setLocale, setMessages]);
+  }, [locale, setLocale, setMessages]);
 
   return null;
 }

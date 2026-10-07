@@ -91,6 +91,8 @@ interface HabitsModalsContainerProps {
     onSubmitSingleHabit: (e: React.FormEvent) => void;
     onExecuteDelete: () => void;
     onEditHabit?: (habit: HabitItem) => void;
+    activeHabits?: HabitItem[];
+    onGraduateHabit?: (habitId: number) => void;
 }
 
 export default function HabitsModalsContainer({
@@ -102,6 +104,8 @@ export default function HabitsModalsContainer({
     setShowCreateModal,
     showHallOfFameModal,
     setShowHallOfFameModal,
+    activeHabits,
+    onGraduateHabit,
     showBatchModal,
     setShowBatchModal,
     batchRows,
@@ -183,6 +187,7 @@ export default function HabitsModalsContainer({
                 onClose={() => setDetailModalHabit(null)}
                 locale={locale}
                 onEditHabit={onEditHabit}
+                onGraduateHabit={onGraduateHabit}
             />
 
             {/* MODAL: NOTE */}
@@ -295,6 +300,8 @@ export default function HabitsModalsContainer({
                     onClose={() => setShowHallOfFameModal(false)}
                     isIndo={isIndo}
                     currentMonthKey={currentMonthKey}
+                    activeHabits={activeHabits}
+                    onGraduateHabit={onGraduateHabit}
                 />
             )}
         </>
