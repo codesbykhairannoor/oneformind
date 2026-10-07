@@ -235,7 +235,9 @@ export default function HabitMatrixTable({
                                                             });
                                                         }}
                                                         disabled={day.isFuture}
-                                                        title={`${habitVal} / ${target} ${habit.unit || ''} (${percentVal}%)`}
+                                                        title={isRest && !hasProgress 
+                                                            ? (isIndo ? 'Hari Istirahat (☕) • Klik kanan untuk ubah/batalkan' : 'Rest Day (☕) • Right-click to edit/cancel') 
+                                                            : `${habitVal} / ${target} ${habit.unit || ''} (${percentVal}%)`}
                                                         className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${
                                                             isDone
                                                                 ? 'shadow-xs text-white'
@@ -287,10 +289,10 @@ export default function HabitMatrixTable({
                                                         day.isFuture 
                                                             ? (isIndo ? 'Tanggal mendatang' : 'Future date')
                                                             : isRest 
-                                                            ? (isIndo ? 'Hari Istirahat (Streak terjaga) • Klik kanan untuk ubah' : 'Rest Day (Streak protected) • Right-click to edit')
+                                                            ? (isIndo ? 'Hari Istirahat (☕) • Klik kiri untuk batalkan istirahat, atau klik kanan untuk ubah/batalkan' : 'Rest Day (☕) • Left-click to cancel rest, or right-click to edit/cancel')
                                                             : isDone 
-                                                            ? (isIndo ? 'Selesai • Klik kanan untuk Istirahat / Catatan' : 'Completed • Right-click for Rest / Notes')
-                                                            : (isIndo ? 'Klik kiri: Centang • Klik kanan: Istirahat / Deload Week' : 'Left-click: Complete • Right-click: Rest / Deload Week')
+                                                            ? (isIndo ? 'Selesai (✓) • Klik kiri untuk batalkan centang, atau klik kanan untuk Istirahat / Catatan' : 'Completed (✓) • Left-click to uncheck, or right-click for Rest / Notes')
+                                                            : (isIndo ? 'Klik kiri: Centang • Klik kanan: Mode Istirahat (☕) / Deload Week' : 'Left-click: Complete • Right-click: Rest Mode (☕) / Deload Week')
                                                     }
                                                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${
                                                         isDone

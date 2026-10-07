@@ -188,6 +188,61 @@ export default function HabitNoteModal({
                         </button>
                     </div>
 
+                    {/* Quick Active Status Banner & Cancel Trigger */}
+                    {currentLogStatus === 'rest' && (
+                        <div className="mb-4 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                            <div className="flex items-center gap-2.5 text-xs font-black text-amber-900 dark:text-amber-200 text-left">
+                                <Coffee size={18} className="text-amber-600 shrink-0" />
+                                <div>
+                                    <p className="leading-tight">{isIndo ? 'Hari ini sedang mode Istirahat (☕)' : 'This day is in Rest mode (☕)'}</p>
+                                    <p className="text-[10px] text-amber-700/80 dark:text-amber-400 font-medium mt-0.5">
+                                        {isIndo ? 'Streak Anda tetap terjaga.' : 'Streak is protected.'}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onSave(habit.id, dateStr, '', 'empty', false, calculatedTargetDates);
+                                    onClose();
+                                }}
+                                className="px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs shadow-xs transition active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer"
+                            >
+                                <RotateCcw size={13} />
+                                <span>
+                                    {isIndo 
+                                        ? (calculatedTargetDates.length > 1 ? `Batalkan (${calculatedTargetDates.length} Hari)` : 'Batalkan Istirahat') 
+                                        : (calculatedTargetDates.length > 1 ? `Cancel (${calculatedTargetDates.length} Days)` : 'Cancel Rest')}
+                                </span>
+                            </button>
+                        </div>
+                    )}
+
+                    {currentLogStatus === 'completed' && (
+                        <div className="mb-4 p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                            <div className="flex items-center gap-2.5 text-xs font-black text-emerald-900 dark:text-emerald-200 text-left">
+                                <Check size={18} className="text-emerald-600 shrink-0" strokeWidth={3} />
+                                <div>
+                                    <p className="leading-tight">{isIndo ? 'Hari ini sudah dicentang Selesai (✓)' : 'Completed today (✓)'}</p>
+                                    <p className="text-[10px] text-emerald-700/80 dark:text-emerald-400 font-medium mt-0.5">
+                                        {isIndo ? 'Ingin membatalkan centang?' : 'Want to uncheck?'}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onSave(habit.id, dateStr, '', 'empty', false, calculatedTargetDates);
+                                    onClose();
+                                }}
+                                className="px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs shadow-xs transition active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer"
+                            >
+                                <RotateCcw size={13} />
+                                <span>{isIndo ? 'Batalkan Centang' : 'Uncheck'}</span>
+                            </button>
+                        </div>
+                    )}
+
                     {/* Form */}
                     <form onSubmit={handleSave} className="space-y-5">
                         
@@ -240,46 +295,62 @@ export default function HabitNoteModal({
                                     <span>{isIndo ? 'Lewati' : 'Skipped'}</span>
                                 </button>
 
-                                {/* Option D: Kosongkan */}
+                                {/* Option D: Kosongkan / Batal */}
                                 <button
                                     type="button"
                                     onClick={() => setSelectedStatus('empty')}
                                     className={`p-2.5 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all text-xs font-black ${
                                         selectedStatus === 'empty'
-                                            ? 'bg-slate-100 dark:bg-slate-800 border-indigo-400 text-slate-700 dark:text-slate-200 shadow-xs'
+                                            ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-700 dark:text-rose-300 shadow-xs ring-2 ring-rose-400/30'
                                             : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300'
                                     }`}
                                 >
-                                    <RotateCcw size={16} className={selectedStatus === 'empty' ? 'text-indigo-500' : 'text-slate-400'} />
-                                    <span>{isIndo ? 'Kosongkan' : 'Reset'}</span>
+                                    <RotateCcw size={16} className={selectedStatus === 'empty' ? 'text-rose-500' : 'text-slate-400'} />
+                                    <span>{isIndo ? 'Kosongkan / Batal' : 'Reset / Clear'}</span>
                                 </button>
                             </div>
 
-                            {/* FLEXIBLE REST PERIOD SECTION */}
+                            {/* FLEXIBLE REST / RESET PERIOD SECTION */}
                             {(selectedStatus === 'rest' || selectedStatus === 'empty') && (
-                                <div className="mt-3 p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 space-y-3.5 text-left animate-in fade-in duration-200">
+                                <div className={`mt-3 p-4 rounded-2xl border space-y-3.5 text-left animate-in fade-in duration-200 ${
+                                    selectedStatus === 'empty'
+                                        ? 'bg-rose-50/70 dark:bg-rose-950/20 border-rose-200/80 dark:border-rose-900/40'
+                                        : 'bg-amber-50/90 dark:bg-amber-950/30 border-amber-200/80 dark:border-amber-900/50'
+                                }`}>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5 text-xs font-black text-amber-900 dark:text-amber-200">
-                                            <Coffee size={14} className="text-amber-600" />
+                                        <div className={`flex items-center gap-1.5 text-xs font-black ${
+                                            selectedStatus === 'empty'
+                                                ? 'text-rose-900 dark:text-rose-200'
+                                                : 'text-amber-900 dark:text-amber-200'
+                                        }`}>
+                                            {selectedStatus === 'empty' ? <RotateCcw size={14} className="text-rose-600" /> : <Coffee size={14} className="text-amber-600" />}
                                             <span>
                                                 {selectedStatus === 'rest'
                                                     ? (isIndo ? 'Durasi Istirahat Terencana' : 'Rest Duration Mode')
-                                                    : (isIndo ? 'Terapkan Reset ke Rentang Tanggal' : 'Apply Reset to Range')}
+                                                    : (isIndo ? 'Cakupan Reset / Pembatalan' : 'Reset / Cancellation Scope')}
                                             </span>
                                         </div>
-                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-200/70 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200">
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                                            selectedStatus === 'empty'
+                                                ? 'bg-rose-200/70 dark:bg-rose-900/60 text-rose-900 dark:text-rose-200'
+                                                : 'bg-amber-200/70 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200'
+                                        }`}>
                                             {calculatedTargetDates.length} {isIndo ? 'Hari' : 'Days'}
                                         </span>
                                     </div>
 
                                     {/* Scope Switcher Tabs */}
-                                    <div className="grid grid-cols-3 gap-1.5 p-1 bg-white dark:bg-slate-900 rounded-xl border border-amber-200/60 dark:border-amber-900/40 text-[11px] font-black">
+                                    <div className={`grid grid-cols-3 gap-1.5 p-1 bg-white dark:bg-slate-900 rounded-xl border text-[11px] font-black ${
+                                        selectedStatus === 'empty'
+                                            ? 'border-rose-200/60 dark:border-rose-900/40'
+                                            : 'border-amber-200/60 dark:border-amber-900/40'
+                                    }`}>
                                         <button
                                             type="button"
                                             onClick={() => setRestScope('single')}
                                             className={`py-1.5 px-2 rounded-lg transition-all ${
                                                 restScope === 'single'
-                                                    ? 'bg-amber-500 text-white shadow-xs'
+                                                    ? (selectedStatus === 'empty' ? 'bg-rose-500 text-white shadow-xs' : 'bg-amber-500 text-white shadow-xs')
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -290,7 +361,7 @@ export default function HabitNoteModal({
                                             onClick={() => setRestScope('week')}
                                             className={`py-1.5 px-2 rounded-lg transition-all ${
                                                 restScope === 'week'
-                                                    ? 'bg-amber-500 text-white shadow-xs'
+                                                    ? (selectedStatus === 'empty' ? 'bg-rose-500 text-white shadow-xs' : 'bg-amber-500 text-white shadow-xs')
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -301,7 +372,7 @@ export default function HabitNoteModal({
                                             onClick={() => setRestScope('range')}
                                             className={`py-1.5 px-2 rounded-lg transition-all ${
                                                 restScope === 'range'
-                                                    ? 'bg-amber-500 text-white shadow-xs'
+                                                    ? (selectedStatus === 'empty' ? 'bg-rose-500 text-white shadow-xs' : 'bg-amber-500 text-white shadow-xs')
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -311,7 +382,9 @@ export default function HabitNoteModal({
 
                                     {/* Quick Presets */}
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                        <span className="text-[10px] font-black text-amber-700 dark:text-amber-400">
+                                        <span className={`text-[10px] font-black ${
+                                            selectedStatus === 'empty' ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'
+                                        }`}>
                                             {isIndo ? 'Preset Cepat:' : 'Quick Presets:'}
                                         </span>
                                         {[
@@ -324,7 +397,11 @@ export default function HabitNoteModal({
                                                 key={preset.days}
                                                 type="button"
                                                 onClick={() => handleApplyPreset(preset.days)}
-                                                className="px-2 py-0.5 rounded-md text-[10px] font-black bg-white dark:bg-slate-900 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800/60 transition"
+                                                className={`px-2 py-0.5 rounded-md text-[10px] font-black bg-white dark:bg-slate-900 border transition ${
+                                                    selectedStatus === 'empty'
+                                                        ? 'hover:bg-rose-100 text-rose-800 dark:text-rose-300 border-rose-300/80 dark:border-rose-800/60'
+                                                        : 'hover:bg-amber-100 text-amber-800 dark:text-amber-300 border-amber-300/80 dark:border-amber-800/60'
+                                                }`}
                                             >
                                                 {preset.label}
                                             </button>
@@ -333,10 +410,14 @@ export default function HabitNoteModal({
 
                                     {/* Date Range Inputs when in range mode */}
                                     {restScope === 'range' && (
-                                        <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-200/60 dark:border-amber-800/40 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                        <div className={`p-3 bg-white dark:bg-slate-900 rounded-xl border grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs ${
+                                            selectedStatus === 'empty'
+                                                ? 'border-rose-200/60 dark:border-rose-800/40'
+                                                : 'border-amber-200/60 dark:border-amber-800/40'
+                                        }`}>
                                             <div>
                                                 <label className="text-[9px] font-black uppercase text-slate-400 block mb-1">
-                                                    {isIndo ? 'Mulai Istirahat:' : 'Start Date:'}
+                                                    {isIndo ? 'Mulai Tanggal:' : 'Start Date:'}
                                                 </label>
                                                 <input
                                                     type="date"
@@ -360,15 +441,26 @@ export default function HabitNoteModal({
                                         </div>
                                     )}
 
-                                    {/* Streak Protection Explanation */}
-                                    <p className="text-[10px] text-amber-800 dark:text-amber-300/90 font-medium leading-relaxed flex items-center gap-1.5 pt-1 border-t border-amber-200/60 dark:border-amber-900/40">
-                                        <Flame size={12} className="text-amber-600 shrink-0" />
-                                        <span>
-                                            {isIndo 
-                                                ? `Seluruh ${calculatedTargetDates.length} hari yang dipilih akan diberi status Istirahat (☕) tanpa merusak atau mereset streak Anda!` 
-                                                : `All ${calculatedTargetDates.length} selected days will be marked as Rest (☕) without resetting your streak!`}
-                                        </span>
-                                    </p>
+                                    {/* Explanation */}
+                                    {selectedStatus === 'empty' ? (
+                                        <p className="text-[10px] text-rose-800 dark:text-rose-300/90 font-medium leading-relaxed flex items-center gap-1.5 pt-1 border-t border-rose-200/60 dark:border-rose-900/40">
+                                            <RotateCcw size={12} className="text-rose-600 shrink-0" />
+                                            <span>
+                                                {isIndo
+                                                    ? `Seluruh status & catatan untuk ${calculatedTargetDates.length} hari yang dipilih akan dikosongkan/dibatalkan.`
+                                                    : `All statuses & notes for the ${calculatedTargetDates.length} selected days will be cleared/cancelled.`}
+                                            </span>
+                                        </p>
+                                    ) : (
+                                        <p className="text-[10px] text-amber-800 dark:text-amber-300/90 font-medium leading-relaxed flex items-center gap-1.5 pt-1 border-t border-amber-200/60 dark:border-amber-900/40">
+                                            <Flame size={12} className="text-amber-600 shrink-0" />
+                                            <span>
+                                                {isIndo 
+                                                    ? `Seluruh ${calculatedTargetDates.length} hari yang dipilih akan diberi status Istirahat (☕) tanpa merusak atau mereset streak Anda!` 
+                                                    : `All ${calculatedTargetDates.length} selected days will be marked as Rest (☕) without resetting your streak!`}
+                                            </span>
+                                        </p>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -397,26 +489,43 @@ export default function HabitNoteModal({
 
                         {/* Actions */}
                         <div className="flex items-center gap-3 pt-1">
-                            {initialNotes && (
+                            {(initialNotes || currentLogStatus !== 'empty') && (
                                 <button
                                     type="button"
                                     onClick={handleDelete}
-                                    className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-500 hover:bg-rose-100 transition flex items-center justify-center border border-rose-100 dark:border-rose-500/20"
-                                    title={isIndo ? 'Hapus Catatan' : 'Delete Note'}
+                                    className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-500/20 transition flex items-center justify-center border border-rose-200 dark:border-rose-500/20 cursor-pointer"
+                                    title={isIndo ? 'Kosongkan / Batalkan Hari Ini' : 'Reset / Clear This Day'}
                                 >
                                     <Trash2 size={16} />
                                 </button>
                             )}
                             <button
                                 type="submit"
-                                className="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none transition flex items-center justify-center gap-2 active:scale-98"
+                                className={`flex-1 py-3.5 font-black text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer ${
+                                    selectedStatus === 'empty'
+                                        ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-200 dark:shadow-none'
+                                        : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100 dark:shadow-none'
+                                }`}
                             >
-                                <Check size={16} strokeWidth={3} />
-                                <span>
-                                    {isIndo 
-                                        ? `Simpan (${calculatedTargetDates.length} Hari)` 
-                                        : `Save (${calculatedTargetDates.length} Days)`}
-                                </span>
+                                {selectedStatus === 'empty' ? (
+                                    <>
+                                        <RotateCcw size={16} />
+                                        <span>
+                                            {isIndo 
+                                                ? `Kosongkan / Batalkan (${calculatedTargetDates.length} Hari)` 
+                                                : `Reset / Cancel (${calculatedTargetDates.length} Days)`}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Check size={16} strokeWidth={3} />
+                                        <span>
+                                            {isIndo 
+                                                ? `Simpan (${calculatedTargetDates.length} Hari)` 
+                                                : `Save (${calculatedTargetDates.length} Days)`}
+                                        </span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>

@@ -201,8 +201,14 @@ export function useHabitActions({
         applyWholeWeekRest?: boolean,
         customRestDates?: string[]
     ) => {
-        const habit = habits.find(h => h.id === habitId);
+        const habit = habitsRef.current.find(h => h.id === habitId);
         if (!habit) return;
+
+        if (newStatus === 'empty') {
+            playUncheckSound();
+        } else if (newStatus === 'completed') {
+            playCheckSound();
+        }
 
         // If customRestDates is passed, use it; otherwise fallback to applyWholeWeekRest or single date
         let targetDates: string[] = [dateStr];
@@ -228,6 +234,26 @@ export function useHabitActions({
                     targetDates.push(isoStr);
                 }
             }
+        }
+
+        // Record in recentTogglesRef to prevent race conditions during SWR revalidations
+        if (recentTogglesRef) {
+            const now = Date.now();
+            targetDates.forEach(dt => {
+                const effStatus = newStatus !== undefined ? newStatus : (habit.logs?.[dt]?.status || 'empty');
+                const isNumeric = habit.measurementType === 'numeric';
+                const targetVal = habit.targetValue || 10;
+                const calcVal = effStatus === 'rest' || effStatus === 'empty' 
+                    ? 0 
+                    : (isNumeric ? targetVal : 1);
+
+                recentTogglesRef.current.set(`${habitId}_${dt}`, {
+                    status: effStatus,
+                    value: calcVal,
+                    notes: dt === dateStr ? noteText : (habit.logs?.[dt]?.notes || ''),
+                    timestamp: now
+                });
+            });
         }
 
         // Optimistically update habits state
@@ -267,10 +293,13 @@ export function useHabitActions({
                 });
             }));
 
-            if (mutateHabits) {
-                mutateHabits();
-            }
-            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+            debounceTimerRef.current = setTimeout(() => {
+                if (mutateHabits) {
+                    mutateHabits();
+                }
+                globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'));
+            }, 400);
         } catch (error) {
             console.error('Failed to save habit note', error);
         }
