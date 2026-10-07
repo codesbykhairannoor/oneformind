@@ -9,6 +9,9 @@ import SwrProvider from "@/components/SwrProvider";
 import { SessionProvider } from "@/components/SessionProvider";
 
 import AffiliateTracker from "@/components/AffiliateTracker";
+import dynamic from "next/dynamic";
+
+const TranvasDevHud = dynamic(() => import("@/components/dev/TranvasDevHud"), { ssr: false });
 
 import "../globals.css";
 
@@ -110,6 +113,7 @@ export default async function RootLayout({
             <SessionProvider>
               <SwrProvider>
                 {children}
+                <TranvasDevHud />
               </SwrProvider>
             </SessionProvider>
           </InstantIntlProvider>
