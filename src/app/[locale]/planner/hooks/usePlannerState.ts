@@ -176,18 +176,18 @@ export function usePlannerState() {
         const matched: ScheduledHabitItem[] = [];
 
         rawHabits.forEach((h: any) => {
-            // Must not be archived
-            if (h.isArchived || h.is_archived) return;
-
-            // Must belong to this month
-            if (h.period && h.period !== currentMonthPeriod) return;
-
             let meta: any = {};
             if (typeof h.status === 'string' && h.status.startsWith('{')) {
                 try { meta = JSON.parse(h.status); } catch {}
             } else if (typeof h.status === 'object' && h.status !== null) {
                 meta = h.status;
             }
+
+            // Must not be archived or graduated
+            if (h.isArchived || h.is_archived || h.status === 'graduated' || meta.status === 'graduated') return;
+
+            // Must belong to this month
+            if (h.period && h.period !== currentMonthPeriod) return;
 
             const startTime = meta.startTime;
             if (!startTime) return; // Only time-scheduled habits appear on timeline
@@ -226,6 +226,10 @@ export function usePlannerState() {
                     const lDate = typeof l.date === 'string' ? l.date.split('T')[0] : '';
                     return lDate === selectedDate;
                 });
+                // Planned rest day: do not schedule on active action timeline
+                if (logToday && logToday.status === 'rest') {
+                    return;
+                }
                 if (logToday && (logToday.status === 'completed' || Number(logToday.value) > 0)) {
                     isDone = true;
                 }

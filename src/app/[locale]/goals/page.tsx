@@ -743,6 +743,58 @@ export default function GoalsPage() {
         }
     };
 
+    const handleGraduateHabit = async (habitId: number | string) => {
+        try {
+            await fetch(`/api/habits/${habitId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    status: 'graduated',
+                    is_archived: true,
+                })
+            });
+            if (mutateHabits) mutateHabits();
+            mutateGoals();
+        } catch (err) {
+            console.error('Failed to graduate habit:', err);
+        }
+    };
+
+    const handleRelinkHabit = async (habitId: number | string, newGoalId: number | string) => {
+        try {
+            const targetGoal = goals.find(g => String(g.id) === String(newGoalId));
+            await fetch(`/api/habits/${habitId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    goalId: newGoalId,
+                    goalTitle: targetGoal?.title || '',
+                })
+            });
+            if (mutateHabits) mutateHabits();
+            mutateGoals();
+        } catch (err) {
+            console.error('Failed to relink habit:', err);
+        }
+    };
+
+    const handlePromoteHabit = async (habitId: number | string) => {
+        try {
+            await fetch(`/api/habits/${habitId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    goalId: null,
+                    goalTitle: '',
+                })
+            });
+            if (mutateHabits) mutateHabits();
+            mutateGoals();
+        } catch (err) {
+            console.error('Failed to promote habit to lifestyle:', err);
+        }
+    };
+
     const handleMarkAsActive = async (goal: GoalItem) => {
         setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'active' } : g));
         try {
@@ -1101,6 +1153,10 @@ export default function GoalsPage() {
                         goal={celebratingGoal}
                         isOpen={isCelebrationOpen}
                         onClose={() => setIsCelebrationOpen(false)}
+                        allGoals={goals}
+                        onGraduateHabit={handleGraduateHabit}
+                        onRelinkHabit={handleRelinkHabit}
+                        onPromoteHabit={handlePromoteHabit}
                     />
 
                     {/* Universal Export Modal (CSV & JSON) */}

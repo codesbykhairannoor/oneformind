@@ -35,7 +35,7 @@ interface HabitMatrixTableProps {
         currentNotes?: string;
     }) => void;
     onOpenNoteModal: (data: { habit: HabitItem; dateStr: string; notes: string }) => void;
-    onToggleStatus: (habitId: number, dateStr: string) => void;
+    onToggleStatus: (habitId: number, dateStr: string, forceStatus?: 'completed' | 'skipped' | 'relapse' | 'rest') => void;
 }
 
 export default function HabitMatrixTable({

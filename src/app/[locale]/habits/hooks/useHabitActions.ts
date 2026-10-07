@@ -88,8 +88,8 @@ export function useHabitActions({
     const habitsRef = useRef(habits);
     habitsRef.current = habits;
 
-    // Toggle Habit Status (Complete / Uncheck / Skip / Relapse)
-    const toggleStatus = async (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse') => {
+    // Toggle Habit Status (Complete / Uncheck / Skip / Relapse / Rest)
+    const toggleStatus = async (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse' | 'rest') => {
         const currentList = habitsRef.current;
         const habit = currentList.find(h => h.id === habitId);
         if (!habit) return;
@@ -97,7 +97,7 @@ export function useHabitActions({
         const currentLog = habit.logs?.[dateString];
         const currentStatus = currentLog?.status;
 
-        let nextStatus: 'completed' | 'skipped' | 'relapse' | 'empty';
+        let nextStatus: 'completed' | 'skipped' | 'relapse' | 'empty' | 'rest';
 
         if (forceStatus) {
             nextStatus = forceStatus;
@@ -131,9 +131,11 @@ export function useHabitActions({
             ? JSON.stringify({ val: nextStatus === 'completed' ? targetVal : 0, note: noteText })
             : noteText;
 
-        const calculatedVal = isNumeric 
-            ? (nextStatus === 'completed' ? targetVal : 0)
-            : (nextStatus === 'completed' ? 1 : 0);
+        const calculatedVal = nextStatus === 'rest'
+            ? 0
+            : (isNumeric 
+                ? (nextStatus === 'completed' ? targetVal : 0)
+                : (nextStatus === 'completed' ? 1 : 0));
 
         // Record recent toggle timestamp to prevent server overwrite during revalidations
         if (recentTogglesRef) {
@@ -190,36 +192,77 @@ export function useHabitActions({
         }
     };
 
-    // Save Note to Habit Log
-    const handleSaveNote = async (habitId: number, dateStr: string, noteText: string) => {
+    // Save Note to Habit Log (with optional status change & planned rest week support)
+    const handleSaveNote = async (
+        habitId: number, 
+        dateStr: string, 
+        noteText: string, 
+        newStatus?: 'completed' | 'skipped' | 'empty' | 'rest' | 'relapse' | 'in_progress',
+        applyWholeWeekRest?: boolean
+    ) => {
+        const habit = habits.find(h => h.id === habitId);
+        if (!habit) return;
+
+        // If applyWholeWeekRest is true, calculate all 7 days of this week
+        const targetDates: string[] = [dateStr];
+        if (applyWholeWeekRest) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const targetDateObj = new Date(y, m - 1, d);
+            const dayOfWeek = targetDateObj.getDay(); // 0: Sun, 1: Mon...
+            const distToMon = (dayOfWeek + 6) % 7;
+            const mondayObj = new Date(targetDateObj);
+            mondayObj.setDate(targetDateObj.getDate() - distToMon);
+
+            for (let i = 0; i < 7; i++) {
+                const dayCur = new Date(mondayObj);
+                dayCur.setDate(mondayObj.getDate() + i);
+                const curY = dayCur.getFullYear();
+                const curM = String(dayCur.getMonth() + 1).padStart(2, '0');
+                const curD = String(dayCur.getDate()).padStart(2, '0');
+                const isoStr = `${curY}-${curM}-${curD}`;
+                if (!targetDates.includes(isoStr)) {
+                    targetDates.push(isoStr);
+                }
+            }
+        }
+
+        // Optimistically update habits state
         setHabits(prevHabits => prevHabits.map(h => {
             if (h.id === habitId) {
                 const updatedLogs = { ...h.logs };
-                const current = updatedLogs[dateStr];
-                updatedLogs[dateStr] = {
-                    status: current?.status || 'empty',
-                    value: current?.value,
-                    notes: noteText
-                };
+                targetDates.forEach(dt => {
+                    const current = updatedLogs[dt];
+                    const effStatus = newStatus !== undefined ? newStatus : (current?.status || 'empty');
+                    if (effStatus === 'empty') {
+                        delete updatedLogs[dt];
+                    } else {
+                        updatedLogs[dt] = {
+                            status: effStatus,
+                            value: effStatus === 'completed' ? (h.targetValue || 1) : 0,
+                            notes: dt === dateStr ? noteText : (current?.notes || '')
+                        };
+                    }
+                });
                 return { ...h, logs: updatedLogs };
             }
             return h;
         }));
 
         try {
-            const habit = habits.find(h => h.id === habitId);
-            const currentLog = habit?.logs?.[dateStr];
+            await Promise.all(targetDates.map(async (dt) => {
+                const effStatus = newStatus !== undefined ? newStatus : (habit.logs?.[dt]?.status || 'empty');
+                await fetch(`/api/habits/${habitId}/logs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: dt,
+                        status: effStatus,
+                        value: effStatus === 'completed' ? (habit.targetValue || 1) : 0,
+                        notes: dt === dateStr ? noteText : (habit.logs?.[dt]?.notes || '')
+                    })
+                });
+            }));
 
-            await fetch(`/api/habits/${habitId}/logs`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    date: dateStr,
-                    status: currentLog?.status || 'empty',
-                    value: currentLog?.value,
-                    notes: noteText
-                })
-            });
             if (mutateHabits) {
                 mutateHabits();
             }
