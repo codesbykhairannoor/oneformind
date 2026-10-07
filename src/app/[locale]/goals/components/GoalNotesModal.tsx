@@ -510,15 +510,6 @@ export default function GoalNotesModal({
                         {/* TAB 2: WOOP MOTIVATION COMPASS */}
                         {activeTab === 'woop' && (
                             <div className="space-y-4">
-                                <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/80 dark:border-indigo-900/40">
-                                    <p className="text-xs text-indigo-900 dark:text-indigo-300 font-semibold leading-relaxed">
-                                        {isIndo 
-                                            ? 'Metode WOOP (Wish, Outcome, Obstacle, Plan) membantu memperkuat psikologi pencapaian agar target tidak berhenti sebagai sekadar angan-angan.'
-                                            : 'The WOOP framework anchors psychological commitment, preparing your mind for obstacles before they happen.'
-                                        }
-                                    </p>
-                                </div>
-
                                 {/* Core Why */}
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
