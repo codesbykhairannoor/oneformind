@@ -67,7 +67,7 @@ export default function FinanceClient({
     initialBudgets: any[];
     initialSavings: SavingsVaultItem[];
 }) {
-    usePageTitle('Finance Workspace');
+    usePageTitle();
     const t = useTranslations();
     const locale = useLocale();
     const router = useRouter();

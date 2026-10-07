@@ -7,11 +7,14 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const isId = locale === 'id';
   return constructPageMetadata({
     locale,
     path: '/register',
-    title: 'Sign Up — Start Your Journey with Tranvas',
-    description: 'Create your free Tranvas account and experience the unified life operating system designed for clarity and daily focus.',
+    title: isId ? 'Daftar Akun Baru Tranvas' : 'Get Started — Free Unified Life OS',
+    description: isId
+      ? 'Buat akun Tranvas Anda dan rasakan kemudahan mengelola seluruh aspek kehidupan dalam satu sistem terpadu.'
+      : 'Create your Tranvas account and experience the unified life operating system designed for focus and clarity.',
     noIndex: true,
   });
 }

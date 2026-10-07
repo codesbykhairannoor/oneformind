@@ -28,13 +28,20 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const baseUrl = 'https://tranvas.com';
+  const isId = locale === 'id';
+
+  const rootTitle = isId
+    ? 'Tranvas — Life OS Terpadu untuk Fokus, Habit, Keuangan & Target'
+    : 'Tranvas — The Unified Life OS for Focus, Habits, Finance & Goals';
+  const rootDesc = isId
+    ? 'Tranvas adalah Life Operating System terpadu: satukan Daily Planner, Habit Matrix 28 Hari, Smart Finance, WOOP Goals, Pipeline Karir, dan Jurnal Refleksi dalam satu sistem cerdas.'
+    : 'Tranvas is the unified Life Operating System: seamlessly align daily planning, 28-day habit streaks, zero-based budgeting, WOOP goal cascading, career pipeline, and mindful reflections.';
 
   const baseMeta = constructPageMetadata({
     locale,
     path: '',
-    title: 'Tranvas | The Unified Life Operating System',
-    description:
-      'Tranvas is the all-in-one Life Operating System. Master daily habits, plan tasks, track finances, and achieve your goals with total clarity and control.',
+    title: rootTitle,
+    description: rootDesc,
   });
 
   return {
@@ -42,7 +49,7 @@ export async function generateMetadata({
     ...baseMeta,
     title: {
       template: '%s | Tranvas',
-      default: 'Tranvas | The Unified Life Operating System',
+      default: rootTitle,
     },
   };
 }

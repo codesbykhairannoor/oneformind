@@ -8,8 +8,10 @@ import GuestNavbar from './guest/GuestNavbar';
 import GuestMobileMenu from './guest/GuestMobileMenu';
 import GuestFooter from './guest/GuestFooter';
 import GuestFloatingPill from './guest/GuestFloatingPill';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function GuestLayout({ children, user = null }: { children: React.ReactNode, user?: any }) {
+    usePageTitle();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobilePanel, setMobilePanel] = useState<string | null>(null);
     const [activeMenu, setActiveMenu] = useState<string | null>(null);

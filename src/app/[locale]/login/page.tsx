@@ -8,7 +8,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { createClient } from '@/utils/supabase/client';
 
 export default function Login({ searchParams }: { searchParams?: { status?: string } }) {
-    usePageTitle('Login');
+    usePageTitle();
     const t = useTranslations();
     const router = useRouter();
 

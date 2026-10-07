@@ -15,7 +15,7 @@ import LandingFAQ from '@/components/landing/LandingFAQ';
 import LandingBottomCTA from '@/components/landing/LandingBottomCTA';
 
 export default function HomePage() {
-    usePageTitle('Home');
+    usePageTitle();
 
     return (
         <GuestLayout>

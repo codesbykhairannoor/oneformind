@@ -18,7 +18,7 @@ import { useGating } from '@/hooks/useGating';
 import { useRouter } from '@/i18n/routing';
 
 export default function PlannerPage() {
-    usePageTitle('Planner');
+    usePageTitle();
     const locale = useLocale();
     const router = useRouter();
     const isIndo = locale === 'id';

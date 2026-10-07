@@ -54,7 +54,9 @@ export function constructPageMetadata({
 
   // Clean title: remove any pre-existing " | Tranvas" so Next.js template doesn't duplicate it
   const cleanTitle = title.replace(/\s*\|\s*Tranvas\s*$/i, '').trim();
-  const fullTitle = `${cleanTitle} | Tranvas`;
+  const fullTitle = cleanTitle.toLowerCase().includes('tranvas')
+    ? cleanTitle
+    : `${cleanTitle} | Tranvas`;
   const absoluteImageUrl = image.startsWith('http')
     ? image
     : `${BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;

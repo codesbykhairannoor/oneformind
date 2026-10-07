@@ -3,9 +3,15 @@ import { redirect } from 'next/navigation';
 import PlannerDashboardClient from './PlannerDashboardClient';
 import { goFetchJson } from '@/lib/go-fetch';
 
+import { getLocale } from 'next-intl/server';
+import { getRouteTitle } from '@/lib/titles';
+
 export async function generateMetadata() {
+    const locale = await getLocale();
     return {
-        title: 'Planner Dashboard | Tranvas',
+        title: {
+            absolute: getRouteTitle('/planner/dashboard', locale),
+        },
     };
 }
 

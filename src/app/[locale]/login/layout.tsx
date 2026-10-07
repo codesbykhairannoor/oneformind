@@ -7,11 +7,14 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const isId = locale === 'id';
   return constructPageMetadata({
     locale,
     path: '/login',
-    title: 'Log In — Welcome Back to Tranvas',
-    description: 'Sign in to access your personal dashboard, habits, daily planner, finance tracking, and neural productivity tools.',
+    title: isId ? 'Masuk ke Akun Tranvas' : 'Log In — Welcome Back',
+    description: isId
+      ? 'Masuk ke akun Tranvas Anda untuk mengakses planner harian, matriks habit, manajemen keuangan, dan target hidup terpadu.'
+      : 'Sign in to access your personal dashboard, habits, daily planner, finance tracking, and neural productivity tools.',
     noIndex: true,
   });
 }

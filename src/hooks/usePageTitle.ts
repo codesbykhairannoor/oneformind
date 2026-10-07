@@ -1,25 +1,42 @@
 'use client';
 
 import { useEffect } from 'react';
-
-const SITE_NAME = 'Tranvas';
+import { useLocale } from 'next-intl';
+import { usePathname } from '@/i18n/routing';
+import { getRouteTitle, SITE_NAME } from '@/lib/titles';
 
 /**
- * Sets the browser tab title for client-side pages.
- * Usage: usePageTitle('Dashboard') → "Dashboard | Tranvas"
- * Usage: usePageTitle('') → "Tranvas | Productivity OS"
+ * Sets the browser tab title for client-side pages following global SaaS and SEO/GEO standards.
+ * Usage: usePageTitle('Planner — Focus & Time Blocking') → "Planner — Focus & Time Blocking | Tranvas"
+ * Usage: usePageTitle('Tranvas — The Unified Life OS...') → "Tranvas — The Unified Life OS..."
+ * Usage: usePageTitle() → automatically resolves based on active route and locale
  */
 export function usePageTitle(pageTitle?: string) {
+  const locale = useLocale();
+  const pathname = usePathname();
+
   useEffect(() => {
-    const newTitle = pageTitle ? `${pageTitle} | ${SITE_NAME}` : `${SITE_NAME} | Productivity OS`;
-    
-    document.title = newTitle;
-    
-    // Bypass Next.js App Router metadata overriding the client title on navigation
+    let finalTitle = '';
+
+    if (pageTitle && pageTitle.trim()) {
+      const trimmed = pageTitle.trim();
+      finalTitle = trimmed.includes(SITE_NAME) ? trimmed : `${trimmed} | ${SITE_NAME}`;
+    } else {
+      const path = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
+      finalTitle = getRouteTitle(path, locale);
+    }
+
+    if (typeof document !== 'undefined') {
+      document.title = finalTitle;
+    }
+
+    // Persist title through Next.js client-side router transitions
     const timeout = setTimeout(() => {
-      document.title = newTitle;
+      if (typeof document !== 'undefined') {
+        document.title = finalTitle;
+      }
     }, 50);
 
     return () => clearTimeout(timeout);
-  }, [pageTitle]);
+  }, [pageTitle, pathname, locale]);
 }

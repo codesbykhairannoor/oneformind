@@ -3,9 +3,15 @@ import { redirect } from 'next/navigation';
 import FinanceDashboardClient from './FinanceDashboardClient';
 import { goFetchJson } from '@/lib/go-fetch';
 
+import { getLocale } from 'next-intl/server';
+import { getRouteTitle } from '@/lib/titles';
+
 export async function generateMetadata() {
+    const locale = await getLocale();
     return {
-        title: 'Finance Dashboard | Tranvas',
+        title: {
+            absolute: getRouteTitle('/finance/dashboard', locale),
+        },
     };
 }
 

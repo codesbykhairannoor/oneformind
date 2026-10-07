@@ -9,7 +9,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { createClient } from '@/utils/supabase/client';
 
 export default function Register() {
-    usePageTitle('Register');
+    usePageTitle();
     const t = useTranslations();
     const locale = useLocale();
     const router = useRouter();

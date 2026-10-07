@@ -2,7 +2,9 @@ import FullPageOnboarding from '@/components/onboarding/FullPageOnboarding';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Onboarding & Workspace Setup | Tranvas OS',
+    title: {
+        absolute: 'Workspace Setup & Onboarding | Tranvas',
+    },
     description: 'Customize your active productivity tabs, choose your persona, and launch your personalized Tranvas Life Operating System.',
 };
 

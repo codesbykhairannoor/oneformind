@@ -3,9 +3,15 @@ import { redirect } from 'next/navigation';
 import HabitsClient from './HabitsClient';
 import { goFetchJson } from '@/lib/go-fetch';
 
+import { getLocale } from 'next-intl/server';
+import { getRouteTitle } from '@/lib/titles';
+
 export async function generateMetadata() {
+    const locale = await getLocale();
     return {
-        title: 'Habits Tracker | Tranvas',
+        title: {
+            absolute: getRouteTitle('/habits', locale),
+        },
     };
 }
 

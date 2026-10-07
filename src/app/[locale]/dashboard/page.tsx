@@ -4,9 +4,14 @@ import DashboardClient from './DashboardClient';
 import { redirect } from 'next/navigation';
 import { goFetchJson } from '@/lib/go-fetch';
 
+import { getRouteTitle } from '@/lib/titles';
+
 export async function generateMetadata() {
+    const locale = await getLocale();
     return {
-        title: `Dashboard - Tranvas`,
+        title: {
+            absolute: getRouteTitle('/dashboard', locale),
+        },
     };
 }
 

@@ -15,6 +15,7 @@ import AuthCoachFloatingButton from './layout/AuthCoachFloatingButton';
 import AuthMobileBottomNav from './layout/AuthMobileBottomNav';
 import ActiveModulesSetupModal from './ActiveModulesSetupModal';
 import { useActiveModules } from '@/hooks/useActiveModules';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 interface AuthenticatedLayoutProps {
     children: React.ReactNode;
@@ -22,6 +23,7 @@ interface AuthenticatedLayoutProps {
 }
 
 export default function AuthenticatedLayout({ children, user: initialUser }: AuthenticatedLayoutProps) {
+    usePageTitle();
     const t = useTranslations();
     const locale = useLocale();
     const pathname = usePathname();

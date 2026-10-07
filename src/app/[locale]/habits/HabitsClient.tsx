@@ -30,7 +30,7 @@ import { useRouter } from '@/i18n/routing';
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function HabitsClient({ initialDateStr, initialHabits }: { initialDateStr: string; initialHabits: any[] }) {
-    usePageTitle('Habits Tracker');
+    usePageTitle();
     const t = useTranslations();
     const locale = useLocale();
     const router = useRouter();
