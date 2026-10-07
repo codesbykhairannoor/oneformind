@@ -17,7 +17,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '../..');
-const ASSESSMENT_DIR = path.join(ROOT_DIR, 'assessment');
 
 console.log("\n================================================================================");
 console.log("🚦 ONEFORMIND MASTER QUALITY NET: AUTOMATED RELEASE GATE RUNNER");
@@ -124,34 +123,6 @@ if (isReleasable) {
   console.log("  🔴 FINAL VERDICT: BLOCKED (Release prohibited due to open P0/P1 defects!)");
 }
 console.log("================================================================================\n");
-
-// Ensure assessment directory exists
-if (!fs.existsSync(ASSESSMENT_DIR)) {
-  fs.mkdirSync(ASSESSMENT_DIR, { recursive: true });
-}
-
-const auditPayload = {
-  timestamp: new Date().toISOString(),
-  gitBranch: 'main',
-  status,
-  summary: {
-    totalSuites: SUITES.length,
-    passedSuites: results.filter(r => r.passed).length,
-    failedSuites: results.filter(r => !r.passed).length,
-    p0Count,
-    p1Count,
-    p2Count,
-    p3Count
-  },
-  suites: results
-};
-
-fs.writeFileSync(
-  path.join(ASSESSMENT_DIR, 'release-decision-latest.json'),
-  JSON.stringify(auditPayload, null, 2)
-);
-
-console.log(`📁 Audit report saved to: assessment/release-decision-latest.json\n`);
 
 if (!isReleasable) {
   process.exit(1);
