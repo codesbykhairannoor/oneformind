@@ -1,48 +1,127 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
+import { trackCTAClick } from '@/lib/analytics';
 
 export default function LandingWaitlist() {
     const t = useTranslations();
 
+    const comparisonRows = [
+        {
+            title: t('comp_r1_title'),
+            sep: t('comp_r1_sep'),
+            tra: t('comp_r1_tra'),
+            highlight: true,
+        },
+        {
+            title: t('comp_r2_title'),
+            sep: t('comp_r2_sep'),
+            tra: t('comp_r2_tra'),
+            highlight: false,
+        },
+        {
+            title: t('comp_r3_title'),
+            sep: t('comp_r3_sep'),
+            tra: t('comp_r3_tra'),
+            highlight: true,
+        },
+        {
+            title: t('comp_r4_title'),
+            sep: t('comp_r4_sep'),
+            tra: t('comp_r4_tra'),
+            highlight: false,
+        },
+        {
+            title: t('comp_r5_title'),
+            sep: t('comp_r5_sep'),
+            tra: t('comp_r5_tra'),
+            highlight: true,
+        },
+    ];
+
     return (
-        <section className="py-48 bg-white overflow-hidden">
-            <div className="max-w-5xl mx-auto px-6">
-                <div className="relative bg-slate-950 rounded-[3rem] p-12 md:p-20 shadow-2xl overflow-hidden group">
-                    <div className="absolute -right-20 -top-20 w-[600px] h-[600px] bg-indigo-600 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+        <section className="py-28 sm:py-36 bg-white overflow-hidden border-t border-slate-200/80" id="comparison">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+                
+                {/* Section Header */}
+                <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs mb-6 tracking-wider uppercase border border-emerald-200/80 shadow-sm">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        {t('comp_badge')}
+                    </div>
+                    <h2 className="text-3xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 font-black tracking-[-0.035em] leading-[1.12]">
+                        {t('comp_title')}
+                    </h2>
+                    <p className="text-slate-600 text-base sm:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
+                        {t('comp_desc')}
+                    </p>
+                </div>
+
+                {/* High-Converting Comparison Matrix Card */}
+                <div className="rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-100 overflow-hidden">
                     
-                    <div className="grid md:grid-cols-2 gap-16 items-center relative z-10">
-                        <div>
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-slate-300 font-bold text-[10px] mb-8 tracking-[0.2em] uppercase border border-white/10">
-                                {t('eco_coming_soon')}
-                            </div>
-                            <h2 className="text-4xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight font-[900] tracking-tight">
-                                {t('waitlist_title')}
-                            </h2>
-                            <p className="text-slate-400 text-lg font-medium leading-relaxed mb-0 opacity-80">
-                                {t('waitlist_desc')}
-                            </p>
+                    {/* Header Columns */}
+                    <div className="grid grid-cols-12 bg-slate-50/80 p-5 sm:p-6 border-b border-slate-200 text-xs sm:text-sm font-bold items-center">
+                        <div className="col-span-5 sm:col-span-4 text-slate-500 uppercase tracking-wider text-[11px] sm:text-xs">
+                            {t('comp_col_feature')}
                         </div>
-
-                        <div className="bg-white/5 p-8 rounded-[2rem] border border-white/10 shadow-inner">
-                            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                                <input 
-                                    type="email" 
-                                    placeholder={t('waitlist_input_placeholder')}
-                                    className="w-full px-6 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 outline-none font-medium transition-all"
-                                    required
-                                />
-                                <button type="submit" className="w-full bg-white text-slate-950 px-6 py-4 rounded-xl font-bold text-lg hover:bg-slate-100 transition transform active:scale-95 shadow-lg">
-                                    {t('waitlist_btn')}
-                                </button>
-                            </form>
-
-                            <p className="mt-6 text-[10px] text-slate-500 font-bold text-center tracking-widest uppercase opacity-60">
-                                {t('waitlist_note')}
-                            </p>
+                        <div className="col-span-3 sm:col-span-4 text-center sm:text-left text-slate-500 font-semibold text-xs sm:text-sm">
+                            {t('comp_col_separated')}
+                        </div>
+                        <div className="col-span-4 text-center sm:text-left text-indigo-600 font-black text-xs sm:text-base flex items-center justify-end sm:justify-start gap-1.5">
+                            <span className="hidden sm:inline">⚡</span>
+                            <span>{t('comp_col_tranvas')}</span>
                         </div>
                     </div>
+
+                    {/* Matrix Rows */}
+                    <div className="divide-y divide-slate-100 text-xs sm:text-sm">
+                        {comparisonRows.map((row, idx) => (
+                            <div 
+                                key={idx}
+                                className={`grid grid-cols-12 p-4 sm:p-5 items-center transition-colors ${
+                                    row.highlight ? 'bg-indigo-50/20' : 'bg-white hover:bg-slate-50/50'
+                                }`}
+                            >
+                                <div className="col-span-5 sm:col-span-4 font-bold text-slate-900 pr-2">
+                                    {row.title}
+                                </div>
+                                <div className="col-span-3 sm:col-span-4 text-slate-500 text-center sm:text-left pr-2 text-[11px] sm:text-sm">
+                                    {row.sep}
+                                </div>
+                                <div className="col-span-4 text-indigo-700 font-bold text-right sm:text-left flex items-center justify-end sm:justify-start gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] shrink-0 font-black">
+                                        ✓
+                                    </span>
+                                    <span className="text-[11px] sm:text-sm">{row.tra}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Bottom Action Footer */}
+                    <div className="p-6 sm:p-8 bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-slate-800">
+                        <div>
+                            <div className="text-lg font-black tracking-tight text-white">
+                                Siap Hentikan Kekacauan 6 Aplikasi?
+                            </div>
+                            <div className="text-xs text-slate-400 mt-1">
+                                Setup dalam 30 detik • Data tersinkron otomatis • 8 modul lengkap terbuka penuh
+                            </div>
+                        </div>
+
+                        <Link
+                            href="/register"
+                            onClick={() => trackCTAClick('comparison_matrix_btn', 'Switch to Tranvas Today', '/register')}
+                            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-center shrink-0 cursor-pointer"
+                        >
+                            {t('comp_cta_btn')}
+                        </Link>
+                    </div>
+
                 </div>
+
             </div>
         </section>
     );

@@ -8,15 +8,22 @@ export default function LandingBottomCTA() {
     const t = useTranslations();
 
     return (
-        <section className="py-56 px-6 text-center relative overflow-hidden bg-white">
-            {/* Aesthetic Accents */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(79,70,229,0.05)_0%,transparent_50%)]"></div>
+        <section className="py-28 sm:py-36 px-4 sm:px-6 text-center relative overflow-hidden bg-slate-950 border-t border-slate-900">
+            {/* Ambient Lighting */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-indigo-600/15 via-purple-600/10 to-emerald-600/10 blur-[130px] rounded-full pointer-events-none -z-10" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
             
-            <div className="max-w-5xl mx-auto relative z-10">
-                <h2 className="text-5xl md:text-[6rem] mb-12 leading-[1] tracking-tight text-slate-900 font-[900]">
+            <div className="max-w-4xl mx-auto relative z-10">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-xs mb-8 tracking-wider uppercase border border-indigo-500/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>SISTEM SIAP PAKAI</span>
+                </div>
+
+                <h2 className="text-3xl sm:text-5xl lg:text-6xl mb-6 leading-[1.12] tracking-[-0.035em] text-white font-black max-w-3xl mx-auto">
                     {t('cta_final_title')}
                 </h2>
-                <p className="text-slate-500 text-lg md:text-xl mb-16 max-w-xl mx-auto font-medium opacity-80">
+
+                <p className="text-slate-400 text-base sm:text-lg mb-12 max-w-xl mx-auto font-normal leading-relaxed">
                     {t('cta_final_desc')}
                 </p>
                 
@@ -24,21 +31,26 @@ export default function LandingBottomCTA() {
                     <Link 
                         href="/register" 
                         onClick={() => trackCTAClick('final_cta_section', 'Get Started Free', '/register')}
-                        className="inline-block bg-indigo-600 text-white px-16 py-6 rounded-2xl font-bold text-xl hover:bg-indigo-700 shadow-[0_20px_40px_-10px_rgba(79,70,229,0.3)] transition transform hover:-translate-y-1 active:scale-95 font-sans"
+                        className="inline-flex items-center justify-center gap-2 bg-indigo-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 font-sans cursor-pointer group"
                     >
-                        {t('cta_final_btn')}
+                        <span>{t('cta_final_btn')}</span>
+                        <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
                     </Link>
-                    <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-400">
+
+                    {/* Compliant Trust Badges (No Free Tier Mentions) */}
+                    <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs font-semibold text-slate-400">
                         <span className="flex items-center gap-1.5">
-                            <span className="text-emerald-500 font-bold">✓</span> Free Plan Available
+                            <span className="text-emerald-400 font-bold">✓</span> 8 Modul Siap Pakai
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1.5">
-                            <span className="text-emerald-500 font-bold">✓</span> No Card Needed
+                            <span className="text-emerald-400 font-bold">✓</span> Setup dalam 30 Detik
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1.5">
-                            <span className="text-emerald-500 font-bold">✓</span> Instant Cloud Sync
+                            <span className="text-emerald-400 font-bold">✓</span> 100% Private & Terenkripsi
                         </span>
                     </div>
                 </div>
