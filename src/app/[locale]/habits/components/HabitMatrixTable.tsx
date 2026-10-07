@@ -283,6 +283,15 @@ export default function HabitMatrixTable({
                                                         });
                                                     }}
                                                     disabled={day.isFuture}
+                                                    title={
+                                                        day.isFuture 
+                                                            ? (isIndo ? 'Tanggal mendatang' : 'Future date')
+                                                            : isRest 
+                                                            ? (isIndo ? 'Hari Istirahat (Streak terjaga) • Klik kanan untuk ubah' : 'Rest Day (Streak protected) • Right-click to edit')
+                                                            : isDone 
+                                                            ? (isIndo ? 'Selesai • Klik kanan untuk Istirahat / Catatan' : 'Completed • Right-click for Rest / Notes')
+                                                            : (isIndo ? 'Klik kiri: Centang • Klik kanan: Istirahat / Deload Week' : 'Left-click: Complete • Right-click: Rest / Deload Week')
+                                                    }
                                                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${
                                                         isDone
                                                             ? 'shadow-xs text-white'

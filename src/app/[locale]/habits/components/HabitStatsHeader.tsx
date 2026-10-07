@@ -307,11 +307,11 @@ export default function HabitStatsHeader({
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0 border-l border-indigo-200 dark:border-indigo-800 pl-6">
                             <span className="w-4 h-4 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md flex items-center justify-center text-[8px] font-black">☕</span>
-                            <span>{isIndo ? 'Hari istirahat terjaga (Rest Day)' : 'Rest days protect streaks'}</span>
+                            <span>{isIndo ? 'Klik kanan kotak untuk atur Libur / Deload Week (Streak Terjaga)' : 'Right-click cell for Rest / Deload Week (Streak Protected)'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0 border-l border-indigo-200 dark:border-indigo-800 pl-6">
                             <span className="w-4 h-4 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded-md flex items-center justify-center text-[8px] font-black">•</span>
-                            <span>{isIndo ? 'Klik titik untuk catatan harian' : 'Click dot for micro-notes'}</span>
+                            <span>{isIndo ? 'Titik kuning menandakan ada catatan harian' : 'Yellow dot indicates micro-note'}</span>
                         </div>
                     </div>
                     <button type="button" onClick={() => setShowHint(false)} className="p-1 text-indigo-400 hover:text-indigo-600">
