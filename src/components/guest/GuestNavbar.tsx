@@ -55,7 +55,7 @@ export default function GuestNavbar({
                     {/* DROPDOWN: FEATURES */}
                     <div className="relative group" onMouseEnter={() => setActiveMenu('features')} onMouseLeave={() => setActiveMenu(null)}>
                         <Link href="/features" className="px-3 py-1.5 rounded-full text-[13px] font-bold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition-all flex items-center gap-1 group-hover:text-indigo-600">
-                            Features
+                            {locale === 'id' ? 'Fitur' : 'Features'}
                             <svg className={`w-3.5 h-3.5 opacity-50 transition-transform ${activeMenu === 'features' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -106,7 +106,7 @@ export default function GuestNavbar({
                     {/* DROPDOWN: SOLUTIONS */}
                     <div className="relative group" onMouseEnter={() => setActiveMenu('solutions')} onMouseLeave={() => setActiveMenu(null)}>
                         <button className="px-3 py-1.5 rounded-full text-[13px] font-bold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition flex items-center gap-1 group-hover:text-indigo-600">
-                            Solutions
+                            {locale === 'id' ? 'Solusi' : 'Solutions'}
                             <svg className={`w-3.5 h-3.5 opacity-50 transition-transform ${activeMenu === 'solutions' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -177,7 +177,7 @@ export default function GuestNavbar({
                     {/* DROPDOWN: RESOURCES */}
                     <div className="relative group" onMouseEnter={() => setActiveMenu('resources')} onMouseLeave={() => setActiveMenu(null)}>
                         <button className="px-3 py-1.5 rounded-full text-[13px] font-bold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition flex items-center gap-1 group-hover:text-indigo-600">
-                            Resources
+                            {locale === 'id' ? 'Sumber Daya' : 'Resources'}
                             <svg className={`w-3.5 h-3.5 opacity-50 transition-transform ${activeMenu === 'resources' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -230,7 +230,7 @@ export default function GuestNavbar({
                     </div>
 
                     <Link href="/pricing" className="px-3 py-1.5 rounded-full text-[13px] font-bold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition">
-                        Pricing
+                        {locale === 'id' ? 'Harga' : 'Pricing'}
                     </Link>
                 </div>
 
@@ -286,14 +286,14 @@ export default function GuestNavbar({
                                     onClick={() => trackCTAClick('header_nav', 'Log in', '/login')}
                                     className="text-[13px] font-bold text-slate-600 hover:text-indigo-600 transition"
                                 >
-                                    Log in
+                                    {locale === 'id' ? 'Masuk' : 'Log in'}
                                 </Link>
                                 <Link 
                                     href="/register" 
                                     onClick={() => trackCTAClick('header_nav', 'Get started', '/register')}
                                     className="px-5 py-2 bg-indigo-600 text-white rounded-full text-[13px] font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5 active:scale-95"
                                 >
-                                    Get started
+                                    {locale === 'id' ? 'Mulai Sekarang' : 'Get started'}
                                 </Link>
                             </>
                         )}

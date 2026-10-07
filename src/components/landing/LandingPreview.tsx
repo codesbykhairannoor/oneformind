@@ -1,9 +1,11 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function LandingPreview() {
     const t = useTranslations();
+    const locale = useLocale();
+    const isId = locale === 'id';
 
     return (
         <section className="py-28 sm:py-36 bg-white relative overflow-hidden border-t border-slate-200/80">
@@ -12,12 +14,12 @@ export default function LandingPreview() {
                     
                     {/* Visual: High-Fidelity Life OS Workspace Frame */}
                     <div className="relative order-2 lg:order-1">
-                        <div className="absolute -inset-10 bg-gradient-to-tr from-indigo-200 via-purple-100 to-emerald-100 rounded-3xl blur-3xl opacity-50 -z-10"></div>
+                        <div className="absolute -inset-10 bg-gradient-to-tr from-indigo-200 via-purple-100 to-emerald-100 rounded-3xl blur-3xl opacity-60 -z-10 animate-pulse-glow"></div>
                         
                         <div 
-                            className="relative bg-slate-900 rounded-3xl p-1 shadow-[0_30px_80px_-15px_rgba(15,23,42,0.35)] border border-slate-800 overflow-hidden text-left" 
+                            className="relative bg-slate-900 rounded-3xl p-1 shadow-[0_30px_80px_-15px_rgba(15,23,42,0.35)] border border-slate-800 overflow-hidden text-left hover:border-slate-700 transition-all duration-300" 
                             role="img" 
-                            aria-label="Tranvas Dashboard Preview: Antarmuka terpadu habit tracking, manajemen keuangan, dan eksekusi task harian."
+                            aria-label="Tranvas Dashboard Preview"
                         >
                             {/* Window Topbar */}
                             <div className="w-full h-9 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between px-4">
@@ -27,7 +29,10 @@ export default function LandingPreview() {
                                     <div className="w-2.5 h-2.5 rounded-full bg-green-500/70"></div>
                                 </div>
                                 <span className="text-[11px] font-mono text-slate-400">tranvas.app/workspace/dashboard</span>
-                                <span className="text-[10px] text-emerald-400 font-medium">● Live Sync</span>
+                                <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    ● Live Sync
+                                </span>
                             </div>
 
                             {/* App Content */}
@@ -39,19 +44,19 @@ export default function LandingPreview() {
                                         <span>📋</span>
                                         <span className="hidden sm:inline">Planner</span>
                                     </div>
-                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2">
+                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2 transition-colors">
                                         <span>🌱</span>
                                         <span className="hidden sm:inline">Habits</span>
                                     </div>
-                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2">
+                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2 transition-colors">
                                         <span>💰</span>
                                         <span className="hidden sm:inline">Finance</span>
                                     </div>
-                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2">
+                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2 transition-colors">
                                         <span>🎯</span>
                                         <span className="hidden sm:inline">Goals</span>
                                     </div>
-                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2">
+                                    <div className="p-2 rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2 transition-colors">
                                         <span>✍️</span>
                                         <span className="hidden sm:inline">Journal</span>
                                     </div>
@@ -60,39 +65,47 @@ export default function LandingPreview() {
                                 {/* Main Active Panel */}
                                 <div className="col-span-8 sm:col-span-9 space-y-3.5">
                                     {/* Focus Banner */}
-                                    <div className="p-4 rounded-2xl bg-indigo-950/50 border border-indigo-500/30 flex flex-col justify-between">
+                                    <div className="p-4 rounded-2xl bg-indigo-950/50 border border-indigo-500/30 flex flex-col justify-between hover:border-indigo-400/50 transition-colors">
                                         <div className="flex items-center justify-between text-[11px]">
                                             <span className="text-indigo-300 font-bold uppercase tracking-wider">Deep Work Block</span>
-                                            <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold">In Progress</span>
+                                            <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold animate-pulse">In Progress</span>
                                         </div>
                                         <div className="text-sm font-bold text-white mt-1">
-                                            Arsitektur Sistem & Core Algorithm v2.4
+                                            {isId ? 'Arsitektur Sistem & Core Engine v2.4' : 'System Architecture & Core Engine v2.4'}
                                         </div>
                                     </div>
 
                                     {/* 2 Side-by-side Mini Widgets */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {/* Habit widget */}
-                                        <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/60">
+                                        <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/60 hover:border-slate-600 transition-colors">
                                             <div className="flex items-center justify-between text-xs mb-2">
                                                 <span className="text-slate-400 font-medium">Habit Streak</span>
-                                                <span className="text-emerald-400 font-bold">🔥 24 Hari</span>
+                                                <span className="text-emerald-400 font-bold">
+                                                    {isId ? '🔥 24 Hari' : '🔥 24 Days'}
+                                                </span>
                                             </div>
                                             <div className="flex gap-1">
                                                 {Array.from({ length: 7 }).map((_, i) => (
                                                     <div key={i} className="flex-1 h-3 rounded-[3px] bg-emerald-500"></div>
                                                 ))}
                                             </div>
-                                            <div className="text-[10px] text-slate-400 mt-2 font-mono">100% Konsistensi Pekan Ini</div>
+                                            <div className="text-[10px] text-slate-400 mt-2 font-mono">
+                                                {isId ? '100% Konsistensi Pekan Ini' : '100% Consistency This Week'}
+                                            </div>
                                         </div>
 
                                         {/* Finance widget */}
-                                        <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/60">
+                                        <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/60 hover:border-slate-600 transition-colors">
                                             <div className="flex items-center justify-between text-xs mb-1">
-                                                <span className="text-slate-400 font-medium">Saldo Bersih</span>
+                                                <span className="text-slate-400 font-medium">
+                                                    {isId ? 'Saldo Bersih' : 'Net Balance'}
+                                                </span>
                                                 <span className="text-amber-400 font-bold">On-Track</span>
                                             </div>
-                                            <div className="text-base font-black text-white">Rp 24.850.000</div>
+                                            <div className="text-base font-black text-white">
+                                                {isId ? 'Rp 24.850.000' : '$1,650.00'}
+                                            </div>
                                             <div className="h-1.5 w-full bg-slate-700 rounded-full mt-2 overflow-hidden">
                                                 <div className="h-full bg-emerald-400 w-[78%]"></div>
                                             </div>
@@ -119,17 +132,17 @@ export default function LandingPreview() {
                         
                         {/* Device & Platform Badges */}
                         <div className="flex flex-wrap gap-3">
-                            <div className="px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs font-bold text-slate-700 shadow-sm">
+                            <div className="px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs font-bold text-slate-700 shadow-sm hover:border-indigo-300 hover:-translate-y-0.5 transition-all">
                                 <span>💻</span>
                                 <span>Desktop Web App</span>
                             </div>
-                            <div className="px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs font-bold text-slate-700 shadow-sm">
+                            <div className="px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs font-bold text-slate-700 shadow-sm hover:border-indigo-300 hover:-translate-y-0.5 transition-all">
                                 <span>📱</span>
                                 <span>Mobile Browser Ready</span>
                             </div>
-                            <div className="px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs font-bold text-slate-700 shadow-sm">
+                            <div className="px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs font-bold text-slate-700 shadow-sm hover:border-indigo-300 hover:-translate-y-0.5 transition-all">
                                 <span>⚡</span>
-                                <span>Zero Install • Langsung Pakai</span>
+                                <span>{isId ? 'Zero Install • Langsung Pakai' : 'Zero Install • Instant Web Access'}</span>
                             </div>
                         </div>
                     </div>

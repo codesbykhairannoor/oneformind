@@ -39,7 +39,7 @@ export default function GuestMobileMenu({
                         onClick={() => setMobilePanel(mobilePanel === 'features' ? null : 'features')} 
                         className="w-full py-5 flex justify-between items-center text-xl font-black text-slate-900 dark:text-white"
                     >
-                        <span>Features</span>
+                        <span>{locale === 'id' ? 'Fitur' : 'Features'}</span>
                         <svg className={`w-5 h-5 text-slate-400 transition-transform ${mobilePanel === 'features' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     {mobilePanel === 'features' && (
@@ -62,7 +62,7 @@ export default function GuestMobileMenu({
                         onClick={() => setMobilePanel(mobilePanel === 'solutions' ? null : 'solutions')} 
                         className="w-full py-5 flex justify-between items-center text-xl font-black text-slate-900 dark:text-white"
                     >
-                        <span>Solutions</span>
+                        <span>{locale === 'id' ? 'Solusi' : 'Solutions'}</span>
                         <svg className={`w-5 h-5 text-slate-400 transition-transform ${mobilePanel === 'solutions' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     {mobilePanel === 'solutions' && (
@@ -86,7 +86,7 @@ export default function GuestMobileMenu({
                         onClick={() => setMobilePanel(mobilePanel === 'resources' ? null : 'resources')} 
                         className="w-full py-5 flex justify-between items-center text-xl font-black text-slate-900 dark:text-white"
                     >
-                        <span>Resources</span>
+                        <span>{locale === 'id' ? 'Sumber Daya' : 'Resources'}</span>
                         <svg className={`w-5 h-5 text-slate-400 transition-transform ${mobilePanel === 'resources' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     {mobilePanel === 'resources' && (
@@ -99,12 +99,12 @@ export default function GuestMobileMenu({
                     )}
                 </div>
 
-                <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block py-5 text-xl font-black text-slate-900 dark:text-white border-b border-slate-50 dark:border-slate-800/50">Pricing</Link>
+                <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block py-5 text-xl font-black text-slate-900 dark:text-white border-b border-slate-50 dark:border-slate-800/50">{locale === 'id' ? 'Harga' : 'Pricing'}</Link>
             </div>
 
             <div className="pt-8 space-y-6">
                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/50">
-                    <span className="text-sm font-bold text-slate-500">Language</span>
+                    <span className="text-sm font-bold text-slate-500">{locale === 'id' ? 'Bahasa' : 'Language'}</span>
                     <div className="flex gap-2">
                         <a 
                             href={idHref} 
@@ -130,19 +130,19 @@ export default function GuestMobileMenu({
                             onClick={() => { setMobileMenuOpen(false); trackCTAClick('mobile_menu', 'Log in', '/login'); }} 
                             className="w-full py-4 text-center font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:border-slate-200"
                         >
-                            Log in
+                            {locale === 'id' ? 'Masuk' : 'Log in'}
                         </Link>
                         <Link 
                             href="/register" 
                             onClick={() => { setMobileMenuOpen(false); trackCTAClick('mobile_menu', 'Get Started', '/register'); }} 
                             className="w-full py-4 text-center font-black text-white bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none active:scale-95 transition-transform"
                         >
-                            Get Started
+                            {locale === 'id' ? 'Mulai Sekarang' : 'Get Started'}
                         </Link>
                     </div>
                 ) : (
                     <div>
-                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block w-full py-4 text-center font-black text-white bg-slate-900 dark:bg-slate-800 rounded-2xl shadow-xl active:scale-95 transition-transform">Go to Dashboard</Link>
+                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block w-full py-4 text-center font-black text-white bg-slate-900 dark:bg-slate-800 rounded-2xl shadow-xl active:scale-95 transition-transform">{locale === 'id' ? 'Buka Dashboard' : 'Go to Dashboard'}</Link>
                     </div>
                 )}
             </div>

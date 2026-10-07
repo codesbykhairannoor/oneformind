@@ -92,10 +92,10 @@ export default function LandingSynergy() {
                                     <div className="relative z-10 text-5xl group-hover:scale-110 transition duration-700">🌌</div>
                                 </div>
 
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl">🌱</div>
-                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl">💰</div>
-                                <div className="absolute left-0 top-1/2 -translate-x-4 -translate-y-1/2 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl">📅</div>
-                                <div className="absolute right-0 top-1/2 translate-x-4 -translate-y-1/2 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl">📔</div>
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl animate-float-slow hover:scale-110 transition-transform">🌱</div>
+                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl animate-float-slow hover:scale-110 transition-transform" style={{ animationDelay: '1.5s' }}>💰</div>
+                                <div className="absolute left-0 top-1/2 -translate-x-4 -translate-y-1/2 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl animate-float-slow hover:scale-110 transition-transform" style={{ animationDelay: '2.5s' }}>📅</div>
+                                <div className="absolute right-0 top-1/2 translate-x-4 -translate-y-1/2 w-14 h-14 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center text-2xl animate-float-slow hover:scale-110 transition-transform" style={{ animationDelay: '3.5s' }}>📔</div>
                             </div>
                         </div>
                     </div>

@@ -88,6 +88,35 @@ body {
   will-change: transform, opacity;
 }
 
+@keyframes floatSlow {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.05); }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 5s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+.animate-shimmer {
+  animation: shimmer 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 /* Journal Markdown Preview Styles */
 .journal-preview .md-h1 { font-size: 1.875rem; font-weight: 900; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--color-slate-900); }
 .dark .journal-preview .md-h1 { color: #f8fafc; }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 
 export default function LandingSolutions() {
@@ -17,6 +17,9 @@ export default function LandingSolutions() {
         { name: 'Freelancer', route: '/solutions/freelancer', icon: '🚀', color: 'from-rose-500/10 to-red-500/10' },
         { name: 'Second Brain', route: '/solutions/second-brain', icon: '💎', color: 'from-indigo-500/10 to-purple-500/10' },
     ];
+
+    const locale = useLocale();
+    const isId = locale === 'id';
 
     return (
         <section className="py-40 bg-slate-900 relative overflow-hidden">
@@ -37,16 +40,16 @@ export default function LandingSolutions() {
 
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {solutionPaths.map((path, idx) => (
-                        <Link key={idx} href={path.route} className="group block p-[1px] rounded-3xl bg-white/5 border border-white/5 hover:border-white/20 transition-all duration-500">
+                        <Link key={idx} href={path.route} className="group block p-[1px] rounded-3xl bg-white/5 border border-white/5 hover:border-white/20 hover:-translate-y-1.5 transition-all duration-300">
                             <div className={`relative overflow-hidden rounded-[calc(1.5rem-1px)] bg-gradient-to-br ${path.color} p-8 h-full flex flex-col items-center text-center`}>
-                                <div className="text-4xl mb-4 group-hover:scale-110 transition duration-500">
+                                <div className="text-4xl mb-4 group-hover:scale-110 transition duration-300">
                                     {path.icon}
                                 </div>
                                 <h3 className="text-white font-bold tracking-tight text-sm">
                                     {path.name}
                                 </h3>
-                                <div className="mt-6 opacity-40 group-hover:opacity-100 transition duration-500 flex items-center gap-2 text-[10px] text-white/60 font-bold uppercase tracking-widest">
-                                    Explore <svg className="w-3 h-3 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                                <div className="mt-6 opacity-40 group-hover:opacity-100 transition duration-300 flex items-center gap-2 text-[10px] text-white/80 font-bold uppercase tracking-widest">
+                                    {isId ? 'Jelajahi' : 'Explore'} <svg className="w-3 h-3 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                                 </div>
                             </div>
                         </Link>

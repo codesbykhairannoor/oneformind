@@ -1,16 +1,18 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function LandingScienceMatrix() {
     const t = useTranslations();
+    const locale = useLocale();
+    const isId = locale === 'id';
 
     return (
         <section className="py-32 bg-slate-950 relative overflow-hidden border-y border-slate-800/80">
             {/* Ambient Grid & Glow */}
             <div className="absolute inset-0 opacity-25 pointer-events-none">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-600/10 rounded-full blur-[140px]"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-600/10 rounded-full blur-[140px] animate-pulse-glow"></div>
             </div>
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -18,13 +20,15 @@ export default function LandingScienceMatrix() {
                 <div className="text-center max-w-3xl mx-auto mb-20">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-[10px] mb-6 uppercase tracking-[0.25em] border border-indigo-500/20">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Cognitive Architecture
+                        {isId ? 'Arsitektur Kognitif' : 'Cognitive Architecture'}
                     </div>
                     <h2 className="text-3xl md:text-5xl lg:text-6xl text-white font-[900] tracking-tight leading-[1.15] mb-6">
                         {t('home_science_title_1')} <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">{t('home_science_title_highlight')}</span>
                     </h2>
                     <p className="text-slate-400 text-base md:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
-                        Tranvas is built upon verified cognitive neuroscience and behavioral economics frameworks—engineered to eliminate cognitive friction and sustain peak execution.
+                        {isId 
+                            ? 'Tranvas dibangun di atas kerangka kerja neurosains kognitif dan ekonomi perilaku teruji—dirancang untuk melenyapkan friksi kognitif dan mempertahankan eksekusi puncak.'
+                            : 'Tranvas is built upon verified cognitive neuroscience and behavioral economics frameworks—engineered to eliminate cognitive friction and sustain peak execution.'}
                     </p>
                 </div>
 

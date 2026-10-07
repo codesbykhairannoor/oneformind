@@ -27,7 +27,9 @@ export default function GuestFooter({
                             <span className="text-lg font-black tracking-tighter text-slate-900">Tranvas</span>
                         </Link>
                         <p className="text-sm text-slate-700 leading-relaxed mb-6 max-w-xs font-medium">
-                            The unified productivity system designed to bring clarity to your life, habits, and finances.
+                            {locale === 'id' 
+                                ? 'Sistem produktivitas terpadu yang dirancang untuk menghadirkan kejelasan pada hidup, habit, dan keuangan Anda.' 
+                                : 'The unified productivity system designed to bring clarity to your life, habits, and finances.'}
                         </p>
                         <div className="text-xs text-slate-600 space-y-2 mt-4 font-bold">
                             <p><strong>Email:</strong> <span dangerouslySetInnerHTML={{ __html: '<!--email_off--><a href="mailto:tranvasapp@gmail.com" class="hover:underline">tranvasapp@gmail.com</a><!--/email_off-->' }} /></p>
@@ -126,7 +128,7 @@ export default function GuestFooter({
                         <span>•</span>
                         <a href={idHref} onClick={(e) => { e.preventDefault(); switchLang('id'); }} className={`hover:text-indigo-600 transition ${locale === 'id' ? 'text-indigo-600 font-black' : ''}`}>Bahasa Indonesia</a>
                     </div>
-                    <p>Made with ❤️ for better focus.</p>
+                    <p>{locale === 'id' ? 'Dibuat dengan ❤️ untuk fokus yang lebih baik.' : 'Made with ❤️ for better focus.'}</p>
                 </div>
             </div>
         </footer>

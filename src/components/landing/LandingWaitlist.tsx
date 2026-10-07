@@ -1,11 +1,13 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { trackCTAClick } from '@/lib/analytics';
 
 export default function LandingWaitlist() {
     const t = useTranslations();
+    const locale = useLocale();
+    const isId = locale === 'id';
 
     const comparisonRows = [
         {
@@ -104,19 +106,22 @@ export default function LandingWaitlist() {
                     <div className="p-6 sm:p-8 bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-slate-800">
                         <div>
                             <div className="text-lg font-black tracking-tight text-white">
-                                Siap Hentikan Kekacauan 6 Aplikasi?
+                                {isId ? 'Siap Hentikan Kekacauan 6 Aplikasi?' : 'Ready to Eliminate the 6-App Chaos?'}
                             </div>
                             <div className="text-xs text-slate-400 mt-1">
-                                Setup dalam 30 detik • Data tersinkron otomatis • 8 modul lengkap terbuka penuh
+                                {isId 
+                                    ? 'Setup dalam 30 detik • Data tersinkron otomatis • 8 modul lengkap terbuka penuh' 
+                                    : '30-second setup • Real-time cloud sync • All 8 modules fully unlocked'}
                             </div>
                         </div>
 
                         <Link
                             href="/register"
                             onClick={() => trackCTAClick('comparison_matrix_btn', 'Switch to Tranvas Today', '/register')}
-                            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-center shrink-0 cursor-pointer"
+                            className="group relative overflow-hidden w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-center shrink-0 cursor-pointer"
                         >
-                            {t('comp_cta_btn')}
+                            <span className="relative z-10">{t('comp_cta_btn')}</span>
+                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                         </Link>
                     </div>
 
