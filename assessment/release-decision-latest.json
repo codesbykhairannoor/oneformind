@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-10-07T13:22:53.828Z",
+  "gitBranch": "main",
+  "status": "RELEASABLE",
+  "summary": {
+    "totalSuites": 7,
+    "passedSuites": 7,
+    "failedSuites": 0,
+    "p0Count": 0,
+    "p1Count": 0,
+    "p2Count": 0,
+    "p3Count": 0
+  },
+  "suites": [
+    {
+      "suiteId": "security_sanitization",
+      "name": "Security, XSS Sanitization & Subscription Hierarchy",
+      "passed": true,
+      "severityIfFailed": "P0",
+      "errorOutput": null
+    },
+    {
+      "suiteId": "adversarial_rls",
+      "name": "Adversarial Multi-Tenant & RLS Leak Guard",
+      "passed": true,
+      "severityIfFailed": "P0",
+      "errorOutput": null
+    },
+    {
+      "suiteId": "concurrency_fuzz",
+      "name": "Concurrency, Race Condition & Idempotency Guard",
+      "passed": true,
+      "severityIfFailed": "P1",
+      "errorOutput": null
+    },
+    {
+      "suiteId": "data_integrity",
+      "name": "Mathematical Invariants & Data Integrity Guard",
+      "passed": true,
+      "severityIfFailed": "P1",
+      "errorOutput": null
+    },
+    {
+      "suiteId": "affiliate_regression",
+      "name": "Commercial & Affiliate Ledger Regression",
+      "passed": true,
+      "severityIfFailed": "P1",
+      "errorOutput": null
+    },
+    {
+      "suiteId": "live_integration",
+      "name": "Live Infrastructure & Schema Validation",
+      "passed": true,
+      "severityIfFailed": "P1",
+      "errorOutput": null
+    },
+    {
+      "suiteId": "seo_crawlability",
+      "name": "SEO, Crawlability & i18n Hydration Audit",
+      "passed": true,
+      "severityIfFailed": "P2",
+      "errorOutput": null
+    }
+  ]
+}

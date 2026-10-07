@@ -1,0 +1,126 @@
+name: SDET Quality Net & Release Gate
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # GATE 2: DEFINITION OF READY (DoR) WORKFLOW GATE
+  # ----------------------------------------------------------------------------
+  definition-of-ready:
+    name: "Gate 2: Definition of Ready Check"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Verify PR Quality Inputs (DoR Enforcer)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "🔍 Checking PR Description for required quality inputs..."
+          PR_BODY="${{ github.event.pull_request.body }}"
+          
+          # Check for Acceptance Criteria (Given / When / Then)
+          if echo "$PR_BODY" | grep -iq "Given" && echo "$PR_BODY" | grep -iq "When" && echo "$PR_BODY" | grep -iq "Then"; then
+            echo "✅ Gate 2 Passed: Gherkin Acceptance Criteria detected."
+          else
+            echo "⚠️ Warning: PR description lacks Gherkin Acceptance Criteria (Given/When/Then)."
+            echo "Please ensure acceptance criteria are explicitly documented per SDET engineering standards."
+          fi
+
+  # ----------------------------------------------------------------------------
+  # BUILD & COMPILE INTEGRITY
+  # ----------------------------------------------------------------------------
+  build-and-compile:
+    name: "Production Build & TypeScript Check"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Run Next.js Production Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key' }}
+
+  # ----------------------------------------------------------------------------
+  # GATE 3: AUTOMATED SDET QUALITY NET
+  # ----------------------------------------------------------------------------
+  quality-net:
+    name: "Gate 3: Automated Quality Net (7 Suites)"
+    runs-on: ubuntu-latest
+    needs: [build-and-compile]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Execute Master Quality Net Runner
+        run: npm run test:qa
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key' }}
+
+      - name: Upload Release Decision Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-decision-matrix
+          path: assessment/release-decision-latest.json
+          retention-days: 30
+
+  # ----------------------------------------------------------------------------
+  # GATE 4: RELEASE-READY TAG GATE
+  # ----------------------------------------------------------------------------
+  release-gate:
+    name: "Gate 4: Release Gating Decision"
+    runs-on: ubuntu-latest
+    needs: [quality-net]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Release Decision Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-decision-matrix
+          path: assessment/
+
+      - name: Evaluate Release Gate Verdict
+        run: |
+          echo "🚦 Evaluating Gated Release on tag ${{ github.ref_name }}..."
+          STATUS=$(node -e "console.log(require('./assessment/release-decision-latest.json').status)")
+          if [ "$STATUS" = "RELEASABLE" ]; then
+            echo "🟢 TAG ${{ github.ref_name }} IS CERTIFIED RELEASABLE! Zero P0/P1 defects."
+          else
+            echo "🔴 TAG ${{ github.ref_name }} IS BLOCKED! Cannot ship with open P0/P1 defects."
+            exit 1
+          fi
