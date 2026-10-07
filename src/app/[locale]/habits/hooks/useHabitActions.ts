@@ -198,14 +198,17 @@ export function useHabitActions({
         dateStr: string, 
         noteText: string, 
         newStatus?: 'completed' | 'skipped' | 'empty' | 'rest' | 'relapse' | 'in_progress',
-        applyWholeWeekRest?: boolean
+        applyWholeWeekRest?: boolean,
+        customRestDates?: string[]
     ) => {
         const habit = habits.find(h => h.id === habitId);
         if (!habit) return;
 
-        // If applyWholeWeekRest is true, calculate all 7 days of this week
-        const targetDates: string[] = [dateStr];
-        if (applyWholeWeekRest) {
+        // If customRestDates is passed, use it; otherwise fallback to applyWholeWeekRest or single date
+        let targetDates: string[] = [dateStr];
+        if (customRestDates && customRestDates.length > 0) {
+            targetDates = customRestDates;
+        } else if (applyWholeWeekRest) {
             const [y, m, d] = dateStr.split('-').map(Number);
             const targetDateObj = new Date(y, m - 1, d);
             const dayOfWeek = targetDateObj.getDay(); // 0: Sun, 1: Mon...
@@ -213,6 +216,7 @@ export function useHabitActions({
             const mondayObj = new Date(targetDateObj);
             mondayObj.setDate(targetDateObj.getDate() - distToMon);
 
+            targetDates = [];
             for (let i = 0; i < 7; i++) {
                 const dayCur = new Date(mondayObj);
                 dayCur.setDate(mondayObj.getDate() + i);

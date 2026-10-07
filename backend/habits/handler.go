@@ -580,10 +580,10 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 		Scan(&l.ID, &logDate, &l.Status, &logNotes, &createdAt, &updatedAt)
 
 	if err != nil {
-		fmt.Printf("Error upserting habit log (retrying with safe status if constraint violated): %v\n", err)
-		safeStatus := "completed"
-		if status == "skipped" || status == "relapse" {
-			safeStatus = status
+		fmt.Printf("Error upserting habit log: %v\n", err)
+		safeStatus := status
+		if safeStatus == "" {
+			safeStatus = "completed"
 		}
 		err = db.QueryRow(query, habitID, dateStr, safeStatus, notes).
 			Scan(&l.ID, &logDate, &l.Status, &logNotes, &createdAt, &updatedAt)
@@ -591,9 +591,9 @@ func handleToggleHabitLog(w http.ResponseWriter, r *http.Request, userID int, ha
 
 	if err != nil {
 		fmt.Printf("Error upserting habit log (trying fallback UPDATE/INSERT): %v\n", err)
-		safeStatus := "completed"
-		if status == "skipped" || status == "relapse" {
-			safeStatus = status
+		safeStatus := status
+		if safeStatus == "" {
+			safeStatus = "completed"
 		}
 		res, updateErr := db.Exec(`UPDATE habit_logs SET status = $1, notes = $2, updated_at = NOW() WHERE habit_id = $3 AND (date = $4::date OR DATE(date) = $4::date)`, safeStatus, notes, habitID, dateStr)
 		if updateErr == nil {

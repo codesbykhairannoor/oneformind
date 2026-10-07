@@ -87,7 +87,7 @@ interface HabitsModalsContainerProps {
     setFormSyncedTabs?: (v: LifeOSTab[]) => void;
     isSubmitting?: boolean;
     onToggleStatus: (habitId: number, dateString: string, forceStatus?: 'completed' | 'skipped' | 'relapse' | 'rest') => void;
-    onSaveNote: (habitId: number, dateStr: string, noteText: string, newStatus?: 'completed' | 'skipped' | 'empty' | 'rest' | 'relapse' | 'in_progress', applyWholeWeekRest?: boolean) => void;
+    onSaveNote: (habitId: number, dateStr: string, noteText: string, newStatus?: 'completed' | 'skipped' | 'empty' | 'rest' | 'relapse' | 'in_progress', applyWholeWeekRest?: boolean, customRestDates?: string[]) => void;
     onSubmitSingleHabit: (e: React.FormEvent) => void;
     onExecuteDelete: () => void;
     onEditHabit?: (habit: HabitItem) => void;
