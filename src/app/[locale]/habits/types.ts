@@ -9,6 +9,8 @@ export interface HabitItem {
     monthlyTarget: number;
     position: number;
     status?: string;
+    isArchived?: boolean;
+    isGraduated?: boolean;
     habitType?: 'positive' | 'negative';
     measurementType?: 'boolean' | 'numeric';
     unit?: string;

@@ -113,6 +113,11 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
             });
         }
 
+        // Determine graduated/archived state
+        const rawStatusStr = typeof h.status === 'string' ? h.status : '';
+        const isGraduated = rawStatusStr === 'graduated' || extraMeta.graduated === true;
+        const isArchived = !!(h.isArchived || h.is_archived);
+
         return {
             id: h.id,
             name: h.name,
@@ -141,6 +146,8 @@ export const parseRawHabitsData = (fetchedHabits: any[]): HabitItem[] => {
             isKeystone: !!extraMeta.isKeystone,
             syncedTabs: Array.isArray(extraMeta.syncedTabs) ? extraMeta.syncedTabs : undefined,
             status: h.status,
+            isArchived,
+            isGraduated,
             logs: logsMap
         };
     });

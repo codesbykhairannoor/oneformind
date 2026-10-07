@@ -228,8 +228,13 @@ export default function HabitsClient({ initialDateStr, initialHabits }: { initia
         setEditingHabitId: form.setEditingHabitId,
     });
 
+    // Filter out graduated/archived habits before calculation — defense-in-depth
+    const activeHabits = useMemo(() => {
+        return habits.filter(h => !h.isGraduated && !h.isArchived);
+    }, [habits]);
+
     const calc = useHabitsCalculation({
-        habits,
+        habits: activeHabits,
         monthDates,
         currentMonthKey: period.currentMonthKey,
         activeFilter: period.activeFilter,

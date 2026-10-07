@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocale } from 'next-intl';
-import useSWR from 'swr';
+import useSWR, { mutate as globalMutate } from 'swr';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 import GoalHeader from './components/GoalHeader';
 import GoalStats from './components/GoalStats';
@@ -753,8 +753,9 @@ export default function GoalsPage() {
                     is_archived: true,
                 })
             });
-            if (mutateHabits) mutateHabits();
+            // Invalidate all habit caches across the app
             mutateGoals();
+            globalMutate((key: any) => typeof key === 'string' && key.startsWith('/api/habits'), undefined, { revalidate: true });
         } catch (err) {
             console.error('Failed to graduate habit:', err);
         }

@@ -334,7 +334,7 @@ func handleUpdateHabit(w http.ResponseWriter, r *http.Request, userID int, habit
 		case "color": dbCol = "color"
 		case "monthlyTarget": dbCol = "monthly_target"
 		case "position": dbCol = "position"
-		case "isArchived": dbCol = "is_archived"
+		case "isArchived", "is_archived": dbCol = "is_archived"
 		case "status": dbCol = "status"
 		default: continue
 		}
