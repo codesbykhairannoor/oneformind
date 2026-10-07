@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * ONEFORMIND MASTER QUALITY NET & RELEASE GATE VERIFIER
+ * TRANVAS MASTER QUALITY NET & RELEASE GATE VERIFIER
  * ==============================================================================
  * Standard: SDET Case Study Task 4: Cut a release and gate it
  * "On the tag (or release event), your pipeline runs your net and surfaces a clear
@@ -19,10 +19,16 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '../..');
 
 console.log("\n================================================================================");
-console.log("🚦 ONEFORMIND MASTER QUALITY NET: AUTOMATED RELEASE GATE RUNNER");
+console.log("🚦 TRANVAS MASTER QUALITY NET: AUTOMATED RELEASE GATE RUNNER");
 console.log("================================================================================\n");
 
 const SUITES = [
+  {
+    id: 'vitest_engine',
+    name: 'Vitest Unit & Integration Engine (TypeScript)',
+    cmd: 'npx vitest run',
+    severityIfFailed: 'P0',
+  },
   {
     id: 'security_sanitization',
     name: 'Security, XSS Sanitization & Subscription Hierarchy',

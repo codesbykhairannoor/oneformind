@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:unit": "vitest run",
     "test:seo": "npx tsx scripts/test-seo-audit.mjs",
     "test:security": "npx tsx scripts/security-qa-test.mjs",
     "test:affiliate": "node scripts/affiliate-qa-test.mjs",
@@ -41,6 +43,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }
