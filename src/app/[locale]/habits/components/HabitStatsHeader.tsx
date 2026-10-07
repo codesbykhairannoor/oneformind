@@ -10,7 +10,8 @@ import {
     VolumeX,
     X,
     Download,
-    Flame
+    Flame,
+    Trophy
 } from 'lucide-react';
 import { ProcessedHabitItem } from '../types';
 import ModuleHeader from '@/components/layout/ModuleHeader';
@@ -37,6 +38,7 @@ interface HabitStatsHeaderProps {
     setShowHint: (show: boolean) => void;
     openCreateModal: () => void;
     openExportModal?: () => void;
+    openHallOfFameModal?: () => void;
 }
 
 export default function HabitStatsHeader({
@@ -60,7 +62,8 @@ export default function HabitStatsHeader({
     showHint,
     setShowHint,
     openCreateModal,
-    openExportModal
+    openExportModal,
+    openHallOfFameModal
 }: HabitStatsHeaderProps) {
     return (
         <ModuleHeader
@@ -196,6 +199,19 @@ export default function HabitStatsHeader({
                             </svg>
                         </div>
                     </div>
+
+                    {/* Hall of Fame Button */}
+                    {openHallOfFameModal && (
+                        <button
+                            type="button"
+                            onClick={openHallOfFameModal}
+                            title={isIndo ? 'Hall of Fame: Lihat Kebiasaan yang Lulus' : 'Hall of Fame: View Graduated Habits'}
+                            className="h-10 px-3.5 flex items-center gap-1.5 text-amber-700 dark:text-amber-300 rounded-xl font-bold bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-200/80 dark:border-amber-800/60 shadow-2xs transition-all active:scale-95 text-xs"
+                        >
+                            <Trophy size={14} className="text-amber-500 shrink-0" />
+                            <span>{isIndo ? 'Hall of Fame' : 'Hall of Fame'}</span>
+                        </button>
+                    )}
 
                     {/* Export Button */}
                     {openExportModal && (

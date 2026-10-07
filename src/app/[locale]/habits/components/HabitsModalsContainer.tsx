@@ -9,6 +9,7 @@ import HabitBatchModal, { BatchRow } from './HabitBatchModal';
 
 const HabitDetailModal = dynamic(() => import('./HabitDetailModal'), { ssr: false });
 const HabitNoteModal = dynamic(() => import('./HabitNoteModal'), { ssr: false });
+const HabitHallOfFameModal = dynamic(() => import('./HabitHallOfFameModal'), { ssr: false });
 
 interface HabitsModalsContainerProps {
     detailModalHabit: HabitItem | null;
@@ -17,6 +18,8 @@ interface HabitsModalsContainerProps {
     setNoteModalData: (d: { habit: HabitItem; dateStr: string; notes: string } | null) => void;
     showCreateModal: boolean;
     setShowCreateModal: (v: boolean) => void;
+    showHallOfFameModal?: boolean;
+    setShowHallOfFameModal?: (v: boolean) => void;
     showBatchModal?: boolean;
     setShowBatchModal?: (v: boolean) => void;
     batchRows?: BatchRow[];
@@ -97,6 +100,8 @@ export default function HabitsModalsContainer({
     setNoteModalData,
     showCreateModal,
     setShowCreateModal,
+    showHallOfFameModal,
+    setShowHallOfFameModal,
     showBatchModal,
     setShowBatchModal,
     batchRows,
@@ -280,6 +285,16 @@ export default function HabitsModalsContainer({
                     onClose={() => setShowBatchModal(false)}
                     onSubmit={onSubmitBatchHabits}
                     onSwitchToSingle={onSwitchToSingle}
+                />
+            )}
+
+            {/* MODAL: HALL OF FAME (GRADUATED HABITS) */}
+            {showHallOfFameModal && setShowHallOfFameModal && (
+                <HabitHallOfFameModal
+                    isOpen={showHallOfFameModal}
+                    onClose={() => setShowHallOfFameModal(false)}
+                    isIndo={isIndo}
+                    currentMonthKey={currentMonthKey}
                 />
             )}
         </>

@@ -115,23 +115,38 @@ func handleGetHabits(w http.ResponseWriter, r *http.Request, userID int) {
 		period = r.URL.Query().Get("month")
 	}
 
+	archivedParam := r.URL.Query().Get("archived")
+
 	query := `SELECT id, user_id, period, name, icon, color, monthly_target, is_archived, created_at, updated_at, status, position 
 			  FROM habits 
-			  WHERE user_id = $1 AND is_archived = false`
+			  WHERE user_id = $1`
 	
 	args := []interface{}{userID}
+	argIdx := 2
+
+	if archivedParam == "true" {
+		query += fmt.Sprintf(` AND is_archived = $%d`, argIdx)
+		args = append(args, true)
+		argIdx++
+	} else if archivedParam != "all" {
+		query += fmt.Sprintf(` AND is_archived = $%d`, argIdx)
+		args = append(args, false)
+		argIdx++
+	}
 	
 	if period != "" && period != "all" {
 		if len(period) == 4 {
-			query += ` AND period LIKE $2`
+			query += fmt.Sprintf(` AND period LIKE $%d`, argIdx)
 			args = append(args, period+"-%")
+			argIdx++
 		} else {
-			query += ` AND period = $2`
+			query += fmt.Sprintf(` AND period = $%d`, argIdx)
 			args = append(args, period)
+			argIdx++
 		}
 	}
 	
-	query += ` ORDER BY position ASC`
+	query += ` ORDER BY position ASC, updated_at DESC`
 
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -325,6 +340,7 @@ func handleUpdateHabit(w http.ResponseWriter, r *http.Request, userID int, habit
 	setParts := []string{}
 	args := []interface{}{habitID}
 	i := 2
+	seenCols := make(map[string]bool)
 
 	for k, v := range req {
 		dbCol := ""
@@ -337,6 +353,20 @@ func handleUpdateHabit(w http.ResponseWriter, r *http.Request, userID int, habit
 		case "isArchived", "is_archived": dbCol = "is_archived"
 		case "status": dbCol = "status"
 		default: continue
+		}
+
+		if seenCols[dbCol] {
+			continue
+		}
+		seenCols[dbCol] = true
+
+		if dbCol == "status" {
+			if _, isString := v.(string); !isString {
+				jsonBytes, err := json.Marshal(v)
+				if err == nil {
+					v = string(jsonBytes)
+				}
+			}
 		}
 
 		setParts = append(setParts, fmt.Sprintf("%s = $%d", dbCol, i))
