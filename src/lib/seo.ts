@@ -52,8 +52,9 @@ export function constructPageMetadata({
       ? trimmedDesc.substring(0, 152).trim() + '...'
       : trimmedDesc;
 
-  // Clean title: remove any pre-existing " | Tranvas" so Next.js template doesn't duplicate it
-  const cleanTitle = title.replace(/\s*\|\s*Tranvas\s*$/i, '').trim();
+  // Clean title: remove any em-dash AI slogans and pre-existing " | Tranvas"
+  const titleWithoutEmDash = title.split('—')[0].trim();
+  const cleanTitle = titleWithoutEmDash.replace(/\s*\|\s*Tranvas\s*$/i, '').trim();
   const fullTitle = cleanTitle.toLowerCase().includes('tranvas')
     ? cleanTitle
     : `${cleanTitle} | Tranvas`;
@@ -62,8 +63,14 @@ export function constructPageMetadata({
     : `${BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
 
   return {
-    // For root (cleanPath === ''), use fullTitle. For subpages, use cleanTitle so template applies cleanly.
-    title: cleanPath === '' ? fullTitle : cleanTitle,
+    // For root (cleanPath === ''), use fullTitle.
+    // For subpages, if title already includes "Tranvas" (e.g. "Tranvas vs Notion"), use absolute so Next.js doesn't duplicate it.
+    // Otherwise return cleanTitle so the layout template '%s | Tranvas' applies cleanly.
+    title: cleanPath === ''
+      ? fullTitle
+      : cleanTitle.toLowerCase().includes('tranvas')
+        ? { absolute: cleanTitle }
+        : cleanTitle,
     description: cleanDescription,
     keywords: keywords || [
       'Tranvas',

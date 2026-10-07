@@ -11,7 +11,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/register',
-    title: isId ? 'Daftar Akun Baru Tranvas' : 'Get Started — Free Unified Life OS',
+    title: isId ? 'Daftar Akun' : 'Get Started',
     description: isId
       ? 'Buat akun Tranvas Anda dan rasakan kemudahan mengelola seluruh aspek kehidupan dalam satu sistem terpadu.'
       : 'Create your Tranvas account and experience the unified life operating system designed for focus and clarity.',

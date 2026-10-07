@@ -11,7 +11,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/login',
-    title: isId ? 'Masuk ke Akun Tranvas' : 'Log In — Welcome Back',
+    title: isId ? 'Masuk' : 'Log in',
     description: isId
       ? 'Masuk ke akun Tranvas Anda untuk mengakses planner harian, matriks habit, manajemen keuangan, dan target hidup terpadu.'
       : 'Sign in to access your personal dashboard, habits, daily planner, finance tracking, and neural productivity tools.',

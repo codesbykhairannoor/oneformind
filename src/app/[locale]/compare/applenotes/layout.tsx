@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/applenotes',
-    title: 'Tranvas vs Applenotes — Feature Comparison',
+    title: 'Tranvas vs Applenotes',
     description: 'Compare Tranvas and Applenotes. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

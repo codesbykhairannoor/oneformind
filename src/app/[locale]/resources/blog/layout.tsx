@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/blog',
-    title: 'Blog — Productivity & Growth Insights',
+    title: 'Blog',
     description: 'Actionable articles, mental models, and deep dives on personal productivity, habit science, financial clarity, and intentional living.',
   });
 }

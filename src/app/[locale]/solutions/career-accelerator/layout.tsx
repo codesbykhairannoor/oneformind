@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/career-accelerator',
-    title: 'Career Tracker — Professional Growth System',
+    title: 'Career Accelerator',
     description: 'Accelerate your career trajectory with skill development roadmaps, interview logs, achievement tracking, and mentor notes.',
   });
 }

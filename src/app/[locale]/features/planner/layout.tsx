@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/planner',
-    title: 'Daily Planner — Focus on What Matters',
+    title: 'Daily Planner',
     description: 'Supercharge your daily workflow with an adaptive daily task planner, batch time-blocking, priority matrix, and intelligent focus modes.',
   });
 }

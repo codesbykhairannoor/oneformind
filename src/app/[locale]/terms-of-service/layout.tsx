@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/terms-of-service',
-    title: 'Terms of Service — User Agreement & Rules',
+    title: 'Terms of Service',
     description: 'Review the Terms of Service governing your account, usage rights, subscription plans, and service commitments on the Tranvas platform.',
   });
 }

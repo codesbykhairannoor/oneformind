@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/neural-os',
-    title: 'Neural OS AI — Powered by Gemini Brain',
+    title: 'Neural OS',
     description: 'Experience proactive AI intelligence across your habits, tasks, and notes with Gemini-powered neural recommendations.',
   });
 }

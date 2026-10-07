@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/goal',
-    title: 'Goal Tracker — Track Your Milestones',
+    title: 'Goal Tracker',
     description: 'Break down ambitious yearly goals into actionable milestones, track key results, and celebrate continuous progress.',
   });
 }

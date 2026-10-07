@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/journal',
-    title: 'Digital Journal — Capture Your Thoughts',
+    title: 'Mindful Journal',
     description: 'Reflect with private digital journaling, emotional check-ins, mood tracking, and AI-assisted weekly retrospectives.',
   });
 }

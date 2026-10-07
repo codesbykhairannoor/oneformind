@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/wallet',
-    title: 'Tranvas vs Wallet — Feature Comparison',
+    title: 'Tranvas vs Wallet',
     description: 'Compare Tranvas and Wallet. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

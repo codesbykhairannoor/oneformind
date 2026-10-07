@@ -19,8 +19,10 @@ export function usePageTitle(pageTitle?: string) {
     let finalTitle = '';
 
     if (pageTitle && pageTitle.trim()) {
-      const trimmed = pageTitle.trim();
-      finalTitle = trimmed.includes(SITE_NAME) ? trimmed : `${trimmed} | ${SITE_NAME}`;
+      // Strip any em-dash AI slogan if provided
+      let clean = pageTitle.split('—')[0].trim();
+      clean = clean.replace(/\s*\|\s*Tranvas\s*$/i, '').trim();
+      finalTitle = clean.toLowerCase().includes('tranvas') ? clean : `${clean} | ${SITE_NAME}`;
     } else {
       const path = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
       finalTitle = getRouteTitle(path, locale);

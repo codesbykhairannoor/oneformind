@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/changelog',
-    title: 'Changelog — What is New in Tranvas',
+    title: 'Changelog',
     description: 'Stay updated on new features, product improvements, bug fixes, and performance upgrades released in the Tranvas ecosystem.',
   });
 }

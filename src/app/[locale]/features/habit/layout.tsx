@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/habit',
-    title: 'Habit Tracker — Build Consistency Every Day',
+    title: 'Habit Tracker',
     description: 'Track daily routines and build atomic habits with visual streaks, frequency scheduling, progress analytics, and mindful reminders.',
   });
 }

@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/deep-work',
-    title: 'Deep Work — Uninterrupted Focus & Flow',
+    title: 'Deep Work',
     description: 'Eliminate digital distractions, schedule focused deep work blocks, and achieve state of flow with science-backed focus tools.',
   });
 }

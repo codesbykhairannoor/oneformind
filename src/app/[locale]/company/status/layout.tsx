@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/company/status',
-    title: 'System Status — Operational Uptime',
+    title: 'System Status',
     description: 'Check real-time operational status, uptime metrics, incident reports, and maintenance schedules for Tranvas services.',
   });
 }

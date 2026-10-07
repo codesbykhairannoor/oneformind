@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/company/press-kit',
-    title: 'Press Kit — Media Assets & Brand Guidelines',
+    title: 'Press Kit',
     description: 'Download official Tranvas brand logos, product screenshots, founder bios, and press media assets.',
   });
 }

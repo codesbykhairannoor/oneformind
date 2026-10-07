@@ -31,8 +31,8 @@ export async function generateMetadata({
   const isId = locale === 'id';
 
   const rootTitle = isId
-    ? 'Tranvas — Life OS Terpadu untuk Fokus, Habit, Keuangan & Target'
-    : 'Tranvas — The Unified Life OS for Focus, Habits, Finance & Goals';
+    ? 'Tranvas | Life OS Terpadu'
+    : 'Tranvas | The Unified Life OS';
   const rootDesc = isId
     ? 'Tranvas adalah Life Operating System terpadu: satukan Daily Planner, Habit Matrix 28 Hari, Smart Finance, WOOP Goals, Pipeline Karir, dan Jurnal Refleksi dalam satu sistem cerdas.'
     : 'Tranvas is the unified Life Operating System: seamlessly align daily planning, 28-day habit streaks, zero-based budgeting, WOOP goal cascading, career pipeline, and mindful reflections.';

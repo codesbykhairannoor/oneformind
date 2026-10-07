@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/job',
-    title: 'Job Tracker — Manage Career Growth',
+    title: 'Career Pipeline',
     description: 'Organize your job search, interviews, application stages, follow-ups, and recruiter communications in one centralized pipeline.',
   });
 }

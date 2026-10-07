@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/atomic-system',
-    title: 'Atomic Habits — Small Steps, Big Results',
+    title: 'Atomic Habits',
     description: 'Implement the James Clear Atomic Habits methodology with 1% daily improvements, habit cues, tracking, and identity shifts.',
   });
 }

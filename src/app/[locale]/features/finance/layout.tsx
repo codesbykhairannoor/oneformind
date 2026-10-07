@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/finance',
-    title: 'Finance OS — Master Your Money Flow',
+    title: 'Finance OS',
     description: 'Track income, expenses, monthly budgets, and multi-currency accounts with interactive charts and automated financial insights.',
   });
 }

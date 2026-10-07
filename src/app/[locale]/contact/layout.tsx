@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/contact',
-    title: 'Contact Us — Get in Touch with Support',
+    title: 'Contact',
     description: 'Have questions or need assistance? Contact the Tranvas support and engineering team for product inquiries or account help.',
   });
 }

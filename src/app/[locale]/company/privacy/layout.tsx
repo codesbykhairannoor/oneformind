@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/privacy-policy',
-    title: 'Privacy Policy — Data Security Standards',
+    title: 'Privacy Policy',
     description: 'Learn about Tranvas data protection, end-to-end security protocols, and strict privacy commitments to our users.',
   });
 }

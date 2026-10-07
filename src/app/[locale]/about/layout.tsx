@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/about',
-    title: 'About Us — Our Mission & Vision',
+    title: 'About',
     description: 'Discover the story behind Tranvas. We are building the unified life operating system to help millions live with focus and clarity.',
   });
 }

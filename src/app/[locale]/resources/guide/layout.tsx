@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/guide',
-    title: 'User Guide — Master the Tranvas Life OS',
+    title: 'User Guide',
     description: 'Comprehensive guides, tutorials, and walkthroughs to help you get the most out of Tranvas modules and advanced features.',
   });
 }

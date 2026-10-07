@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/second-brain',
-    title: 'Second Brain — Digital Knowledge Map',
+    title: 'Second Brain',
     description: 'Capture, organize, and synthesize ideas, notes, and insights into an interconnected personal knowledge management system.',
   });
 }

@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/compare/onenote',
-    title: 'Tranvas vs Onenote — Feature Comparison',
+    title: 'Tranvas vs Onenote',
     description: 'Compare Tranvas and Onenote. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
   });
 }

@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/help',
-    title: 'Help Center — FAQs & Knowledge Base',
+    title: 'Help Center',
     description: 'Find instant answers to frequently asked questions, account settings, billing troubleshooting, and feature guides.',
   });
 }

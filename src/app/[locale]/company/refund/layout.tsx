@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/company/refund',
-    title: 'Refund Policy — Satisfaction Guarantee',
+    title: 'Refund Policy',
     description: 'Review our transparent 14-day refund policy, subscription cancellation rules, and billing guarantees.',
   });
 }

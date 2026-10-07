@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/company/security',
-    title: 'Security — Enterprise-Grade Protection',
+    title: 'Security',
     description: 'Learn how Tranvas implements bank-grade 256-bit encryption, row-level security, and continuous vulnerability monitoring.',
   });
 }

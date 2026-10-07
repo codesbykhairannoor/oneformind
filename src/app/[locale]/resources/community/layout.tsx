@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/community',
-    title: 'Community — Connect with Fellow Builders',
+    title: 'Community',
     description: 'Join a vibrant community of intentional individuals, share productivity systems, exchange habit tips, and grow together.',
   });
 }

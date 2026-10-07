@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/affiliate',
-    title: 'Affiliate Partner Program — 60% Recurring Commission',
+    title: 'Affiliates',
     description: 'Join the Tranvas partner program. Earn 60% monthly recurring commission for up to 8 months per subscriber with a 90-day cookie window.',
   });
 }

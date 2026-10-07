@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/mental-clarity',
-    title: 'Mental Health — Journaling & Mindfulness',
+    title: 'Mental Clarity',
     description: 'Cultivate mindfulness, reduce stress, and reflect on life with guided gratitude journaling and wellness habit routines.',
   });
 }

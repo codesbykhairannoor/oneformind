@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/pricing',
-    title: 'Pricing & Plans — Choose Your Journey',
+    title: 'Pricing',
     description: 'Flexible pricing plans for individuals, creators, and teams. Master daily habits, planner tasks, and finances with Tranvas Life OS.',
   });
 }

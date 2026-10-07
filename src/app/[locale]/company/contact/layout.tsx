@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/contact',
-    title: 'Contact Us — Support & Inquiries',
+    title: 'Contact',
     description: 'Connect directly with our customer experience team for support, feature feedback, and partnership opportunities.',
   });
 }

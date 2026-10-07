@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/student',
-    title: 'For Students — Optimize Your Learning',
+    title: 'For Students',
     description: 'Ace your studies with academic schedule planning, assignment tracking, study routines, and exam preparation workflows.',
   });
 }

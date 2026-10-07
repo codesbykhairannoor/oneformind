@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/features/calendar',
-    title: 'Smart Calendar — Sync Your Schedules',
+    title: 'Smart Calendar',
     description: 'Unify your deadlines, events, scheduled tasks, and habit commitments in one seamless interactive calendar view.',
   });
 }

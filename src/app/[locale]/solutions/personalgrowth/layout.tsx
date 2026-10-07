@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/personalgrowth',
-    title: 'Personal Growth — Master Your Self-System',
+    title: 'Personal Growth',
     description: 'Design an intentional lifestyle through holistic daily planning, habit consistency, mindful reflection, and goal alignment.',
   });
 }

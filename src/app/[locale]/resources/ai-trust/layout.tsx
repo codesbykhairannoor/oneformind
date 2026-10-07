@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/ai-trust',
-    title: 'AI Transparency — Security & Privacy Commitment',
+    title: 'AI & Privacy',
     description: 'Learn how Tranvas uses AI ethically, safeguarding user privacy, encrypting sensitive data, and ensuring total user ownership.',
   });
 }

@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/resources/stories',
-    title: 'Success Stories — User Transformations',
+    title: 'Customer Stories',
     description: 'Discover inspiring stories and real results from individuals and creators who transformed their habits and focus with Tranvas.',
   });
 }

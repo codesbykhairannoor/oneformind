@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/freelancer',
-    title: 'For Freelancers — Scale Your Workflow',
+    title: 'For Freelancers',
     description: 'Manage client projects, deadlines, invoices, billable hours, and personal capacity in a unified freelancer workspace.',
   });
 }

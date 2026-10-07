@@ -10,7 +10,7 @@ export async function generateMetadata({
   return constructPageMetadata({
     locale,
     path: '/solutions/finance-mastery',
-    title: 'Financial Clarity — Manage Assets & Cashflow',
+    title: 'Finance Mastery',
     description: 'Take full control of personal finances, build emergency funds, track investments, and eliminate wasteful spending with ease.',
   });
 }
