@@ -5,6 +5,10 @@ services:
     build:
       context: .
       dockerfile: web.Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-https://esahuobozjxkyjvpxslu.supabase.co}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzYWh1b2Jvemp4a3lqdnB4c2x1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MDk3NzMsImV4cCI6MjA4NDQ4NTc3M30.V6ZBvGe00D7HsduaxstN8bquN8-Snnl61LbwPVSi3ks}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://api:8080/api}
     networks:
       - coolify
     environment:

@@ -17,7 +17,8 @@
     "test:qa:adversarial": "node scripts/qa/adversarial-rls-guard.mjs",
     "test:qa:concurrency": "node scripts/qa/concurrency-fuzz-guard.mjs",
     "test:qa:integrity": "node scripts/qa/data-integrity-guard.mjs",
-    "test:qa:gate": "node scripts/qa/release-gate-verifier.mjs"
+    "test:qa:gate": "node scripts/qa/release-gate-verifier.mjs",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@paypal/paypal-js": "^10.1.0",
@@ -32,6 +33,7 @@
     "pg": "^8.23.0",
     "react": "19.2.8",
     "react-chartjs-2": "^5.3.1",
+    "ssh2": "^1.17.0",
     "sweetalert2": "^11.26.25",
     "swr": "^2.5.1",
     "zod": "^4.6.5"

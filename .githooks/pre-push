@@ -1,0 +1,51 @@
+#!/bin/sh
+# ==============================================================================
+# TRANVAS AUTOMATED RELEASE GATE & SDET QUALITY NET (PRE-PUSH HOOK)
+# Strictly prevents broken builds or failing tests from ever reaching remote/production
+# ==============================================================================
+
+echo ""
+echo "🛡️  ================================================================"
+echo "🛡️  TRANVAS SDET QUALITY GATE: ENFORCING PRE-PUSH INTEGRITY CHECK"
+echo "🛡️  ================================================================"
+echo ""
+
+# 1. Run Vitest TypeScript unit & contract tests
+echo "⏳ [GATE 1/3] Running Vitest Test Suite..."
+npm run test
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ [BLOCKER] Vitest tests failed! Push aborted."
+    echo "Fix failing unit tests before pushing to remote repository."
+    exit 1
+fi
+echo "✅ [GATE 1/3] Vitest tests passed."
+
+# 2. Run Master SDET Quality Net (RLS Leak Guard, Concurrency, Data Integrity)
+echo "⏳ [GATE 2/3] Running Master SDET Quality Net..."
+npm run test:qa
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ [BLOCKER] SDET Quality Net verifications failed! Push aborted."
+    echo "Security, RLS, or Data Integrity gate rejected this commit."
+    exit 1
+fi
+echo "✅ [GATE 2/3] Master SDET Quality Net passed."
+
+# 3. Run Production Next.js Build Verification
+echo "⏳ [GATE 3/3] Running Next.js Production Build Validation..."
+npm run build
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ [BLOCKER] Next.js production build failed! Push aborted."
+    echo "Ensure there are no build, syntax, or typing errors."
+    exit 1
+fi
+echo "✅ [GATE 3/3] Next.js production build passed."
+
+echo ""
+echo "🟢 ================================================================"
+echo "🟢 [TRANVAS QUALITY GATE PASSED] All checks passed. Pushing to origin..."
+echo "🟢 ================================================================"
+echo ""
+exit 0
