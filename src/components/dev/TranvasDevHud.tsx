@@ -17,6 +17,7 @@ import {
 import { SyntheticDataFactory } from '@/lib/testing/synthetic-data-factory';
 
 export default function TranvasDevHud() {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [fps, setFps] = useState(60);
   const [memoryMb, setMemoryMb] = useState<number | null>(null);
@@ -26,9 +27,13 @@ export default function TranvasDevHud() {
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(performance.now());
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Only render in development mode or when query param ?debug=tranvas is present
-  const isDev = process.env.NODE_ENV === 'development' || 
-    (typeof window !== 'undefined' && window.location.search.includes('debug=tranvas'));
+  const isDev = mounted && (process.env.NODE_ENV === 'development' || 
+    (typeof window !== 'undefined' && window.location.search.includes('debug=tranvas')));
 
   useEffect(() => {
     if (!isDev) return;

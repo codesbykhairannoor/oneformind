@@ -129,12 +129,24 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
             '/calendar',
             '/jobs',
             '/goals',
-            '/settings',
-            '/billing'
         ];
-        routes.forEach(route => {
-            router.prefetch(route);
-        });
+        
+        // Idle prefetch: warm cache progressively after page load without saturating network queue
+        const timeoutId = setTimeout(() => {
+            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+                (window as any).requestIdleCallback(() => {
+                    routes.forEach((route, idx) => {
+                        setTimeout(() => router.prefetch(route), idx * 120);
+                    });
+                });
+            } else {
+                routes.forEach((route, idx) => {
+                    setTimeout(() => router.prefetch(route), idx * 150);
+                });
+            }
+        }, 1200);
+
+        return () => clearTimeout(timeoutId);
     }, [router]);
 
     useEffect(() => {
