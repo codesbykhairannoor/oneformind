@@ -1,17 +1,14 @@
 # Dockerfile.next
-# Clean build: No Prisma, no postinstall scripts, just Next.js + Supabase
-FROM public.ecr.aws/docker/library/node:22-slim AS builder
+# Clean, reliable Next.js build using Node 22 Alpine
+FROM public.ecr.aws/docker/library/node:22-alpine AS builder
 
 WORKDIR /app
-
-# Install openssl (required by some packages on Debian slim)
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files first (layer caching)
 COPY package.json package-lock.json* ./
 
-# Install dependencies — no postinstall scripts, clean and fast
-RUN npm ci
+# Install dependencies reliably
+RUN npm install --no-audit
 
 # Copy source code
 COPY . .
@@ -31,7 +28,7 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 RUN npm run build
 
 # --- Production runner ---
-FROM public.ecr.aws/docker/library/node:22-slim AS runner
+FROM public.ecr.aws/docker/library/node:22-alpine AS runner
 
 WORKDIR /app
 
