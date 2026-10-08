@@ -10,7 +10,6 @@ import { SessionProvider } from "@/components/SessionProvider";
 
 import AffiliateTracker from "@/components/AffiliateTracker";
 import TranvasDevHud from "@/components/dev/TranvasDevHud";
-import { OptimisticNavProvider } from "@/components/layout/RouteProgressIndicator";
 
 import "../globals.css";
 
@@ -111,10 +110,8 @@ export default async function RootLayout({
             <AffiliateTracker />
             <SessionProvider>
               <SwrProvider>
-                <OptimisticNavProvider>
-                  {children}
-                  <TranvasDevHud />
-                </OptimisticNavProvider>
+                {children}
+                <TranvasDevHud />
               </SwrProvider>
             </SessionProvider>
           </InstantIntlProvider>

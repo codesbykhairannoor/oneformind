@@ -15,21 +15,19 @@ export async function generateMetadata() {
     };
 }
 
-export default async function FinancePage({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
+export default async function FinancePage({ searchParams }: { searchParams: { month?: string } }) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user?.email) {
         redirect('/login');
     }
 
-    const resolvedParams = await searchParams;
-
     // Default to current month if not provided in URL
     let year = new Date().getFullYear();
     let month = new Date().getMonth() + 1;
 
-    if (resolvedParams?.month) {
-        const parts = resolvedParams.month.split('-');
+    if (searchParams?.month) {
+        const parts = searchParams.month.split('-');
         if (parts.length === 2) {
             year = parseInt(parts[0]);
             month = parseInt(parts[1]);

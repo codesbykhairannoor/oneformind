@@ -3,7 +3,6 @@
 import React from 'react';
 import { usePathname, Link } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
-import { useOptimisticNav } from './RouteProgressIndicator';
 import { 
     LayoutDashboard, 
     CheckSquare, 
@@ -21,7 +20,6 @@ export default function AuthMobileBottomNav({ moduleSettings = {} }: AuthMobileB
     const pathname = usePathname();
     const locale = useLocale();
     const isIndo = locale === 'id';
-    const { pendingPath, startNav, prefetchRoute } = useOptimisticNav();
 
     // Core tabs to display on mobile bottom nav
     const navItems = [
@@ -82,20 +80,8 @@ export default function AuthMobileBottomNav({ moduleSettings = {} }: AuthMobileB
     ].filter(item => item.enabled);
 
     const isItemActive = (href: string) => {
-        if (pendingPath) {
-            if (href === '/dashboard') return pendingPath === '/dashboard';
-            return pendingPath.startsWith(href);
-        }
         if (href === '/dashboard' && (pathname === '/dashboard' || pathname === '/')) return true;
         return pathname?.startsWith(href);
-    };
-
-    const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        if (isItemActive(href) && !pendingPath) {
-            e.preventDefault();
-            return;
-        }
-        startNav(href);
     };
 
     return (
@@ -109,12 +95,7 @@ export default function AuthMobileBottomNav({ moduleSettings = {} }: AuthMobileB
                         <Link
                             key={item.key}
                             href={item.href}
-                            prefetch={true}
-                            onMouseEnter={() => prefetchRoute(item.href)}
-                            onTouchStart={() => prefetchRoute(item.href)}
-                            onFocus={() => prefetchRoute(item.href)}
-                            onClick={(e) => handleItemClick(e, item.href)}
-                            className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-150 active:scale-90 relative ${
+                            className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200 active:scale-90 relative ${
                                 active
                                     ? `${item.activeColor}`
                                     : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
@@ -122,11 +103,11 @@ export default function AuthMobileBottomNav({ moduleSettings = {} }: AuthMobileB
                         >
                             {/* Active background pill */}
                             {active && (
-                                <div className={`absolute inset-0 rounded-2xl ${item.activeBg} -z-10 animate-in fade-in zoom-in-95 duration-150`} />
+                                <div className={`absolute inset-0 rounded-2xl ${item.activeBg} -z-10 animate-in fade-in zoom-in-95 duration-200`} />
                             )}
 
                             <div className="relative">
-                                <Icon className={`w-5 h-5 transition-transform duration-150 ${active ? 'scale-110 stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                                <Icon className={`w-5 h-5 transition-transform duration-200 ${active ? 'scale-110 stroke-[2.5]' : 'stroke-[1.8]'}`} />
                                 {active && (
                                     <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-current animate-ping" />
                                 )}

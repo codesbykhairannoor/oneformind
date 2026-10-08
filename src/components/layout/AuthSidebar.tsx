@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Link } from '@/i18n/routing';
-import { useOptimisticNav } from './RouteProgressIndicator';
 import {
     LayoutDashboard,
     Calendar,
@@ -52,24 +51,6 @@ export default function AuthSidebar({
     isActive,
     isAdmin = false
 }: AuthSidebarProps) {
-    const { pendingPath, startNav, prefetchRoute } = useOptimisticNav();
-
-    const isTabActive = (path: string) => {
-        if (pendingPath) {
-            if (path === '/dashboard') return pendingPath === '/dashboard';
-            return pendingPath.startsWith(path);
-        }
-        return isActive(path);
-    };
-
-    const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
-        if (isTabActive(path) && !pendingPath) {
-            e.preventDefault();
-            return;
-        }
-        startNav(path);
-    };
-
     return (
         <aside 
             className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out fixed top-[72px] sm:top-16 bottom-0 left-0 z-[61] w-full md:relative md:top-0 md:bottom-auto md:left-auto md:z-[10] ${
@@ -105,22 +86,17 @@ export default function AuthSidebar({
                         {/* Dashboard */}
                         <Link 
                             href="/dashboard"
-                            prefetch={true}
-                            onMouseEnter={() => prefetchRoute('/dashboard')}
-                            onTouchStart={() => prefetchRoute('/dashboard')}
-                            onFocus={() => prefetchRoute('/dashboard')}
-                            onClick={(e) => handleLinkClick(e, '/dashboard')}
-                            className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                            className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                 isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                             } ${
-                                isTabActive('/dashboard')
+                                isActive('/dashboard')
                                     ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                     : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                             }`}
                         >
-                            <LayoutDashboard size={18} className={isTabActive('/dashboard') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                            <LayoutDashboard size={18} className={isActive('/dashboard') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                             {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Dashboard</span>}
-                            {isTabActive('/dashboard') && !isSidebarCollapsed && (
+                            {isActive('/dashboard') && !isSidebarCollapsed && (
                                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                             )}
                         </Link>
@@ -129,22 +105,17 @@ export default function AuthSidebar({
                         {moduleSettings.habit && (
                             <Link 
                                 href="/habits"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/habits')}
-                                onTouchStart={() => prefetchRoute('/habits')}
-                                onFocus={() => prefetchRoute('/habits')}
-                                onClick={(e) => handleLinkClick(e, '/habits')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/habits')
+                                    isActive('/habits')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Flame size={18} className={isTabActive('/habits') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <Flame size={18} className={isActive('/habits') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Habits</span>}
-                                {isTabActive('/habits') && !isSidebarCollapsed && (
+                                {isActive('/habits') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -154,22 +125,17 @@ export default function AuthSidebar({
                         {moduleSettings.planner && (
                             <Link 
                                 href="/planner"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/planner')}
-                                onTouchStart={() => prefetchRoute('/planner')}
-                                onFocus={() => prefetchRoute('/planner')}
-                                onClick={(e) => handleLinkClick(e, '/planner')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/planner')
+                                    isActive('/planner')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Calendar size={18} className={isTabActive('/planner') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <Calendar size={18} className={isActive('/planner') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Planner</span>}
-                                {isTabActive('/planner') && !isSidebarCollapsed && (
+                                {isActive('/planner') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -179,22 +145,17 @@ export default function AuthSidebar({
                         {moduleSettings.finance && (
                             <Link 
                                 href="/finance"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/finance')}
-                                onTouchStart={() => prefetchRoute('/finance')}
-                                onFocus={() => prefetchRoute('/finance')}
-                                onClick={(e) => handleLinkClick(e, '/finance')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/finance')
+                                    isActive('/finance')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Wallet size={18} className={isTabActive('/finance') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <Wallet size={18} className={isActive('/finance') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Finance</span>}
-                                {isTabActive('/finance') && !isSidebarCollapsed && (
+                                {isActive('/finance') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -204,22 +165,17 @@ export default function AuthSidebar({
                         {moduleSettings.study !== false && (
                             <Link 
                                 href="/study"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/study')}
-                                onTouchStart={() => prefetchRoute('/study')}
-                                onFocus={() => prefetchRoute('/study')}
-                                onClick={(e) => handleLinkClick(e, '/study')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/study')
+                                    isActive('/study')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <GraduationCap size={18} className={isTabActive('/study') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <GraduationCap size={18} className={isActive('/study') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Study</span>}
-                                {isTabActive('/study') && !isSidebarCollapsed && (
+                                {isActive('/study') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -255,22 +211,17 @@ export default function AuthSidebar({
                         {moduleSettings.journal && (
                             <Link 
                                 href="/journal"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/journal')}
-                                onTouchStart={() => prefetchRoute('/journal')}
-                                onFocus={() => prefetchRoute('/journal')}
-                                onClick={(e) => handleLinkClick(e, '/journal')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/journal')
+                                    isActive('/journal')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <BookOpen size={18} className={isTabActive('/journal') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <BookOpen size={18} className={isActive('/journal') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Journal</span>}
-                                {isTabActive('/journal') && !isSidebarCollapsed && (
+                                {isActive('/journal') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -280,22 +231,17 @@ export default function AuthSidebar({
                         {moduleSettings.calendar && (
                             <Link 
                                 href="/calendar"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/calendar')}
-                                onTouchStart={() => prefetchRoute('/calendar')}
-                                onFocus={() => prefetchRoute('/calendar')}
-                                onClick={(e) => handleLinkClick(e, '/calendar')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/calendar')
+                                    isActive('/calendar')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <CalendarDays size={18} className={isTabActive('/calendar') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <CalendarDays size={18} className={isActive('/calendar') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Calendar</span>}
-                                {isTabActive('/calendar') && !isSidebarCollapsed && (
+                                {isActive('/calendar') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -305,22 +251,17 @@ export default function AuthSidebar({
                         {moduleSettings.job && (
                             <Link 
                                 href="/jobs"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/jobs')}
-                                onTouchStart={() => prefetchRoute('/jobs')}
-                                onFocus={() => prefetchRoute('/jobs')}
-                                onClick={(e) => handleLinkClick(e, '/jobs')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/jobs')
+                                    isActive('/jobs')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Briefcase size={18} className={isTabActive('/jobs') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <Briefcase size={18} className={isActive('/jobs') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Jobs</span>}
-                                {isTabActive('/jobs') && !isSidebarCollapsed && (
+                                {isActive('/jobs') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -330,22 +271,17 @@ export default function AuthSidebar({
                         {moduleSettings.goal && (
                             <Link 
                                 href="/goals"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/goals')}
-                                onTouchStart={() => prefetchRoute('/goals')}
-                                onFocus={() => prefetchRoute('/goals')}
-                                onClick={(e) => handleLinkClick(e, '/goals')}
-                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                                className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                     isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                                 } ${
-                                    isTabActive('/goals')
+                                    isActive('/goals')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Target size={18} className={isTabActive('/goals') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                <Target size={18} className={isActive('/goals') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                 {!isSidebarCollapsed && <span className="text-[15px] font-semibold tracking-tight truncate">Goals</span>}
-                                {isTabActive('/goals') && !isSidebarCollapsed && (
+                                {isActive('/goals') && !isSidebarCollapsed && (
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
@@ -366,15 +302,10 @@ export default function AuthSidebar({
 
                 <Link 
                     href="/coach"
-                    prefetch={true}
-                    onMouseEnter={() => prefetchRoute('/coach')}
-                    onTouchStart={() => prefetchRoute('/coach')}
-                    onFocus={() => prefetchRoute('/coach')}
-                    onClick={(e) => handleLinkClick(e, '/coach')}
-                    className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                    className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                         isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                     } ${
-                        isTabActive('/coach')
+                        isActive('/coach')
                             ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                             : 'text-slate-500 dark:text-slate-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5 hover:text-indigo-700 font-medium'
                     }`}
@@ -388,7 +319,7 @@ export default function AuthSidebar({
                             </span>
                         </>
                     )}
-                    {isTabActive('/coach') && !isSidebarCollapsed && (
+                    {isActive('/coach') && !isSidebarCollapsed && (
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-500 rounded-r-full" />
                     )}
                 </Link>
@@ -418,11 +349,6 @@ export default function AuthSidebar({
                             </div>
                             <Link
                                 href="/billing"
-                                prefetch={true}
-                                onMouseEnter={() => prefetchRoute('/billing')}
-                                onTouchStart={() => prefetchRoute('/billing')}
-                                onFocus={() => prefetchRoute('/billing')}
-                                onClick={(e) => handleLinkClick(e, '/billing')}
                                 className="flex items-center justify-center gap-1.5 w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95"
                             >
                                 <Crown size={10} />
@@ -439,20 +365,15 @@ export default function AuthSidebar({
                     {isAdmin && (
                         <Link 
                             href="/admin"
-                            prefetch={true}
-                            onMouseEnter={() => prefetchRoute('/admin')}
-                            onTouchStart={() => prefetchRoute('/admin')}
-                            onFocus={() => prefetchRoute('/admin')}
-                            onClick={(e) => handleLinkClick(e, '/admin')}
-                            className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                            className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                                 isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                             } ${
-                                isTabActive('/admin')
+                                isActive('/admin')
                                     ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/30'
                                     : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-medium'
                             }`}
                         >
-                            <ShieldCheck size={18} className={isTabActive('/admin') ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-500'} />
+                            <ShieldCheck size={18} className={isActive('/admin') ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-500'} />
                             {!isSidebarCollapsed && (
                                 <>
                                     <span className="text-[14px] font-bold tracking-tight truncate flex-1 text-left">
@@ -463,7 +384,7 @@ export default function AuthSidebar({
                                     </span>
                                 </>
                             )}
-                            {isTabActive('/admin') && !isSidebarCollapsed && (
+                            {isActive('/admin') && !isSidebarCollapsed && (
                                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-emerald-500 rounded-r-full" />
                             )}
                         </Link>
@@ -472,26 +393,21 @@ export default function AuthSidebar({
                     {/* Settings / Pengaturan Link */}
                     <Link 
                         href="/settings"
-                        prefetch={true}
-                        onMouseEnter={() => prefetchRoute('/settings')}
-                        onTouchStart={() => prefetchRoute('/settings')}
-                        onFocus={() => prefetchRoute('/settings')}
-                        onClick={(e) => handleLinkClick(e, '/settings')}
-                        className={`relative flex items-center w-full rounded-xl transition-all duration-150 active:scale-[0.98] ${
+                        className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
                             isSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2 gap-3'
                         } ${
-                            isTabActive('/settings')
+                            isActive('/settings')
                                 ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                 : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                         }`}
                     >
-                        <Settings size={18} className={isTabActive('/settings') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                        <Settings size={18} className={isActive('/settings') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                         {!isSidebarCollapsed && (
                             <span className="text-[14px] font-semibold tracking-tight truncate">
                                 {locale === 'id' ? 'Pengaturan' : 'Settings'}
                             </span>
                         )}
-                        {isTabActive('/settings') && !isSidebarCollapsed && (
+                        {isActive('/settings') && !isSidebarCollapsed && (
                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-600 rounded-r-full" />
                         )}
                     </Link>
