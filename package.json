@@ -18,7 +18,7 @@
     "test:qa:concurrency": "node scripts/qa/concurrency-fuzz-guard.mjs",
     "test:qa:integrity": "node scripts/qa/data-integrity-guard.mjs",
     "test:qa:gate": "node scripts/qa/release-gate-verifier.mjs",
-    "prepare": "git config core.hooksPath .githooks"
+    "prepare": "node -e \"try { require('child_process').execSync('git config core.hooksPath .githooks', { stdio: 'ignore' }); } catch (e) {}\""
   },
   "dependencies": {
     "@paypal/paypal-js": "^10.1.0",

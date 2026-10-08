@@ -1,14 +1,17 @@
 # Dockerfile.next
-# Clean, reliable Next.js build using Node 22 Alpine
-FROM public.ecr.aws/docker/library/node:22-alpine AS builder
+# Clean build: Node 22 slim with layer caching and ignore scripts
+FROM public.ecr.aws/docker/library/node:22-slim AS builder
 
 WORKDIR /app
+
+# Install openssl (required by some packages on Debian slim)
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files first (layer caching)
 COPY package.json package-lock.json* ./
 
-# Install dependencies reliably
-RUN npm install --no-audit
+# Install dependencies — ignore lifecycle scripts inside container (fast, clean, reliable)
+RUN npm ci --ignore-scripts
 
 # Copy source code
 COPY . .
@@ -28,7 +31,7 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 RUN npm run build
 
 # --- Production runner ---
-FROM public.ecr.aws/docker/library/node:22-alpine AS runner
+FROM public.ecr.aws/docker/library/node:22-slim AS runner
 
 WORKDIR /app
 
