@@ -17,6 +17,7 @@
     "test:qa:adversarial": "node scripts/qa/adversarial-rls-guard.mjs",
     "test:qa:concurrency": "node scripts/qa/concurrency-fuzz-guard.mjs",
     "test:qa:integrity": "node scripts/qa/data-integrity-guard.mjs",
+    "test:qa:container": "node scripts/qa/container-safety-guard.mjs",
     "test:qa:gate": "node scripts/qa/release-gate-verifier.mjs",
     "prepare": "node -e \"try { require('child_process').execSync('git config core.hooksPath .githooks', { stdio: 'ignore' }); } catch (e) {}\""
   },

@@ -10,8 +10,19 @@ echo "🛡️  TRANVAS SDET QUALITY GATE: ENFORCING PRE-PUSH INTEGRITY CHECK"
 echo "🛡️  ================================================================"
 echo ""
 
+# 0. Fast Pre-flight: Container & Deployment Integrity Guard
+echo "⏳ [GATE 0/4] Enforcing Container & Deployment Safety Guard..."
+npm run test:qa:container
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ [BLOCKER] Container Safety Guard failed! Push aborted."
+    echo "Fix Dockerfile or package.json lifecycle scripts before pushing."
+    exit 1
+fi
+echo "✅ [GATE 0/4] Container Safety Guard passed."
+
 # 1. Run Vitest TypeScript unit & contract tests
-echo "⏳ [GATE 1/3] Running Vitest Test Suite..."
+echo "⏳ [GATE 1/4] Running Vitest Test Suite..."
 npm run test
 if [ $? -ne 0 ]; then
     echo ""
@@ -19,10 +30,10 @@ if [ $? -ne 0 ]; then
     echo "Fix failing unit tests before pushing to remote repository."
     exit 1
 fi
-echo "✅ [GATE 1/3] Vitest tests passed."
+echo "✅ [GATE 1/4] Vitest tests passed."
 
 # 2. Run Master SDET Quality Net (RLS Leak Guard, Concurrency, Data Integrity)
-echo "⏳ [GATE 2/3] Running Master SDET Quality Net..."
+echo "⏳ [GATE 2/4] Running Master SDET Quality Net..."
 npm run test:qa
 if [ $? -ne 0 ]; then
     echo ""
@@ -30,10 +41,10 @@ if [ $? -ne 0 ]; then
     echo "Security, RLS, or Data Integrity gate rejected this commit."
     exit 1
 fi
-echo "✅ [GATE 2/3] Master SDET Quality Net passed."
+echo "✅ [GATE 2/4] Master SDET Quality Net passed."
 
 # 3. Run Production Next.js Build Verification
-echo "⏳ [GATE 3/3] Running Next.js Production Build Validation..."
+echo "⏳ [GATE 3/4] Running Next.js Production Build Validation..."
 npm run build
 if [ $? -ne 0 ]; then
     echo ""
@@ -41,7 +52,7 @@ if [ $? -ne 0 ]; then
     echo "Ensure there are no build, syntax, or typing errors."
     exit 1
 fi
-echo "✅ [GATE 3/3] Next.js production build passed."
+echo "✅ [GATE 3/4] Next.js production build passed."
 
 echo ""
 echo "🟢 ================================================================"

@@ -71,6 +71,12 @@ const SUITES = [
     cmd: 'npx tsx scripts/test-seo-audit.mjs',
     severityIfFailed: 'P2',
   },
+  {
+    id: 'container_integrity',
+    name: 'Container & Reproducible Deployment Integrity Guard',
+    cmd: 'node scripts/qa/container-safety-guard.mjs',
+    severityIfFailed: 'P0',
+  },
 ];
 
 const results = [];
