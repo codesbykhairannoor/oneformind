@@ -100,11 +100,11 @@ export default function AuthHeader({
                         </div>
                     </button>
 
-                    <Link href="/dashboard" className="group flex items-center gap-2.5 z-[110] hover:opacity-80 transition-opacity">
-                        <div className="w-10 h-10 sm:w-9 sm:h-9 bg-indigo-600 rounded-xl flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-lg shadow-indigo-200 dark:shadow-none shrink-0">
-                            <img src="/favicon.svg" alt="Tranvas Logo" className="w-6 h-6 sm:w-5 sm:h-5 brightness-0 invert" />
+                    <Link href="/dashboard" className="group flex items-center gap-2 z-[110] hover:opacity-80 transition-opacity">
+                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-md shadow-indigo-200 dark:shadow-none shrink-0">
+                            <img src="/favicon.svg" alt="Tranvas Logo" className="w-4.5 h-4.5 brightness-0 invert" />
                         </div>
-                        <span className="text-2xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Tranvas</span>
+                        <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Tranvas</span>
                     </Link>
                 </div>
 

@@ -12,20 +12,20 @@ export default function LandingScienceMatrix() {
             {/* Ambient Grid & Glow */}
             <div className="absolute inset-0 opacity-25 pointer-events-none max-w-[100vw] overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[350px] sm:h-[500px] bg-indigo-600/10 rounded-full blur-[140px] animate-pulse-glow"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[350px] sm:h-[500px] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-20">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-xs mb-6 uppercase tracking-wider border border-indigo-500/20">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-xs mb-4 sm:mb-5 uppercase tracking-wider border border-indigo-500/20">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         {isId ? 'Arsitektur Kognitif' : 'Cognitive Architecture'}
                     </div>
-                    <h2 className="text-4xl sm:text-5xl lg:text-6xl text-white font-black tracking-tight leading-[1.1] mb-6">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-black tracking-tight leading-tight mb-4 sm:mb-6">
                         {t('home_science_title_1')} <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">{t('home_science_title_highlight')}</span>
                     </h2>
-                    <p className="text-slate-400 text-base sm:text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
+                    <p className="text-slate-400 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
                         {isId 
                             ? 'Tranvas dibangun di atas kerangka kerja neurosains kognitif dan ekonomi perilaku teruji—dirancang untuk melenyapkan friksi kognitif dan mempertahankan eksekusi puncak.'
                             : 'Tranvas is built upon verified cognitive neuroscience and behavioral economics frameworks—engineered to eliminate cognitive friction and sustain peak execution.'}

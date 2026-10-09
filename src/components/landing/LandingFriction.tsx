@@ -27,16 +27,16 @@ export default function LandingFriction() {
                     
                     {/* Left: Problem Agitation */}
                     <div className="lg:col-span-7">
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 text-rose-400 font-bold text-xs sm:text-sm mb-6 border border-rose-500/20 tracking-wider uppercase">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 font-bold text-xs mb-4 sm:mb-5 border border-rose-500/20 tracking-wider uppercase">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
                             {t('fric_badge')}
                         </div>
 
-                        <h2 className="text-4xl sm:text-5xl lg:text-6xl text-white mb-6 font-black tracking-tight leading-[1.1]">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-4 sm:mb-6 font-black tracking-tight leading-tight">
                             {t('fric_title')}
                         </h2>
 
-                        <p className="text-slate-300 text-base sm:text-lg lg:text-xl leading-relaxed mb-8 sm:mb-10 font-normal max-w-2xl">
+                        <p className="text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8 font-normal max-w-2xl">
                             {t('fric_desc')}
                         </p>
 

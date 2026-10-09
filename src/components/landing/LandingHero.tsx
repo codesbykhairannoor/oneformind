@@ -93,49 +93,44 @@ export default function LandingHero() {
     };
 
     return (
-        <header className="relative pt-32 pb-20 sm:pt-36 sm:pb-32 lg:pt-40 lg:pb-48 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50">
-            {/* Ambient High-End Radial Lighting & Grid Mesh (contained) */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] max-w-[100vw] h-[750px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(99,102,241,0.16),rgba(255,255,255,0))] pointer-events-none -z-10 overflow-hidden" />
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] max-w-[100vw] h-[400px] bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-emerald-500/5 blur-3xl pointer-events-none -z-10 rounded-full animate-pulse-glow overflow-hidden" />
-            
-            {/* Hardware Accelerated Background Grid */}
-            <div 
-                className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none -z-10 opacity-70" 
-            />
+        <header className="relative pt-28 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50">
+            {/* Lightweight High-Performance Ambient Lighting (Zero Lag, No Repaints) */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[650px] max-w-[100vw] h-[350px] bg-gradient-to-b from-indigo-500/12 via-purple-500/5 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none -z-10 opacity-50" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-center">
                 
                 {/* 1. Micro-Badge Announcement Pill */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-200/80 bg-indigo-50/80 text-indigo-700 font-bold text-xs sm:text-sm mb-6 sm:mb-8 tracking-wide shadow-sm hover:bg-indigo-100/70 hover:scale-[1.02] transition-all cursor-default">
-                    <span className="relative flex h-2.5 w-2.5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-200/80 bg-indigo-50/80 text-indigo-700 font-bold text-xs mb-5 sm:mb-6 tracking-wide shadow-xs hover:bg-indigo-100/70 transition-all cursor-default">
+                    <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
                     </span>
                     <span>{t('hero_premium_badge')}</span>
                 </div>
                 
-                {/* 2. Authority H1 Headline */}
-                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 sm:mb-8 tracking-tight text-slate-900 font-black leading-[1.06] max-w-5xl mx-auto">
+                {/* 2. Balanced H1 Headline (Calibrated to /features) */}
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6 tracking-tight text-slate-900 font-black leading-tight max-w-4xl mx-auto">
                     {t('hero_premium_title_1')}{' '}
                     <span className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent block sm:inline mt-1 sm:mt-0">
                         {t('hero_premium_title_2')}
                     </span>
                 </h1>
                 
-                {/* 3. Problem-Solving Subheading */}
-                <p className="text-lg sm:text-xl lg:text-2xl text-slate-600 mb-8 sm:mb-10 leading-relaxed max-w-3xl mx-auto font-medium">
+                {/* 3. Balanced Subheading (Calibrated to /features) */}
+                <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto font-medium">
                     {t('hero_premium_desc')}
                 </p>
                 
-                {/* 4. High-Converting Dual Action CTAs */}
-                <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 justify-center items-center mb-8 max-w-md mx-auto sm:max-w-none">
+                {/* 4. Balanced Dual Action CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6 sm:mb-8 max-w-md mx-auto sm:max-w-none">
                     <Link 
                         href="/register" 
                         onClick={() => trackCTAClick('hero_primary', 'Start Free Today', '/register')}
-                        className="w-full sm:w-auto relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4.5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer before:absolute before:inset-0 before:-translate-x-full hover:before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent"
+                        className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-indigo-600/25 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer"
                     >
                         <span>{t('hero_premium_cta_primary')}</span>
-                        <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     </Link>
@@ -146,28 +141,28 @@ export default function LandingHero() {
                             trackCTAClick('hero_secondary', 'Explore 8 Modules', '#interactive-stage');
                             scrollToCanvas();
                         }}
-                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 px-8 py-4.5 rounded-2xl font-bold text-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer group"
+                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-xs hover:shadow transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer"
                     >
                         <span>{t('hero_premium_cta_secondary')}</span>
-                        <span className="text-base text-slate-400 group-hover:translate-y-0.5 transition-transform">↓</span>
+                        <span className="text-slate-400">↓</span>
                     </button>
                 </div>
 
                 {/* 5. Frictionless Trust Badges */}
-                <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-6 sm:gap-x-8 text-sm sm:text-base font-semibold text-slate-600 max-w-2xl mx-auto mb-12 sm:mb-20">
-                    <div className="flex items-center gap-2 hover:text-slate-900 transition-colors">
+                <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-5 sm:gap-x-7 text-xs sm:text-sm font-semibold text-slate-500 max-w-xl mx-auto mb-10 sm:mb-14">
+                    <div className="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
                         <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <span>{t('hero_trust_badge_1')}</span>
                     </div>
-                    <div className="flex items-center gap-2 hover:text-slate-900 transition-colors">
+                    <div className="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
                         <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <span>{t('hero_trust_badge_2')}</span>
                     </div>
-                    <div className="flex items-center gap-2 hover:text-slate-900 transition-colors">
+                    <div className="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
                         <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
@@ -183,8 +178,8 @@ export default function LandingHero() {
                     onMouseLeave={() => setIsPaused(false)}
                     className="relative max-w-5xl mx-auto text-left"
                 >
-                    {/* Glowing Aura Behind Window */}
-                    <div className="absolute -inset-3 bg-gradient-to-r from-indigo-500/20 via-purple-500/15 to-emerald-500/15 rounded-3xl blur-2xl -z-10 opacity-70 animate-pulse-glow" />
+                    {/* Lightweight Static Aura Behind Window (Zero GPU Lag) */}
+                    <div className="absolute -inset-2 bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-emerald-500/10 rounded-2xl blur-xl -z-10 opacity-60 pointer-events-none" />
 
                     {/* Window Frame */}
                     <div className="rounded-2xl sm:rounded-3xl border border-slate-700/60 bg-slate-900 shadow-[0_25px_70px_-15px_rgba(15,23,42,0.4)] overflow-hidden transition-all duration-300">

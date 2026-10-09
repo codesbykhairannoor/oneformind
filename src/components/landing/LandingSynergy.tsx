@@ -24,13 +24,13 @@ export default function LandingSynergy() {
             <section className="py-16 sm:py-28 lg:py-36 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-20">
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-6 tracking-wider uppercase border border-indigo-200">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-4 sm:mb-5 tracking-wider uppercase border border-indigo-200">
                             {t('flow_badge')}
                         </div>
-                        <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 sm:mb-8 leading-[1.1] font-black tracking-tight">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 sm:mb-6 leading-tight font-black tracking-tight">
                             {t('home_flow_title')}
                         </h2>
-                        <p className="text-slate-600 sm:text-slate-500 text-base sm:text-lg lg:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
                             {t('home_flow_desc')}
                         </p>
                     </div>
@@ -57,13 +57,13 @@ export default function LandingSynergy() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                         <div>
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs mb-6 sm:mb-8 uppercase tracking-wider border border-indigo-100">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs mb-4 sm:mb-6 uppercase tracking-wider border border-indigo-100">
                                 🔗 {t('home_synergy_badge')}
                             </div>
-                            <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 sm:mb-8 leading-[1.1] font-black tracking-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 sm:mb-6 leading-tight font-black tracking-tight">
                                 {t('home_synergy_title')}
                             </h2>
-                            <p className="text-slate-600 sm:text-slate-500 text-base sm:text-lg lg:text-xl font-medium leading-relaxed mb-8 sm:mb-12">
+                            <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed mb-6 sm:mb-8">
                                 {t('home_synergy_desc')}
                             </p>
 

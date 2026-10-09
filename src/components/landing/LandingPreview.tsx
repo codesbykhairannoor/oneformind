@@ -14,7 +14,7 @@ export default function LandingPreview() {
                     
                     {/* Visual: High-Fidelity Life OS Workspace Frame */}
                     <div className="relative order-2 lg:order-1">
-                        <div className="absolute -inset-6 sm:-inset-10 bg-gradient-to-tr from-indigo-200 via-purple-100 to-emerald-100 rounded-3xl blur-2xl sm:blur-3xl opacity-60 -z-10 animate-pulse-glow max-w-[100vw]"></div>
+                        <div className="absolute -inset-6 sm:-inset-10 bg-gradient-to-tr from-indigo-200/50 via-purple-100/40 to-emerald-100/40 rounded-3xl blur-2xl sm:blur-3xl opacity-60 -z-10 max-w-[100vw] pointer-events-none"></div>
                         
                         <div 
                             className="relative bg-slate-900 rounded-2xl sm:rounded-3xl p-1 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.35)] sm:shadow-[0_30px_80px_-15px_rgba(15,23,42,0.35)] border border-slate-800 overflow-hidden text-left hover:border-slate-700 transition-all duration-300" 
@@ -119,14 +119,14 @@ export default function LandingPreview() {
 
                     {/* Right: Copywriting & Device Badges */}
                     <div className="order-1 lg:order-2">
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs mb-6 uppercase tracking-wider border border-indigo-200/80 shadow-sm">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs mb-4 sm:mb-5 uppercase tracking-wider border border-indigo-200/80 shadow-xs">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
                             {t('vsn_badge')}
                         </div>
-                        <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 font-black tracking-tight leading-[1.1]">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 sm:mb-6 font-black tracking-tight leading-tight">
                             {t('vsn_title')}
                         </h2>
-                        <p className="text-slate-600 text-base sm:text-lg md:text-xl font-normal leading-relaxed mb-8 sm:mb-10 max-w-xl">
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed mb-6 sm:mb-8 max-w-xl">
                             {t('vsn_desc')}
                         </p>
                         

@@ -48,14 +48,14 @@ export default function LandingWaitlist() {
                 
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-20">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs mb-6 tracking-wider uppercase border border-emerald-200/80 shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs mb-4 sm:mb-5 tracking-wider uppercase border border-emerald-200/80 shadow-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         {t('comp_badge')}
                     </div>
-                    <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 font-black tracking-tight leading-[1.1]">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 sm:mb-6 font-black tracking-tight leading-tight">
                         {t('comp_title')}
                     </h2>
-                    <p className="text-slate-600 text-base sm:text-lg md:text-xl font-normal leading-relaxed max-w-2xl mx-auto">
+                    <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
                         {t('comp_desc')}
                     </p>
                 </div>

@@ -29,11 +29,11 @@ export default function LandingSolutions() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 <div className="text-center mb-12 sm:mb-20">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 text-white/70 text-xs font-bold tracking-wider mb-6 border border-white/10 uppercase">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 text-white/70 text-xs font-bold tracking-wider mb-4 sm:mb-5 border border-white/10 uppercase">
                         🚀 {t('home_solutions_badge')}
                     </div>
-                    <h2 className="text-4xl sm:text-5xl lg:text-6xl text-white mb-6 sm:mb-8 tracking-tight font-black leading-[1.1]">{t('home_solutions_title')}</h2>
-                    <p className="text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto font-medium">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-4 sm:mb-6 tracking-tight font-black leading-tight">{t('home_solutions_title')}</h2>
+                    <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
                         {t('home_solutions_desc')}
                     </p>
                 </div>

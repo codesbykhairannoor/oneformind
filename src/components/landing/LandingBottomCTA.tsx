@@ -11,21 +11,21 @@ export default function LandingBottomCTA() {
 
     return (
         <section className="py-16 sm:py-28 lg:py-36 px-4 sm:px-6 text-center relative overflow-hidden bg-slate-950 border-t border-slate-900">
-            {/* Ambient Lighting */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[350px] sm:h-[400px] bg-gradient-to-tr from-indigo-600/15 via-purple-600/10 to-emerald-600/10 blur-[130px] rounded-full pointer-events-none -z-10 animate-pulse-glow max-w-[100vw]" />
+            {/* Ambient Lighting (Static, Zero Lag) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[350px] sm:h-[400px] bg-gradient-to-tr from-indigo-600/15 via-purple-600/10 to-emerald-600/10 blur-[130px] rounded-full pointer-events-none -z-10 max-w-[100vw]" />
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
             
             <div className="max-w-4xl mx-auto relative z-10">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-xs mb-6 sm:mb-8 tracking-wider uppercase border border-indigo-500/20">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-xs mb-4 sm:mb-6 tracking-wider uppercase border border-indigo-500/20">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span>{isId ? 'SISTEM SIAP PAKAI' : 'READY-TO-USE LIFE OS'}</span>
                 </div>
 
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl mb-6 leading-[1.1] tracking-tight text-white font-black max-w-3xl mx-auto">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-4 sm:mb-6 leading-tight tracking-tight text-white font-black max-w-3xl mx-auto">
                     {t('cta_final_title')}
                 </h2>
 
-                <p className="text-slate-400 text-base sm:text-lg md:text-xl mb-8 sm:mb-12 max-w-xl mx-auto font-normal leading-relaxed">
+                <p className="text-slate-400 text-sm sm:text-base md:text-lg mb-6 sm:mb-10 max-w-xl mx-auto font-normal leading-relaxed">
                     {t('cta_final_desc')}
                 </p>
                 
