@@ -251,8 +251,9 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                 {/* Mobile Drawer Overlay */}
                 {(!isDesktop && isMobileDrawerOpen) && (
                     <div 
-                        className="fixed inset-0 top-12 sm:top-16 bg-slate-900/50 z-[60] md:hidden backdrop-blur-sm transition-opacity animate-in fade-in" 
+                        className="fixed inset-0 bg-slate-950/60 z-[75] md:hidden backdrop-blur-sm transition-opacity animate-in fade-in duration-200" 
                         onClick={() => setIsMobileDrawerOpen(false)}
+                        aria-hidden="true"
                     />
                 )}
 
@@ -261,6 +262,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                     isDesktop={isDesktop}
                     isSidebarCollapsed={isSidebarCollapsed}
                     isMobileDrawerOpen={isMobileDrawerOpen}
+                    onCloseMobileDrawer={() => setIsMobileDrawerOpen(false)}
                     coreExpanded={coreExpanded}
                     platinumExpanded={platinumExpanded}
                     moduleSettings={effectiveModuleSettings}
