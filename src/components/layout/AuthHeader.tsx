@@ -69,7 +69,7 @@ export default function AuthHeader({
     isAdmin = false
 }: AuthHeaderProps) {
     return (
-        <header className="h-[72px] sm:h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/60 sticky top-0 z-[70] transition-all duration-500 shadow-sm">
+        <header className="h-14 sm:h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/60 sticky top-0 z-[70] transition-all duration-500 shadow-sm">
             <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
                 
                 {/* LEFT: HAMBURGER + LOGO */}

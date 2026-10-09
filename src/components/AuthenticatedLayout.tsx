@@ -251,7 +251,7 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
                 {/* Mobile Drawer Overlay */}
                 {(!isDesktop && isMobileDrawerOpen) && (
                     <div 
-                        className="fixed inset-0 top-[72px] sm:top-16 bg-slate-900/50 z-[60] md:hidden backdrop-blur-sm transition-opacity animate-in fade-in" 
+                        className="fixed inset-0 top-14 sm:top-16 bg-slate-900/50 z-[60] md:hidden backdrop-blur-sm transition-opacity animate-in fade-in" 
                         onClick={() => setIsMobileDrawerOpen(false)}
                     />
                 )}
