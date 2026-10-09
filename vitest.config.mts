@@ -6,6 +6,10 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+    pool: 'forks',
+    forks: {
+      singleFork: true,
+    },
   },
   resolve: {
     alias: {
