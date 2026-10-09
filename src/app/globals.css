@@ -14,10 +14,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
-@media (min-width: 1024px) {
-  html {
-    zoom: 80%;
-  }
+html.app-authenticated {
+  zoom: 85%;
 }
 html.dark {
   --text-muted: #94a3b8;

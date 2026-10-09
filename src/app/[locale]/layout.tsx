@@ -97,6 +97,10 @@ export default async function RootLayout({
                 } else {
                   document.documentElement.classList.remove('dark');
                 }
+                var p = window.location.pathname;
+                if (/\/(dashboard|planner|habits|finance|goals|jobs|journal|study|calendar|settings|profile|coach)(\/|$)/.test(p)) {
+                  document.documentElement.classList.add('app-authenticated');
+                }
               } catch (e) {}
             `,
           }}

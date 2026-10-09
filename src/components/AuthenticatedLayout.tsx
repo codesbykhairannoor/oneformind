@@ -96,7 +96,11 @@ export default function AuthenticatedLayout({ children, user: initialUser }: Aut
         const handleResize = () => setIsDesktop(window.innerWidth >= 768);
         handleResize();
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        document.documentElement.classList.add('app-authenticated');
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            document.documentElement.classList.remove('app-authenticated');
+        };
     }, []);
 
     useEffect(() => {
