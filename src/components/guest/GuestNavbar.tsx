@@ -37,17 +37,17 @@ export default function GuestNavbar({
         <nav 
             className={`fixed top-0 w-full z-[100] transition-all duration-300 ${
                 mobileMenuOpen
-                    ? 'bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm'
-                    : (scrolled ? 'bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm' : 'bg-transparent')
+                    ? 'bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-xs'
+                    : (scrolled ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-xs' : 'bg-transparent')
             }`}
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[72px] sm:h-16 flex justify-between items-center relative">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex justify-between items-center relative">
                 {/* UNIFIED LOGO */}
                 <Link href="/" className="group flex items-center gap-2 z-[110] hover:opacity-90 transition-opacity">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-md shadow-indigo-200 shrink-0">
-                        <img src="/favicon.svg" alt="Tranvas Logo" className="w-4.5 h-4.5 brightness-0 invert" />
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-xs shadow-indigo-200 shrink-0">
+                        <img src="/favicon.svg" alt="Tranvas Logo" className="w-4 h-4 sm:w-4.5 sm:h-4.5 brightness-0 invert" />
                     </div>
-                    <span className="text-lg font-black tracking-tight text-slate-900 block">Tranvas</span>
+                    <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 block">Tranvas</span>
                 </Link>
 
                 {/* DESKTOP MENU */}
@@ -299,19 +299,47 @@ export default function GuestNavbar({
                         )}
                     </div>
 
-                    {/* MOBILE HAMBURGER BUTTON */}
-                    <button 
-                        type="button"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
-                        className="flex lg:hidden h-10 w-10 items-center justify-center rounded-xl text-slate-900 transition-all hover:bg-slate-100 active:scale-95 relative z-[110] focus:outline-none"
-                        aria-label="Toggle Menu"
-                    >
-                        <div className="w-5 flex flex-col items-end gap-[5px]">
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-[7px] w-5' : 'w-5'}`} />
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : 'w-3.5'}`} />
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-[7px] w-5' : 'w-4'}`} />
-                        </div>
-                    </button>
+                    {/* MOBILE QUICK ACTIONS & HAMBURGER */}
+                    <div className="flex lg:hidden items-center gap-1.5 sm:gap-2">
+                        {!user ? (
+                            <>
+                                <Link 
+                                    href="/login" 
+                                    onClick={() => trackCTAClick('header_nav_mobile', 'Log in', '/login')}
+                                    className="text-xs font-bold text-slate-600 hover:text-indigo-600 px-2 sm:px-2.5 py-1.5 transition"
+                                >
+                                    {locale === 'id' ? 'Masuk' : 'Log in'}
+                                </Link>
+                                <Link 
+                                    href="/register" 
+                                    onClick={() => trackCTAClick('header_nav_mobile', 'Get started', '/register')}
+                                    className="px-3 sm:px-3.5 py-1.5 bg-indigo-600 text-white rounded-full text-xs font-bold hover:bg-indigo-700 shadow-xs shadow-indigo-200 transition active:scale-95"
+                                >
+                                    {locale === 'id' ? 'Mulai' : 'Start'}
+                                </Link>
+                            </>
+                        ) : (
+                            <Link 
+                                href="/dashboard" 
+                                className="px-3 py-1.5 bg-slate-900 text-white rounded-full text-xs font-bold shadow-xs transition"
+                            >
+                                Dashboard
+                            </Link>
+                        )}
+
+                        <button 
+                            type="button"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+                            className="h-9 w-9 flex items-center justify-center rounded-xl text-slate-900 hover:bg-slate-100 active:scale-95 relative z-[110] focus:outline-none transition-all ml-0.5"
+                            aria-label="Toggle Menu"
+                        >
+                            <div className="w-4.5 flex flex-col items-end gap-[4px]">
+                                <span className={`h-[2px] bg-current transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-[6px] w-4.5' : 'w-4.5'}`} />
+                                <span className={`h-[2px] bg-current transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : 'w-3'}`} />
+                                <span className={`h-[2px] bg-current transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-[6px] w-4.5' : 'w-4'}`} />
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </nav>

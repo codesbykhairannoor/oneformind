@@ -26,7 +26,7 @@ export default function GuestFloatingPill({
     }
 
     return (
-        <aside aria-label="Quick Signup" className="fixed bottom-6 right-6 z-40 animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <aside aria-label="Quick Signup" className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 animate-in fade-in slide-in-from-bottom-5 duration-300">
             <div className="flex items-center gap-3 p-1.5 pl-4 bg-slate-900/90 text-white backdrop-blur-xl border border-white/10 rounded-full shadow-2xl shadow-indigo-500/20 hover:scale-[1.03] transition-all">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
