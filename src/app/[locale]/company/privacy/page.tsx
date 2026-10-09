@@ -49,34 +49,34 @@ export default function PrivacyPage() {
                             {t('privacy_badge')}
                         </div>
 
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
                             {t('privacy_title_1')} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">
                                 {t('privacy_title_2')}
                             </span>
                         </h1>
 
-                        <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed mb-8 sm:mb-12 border-l-4 border-indigo-500/40 pl-6 sm:pl-8">
+                        <p className="text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed mb-8 sm:mb-12 border-l-4 border-indigo-500/40 pl-6 sm:pl-8">
                             {t('privacy_subtitle')}
                         </p>
 
                         {/* Status Hub */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 p-6 bg-white/5 border border-white/10 rounded-3xl">
                             <div>
-                                <p className="text-[9px] text-slate-500 font-black uppercase mb-1">{t('privacy_status_protection')}</p>
+                                <p className="text-[11px] text-slate-400 font-bold uppercase mb-1">{t('privacy_status_protection')}</p>
                                 <p className="text-white font-bold text-sm tracking-widest">{t('privacy_status_protection_val')}</p>
                             </div>
                             <div>
-                                <p className="text-[9px] text-slate-500 font-black uppercase mb-1">{t('privacy_status_access')}</p>
+                                <p className="text-[11px] text-slate-400 font-bold uppercase mb-1">{t('privacy_status_access')}</p>
                                 <p className="text-emerald-400 font-bold text-sm">{t('privacy_status_access_val')}</p>
                             </div>
                             <div>
-                                <p className="text-[9px] text-slate-500 font-black uppercase mb-1">{t('privacy_status_tracking')}</p>
+                                <p className="text-[11px] text-slate-400 font-bold uppercase mb-1">{t('privacy_status_tracking')}</p>
                                 <p className="text-white font-bold text-sm">{t('privacy_status_tracking_val')}</p>
                             </div>
                             <div className="col-span-1">
-                                <p className="text-[9px] text-slate-500 font-black uppercase mb-1">{t('privacy_status_protocol')}</p>
-                                <p className="text-slate-300 font-bold text-[10px]">{t('privacy_status_protocol_val')}</p>
+                                <p className="text-[11px] text-slate-400 font-bold uppercase mb-1">{t('privacy_status_protocol')}</p>
+                                <p className="text-slate-200 font-bold text-xs">{t('privacy_status_protocol_val')}</p>
                             </div>
                         </div>
                     </div>

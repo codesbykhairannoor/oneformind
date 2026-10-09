@@ -48,7 +48,7 @@ export default function SolutionDeepWorkPage() {
                         </div>
                         
                         {/* Title */}
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight tracking-tight text-gray-900 font-black">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight tracking-tight text-gray-900 font-black">
                             {t('deepwork_hero_title_1')}<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                                 {t('deepwork_hero_title_2')}
@@ -56,13 +56,13 @@ export default function SolutionDeepWorkPage() {
                         </h1>
                         
                         {/* Description */}
-                        <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
+                        <p className="text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
                             {t('deepwork_hero_desc')}
                         </p>
                         
                         {/* CTA */}
                         <div className="flex justify-center gap-4 mb-16 sm:mb-24 font-bold">
-                            <Link href="/register" className="bg-indigo-600 text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 transition transform hover:-translate-y-1">
+                            <Link href="/register" className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-base hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 transition transform hover:-translate-y-1">
                                 {t('deepwork_hero_cta')}
                             </Link>
                         </div>

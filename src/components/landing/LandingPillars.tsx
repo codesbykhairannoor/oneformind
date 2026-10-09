@@ -17,10 +17,10 @@ export default function LandingPillars() {
                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
                         {t('pill_badge')}
                     </div>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 sm:mb-6 font-black tracking-tight leading-tight">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl text-slate-900 mb-4 sm:mb-6 font-black tracking-tight leading-tight">
                         {t('home_pillars_title')}
                     </h2>
-                    <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
+                    <p className="text-slate-600 text-base sm:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
                         {t('home_pillars_desc')}
                     </p>
                 </div>

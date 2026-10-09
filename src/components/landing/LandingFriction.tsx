@@ -32,11 +32,11 @@ export default function LandingFriction() {
                             {t('fric_badge')}
                         </div>
 
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-4 sm:mb-6 font-black tracking-tight leading-tight">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl text-white mb-4 sm:mb-6 font-black tracking-tight leading-tight">
                             {t('fric_title')}
                         </h2>
 
-                        <p className="text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8 font-normal max-w-2xl">
+                        <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 font-normal max-w-2xl">
                             {t('fric_desc')}
                         </p>
 

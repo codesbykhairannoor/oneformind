@@ -110,7 +110,7 @@ export default function LandingHero() {
                 </div>
                 
                 {/* 2. Balanced H1 Headline (Calibrated to /features) */}
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6 tracking-tight text-slate-900 font-black leading-tight max-w-4xl mx-auto">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 tracking-tight text-slate-900 font-black leading-tight max-w-4xl mx-auto">
                     {t('hero_premium_title_1')}{' '}
                     <span className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent block sm:inline mt-1 sm:mt-0">
                         {t('hero_premium_title_2')}
@@ -118,7 +118,7 @@ export default function LandingHero() {
                 </h1>
                 
                 {/* 3. Balanced Subheading (Calibrated to /features) */}
-                <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto font-medium">
+                <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto font-medium">
                     {t('hero_premium_desc')}
                 </p>
                 
@@ -127,7 +127,7 @@ export default function LandingHero() {
                     <Link 
                         href="/register" 
                         onClick={() => trackCTAClick('hero_primary', 'Start Free Today', '/register')}
-                        className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-indigo-600/25 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer"
+                        className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-base shadow-lg shadow-indigo-600/25 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer"
                     >
                         <span>{t('hero_premium_cta_primary')}</span>
                         <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,7 @@ export default function LandingHero() {
                             trackCTAClick('hero_secondary', 'Explore 8 Modules', '#interactive-stage');
                             scrollToCanvas();
                         }}
-                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-xs hover:shadow transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-8 py-4 rounded-xl font-bold text-base shadow-xs hover:shadow transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer"
                     >
                         <span>{t('hero_premium_cta_secondary')}</span>
                         <span className="text-slate-400">↓</span>

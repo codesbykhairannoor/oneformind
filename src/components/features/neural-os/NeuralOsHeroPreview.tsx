@@ -20,7 +20,7 @@ export default function NeuralOsHeroPreview({ t }: NeuralOsHeroPreviewProps) {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-gradient-to-b from-purple-50/50 via-white to-white rounded-full blur-3xl -z-10"></div>
                 
                 <div className="max-w-5xl mx-auto relative z-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-100 shadow-sm text-purple-700 text-[10px] mb-10 tracking-[0.2em] animate-in fade-in slide-in-from-bottom-4 duration-700 font-bold uppercase">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-100 shadow-sm text-purple-700 text-xs mb-10 tracking-[0.2em] animate-in fade-in slide-in-from-bottom-4 duration-700 font-bold uppercase">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-600"></span>
@@ -28,19 +28,19 @@ export default function NeuralOsHeroPreview({ t }: NeuralOsHeroPreviewProps) {
                         {t('neural_hero_badge')}
                     </div>
                     
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
                         {t('neural_hero_title_1')}<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800">
                             {t('neural_hero_title_2')}
                         </span>
                     </h1>
                     
-                    <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 fill-mode-both">
+                    <p className="text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 fill-mode-both">
                         {t('neural_hero_desc')}
                     </p>
                     
                     <div className="flex flex-col sm:flex-row justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
-                        <Link href="/register" className="bg-indigo-600 text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition transform hover:-translate-y-1 active:scale-95 group font-bold">
+                        <Link href="/register" className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-base hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition transform hover:-translate-y-1 active:scale-95 group font-bold">
                             {t('neural_hero_cta_1')}
                             <span className="inline-block transition-transform group-hover:translate-x-1 ml-2">→</span>
                         </Link>

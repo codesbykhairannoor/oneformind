@@ -95,7 +95,7 @@ export default function AffiliatesPage() {
                             {isId ? 'PROGRAM KEMITRAAN RESMI • 60% KOMISI RECURRING' : 'OFFICIAL PARTNER PROGRAM • 60% RECURRING'}
                         </div>
 
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                             {isId ? 'Dapatkan Komisi ' : 'Earn '}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-indigo-600 to-purple-600">
                                 60% Recurring
@@ -104,7 +104,7 @@ export default function AffiliatesPage() {
                             {isId ? 'Hingga 8 Bulan per User' : 'For Up to 8 Months per User'}
                         </h1>
 
-                        <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
                             {isId
                                 ? 'Bantu audiens Anda membangun Life Operating System terbaik dan nikmati bagi hasil 60% tiap bulan selama hingga 8 bulan langganan aktif, didukung cookie tracking 90 hari.'
                                 : 'Partner with the leading unified Life OS. Turn your audience into sustainable monthly passive income with 60% recurring commissions for up to 8 months per active subscriber.'}
@@ -114,7 +114,7 @@ export default function AffiliatesPage() {
                             <Link
                                 href="/login?next=/settings?tab=affiliate"
                                 onClick={() => trackCTAClick('affiliate_hero', 'Join Partner Program', '/login?next=/settings?tab=affiliate')}
-                                className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-base shadow-xl shadow-indigo-200 dark:shadow-none transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                                className="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-base shadow-xl shadow-indigo-200 dark:shadow-none transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 <span>{isId ? 'Masuk ke Dashboard Partner' : 'Login to Partner Dashboard'}</span>
                                 <ArrowRight className="w-4 h-4" />
