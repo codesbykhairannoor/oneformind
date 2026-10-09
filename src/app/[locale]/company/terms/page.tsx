@@ -50,14 +50,14 @@ export default function TermsPage() {
                         🚨 {t('terms_badge')}
                     </div>
 
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
                         {t('terms_title_1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">
                             {t('terms_title_2')}
                         </span>
                     </h1>
 
-                    <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 font-medium">
+                    <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 font-medium">
                         {t('terms_subtitle')}
                     </p>
 

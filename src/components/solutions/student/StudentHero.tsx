@@ -16,14 +16,14 @@ export default function StudentHero() {
                         🎓 {t('student_hero_badge')}
                     </div>
                     
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-[1.1] text-gray-900 tracking-tight font-black">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-[1.1] text-gray-900 tracking-tight font-black">
                         {t('student_hero_title_1')}
                         <span className="block py-1 sm:py-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                             {t('student_hero_title_2')}
                         </span>
                     </h1>
                     
-                    <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
+                    <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
                         {t('student_hero_desc')}
                     </p>
                     

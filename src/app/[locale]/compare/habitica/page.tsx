@@ -42,11 +42,11 @@ export default function HabiticaComparePage() {
                                 <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
                                 {t('habitica_badge')}
                             </div>
-                            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight">
                                 {t('habitica_hero_title_1')} <br/>
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">{t('habitica_hero_title_2')}</span>
                             </h1>
-                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('habitica_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('habitica_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="w-full sm:w-auto bg-indigo-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-indigo-500 transition-all shadow-[0_0_40px_rgba(79,70,229,0.3)] hover:shadow-[0_0_60px_rgba(79,70,229,0.5)] text-center">
                                     {t('habitica_hero_cta')}

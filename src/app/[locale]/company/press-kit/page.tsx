@@ -21,7 +21,7 @@ export default function PressKitPage() {
                         🚀 {t('press_kit_title')}
                     </div>
                     
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.95] tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.95] tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
                         {t('press_kit_subtitle')}
                     </h1>
                     

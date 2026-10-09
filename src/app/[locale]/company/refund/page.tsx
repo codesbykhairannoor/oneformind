@@ -35,7 +35,7 @@ export default function RefundPage() {
                         🛑 {t('refund_badge')}
                     </div>
 
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-[0.85] mb-8 font-black">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-[0.85] mb-8 font-black">
                         {t('refund_title_1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-rose-300">
                             {t('refund_title_2')}

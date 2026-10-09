@@ -89,7 +89,7 @@ export default function BlogIndexPage() {
                             </div>
 
                             {/* Headline */}
-                            <h1 className="text-3xl sm:text-5xl md:text-6xl leading-tight text-gray-900 tracking-tight font-black">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight text-gray-900 tracking-tight font-black">
                                 {t('blog_hero_title_1')} <br className="hidden md:block" />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{t('blog_hero_title_2')}</span>
                             </h1>

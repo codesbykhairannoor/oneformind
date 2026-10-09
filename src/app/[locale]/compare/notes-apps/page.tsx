@@ -35,11 +35,11 @@ export default function NotesAppsComparePage() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-bold text-xs mb-8 uppercase tracking-wider border border-slate-300 shadow-sm">
                             {t('notes_apps_badge')}
                         </div>
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
                             {t('notes_apps_hero_title_1')} <br/>
                             <span className="text-indigo-600 underline decoration-wavy decoration-indigo-200">{t('notes_apps_hero_title_2')}</span>
                         </h1>
-                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notes_apps_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notes_apps_hero_desc') }} />
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="w-full sm:w-auto bg-slate-900 text-white font-bold px-10 py-5 rounded-2xl hover:bg-indigo-600 transition-colors shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-1 transform">
                                 {t('notes_apps_hero_cta')}

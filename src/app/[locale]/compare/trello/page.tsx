@@ -40,7 +40,7 @@ export default function TrelloComparePage() {
                             📋 {t('trello_badge')}
                         </div>
 
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight">
                             {t('trello_hero_title_1')} <br/>
                             <span className="text-indigo-200">{t('trello_hero_title_2')}</span>
                         </h1>

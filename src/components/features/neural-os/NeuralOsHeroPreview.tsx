@@ -28,7 +28,7 @@ export default function NeuralOsHeroPreview({ t }: NeuralOsHeroPreviewProps) {
                         {t('neural_hero_badge')}
                     </div>
                     
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
                         {t('neural_hero_title_1')}<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800">
                             {t('neural_hero_title_2')}

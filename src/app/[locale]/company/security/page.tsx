@@ -55,7 +55,7 @@ export default function SecurityPage() {
                             {t('sec_badge')}
                         </div>
 
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-[0.9] mb-8 font-black">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-[0.9] mb-8 font-black">
                             {t('sec_title_1')} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-400">
                                 {t('sec_title_2')}

@@ -42,7 +42,7 @@ export default function AiTrustPage() {
                                 System Transparency Report v2.5
                             </div>
 
-                            <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 900, lineHeight: 1 }} className="text-white tracking-tighter font-black">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter font-black".replace(/s+/g, ' ').trim()}">
                                 Neural OS <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">
                                     Architecture

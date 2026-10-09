@@ -23,14 +23,14 @@ export default function SecondBrainHero() {
                     {t('brain_hero_badge')}
                 </div>
                 
-                <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight text-slate-900 tracking-tight font-black">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-slate-900 tracking-tight font-black">
                     {t('brain_hero_title_1')}<br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                         {t('brain_hero_title_2')}
                     </span>
                 </h1>
                 
-                <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
+                <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
                     {t('brain_hero_desc')}
                 </p>
                 

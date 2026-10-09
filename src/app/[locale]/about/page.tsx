@@ -54,14 +54,14 @@ export default function AboutPage() {
                         {t('about_badge')}
                     </div>
 
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 text-slate-900 tracking-tight font-black leading-tight">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 text-slate-900 tracking-tight font-black leading-tight">
                         {t('about_title_1')}<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-900">
                             {t('about_title_2')}
                         </span>
                     </h1>
 
-                    <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
+                    <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
                         {t('about_desc')}
                     </p>
                 </header>

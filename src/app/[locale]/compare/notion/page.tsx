@@ -46,12 +46,12 @@ export default function NotionComparePage() {
                             🎯 {t('notion_badge')}
                         </div>
 
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
                             {t('notion_hero_title_1')} <br/>
                             <span className="text-indigo-600">{t('notion_hero_title_2')}</span>
                         </h1>
 
-                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notion_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notion_hero_desc') }} />
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="bg-indigo-600 text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl font-bold text-base hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition-all transform hover:-translate-y-1">

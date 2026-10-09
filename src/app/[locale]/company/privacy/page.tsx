@@ -49,7 +49,7 @@ export default function PrivacyPage() {
                             {t('privacy_badge')}
                         </div>
 
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
                             {t('privacy_title_1')} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">
                                 {t('privacy_title_2')}

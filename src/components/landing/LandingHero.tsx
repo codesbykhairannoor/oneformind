@@ -118,7 +118,7 @@ export default function LandingHero() {
                 </h1>
                 
                 {/* 3. Balanced Subheading (Calibrated to /features) */}
-                <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto font-medium">
+                <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto font-medium">
                     {t('hero_premium_desc')}
                 </p>
                 

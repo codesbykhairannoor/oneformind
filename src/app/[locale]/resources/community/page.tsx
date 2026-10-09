@@ -44,7 +44,7 @@ export default function CommunityPage() {
                             {t('comm_hero_badge')}
                         </div>
 
-                        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 5.5rem)', fontWeight: 900, lineHeight: 0.95 }} className="text-slate-900 tracking-tighter font-black">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-slate-900 tracking-tighter font-black".replace(/s+/g, ' ').trim()}">
                             {t('comm_hero_title')}
                         </h1>
 

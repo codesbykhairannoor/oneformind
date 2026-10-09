@@ -49,7 +49,7 @@ export default function SolutionAtomicSystemPage() {
                         </div>
                         
                         {/* Title */}
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 text-gray-900 tracking-tight font-black leading-tight">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 text-gray-900 tracking-tight font-black leading-tight">
                             {t('atomic_hero_title_1')}<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                                 {t('atomic_hero_title_2')}
@@ -57,7 +57,7 @@ export default function SolutionAtomicSystemPage() {
                         </h1>
                         
                         {/* Description */}
-                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
+                        <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
                             {t('atomic_hero_desc')}
                         </p>
                         

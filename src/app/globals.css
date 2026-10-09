@@ -65,7 +65,7 @@ body {
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
   /* Global SaaS Marketing Responsive Design Tokens */
-  .mkt-h1 { @apply text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1]; }
+  .mkt-h1 { @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1]; }
   .mkt-h2 { @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.18]; }
   .mkt-h2-lg { @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]; }
   .mkt-h3 { @apply text-lg sm:text-xl md:text-2xl font-bold tracking-tight leading-snug; }

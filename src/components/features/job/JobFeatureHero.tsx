@@ -18,7 +18,7 @@ export default function JobFeatureHero({ t }: JobFeatureHeroProps) {
                         <span className="text-lg">💼</span> {t('job_hero_badge')}
                     </div>
                     
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-gray-900 tracking-tight font-black">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-gray-900 tracking-tight font-black">
                         {t('job_hero_title_1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                             {t('job_hero_title_2')}

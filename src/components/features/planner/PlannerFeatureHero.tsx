@@ -16,7 +16,7 @@ export default function PlannerFeatureHero({ t }: PlannerFeatureHeroProps) {
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-6 uppercase tracking-wider border border-indigo-200">
                     <span className="text-lg">📅</span> {t('planner_hero_badge')}
                 </div>
-                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-gray-900 tracking-tight font-black">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-gray-900 tracking-tight font-black">
                     {t('planner_hero_title_1')} <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-500">{t('planner_hero_title_2')}</span>
                 </h1>
