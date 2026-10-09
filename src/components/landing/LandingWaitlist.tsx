@@ -52,10 +52,10 @@ export default function LandingWaitlist() {
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         {t('comp_badge')}
                     </div>
-                    <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-6 font-black tracking-[-0.035em] leading-[1.12]">
+                    <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 font-black tracking-tight leading-[1.1]">
                         {t('comp_title')}
                     </h2>
-                    <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
+                    <p className="text-slate-600 text-base sm:text-lg md:text-xl font-normal leading-relaxed max-w-2xl mx-auto">
                         {t('comp_desc')}
                     </p>
                 </div>

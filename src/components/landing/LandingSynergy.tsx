@@ -27,10 +27,10 @@ export default function LandingSynergy() {
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-6 tracking-wider uppercase border border-indigo-200">
                             {t('flow_badge')}
                         </div>
-                        <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-6 sm:mb-8 leading-tight font-[900] tracking-tight">
+                        <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 sm:mb-8 leading-[1.1] font-black tracking-tight">
                             {t('home_flow_title')}
                         </h2>
-                        <p className="text-slate-600 sm:text-slate-500 text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+                        <p className="text-slate-600 sm:text-slate-500 text-base sm:text-lg lg:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
                             {t('home_flow_desc')}
                         </p>
                     </div>
@@ -60,10 +60,10 @@ export default function LandingSynergy() {
                             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs mb-6 sm:mb-8 uppercase tracking-wider border border-indigo-100">
                                 🔗 {t('home_synergy_badge')}
                             </div>
-                            <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-6 sm:mb-8 leading-[1.12] font-[900] tracking-tight">
+                            <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 sm:mb-8 leading-[1.1] font-black tracking-tight">
                                 {t('home_synergy_title')}
                             </h2>
-                            <p className="text-slate-600 sm:text-slate-500 text-base sm:text-lg font-medium leading-relaxed mb-8 sm:mb-12">
+                            <p className="text-slate-600 sm:text-slate-500 text-base sm:text-lg lg:text-xl font-medium leading-relaxed mb-8 sm:mb-12">
                                 {t('home_synergy_desc')}
                             </p>
 

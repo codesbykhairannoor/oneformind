@@ -115,7 +115,7 @@ export default function LandingHero() {
                 </div>
                 
                 {/* 2. Authority H1 Headline */}
-                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 sm:mb-8 tracking-[-0.03em] text-slate-900 font-black leading-[1.12] sm:leading-[1.08] max-w-5xl mx-auto">
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 sm:mb-8 tracking-tight text-slate-900 font-black leading-[1.06] max-w-5xl mx-auto">
                     {t('hero_premium_title_1')}{' '}
                     <span className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent block sm:inline mt-1 sm:mt-0">
                         {t('hero_premium_title_2')}
@@ -123,7 +123,7 @@ export default function LandingHero() {
                 </h1>
                 
                 {/* 3. Problem-Solving Subheading */}
-                <p className="text-base sm:text-lg lg:text-xl text-slate-600 mb-8 sm:mb-10 leading-relaxed max-w-3xl mx-auto font-medium">
+                <p className="text-lg sm:text-xl lg:text-2xl text-slate-600 mb-8 sm:mb-10 leading-relaxed max-w-3xl mx-auto font-medium">
                     {t('hero_premium_desc')}
                 </p>
                 
@@ -132,10 +132,10 @@ export default function LandingHero() {
                     <Link 
                         href="/register" 
                         onClick={() => trackCTAClick('hero_primary', 'Start Free Today', '/register')}
-                        className="w-full sm:w-auto relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer before:absolute before:inset-0 before:-translate-x-full hover:before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent"
+                        className="w-full sm:w-auto relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4.5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer before:absolute before:inset-0 before:-translate-x-full hover:before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent"
                     >
                         <span>{t('hero_premium_cta_primary')}</span>
-                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     </Link>
@@ -146,15 +146,15 @@ export default function LandingHero() {
                             trackCTAClick('hero_secondary', 'Explore 8 Modules', '#interactive-stage');
                             scrollToCanvas();
                         }}
-                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 px-8 py-4 rounded-xl font-bold text-base sm:text-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer group"
+                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 px-8 py-4.5 rounded-2xl font-bold text-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer group"
                     >
                         <span>{t('hero_premium_cta_secondary')}</span>
-                        <span className="text-sm text-slate-400 group-hover:translate-y-0.5 transition-transform">↓</span>
+                        <span className="text-base text-slate-400 group-hover:translate-y-0.5 transition-transform">↓</span>
                     </button>
                 </div>
 
                 {/* 5. Frictionless Trust Badges */}
-                <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-6 sm:gap-x-8 text-xs sm:text-sm font-semibold text-slate-600 max-w-2xl mx-auto mb-12 sm:mb-20">
+                <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-6 sm:gap-x-8 text-sm sm:text-base font-semibold text-slate-600 max-w-2xl mx-auto mb-12 sm:mb-20">
                     <div className="flex items-center gap-2 hover:text-slate-900 transition-colors">
                         <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

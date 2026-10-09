@@ -123,10 +123,10 @@ export default function LandingPreview() {
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
                             {t('vsn_badge')}
                         </div>
-                        <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-6 font-black tracking-[-0.035em] leading-[1.12]">
+                        <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6 font-black tracking-tight leading-[1.1]">
                             {t('vsn_title')}
                         </h2>
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed mb-8 sm:mb-10 max-w-xl">
+                        <p className="text-slate-600 text-base sm:text-lg md:text-xl font-normal leading-relaxed mb-8 sm:mb-10 max-w-xl">
                             {t('vsn_desc')}
                         </p>
                         

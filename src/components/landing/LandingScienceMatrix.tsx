@@ -22,10 +22,10 @@ export default function LandingScienceMatrix() {
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         {isId ? 'Arsitektur Kognitif' : 'Cognitive Architecture'}
                     </div>
-                    <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-[900] tracking-tight leading-[1.15] mb-6">
+                    <h2 className="text-4xl sm:text-5xl lg:text-6xl text-white font-black tracking-tight leading-[1.1] mb-6">
                         {t('home_science_title_1')} <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">{t('home_science_title_highlight')}</span>
                     </h2>
-                    <p className="text-slate-400 text-sm sm:text-base md:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+                    <p className="text-slate-400 text-base sm:text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
                         {isId 
                             ? 'Tranvas dibangun di atas kerangka kerja neurosains kognitif dan ekonomi perilaku teruji—dirancang untuk melenyapkan friksi kognitif dan mempertahankan eksekusi puncak.'
                             : 'Tranvas is built upon verified cognitive neuroscience and behavioral economics frameworks—engineered to eliminate cognitive friction and sustain peak execution.'}

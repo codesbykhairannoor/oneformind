@@ -21,11 +21,11 @@ export default function LandingBottomCTA() {
                     <span>{isId ? 'SISTEM SIAP PAKAI' : 'READY-TO-USE LIFE OS'}</span>
                 </div>
 
-                <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 leading-[1.12] tracking-[-0.035em] text-white font-black max-w-3xl mx-auto">
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl mb-6 leading-[1.1] tracking-tight text-white font-black max-w-3xl mx-auto">
                     {t('cta_final_title')}
                 </h2>
 
-                <p className="text-slate-400 text-sm sm:text-base md:text-lg mb-8 sm:mb-12 max-w-xl mx-auto font-normal leading-relaxed">
+                <p className="text-slate-400 text-base sm:text-lg md:text-xl mb-8 sm:mb-12 max-w-xl mx-auto font-normal leading-relaxed">
                     {t('cta_final_desc')}
                 </p>
                 

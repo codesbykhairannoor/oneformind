@@ -22,9 +22,9 @@ export default function GuestFooter({
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-12 md:gap-12 mb-16 text-left">
                     {/* COL 1: BRAND */}
                     <div className="col-span-2 md:col-span-1">
-                        <Link href="/" className="flex items-center gap-2 mb-6">
-                            <img src="/favicon.svg" alt="Tranvas Logo" className="w-7 h-7" />
-                            <span className="text-lg font-black tracking-tighter text-slate-900">Tranvas</span>
+                        <Link href="/" className="flex items-center gap-2.5 mb-6">
+                            <img src="/favicon.svg" alt="Tranvas Logo" className="w-8 h-8" />
+                            <span className="text-xl font-black tracking-tight text-slate-900">Tranvas</span>
                         </Link>
                         <p className="text-sm text-slate-700 leading-relaxed mb-6 max-w-xs font-medium">
                             {locale === 'id' 

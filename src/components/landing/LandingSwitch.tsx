@@ -12,7 +12,7 @@ export default function LandingSwitch() {
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-6 sm:mb-8 tracking-wider uppercase border border-indigo-200">
                     {t('mig_badge')}
                 </div>
-                <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-10 sm:mb-16 leading-tight font-[900] tracking-tight">
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-10 sm:mb-16 leading-[1.1] font-black tracking-tight">
                     {t('mig_title')}
                 </h2>
 

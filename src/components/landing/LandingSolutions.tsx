@@ -32,8 +32,8 @@ export default function LandingSolutions() {
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 text-white/70 text-xs font-bold tracking-wider mb-6 border border-white/10 uppercase">
                         🚀 {t('home_solutions_badge')}
                     </div>
-                    <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-6 sm:mb-8 tracking-tight font-[900]">{t('home_solutions_title')}</h2>
-                    <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium">
+                    <h2 className="text-4xl sm:text-5xl lg:text-6xl text-white mb-6 sm:mb-8 tracking-tight font-black leading-[1.1]">{t('home_solutions_title')}</h2>
+                    <p className="text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto font-medium">
                         {t('home_solutions_desc')}
                     </p>
                 </div>
