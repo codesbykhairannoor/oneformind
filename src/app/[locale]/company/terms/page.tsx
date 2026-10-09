@@ -46,18 +46,18 @@ export default function TermsPage() {
             <header className="relative pt-32 pb-24 px-6 bg-slate-950 overflow-hidden border-b border-white/5">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-20"></div>
                 <div className="max-w-7xl mx-auto relative z-10 text-center animate-in fade-in slide-in-from-top-12 duration-1000">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-rose-500/30 bg-rose-500/10 text-rose-400 font-mono text-[10px] mb-8 uppercase tracking-widest ">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-rose-500/30 bg-rose-500/10 text-rose-400 font-mono text-xs mb-6 sm:mb-8 uppercase tracking-wider">
                         🚨 {t('terms_badge')}
                     </div>
 
-                    <h1 className="text-5xl md:text-8xl text-white tracking-tighter leading-[0.85] mb-8 font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
                         {t('terms_title_1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">
                             {t('terms_title_2')}
                         </span>
                     </h1>
 
-                    <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-bold">
+                    <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 font-medium">
                         {t('terms_subtitle')}
                     </p>
 

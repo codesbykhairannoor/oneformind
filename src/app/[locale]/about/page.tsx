@@ -47,27 +47,27 @@ export default function AboutPage() {
         <GuestLayout>
             <main id="about-monument" className="overflow-x-hidden">
                 {/* SECTION 1: HERO SECTION */}
-                <header className="pt-32 pb-24 px-6 text-center max-w-5xl mx-auto relative overflow-hidden">
+                <header className="pt-24 pb-16 sm:pt-32 sm:pb-24 px-4 sm:px-6 text-center max-w-5xl mx-auto relative overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-indigo-50/50 rounded-full blur-3xl -z-10 animate-pulse pointer-events-none" />
 
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 font-black text-[10px] mb-10 tracking-[0.2em] border border-indigo-100 uppercase">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs mb-8 uppercase tracking-wider border border-indigo-100">
                         {t('about_badge')}
                     </div>
 
-                    <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.8rem)', fontWeight: 900, lineHeight: 0.95 }} className="mb-10 text-slate-900 tracking-tight font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 text-slate-900 tracking-tight font-black leading-tight">
                         {t('about_title_1')}<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-900">
                             {t('about_title_2')}
                         </span>
                     </h1>
 
-                    <p style={{ fontSize: '1.25rem', lineHeight: 1.8 }} className="text-slate-500 max-w-3xl mx-auto font-medium">
+                    <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
                         {t('about_desc')}
                     </p>
                 </header>
 
                 {/* SECTION 2: STORY SECTION (FRICTION CRISIS) */}
-                <section className="py-40 bg-slate-50 relative overflow-hidden">
+                <section className="py-16 sm:py-28 lg:py-40 bg-slate-50 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-1/3 h-full bg-indigo-600/5 -skew-x-12 translate-x-1/2 pointer-events-none" />
 
                     <div className="max-w-7xl mx-auto px-6 relative z-10">

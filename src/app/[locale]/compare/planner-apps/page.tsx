@@ -40,11 +40,11 @@ export default function PlannerAppsComparePage() {
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-8 uppercase tracking-wider border border-indigo-200">
                                 🎯 Tranvas vs Standalone Planner Apps
                             </div>
-                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
                                 Stop listing tasks. <br/>
                                 <span className="text-indigo-600">Start executing flow.</span>
                             </h1>
-                            <p className="text-xl text-slate-600 mb-10 max-w-xl leading-relaxed">
+                            <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-xl leading-relaxed">
                                 Standard to-do and planner apps create guilt-inducing lists that disconnect from your reality. Tranvas transforms planning into a living, unified operating system.
                             </p>
                             <div className="flex flex-col sm:flex-row items-start gap-4">

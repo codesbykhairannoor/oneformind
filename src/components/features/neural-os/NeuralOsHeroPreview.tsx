@@ -28,23 +28,23 @@ export default function NeuralOsHeroPreview({ t }: NeuralOsHeroPreviewProps) {
                         {t('neural_hero_badge')}
                     </div>
                     
-                    <h1 className="text-[42px] leading-[1.1] md:text-7xl lg:text-8xl mb-10 leading-[0.95] tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
                         {t('neural_hero_title_1')}<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800">
                             {t('neural_hero_title_2')}
                         </span>
                     </h1>
                     
-                    <p className="text-lg md:text-xl text-slate-500 mb-14 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 fill-mode-both">
+                    <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 fill-mode-both">
                         {t('neural_hero_desc')}
                     </p>
                     
-                    <div className="flex flex-col sm:flex-row justify-center gap-5 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
-                        <Link href="/register" className="bg-indigo-600 text-white px-12 py-6 rounded-3xl text-xl hover:bg-indigo-700 hover:shadow-2xl hover:shadow-indigo-200 transition transform hover:-translate-y-1 active:scale-95 group font-bold">
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
+                        <Link href="/register" className="bg-indigo-600 text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition transform hover:-translate-y-1 active:scale-95 group font-bold">
                             {t('neural_hero_cta_1')}
                             <span className="inline-block transition-transform group-hover:translate-x-1 ml-2">→</span>
                         </Link>
-                        <a href="#audit" className="bg-white text-slate-700 border border-slate-200 px-12 py-6 rounded-3xl text-xl hover:bg-slate-50 hover:border-slate-300 transition transform hover:-translate-y-1 active:scale-95 font-bold">
+                        <a href="#audit" className="bg-white text-slate-700 border border-slate-200 px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base hover:bg-slate-50 hover:border-slate-300 transition transform hover:-translate-y-1 active:scale-95 font-bold">
                             {t('neural_hero_cta_2')}
                         </a>
                     </div>

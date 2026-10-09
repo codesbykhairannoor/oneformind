@@ -154,21 +154,21 @@ export default function FeaturesIndexPage() {
               Unified Productivity Operating System
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 dark:text-white mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 dark:text-white mb-4 sm:mb-6 leading-tight">
               Powerful Features for <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Total Life Clarity and Control
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-medium leading-relaxed mb-10">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-medium leading-relaxed mb-8 sm:mb-10">
               Replace a dozen disconnected productivity apps with one interconnected workspace. Tranvas harmonizes your daily habits, task scheduling, personal finance, journaling, and long-term milestones.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex items-center gap-2 px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 Get Started Free
                 <ArrowRight className="w-4 h-4" />

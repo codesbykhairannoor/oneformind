@@ -40,11 +40,11 @@ export default function TickTickComparePage() {
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-bold text-xs mb-8 uppercase tracking-wider shadow-sm border border-blue-200">
                                 {t('ticktick_badge')}
                             </div>
-                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
                                 {t('ticktick_hero_title_1')} <br/>
                                 <span className="text-blue-600">{t('ticktick_hero_title_2')}</span>
                             </h1>
-                            <p className="text-xl text-slate-500 mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('ticktick_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('ticktick_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="w-full sm:w-auto bg-blue-600 text-white font-black px-10 py-5 rounded-2xl hover:bg-blue-700 transition-all shadow-[0_10px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1">
                                     {t('ticktick_hero_cta')}

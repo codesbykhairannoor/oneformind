@@ -90,12 +90,12 @@ export default function AffiliatesPage() {
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-[750px] bg-[radial-gradient(circle_at_50%_0%,#4f46e515_0,transparent_50%)] -z-10" />
                     
                     <div className="max-w-5xl mx-auto space-y-8">
-                        <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-black text-[10px] uppercase tracking-[0.3em] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider shadow-xs border border-emerald-100 dark:border-emerald-500/20">
                             <Sparkles className="w-3.5 h-3.5" />
                             {isId ? 'PROGRAM KEMITRAAN RESMI • 60% KOMISI RECURRING' : 'OFFICIAL PARTNER PROGRAM • 60% RECURRING'}
                         </div>
 
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05]">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                             {isId ? 'Dapatkan Komisi ' : 'Earn '}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-indigo-600 to-purple-600">
                                 60% Recurring
@@ -104,7 +104,7 @@ export default function AffiliatesPage() {
                             {isId ? 'Hingga 8 Bulan per User' : 'For Up to 8 Months per User'}
                         </h1>
 
-                        <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
                             {isId
                                 ? 'Bantu audiens Anda membangun Life Operating System terbaik dan nikmati bagi hasil 60% tiap bulan selama hingga 8 bulan langganan aktif, didukung cookie tracking 90 hari.'
                                 : 'Partner with the leading unified Life OS. Turn your audience into sustainable monthly passive income with 60% recurring commissions for up to 8 months per active subscriber.'}
@@ -114,7 +114,7 @@ export default function AffiliatesPage() {
                             <Link
                                 href="/login?next=/settings?tab=affiliate"
                                 onClick={() => trackCTAClick('affiliate_hero', 'Join Partner Program', '/login?next=/settings?tab=affiliate')}
-                                className="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-base shadow-xl shadow-indigo-200 dark:shadow-none transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                                className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-base shadow-xl shadow-indigo-200 dark:shadow-none transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 <span>{isId ? 'Masuk ke Dashboard Partner' : 'Login to Partner Dashboard'}</span>
                                 <ArrowRight className="w-4 h-4" />

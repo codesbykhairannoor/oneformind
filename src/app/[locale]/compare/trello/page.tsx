@@ -40,7 +40,7 @@ export default function TrelloComparePage() {
                             📋 {t('trello_badge')}
                         </div>
 
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 tracking-tight leading-tight drop-shadow-sm">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight">
                             {t('trello_hero_title_1')} <br/>
                             <span className="text-indigo-200">{t('trello_hero_title_2')}</span>
                         </h1>
@@ -48,7 +48,7 @@ export default function TrelloComparePage() {
                         <p className="text-xl text-indigo-100 mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('trello_hero_desc') }} />
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                            <Link href="/register" className="bg-white text-indigo-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                            <Link href="/register" className="bg-white text-indigo-600 px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl font-bold text-base hover:bg-indigo-50 hover:shadow-xl transition-all transform hover:-translate-y-1">
                                 {t('trello_hero_cta')}
                             </Link>
                             <span className="text-sm text-indigo-200 font-medium">{t('trello_hero_note')}</span>

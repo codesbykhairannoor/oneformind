@@ -23,19 +23,19 @@ export default function SecondBrainHero() {
                     {t('brain_hero_badge')}
                 </div>
                 
-                <h1 className="text-6xl md:text-7xl mb-6 leading-tight text-slate-900 tracking-tight font-black">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight text-slate-900 tracking-tight font-black">
                     {t('brain_hero_title_1')}<br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                         {t('brain_hero_title_2')}
                     </span>
                 </h1>
                 
-                <p className="text-xl md:text-2xl text-slate-500 mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
+                <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
                     {t('brain_hero_desc')}
                 </p>
                 
-                <div className="flex justify-center gap-4 mb-24">
-                    <Link href="/register" className="bg-indigo-600 text-white px-10 py-4 rounded-2xl text-lg hover:bg-indigo-700 shadow-[0_15px_30px_rgba(79,70,229,0.3)] hover:shadow-[0_20px_40px_rgba(79,70,229,0.4)] transition transform hover:-translate-y-1 font-bold">
+                <div className="flex justify-center gap-4 mb-16 sm:mb-24">
+                    <Link href="/register" className="bg-indigo-600 text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 transition transform hover:-translate-y-1 font-bold">
                         {t('brain_hero_cta')}
                     </Link>
                 </div>

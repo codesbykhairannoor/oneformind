@@ -40,11 +40,11 @@ export default function OneNoteComparePage() {
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700 font-bold text-xs mb-8 uppercase tracking-wider border border-purple-200">
                                 📓 {t('onenote_badge')}
                             </div>
-                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
                                 {t('onenote_hero_title_1')} <br/>
                                 <span className="text-purple-600">{t('onenote_hero_title_2')}</span>
                             </h1>
-                            <p className="text-xl text-slate-600 mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('onenote_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('onenote_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="w-full sm:w-auto bg-slate-900 text-white font-bold px-8 py-4 rounded-xl hover:bg-purple-600 transition-colors shadow-xl hover:shadow-purple-500/30 hover:-translate-y-1 transform">
                                     {t('onenote_hero_cta')}

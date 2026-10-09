@@ -18,12 +18,12 @@ export default function CustomAppsHero() {
                             ⚠️ {t('blank_badge')}
                         </div>
                         
-                        <h1 className="text-[36px] leading-[1.1] md:text-6xl lg:text-7xl mb-6 text-gray-900 tracking-tight font-black">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-4 sm:mb-6 tracking-tight leading-tight">
                             {t('blank_hero_title_1')}<br/>
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{t('blank_hero_title_2')}</span>
                         </h1>
                         
-                        <p className="text-xl text-gray-500 mb-10 leading-relaxed font-medium max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('blank_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('blank_hero_desc') }} />
                         
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link href="/register" className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition transform hover:-translate-y-1 text-center">

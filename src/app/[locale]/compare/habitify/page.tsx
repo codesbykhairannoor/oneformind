@@ -45,11 +45,11 @@ export default function HabitifyComparePage() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-8 uppercase tracking-wider shadow-sm">
                             {t('habitify_badge')}
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
                             {t('habitify_hero_title_1')} <br/>
                             <span className="text-indigo-600">{t('habitify_hero_title_2')}</span>
                         </h1>
-                        <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed bg-white/50 backdrop-blur-sm rounded-xl p-4 inline-block" dangerouslySetInnerHTML={{ __html: t.raw('habitify_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed bg-white/50 backdrop-blur-sm rounded-xl p-4 inline-block" dangerouslySetInnerHTML={{ __html: t.raw('habitify_hero_desc') }} />
                         
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="w-full sm:w-auto bg-indigo-600 text-white font-black px-10 py-5 rounded-2xl hover:bg-indigo-700 transition-all shadow-[0_10px_30px_rgba(79,70,229,0.3)] hover:-translate-y-1 text-center">

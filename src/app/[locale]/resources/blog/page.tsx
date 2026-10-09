@@ -84,12 +84,12 @@ export default function BlogIndexPage() {
                         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100 fill-mode-both space-y-8">
                             
                             {/* Editorial Badge */}
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[10px] md:text-xs uppercase tracking-wider shadow-sm border border-indigo-200">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs uppercase tracking-wider shadow-xs border border-indigo-200">
                                 ⭐ {t('blog_hero_badge')}
                             </div>
 
                             {/* Headline */}
-                            <h1 className="text-4xl md:text-7xl leading-[1.1] text-gray-900 tracking-tight font-black">
+                            <h1 className="text-3xl sm:text-5xl md:text-6xl leading-tight text-gray-900 tracking-tight font-black">
                                 {t('blog_hero_title_1')} <br className="hidden md:block" />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{t('blog_hero_title_2')}</span>
                             </h1>

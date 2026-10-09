@@ -20,14 +20,14 @@ export default function ContactPage() {
             <div className="pt-32 pb-24 px-4 bg-slate-50 dark:bg-slate-900/50 min-h-screen">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="text-center mb-20 animate-in fade-in slide-in-from-bottom-6 duration-700">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-black text-[10px] mb-6 uppercase tracking-widest border border-indigo-100 dark:border-indigo-500/20 shadow-sm">
+                    <div className="text-center mb-16 sm:mb-20 animate-in fade-in slide-in-from-bottom-6 duration-700">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold text-xs mb-6 uppercase tracking-wider border border-indigo-100 dark:border-indigo-500/20 shadow-xs">
                             ✨ {t('contact_title')}
                         </div>
-                        <h1 className="text-4xl md:text-6xl text-slate-900 dark:text-white tracking-tight mb-6 font-black">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl text-slate-900 dark:text-white tracking-tight mb-4 sm:mb-6 font-black leading-tight">
                             {t('contact_title')}
                         </h1>
-                        <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-bold">
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
                             {t('contact_subtitle')}
                         </p>
                     </div>

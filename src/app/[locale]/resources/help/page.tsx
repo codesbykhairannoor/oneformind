@@ -67,7 +67,7 @@ export default function HelpPage() {
                         </div>
 
                         {/* Status Badge */}
-                        <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-emerald-50 text-emerald-600 font-black text-[10px] mb-8 uppercase tracking-[0.25em] border border-emerald-100/50 shadow-sm">
+                        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-bold text-xs mb-6 sm:mb-8 uppercase tracking-wider border border-emerald-100/50 shadow-xs">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -75,12 +75,12 @@ export default function HelpPage() {
                             {t('help_status_all_ok')}
                         </div>
 
-                        <h1 className="text-6xl md:text-8xl mb-10 leading-[1] text-slate-900 tracking-tighter font-black">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight text-slate-900 tracking-tight font-black">
                             {t('help_hero_title_1')}<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">{t('help_hero_title_2')}</span>
                         </h1>
 
-                        <p className="text-xl md:text-2xl text-slate-500 mb-16 leading-relaxed max-w-2xl mx-auto font-medium opacity-80">
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
                             {t('help_hero_desc')}
                         </p>
 

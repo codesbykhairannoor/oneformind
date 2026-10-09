@@ -77,25 +77,25 @@ export default function PricingPage() {
                 <header style={{ marginBottom: '80px' }} className="pt-32 pb-16 px-6 relative text-center">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-[800px] bg-[radial-gradient(circle_at_50%_0%,#4f46e515_0,transparent_50%)] -z-10" />
                     <div className="max-w-7xl mx-auto space-y-8">
-                        <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-black text-[10px] mb-10 uppercase tracking-[0.3em] shadow-sm border border-indigo-100 dark:border-indigo-500/20">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold text-xs mb-8 uppercase tracking-wider shadow-xs border border-indigo-100 dark:border-indigo-500/20">
                             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
                             {t('pricing_badge')}
                         </div>
 
-                        <h1 style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', fontWeight: 900, lineHeight: 0.95 }} className="text-slate-900 dark:text-white tracking-tighter font-black">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                             {t('pricing_title_1')}<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">
                                 {t('pricing_title_2')}
                             </span>
                         </h1>
 
-                        <p style={{ fontSize: '1.25rem', lineHeight: 1.8 }} className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-bold">
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
                             {t('pricing_subtitle')}
                         </p>
 
                         {/* Billing Toggle */}
                         <div className="flex items-center justify-center gap-6 pt-4">
-                            <span className={`text-sm font-black transition-all duration-300 ${!isAnnual ? 'text-slate-900 dark:text-white scale-110' : 'text-slate-400 opacity-50'}`}>
+                            <span className={`text-sm font-bold transition-all duration-300 ${!isAnnual ? 'text-slate-900 dark:text-white scale-110' : 'text-slate-400 opacity-50'}`}>
                                 {t('pricing_monthly')}
                             </span>
 
@@ -110,11 +110,11 @@ export default function PricingPage() {
                                 <div className={`w-6 h-6 rounded-full bg-indigo-600 dark:bg-indigo-500 shadow-xl transform transition-transform duration-500 ${isAnnual ? 'translate-x-10' : 'translate-x-0'}`} />
                             </button>
 
-                            <span className={`text-sm font-black transition-all duration-300 ${isAnnual ? 'text-slate-900 dark:text-white scale-110' : 'text-slate-400 opacity-50'}`}>
+                            <span className={`text-sm font-bold transition-all duration-300 ${isAnnual ? 'text-slate-900 dark:text-white scale-110' : 'text-slate-400 opacity-50'}`}>
                                 {t('pricing_yearly')}
                             </span>
 
-                            <div className="hidden sm:block px-4 py-1.5 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 animate-bounce">
+                            <div className="hidden sm:block px-3.5 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/20 animate-bounce">
                                 {t('pricing_billing_save')}
                             </div>
                         </div>

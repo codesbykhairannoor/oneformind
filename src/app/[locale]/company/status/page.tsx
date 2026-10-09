@@ -57,7 +57,7 @@ export default function StatusPage() {
                         {t('stat_hero_badge')}
                     </div>
                     
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl mb-10 text-slate-900 tracking-tight leading-tight font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl mb-6 sm:mb-10 text-slate-900 tracking-tight leading-tight font-black">
                         {t('stat_hero_title')}
                     </h1>
 

@@ -64,14 +64,14 @@ export default function GuidePage() {
                                 📚 {t('guide_hero_badge')}
                             </div>
 
-                            <h1 className="text-5xl md:text-7xl leading-[1.1] text-gray-900 tracking-tight font-black">
+                            <h1 className="text-3xl sm:text-5xl md:text-6xl leading-tight text-gray-900 tracking-tight font-black">
                                 {t('guide_hero_title_1')} <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                                     {t('guide_hero_title_2')}
                                 </span>
                             </h1>
 
-                            <p className="text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto font-medium">
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto font-medium">
                                 {t('guide_hero_desc')}
                             </p>
 
