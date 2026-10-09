@@ -24,7 +24,7 @@ export default function FreelancerScienceFaqCta() {
     return (
         <>
             {/* SECTION 8: SCIENTIFIC PILLAR */}
-            <section className="py-32 bg-slate-900 relative overflow-hidden text-left border-y border-slate-950">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 relative overflow-hidden text-left border-y border-slate-950">
                 <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(99,102,241,0.05)_1px,transparent_1px)] [background-size:100px_100px]"></div>
                 
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -36,7 +36,7 @@ export default function FreelancerScienceFaqCta() {
                                     🧬 {t('freelance_science_badge')}
                                 </div>
 
-                                <h2 className="text-5xl md:text-6xl text-white mb-10 leading-tight font-black">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-10 leading-tight font-black">
                                     {t('freelance_science_title')}
                                 </h2>
 
@@ -83,9 +83,9 @@ export default function FreelancerScienceFaqCta() {
             </section>
 
             {/* SECTION 9: FAQ */}
-            <section className="py-32 bg-gray-50 border-y border-gray-100">
+            <section className="py-14 sm:py-20 lg:py-28 bg-gray-50 border-y border-gray-100">
                 <div className="max-w-4xl mx-auto px-6">
-                    <h2 className="text-5xl md:text-6xl text-center text-gray-900 mb-16 font-black">{t('freelance_faq_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center text-gray-900 mb-16 font-black">{t('freelance_faq_title')}</h2>
                     <div className="space-y-6">
                         {faqs.map((faq, idx) => (
                             <div key={idx} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition">
@@ -98,12 +98,12 @@ export default function FreelancerScienceFaqCta() {
             </section>
 
             {/* SECTION 10: INVOICE-STYLE CTA */}
-            <section className="py-24 px-6 bg-gray-50 relative overflow-hidden text-center">
+            <section className="py-12 sm:py-16 lg:py-24 px-6 bg-gray-50 relative overflow-hidden text-center">
                 <div className="max-w-4xl mx-auto relative z-10">
                     <div className="bg-slate-900 rounded-3xl md:rounded-[3rem] p-12 md:p-20 relative shadow-2xl overflow-hidden border border-slate-700 border-t-8 border-t-indigo-500">
                         <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-30"></div>
                         
-                        <h2 className="text-6xl md:text-6xl mb-8 text-white tracking-tight font-black">{t('freelance_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-white tracking-tight font-black">{t('freelance_cta_title')}</h2>
                         <p className="text-slate-400 text-xl md:text-2xl mb-12 font-medium leading-relaxed max-w-2xl mx-auto">
                             {t('freelance_cta_desc')}
                         </p>

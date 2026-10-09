@@ -11,7 +11,7 @@ export default function HabitFeatureScienceNeural({ t }: HabitFeatureScienceNeur
     return (
         <>
             {/* SECTION: SCIENTIFIC PILLAR - DUAL GLASSMORPHISM RESEARCH CARDS */}
-            <section className="py-32 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
                 <div className="absolute top-1/3 right-1/4 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none"></div>
                 
@@ -20,7 +20,7 @@ export default function HabitFeatureScienceNeural({ t }: HabitFeatureScienceNeur
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 font-bold text-[10px] uppercase tracking-[0.25em] mb-6 border border-emerald-500/20">
                             🧬 Behavioral Neuroscience
                         </div>
-                        <h2 className="text-3xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
                             {t('habit_science_title_1')}{' '}
                             <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
                                 {t('habit_science_title_highlight')}
@@ -34,7 +34,7 @@ export default function HabitFeatureScienceNeural({ t }: HabitFeatureScienceNeur
                     {/* Dual Research Cards Grid */}
                     <div className="grid md:grid-cols-2 gap-8">
                         {/* Card 1: 66-Day Plateau (Lally) */}
-                        <div className="bg-slate-900/80 backdrop-blur-2xl p-8 lg:p-10 rounded-[2.5rem] border border-slate-800 hover:border-emerald-500/40 transition duration-500 flex flex-col justify-between group shadow-2xl">
+                        <div className="bg-slate-900/80 backdrop-blur-2xl p-8 lg:p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-slate-800 hover:border-emerald-500/40 transition duration-500 flex flex-col justify-between group shadow-2xl">
                             <div>
                                 <div className="flex items-center justify-between mb-8">
                                     <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-2xl">
@@ -62,7 +62,7 @@ export default function HabitFeatureScienceNeural({ t }: HabitFeatureScienceNeur
                         </div>
 
                         {/* Card 2: 43% Automaticity (Wood) */}
-                        <div className="bg-slate-900/80 backdrop-blur-2xl p-8 lg:p-10 rounded-[2.5rem] border border-slate-800 hover:border-indigo-500/40 transition duration-500 flex flex-col justify-between group shadow-2xl">
+                        <div className="bg-slate-900/80 backdrop-blur-2xl p-8 lg:p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-slate-800 hover:border-indigo-500/40 transition duration-500 flex flex-col justify-between group shadow-2xl">
                             <div>
                                 <div className="flex items-center justify-between mb-8">
                                     <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl">
@@ -93,14 +93,14 @@ export default function HabitFeatureScienceNeural({ t }: HabitFeatureScienceNeur
             </section>
 
             {/* NEURAL PROMO: HABIT AUDIT */}
-            <section className="py-32 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:40px_40px] opacity-10"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10 flex flex-col lg:flex-row items-center gap-16 text-left">
                     <div className="lg:w-1/2">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] uppercase tracking-widest mb-8 border border-indigo-500/20">
                             🧠 {t('habit_ai_promo_badge')}
                         </div>
-                        <h2 className="text-5xl md:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
                             {t('habit_ai_promo_title')}
                         </h2>
                         <p className="text-slate-400 text-xl font-medium leading-relaxed mb-12">
@@ -133,10 +133,10 @@ export default function HabitFeatureScienceNeural({ t }: HabitFeatureScienceNeur
             </section>
 
             {/* SECTION 7: PHILOSOPHICAL QUOTE */}
-            <section className="py-32 bg-gray-50 border-y border-gray-100 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-gray-50 border-y border-gray-100 relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <div className="text-9xl text-indigo-50 mb-4 font-serif leading-none italic select-none">"</div>
-                    <h2 className="text-4xl md:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
                         {t('habit_quote_text')}
                     </h2>
                     <div className="flex flex-col items-center">

@@ -56,7 +56,7 @@ export default function FiveAppsComparePage() {
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{t('five_hero_title_2')}</span>
                             </h1>
                             
-                            <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('five_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('five_hero_desc') }} />
                             
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link href="/register" className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition transform hover:-translate-y-1 text-center">
@@ -75,7 +75,7 @@ export default function FiveAppsComparePage() {
                                 <div className="absolute top-1/2 left-0 w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl opacity-40 rotate-90 animate-float">🎯</div>
                             </div>
 
-                            <div className="relative bg-white/90 p-10 rounded-[3rem] shadow-2xl border border-white w-80 z-20 overflow-hidden transform hover:scale-105 transition duration-500" role="img" aria-label="Tranvas Unified Orb">
+                            <div className="relative bg-white/90 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-2xl border border-white w-80 z-20 overflow-hidden transform hover:scale-105 transition duration-500" role="img" aria-label="Tranvas Unified Orb">
                                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"></div>
                                 
                                 <div className="relative z-10 text-center">
@@ -105,13 +105,13 @@ export default function FiveAppsComparePage() {
                         </div>
 
                         <div className="grid md:grid-cols-12 gap-6 max-w-5xl mx-auto">
-                            <div className="md:col-span-8 bg-slate-800/50 p-10 rounded-[2.5rem] border border-slate-700/50 hover:bg-slate-800 transition group">
+                            <div className="md:col-span-8 bg-slate-800/50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-slate-700/50 hover:bg-slate-800 transition group">
                                 <div className="text-4xl mb-6 group-hover:scale-110 transition-transform origin-left font-black">🏃‍♂️</div>
                                 <h3 className="text-2xl font-bold mb-3 text-white">{t('five_cycle_1_title')}</h3>
                                 <p className="text-slate-400 leading-relaxed">{t('five_cycle_1_desc')}</p>
                             </div>
                             
-                            <div className="md:col-span-4 bg-indigo-600 p-10 rounded-[2.5rem] border border-indigo-500 shadow-2xl shadow-indigo-900/50 relative overflow-hidden group">
+                            <div className="md:col-span-4 bg-indigo-600 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-indigo-500 shadow-2xl shadow-indigo-900/50 relative overflow-hidden group">
                                 <div className="absolute -top-4 -right-4 bg-rose-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-bounce z-10">SYNC FAILED</div>
                                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 <div className="text-4xl mb-6 relative z-10 group-hover:-translate-y-2 transition-transform font-black">🧱</div>
@@ -119,7 +119,7 @@ export default function FiveAppsComparePage() {
                                 <p className="text-indigo-100 leading-relaxed relative z-10">{t('five_cycle_2_desc')}</p>
                             </div>
 
-                            <div className="md:col-span-12 bg-slate-800/50 p-10 rounded-[2.5rem] border border-slate-700/50 flex flex-col md:flex-row items-center gap-8 hover:border-slate-600 transition group">
+                            <div className="md:col-span-12 bg-slate-800/50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-slate-700/50 flex flex-col md:flex-row items-center gap-8 hover:border-slate-600 transition group">
                                 <div className="text-6xl group-hover:rotate-12 transition-transform font-black">😴</div>
                                 <div>
                                     <h3 className="text-2xl font-bold mb-3 text-white">{t('five_cycle_3_title')}</h3>
@@ -141,7 +141,7 @@ export default function FiveAppsComparePage() {
                             {t('five_prob_desc')}
                         </p>
                         
-                        <div className="w-full bg-white p-12 rounded-[3rem] border border-slate-200 shadow-xl relative overflow-hidden">
+                        <div className="w-full bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 w-full h-2 bg-gradient-to-r from-rose-400 to-orange-400 left-0"></div>
                             
                             <h4 className="text-xs uppercase tracking-widest text-slate-400 mb-8">The App Stack Graveyard</h4>
@@ -366,7 +366,7 @@ export default function FiveAppsComparePage() {
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f46e5_1px,transparent_1px),linear-gradient(to_bottom,#4f46e5_1px,transparent_1px)] bg-[size:40px_40px] opacity-20"></div>
                     
                     <div className="max-w-3xl mx-auto text-center relative z-10 bg-white/10 border border-white/20 p-12 md:p-20 rounded-[3rem] shadow-2xl">
-                        <h2 className="text-4xl md:text-6xl mb-6 text-white tracking-tight leading-tight font-black" dangerouslySetInnerHTML={{ __html: t.raw('five_cta_title') }} />
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-white tracking-tight leading-tight font-black" dangerouslySetInnerHTML={{ __html: t.raw('five_cta_title') }} />
                         <p className="text-indigo-100 text-lg md:text-xl mb-10 font-medium leading-relaxed">
                             {t('five_cta_desc')}
                         </p>

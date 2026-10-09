@@ -11,14 +11,14 @@ export default function CalendarFeatureSyncScience({ t }: CalendarFeatureSyncSci
     return (
         <>
             {/* SECTION 3.5: ECOSYSTEM SYNC (NETWORK GRAPH VISUAL) */}
-            <section className="py-32 bg-slate-50 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row gap-20 items-center">
                         <div className="flex-1 text-left">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-[10px] uppercase tracking-[0.2em] mb-8 shadow-sm border border-indigo-200">
                                 {t('calendar_sync_badge')}
                             </div>
-                            <h2 className="text-5xl md:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
                                 {t('calendar_sync_title')}
                             </h2>
                             <p className="text-gray-600 text-xl mb-12 leading-relaxed font-medium">
@@ -97,7 +97,7 @@ export default function CalendarFeatureSyncScience({ t }: CalendarFeatureSyncSci
             </section>
 
             {/* SECTION 4: SCIENTIFIC PILLAR */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     <div className="flex flex-col lg:flex-row gap-20 items-center">
                         <div className="flex-1 w-full relative h-[450px] flex items-center justify-center">
@@ -116,7 +116,7 @@ export default function CalendarFeatureSyncScience({ t }: CalendarFeatureSyncSci
                                 🧩 {t('calendar_science_badge')}
                             </div>
                             
-                            <h2 className="text-5xl md:text-6xl text-gray-900 mb-10 leading-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-10 leading-tight font-black">
                                 {t('calendar_science_title')}
                             </h2>
                             
@@ -146,13 +146,13 @@ export default function CalendarFeatureSyncScience({ t }: CalendarFeatureSyncSci
             </section>
 
             {/* NEURAL PROMO: CALENDAR FLOW */}
-            <section className="py-32 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6 relative z-10 flex flex-col lg:flex-row items-center gap-16 text-left">
                     <div className="lg:w-1/2">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] uppercase tracking-widest mb-8 border border-blue-500/20">
                             📅 {t('calendar_ai_promo_badge')}
                         </div>
-                        <h2 className="text-5xl md:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
                             {t('calendar_ai_promo_title')}
                         </h2>
                         <p className="text-slate-400 text-xl font-medium leading-relaxed mb-12">
@@ -181,10 +181,10 @@ export default function CalendarFeatureSyncScience({ t }: CalendarFeatureSyncSci
             </section>
 
             {/* SECTION 7: PHILOSOPHICAL QUOTE */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <div className="text-9xl text-indigo-50 mb-4 font-serif leading-none italic select-none">"</div>
-                    <h2 className="text-4xl md:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
                         {t('calendar_quote_text')}
                     </h2>
                     <div className="flex flex-col items-center">

@@ -57,7 +57,7 @@ export default function TermsPage() {
                         </span>
                     </h1>
 
-                    <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 font-medium">
+                    <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 font-medium">
                         {t('terms_subtitle')}
                     </p>
 
@@ -69,7 +69,7 @@ export default function TermsPage() {
                 </div>
             </header>
 
-            <section className="py-24 bg-[#fafafa]">
+            <section className="py-12 sm:py-16 lg:py-24 bg-[#fafafa]">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-20 relative">
                     
                     <aside className="hidden lg:block w-1/4 shrink-0 relative">
@@ -121,33 +121,33 @@ export default function TermsPage() {
                                 </p>
                             </div>
 
-                            <h2 id="eligibility" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('terms_h2_eligibility')}</h2>
+                            <h2 id="eligibility" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('terms_h2_eligibility')}</h2>
                             <p>{t('terms_p_eligibility')}</p>
                             <ul className="marker:text-indigo-600 font-bold">
                                 <li>{t('terms_eligibility_1')}</li>
                                 <li>{t('terms_eligibility_2')}</li>
                             </ul>
 
-                            <h2 id="rules" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('terms_h2_rules')}</h2>
+                            <h2 id="rules" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('terms_h2_rules')}</h2>
                             <p>{t('terms_p_rules')}</p>
 
-                            <h2 id="payment" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('terms_h2_payment')}</h2>
+                            <h2 id="payment" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('terms_h2_payment')}</h2>
                             <p>{t('terms_p_payment')}</p>
                             <ul className="font-bold">
                                 <li>{t('terms_li_payment_1_title')}: {t('terms_li_payment_1_desc')}</li>
                                 <li className="text-rose-600">{t('terms_li_payment_2_title')}: {t('terms_li_payment_2_desc')}</li>
                             </ul>
 
-                            <h2 id="intellectual" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('terms_h2_intellectual')}</h2>
+                            <h2 id="intellectual" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('terms_h2_intellectual')}</h2>
                             <p>{t('terms_p_intellectual')}</p>
 
-                            <h2 id="termination" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('terms_h2_termination')}</h2>
+                            <h2 id="termination" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('terms_h2_termination')}</h2>
                             <p>{t('terms_p_termination')}</p>
 
-                            <h2 id="dispute" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('terms_h2_dispute')}</h2>
+                            <h2 id="dispute" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('terms_h2_dispute')}</h2>
                             <p>{t('terms_p_dispute')}</p>
 
-                            <h2 id="liability" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('terms_h2_liability')}</h2>
+                            <h2 id="liability" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('terms_h2_liability')}</h2>
                             <div className="p-8 bg-slate-900 rounded-3xl text-indigo-100 font-mono text-xs leading-relaxed border-l-[12px] border-rose-500 shadow-2xl">
                                 {t('terms_legal_caps')}
                             </div>

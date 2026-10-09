@@ -10,7 +10,7 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
     return (
         <>
             {/* SECTION 4: PRIVACY & SECURITY */}
-            <section className="py-32 bg-indigo-950 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-indigo-950 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
                 <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-indigo-950 via-transparent to-indigo-950"></div>
                 
@@ -18,7 +18,7 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
                     <div className="inline-flex items-center justify-center px-6 py-2 bg-indigo-900/50 border border-indigo-700/50 text-indigo-300 rounded-full text-sm font-bold uppercase tracking-widest mb-8">
                         {t('finance_privacy_badge')}
                     </div>
-                    <h2 className="text-5xl md:text-5xl text-white mb-6 font-black">{t('finance_privacy_title')}</h2>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-6 font-black">{t('finance_privacy_title')}</h2>
                     <p className="text-indigo-200 text-xl max-w-3xl mx-auto leading-relaxed mb-16 font-medium">
                         {t('finance_privacy_desc')}
                     </p>
@@ -44,13 +44,13 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
             </section>
 
             {/* SECTION 5: WEALTH TRAJECTORY */}
-            <section className="py-32 bg-slate-50 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] uppercase tracking-[0.2em] mb-8 shadow-sm border border-emerald-200">
                             {t('finance_trajectory_badge')}
                         </div>
-                        <h2 className="text-5xl md:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
                             {t('finance_trajectory_title')}
                         </h2>
                         <p className="text-gray-600 text-xl leading-relaxed font-medium">
@@ -60,7 +60,7 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
 
                     <div className="grid md:grid-cols-3 gap-8 mb-20 text-left">
                         {/* Trajectory Card 1 */}
-                        <div className="bg-white p-10 rounded-[3rem] shadow-xl border border-gray-100 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
+                        <div className="bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[4rem] group-hover:scale-110 transition duration-700"></div>
                             <div className="relative z-10">
                                 <span className="text-emerald-500 text-4xl mb-6 block font-black">📈</span>
@@ -73,7 +73,7 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
                         </div>
 
                         {/* Trajectory Card 2 */}
-                        <div className="bg-slate-900 p-10 rounded-[3rem] shadow-2xl border border-slate-800 transform md:-translate-y-4 group relative overflow-hidden">
+                        <div className="bg-slate-900 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-800 transform md:-translate-y-4 group relative overflow-hidden">
                             <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
                             <div className="relative z-10 text-white">
                                 <span className="text-indigo-400 text-4xl mb-6 block font-black">🎯</span>
@@ -86,7 +86,7 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
                         </div>
 
                         {/* Trajectory Card 3 */}
-                        <div className="bg-white p-10 rounded-[3rem] shadow-xl border border-gray-100 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
+                        <div className="bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-bl-[4rem] group-hover:scale-110 transition duration-700"></div>
                             <div className="relative z-10">
                                 <span className="text-amber-500 text-4xl mb-6 block font-black">🏖️</span>

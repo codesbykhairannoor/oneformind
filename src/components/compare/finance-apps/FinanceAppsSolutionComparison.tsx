@@ -25,7 +25,7 @@ export default function FinanceAppsSolutionComparison() {
                     </div>
 
                     <div className="grid lg:grid-cols-12 gap-8 max-w-5xl mx-auto">
-                        <div className="lg:col-span-7 bg-white/5 border border-white/10 p-10 md:p-12 rounded-[3rem] ">
+                        <div className="lg:col-span-7 bg-white/5 border border-white/10 p-10 md:p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl ">
                             <h3 className="text-3xl mb-6 font-black">{t('finapp_sol_box_title')}</h3>
                             <p className="text-slate-300 text-lg leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: t.raw('finapp_sol_box_desc') }} />
                             <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800">

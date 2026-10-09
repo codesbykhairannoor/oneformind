@@ -10,14 +10,14 @@ export default function JobFeatureFunnelMatrix({ t }: JobFeatureFunnelMatrixProp
     return (
         <>
             {/* SECTION 2: OPPORTUNITY FUNNEL (PIPELINE VISUAL) */}
-            <section id="how-it-works" className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section id="how-it-works" className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row gap-24 items-center">
                         <div className="flex-1 text-left animate-in fade-in slide-in-from-left-8 duration-700">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-xs uppercase tracking-[0.2em] mb-8 shadow-sm border border-indigo-100">
                                 {t('job_funnel_badge')}
                             </div>
-                            <h2 className="text-6xl leading-[1.1] md:text-7xl text-gray-900 mb-10 tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.1] text-gray-900 mb-10 tracking-tight font-black">
                                 {t('job_funnel_title')}
                             </h2>
                             <p className="text-gray-500 text-xl mb-12 leading-relaxed font-medium">
@@ -87,7 +87,7 @@ export default function JobFeatureFunnelMatrix({ t }: JobFeatureFunnelMatrixProp
             </section>
 
             {/* SECTION 3: DECISION MATRIX (COMPARISON GRID) */}
-            <section className="py-32 bg-slate-50 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     <div className="flex flex-col lg:flex-row gap-24 items-center">
                         <div className="flex-1 order-2 lg:order-1">
@@ -124,7 +124,7 @@ export default function JobFeatureFunnelMatrix({ t }: JobFeatureFunnelMatrixProp
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 text-white text-xs uppercase tracking-[0.2em] mb-8 shadow-2xl">
                                 {t('job_matrix_badge')}
                             </div>
-                            <h2 className="text-5xl md:text-6xl text-gray-900 mb-10 leading-tight tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-10 leading-tight tracking-tight font-black">
                                 {t('job_matrix_title')}
                             </h2>
                             <p className="text-gray-600 text-xl mb-12 leading-relaxed font-medium">

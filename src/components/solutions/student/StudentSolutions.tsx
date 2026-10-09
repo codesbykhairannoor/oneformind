@@ -8,7 +8,7 @@ export default function StudentSolutions() {
     return (
         <>
             {/* SECTION 3: SOLUTION HIGHLIGHT 1 (ACADEMIC & PROJECTS) */}
-            <section className="py-24 bg-gray-50 border-y border-gray-100">
+            <section className="py-12 sm:py-16 lg:py-24 bg-gray-50 border-y border-gray-100">
                 <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
                     <div className="order-2 lg:order-1 relative h-[400px] bg-slate-900 rounded-[3rem] p-8 flex items-center justify-center overflow-hidden border border-slate-800 shadow-2xl">
                         <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:20px_20px] opacity-20"></div>
@@ -26,7 +26,7 @@ export default function StudentSolutions() {
                     
                     <div className="order-1 lg:order-2">
                         <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl text-2xl mb-6 font-black select-none">🎯</div>
-                        <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('student_feat_1_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('student_feat_1_title')}</h2>
                         <p className="text-gray-500 text-lg leading-relaxed mb-8 font-medium">
                             {t('student_feat_1_desc')}
                         </p>
@@ -39,11 +39,11 @@ export default function StudentSolutions() {
             </section>
 
             {/* SECTION 4: SOLUTION HIGHLIGHT 2 (FINANCE SURVIVAL) */}
-            <section className="py-24 bg-white">
+            <section className="py-12 sm:py-16 lg:py-24 bg-white">
                 <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
                     <div>
                         <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl text-2xl mb-6 font-black select-none">🍜</div>
-                        <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('student_feat_2_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('student_feat_2_title')}</h2>
                         <p className="text-gray-500 text-lg leading-relaxed mb-8 font-medium">
                             {t('student_feat_2_desc')}
                         </p>

@@ -10,7 +10,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
     return (
         <>
             {/* SECTION 2: VERTICAL ASCENT (STRATEGY HIERARCHY) */}
-            <section className="py-32 bg-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row gap-20 items-center">
                         
@@ -60,7 +60,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 text-amber-700 text-xs uppercase tracking-[0.2em] mb-8 shadow-sm border border-amber-100">
                                 {t('goal_ascent_badge')}
                             </div>
-                            <h2 className="text-6xl leading-[1.1] md:text-7xl text-gray-900 mb-10 tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.1] text-gray-900 mb-10 tracking-tight font-black">
                                 {t('goal_ascent_title')}
                             </h2>
                             <p className="text-gray-500 text-xl mb-12 leading-relaxed font-medium">
@@ -89,7 +89,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
             </section>
 
             {/* SECTION 3: MOMENTUM ORBIT (CIRCULAR PROGRESSION) */}
-            <section className="py-32 bg-slate-50 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-100/50 rounded-full blur-3xl -mr-96 -mt-96"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     <div className="flex flex-col lg:flex-row gap-24 items-center">
@@ -125,7 +125,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900 text-white text-xs uppercase tracking-[0.2em] mb-8 shadow-2xl">
                                 {t('goal_performance_badge')}
                             </div>
-                            <h2 className="text-5xl md:text-6xl text-gray-900 mb-10 leading-tight tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-10 leading-tight tracking-tight font-black">
                                 {t('goal_momentum_title')}
                             </h2>
                             <p className="text-gray-600 text-xl mb-12 leading-relaxed">

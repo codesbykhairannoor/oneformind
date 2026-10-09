@@ -11,14 +11,14 @@ export default function HabitFeatureHeatmap({ t, opacities }: HabitFeatureHeatma
     return (
         <>
             {/* SECTION 2: THE CONSISTENCY GRID */}
-            <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
+            <section id="how-it-works" className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col md:flex-row gap-16 items-center">
                         <div className="flex-1 text-left animate-in fade-in slide-in-from-left-8 duration-700">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-wider mb-6">
                                 {t('habit_heatmap_badge')}
                             </div>
-                            <h2 className="text-4xl md:text-5xl text-gray-900 mb-6 leading-tight font-black">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight font-black">
                                 {t('habit_heatmap_title')}
                             </h2>
                             <p className="text-gray-600 text-lg mb-8 leading-relaxed">
@@ -74,14 +74,14 @@ export default function HabitFeatureHeatmap({ t, opacities }: HabitFeatureHeatma
             </section>
 
             {/* SECTION 3: STREAK MOMENTUM TIMELINE */}
-            <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-indigo-500/10 blur-3xl rounded-full"></div>
                 <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-purple-500/10 blur-3xl rounded-full"></div>
                 
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     <div className="text-center max-w-3xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <span className="text-indigo-400 font-bold uppercase tracking-[0.3em] text-xs mb-4 block">{t('habit_streak_badge')}</span>
-                        <h2 className="text-4xl md:text-5xl mb-6 font-black">{t('habit_streak_title')}</h2>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 font-black">{t('habit_streak_title')}</h2>
                         <p className="text-indigo-100 text-lg opacity-80">{t('habit_streak_desc')}</p>
                     </div>
 

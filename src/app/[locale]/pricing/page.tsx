@@ -82,14 +82,14 @@ export default function PricingPage() {
                             {t('pricing_badge')}
                         </div>
 
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                             {t('pricing_title_1')}<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">
                                 {t('pricing_title_2')}
                             </span>
                         </h1>
 
-                        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                        <p className="text-lg md:text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
                             {t('pricing_subtitle')}
                         </p>
 
@@ -133,7 +133,7 @@ export default function PricingPage() {
                 <section style={{ marginBottom: '80px' }} className="pb-32 px-6">
                     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch">
                         {/* 1. Explorer */}
-                        <div className="group relative flex flex-col p-10 rounded-[3rem] bg-white/50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:-translate-y-4 transition-all duration-700 hover:shadow-2xl">
+                        <div className="group relative flex flex-col p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-white/50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:-translate-y-4 transition-all duration-700 hover:shadow-2xl">
                             <div className="mb-10">
                                 <span className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">{t('pricing_l1_name')}</span>
                                 <div className="mt-4 flex items-baseline gap-1">
@@ -176,7 +176,7 @@ export default function PricingPage() {
                         </div>
 
                         {/* 2. Architect */}
-                        <div className="group relative flex flex-col p-10 rounded-[3rem] bg-white dark:bg-slate-800 border-4 border-indigo-50 dark:border-indigo-950/50 shadow-2xl hover:-translate-y-4 transition-all duration-700">
+                        <div className="group relative flex flex-col p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800 border-4 border-indigo-50 dark:border-indigo-950/50 shadow-2xl hover:-translate-y-4 transition-all duration-700">
                             <div className="mb-10">
                                 <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 tracking-[0.2em] uppercase">{t('pricing_l2_name')}</span>
                                 <div className="mt-4 flex items-baseline gap-1">
@@ -279,7 +279,7 @@ export default function PricingPage() {
                         </div>
 
                         {/* 4. Legendary */}
-                        <div className="group relative flex flex-col p-10 rounded-[3rem] bg-white dark:bg-black border border-slate-200 dark:border-slate-800 hover:-translate-y-4 transition-all duration-700 hover:shadow-2xl">
+                        <div className="group relative flex flex-col p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-white dark:bg-black border border-slate-200 dark:border-slate-800 hover:-translate-y-4 transition-all duration-700 hover:shadow-2xl">
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-amber-500 text-white text-[8px] font-black tracking-widest whitespace-nowrap shadow-lg">
                                 {t('pricing_badge_founder')}
                             </div>
@@ -347,7 +347,7 @@ export default function PricingPage() {
                 </section>
 
                 {/* EXPANDED COMPARISON TABLE */}
-                <section style={{ marginBottom: '80px' }} className="py-40 bg-slate-50/50 dark:bg-slate-900/30">
+                <section style={{ marginBottom: '80px' }} className="py-16 sm:py-24 lg:py-32 bg-slate-50/50 dark:bg-slate-900/30">
                     <div className="max-w-6xl mx-auto px-6 space-y-12">
                         <div className="text-center space-y-2 mb-24">
                             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-slate-900 dark:text-white font-black">

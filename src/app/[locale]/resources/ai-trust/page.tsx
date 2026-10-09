@@ -49,14 +49,14 @@ export default function AiTrustPage() {
                                 </span>
                             </h1>
 
-                            <p className="text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                            <p className="text-base sm:text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto">
                                 Transparency is the foundation of trust. Explore how our unified productivity AI integrates with your life while upholding the highest ethical standards.
                             </p>
                         </div>
                     </header>
 
                     {/* CORE PRINCIPLES */}
-                    <section className="py-24 bg-white">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-white">
                         <div className="max-w-5xl mx-auto px-6">
                             <div className="grid gap-12">
                                 {/* Principle 1 */}

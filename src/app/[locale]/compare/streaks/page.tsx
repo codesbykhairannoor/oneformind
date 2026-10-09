@@ -79,7 +79,7 @@ export default function StreaksComparePage() {
                                 {t('streaks_hero_title_1')} <br/>
                                 <span className="text-indigo-600 underline decoration-wavy decoration-indigo-200">{t('streaks_hero_title_2')}</span>
                             </h1>
-                            <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('streaks_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('streaks_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="w-full sm:w-auto bg-slate-900 text-white font-bold px-8 py-4 rounded-xl hover:bg-indigo-600 transition-colors shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-1 transform">
                                     {t('streaks_hero_cta')}
@@ -93,7 +93,7 @@ export default function StreaksComparePage() {
                 {/* SECTION 2: THE PROBLEM */}
                 <section className="py-[80px] bg-white overflow-hidden">
                     <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-                        <div className="bg-orange-50 p-12 rounded-[3rem] border border-orange-100 relative group">
+                        <div className="bg-orange-50 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-orange-100 relative group">
                             <div className="flex items-center justify-center gap-2 text-4xl mb-8 group-hover:scale-105 transition-transform">
                                 <span className="text-orange-500">🔗</span>
                                 <span className="text-orange-500">🔗</span>
@@ -306,7 +306,7 @@ export default function StreaksComparePage() {
 
                 {/* SECTION 7: CTA */}
                 <section className="py-[80px] bg-slate-50 text-center px-6 border-t border-slate-200">
-                    <h2 className="text-4xl md:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('streaks_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('streaks_cta_title') }} />
                     <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-slate-500 mb-10">{t('streaks_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-indigo-600 text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-indigo-200 hover:scale-105 transition-transform">{t('streaks_cta_btn')}</Link>
                 </section>

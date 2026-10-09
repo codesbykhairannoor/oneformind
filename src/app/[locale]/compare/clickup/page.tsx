@@ -50,7 +50,7 @@ export default function ClickUpComparePage() {
                             {t('clickup_hero_title_1')} <br/>
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{t('clickup_hero_title_2')}</span>
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed bg-slate-900/50 backdrop-blur-sm p-4 rounded-2xl inline-block border border-slate-800" dangerouslySetInnerHTML={{ __html: t.raw('clickup_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed bg-slate-900/50 backdrop-blur-sm p-4 rounded-2xl inline-block border border-slate-800" dangerouslySetInnerHTML={{ __html: t.raw('clickup_hero_desc') }} />
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="w-full sm:w-auto bg-purple-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-purple-500 transition-all shadow-[0_0_40px_rgba(168,85,247,0.3)] hover:shadow-[0_0_60px_rgba(168,85,247,0.5)] hover:-translate-y-1 transform">
                                 {t('clickup_hero_cta')}
@@ -101,7 +101,7 @@ export default function ClickUpComparePage() {
                 {/* SECTION 3: THE SOLUTION (Simplicity) */}
                 <section className="py-[80px] px-6 bg-slate-900 text-white">
                     <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-                        <div className="bg-slate-800 p-12 rounded-[3rem] shadow-2xl border border-slate-700 relative overflow-hidden group">
+                        <div className="bg-slate-800 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-700 relative overflow-hidden group">
                             <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-transparent"></div>
                             <div className="relative z-10 text-center">
                                 <div className="text-6xl mb-6 transform group-hover:scale-110 transition-transform">🧘</div>
@@ -270,7 +270,7 @@ export default function ClickUpComparePage() {
                 {/* SECTION 7: CTA */}
                 <section className="py-[80px] px-6 bg-slate-950 text-center">
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="text-4xl md:text-6xl text-white font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('clickup_cta_title') }} />
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('clickup_cta_title') }} />
                         <p className="text-purple-200 text-xl mb-10">{t('clickup_cta_desc')}</p>
                         <Link href="/register" className="inline-block bg-purple-600 text-white font-black px-12 py-5 rounded-2xl shadow-[0_15px_30px_rgba(168,85,247,0.3)] hover:scale-105 hover:bg-purple-500 transition-all">{t('clickup_cta_btn')}</Link>
                     </div>

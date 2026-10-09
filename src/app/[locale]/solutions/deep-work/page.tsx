@@ -48,7 +48,7 @@ export default function SolutionDeepWorkPage() {
                         </div>
                         
                         {/* Title */}
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight tracking-tight text-gray-900 font-black">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight tracking-tight text-gray-900 font-black">
                             {t('deepwork_hero_title_1')}<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                                 {t('deepwork_hero_title_2')}
@@ -56,7 +56,7 @@ export default function SolutionDeepWorkPage() {
                         </h1>
                         
                         {/* Description */}
-                        <p className="text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
+                        <p className="text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
                             {t('deepwork_hero_desc')}
                         </p>
                         
@@ -119,25 +119,25 @@ export default function SolutionDeepWorkPage() {
                 </header>
 
                 {/* SECTION 2: THE PROBLEM */}
-                <section className="py-32 bg-white relative">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white relative">
                     <div className="max-w-6xl mx-auto px-6 text-left">
                         <div className="text-center mb-20">
-                            <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('deepwork_prob_title')}</h2>
-                            <p className="text-xl text-gray-500 max-w-3xl mx-auto font-medium">{t('deepwork_prob_desc')}</p>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('deepwork_prob_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 max-w-3xl mx-auto font-medium">{t('deepwork_prob_desc')}</p>
                         </div>
                         
                         <div className="grid md:grid-cols-3 gap-8">
-                            <div className="bg-gray-50 p-10 rounded-[2.5rem] border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                            <div className="bg-gray-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm text-3xl mb-6 font-black select-none">📱</div>
                                 <h4 className="text-xl font-bold text-gray-900 mb-3">{t('deepwork_prob_1_title')}</h4>
                                 <p className="text-gray-500 leading-relaxed font-medium">{t('deepwork_prob_1_desc')}</p>
                             </div>
-                            <div className="bg-gray-50 p-10 rounded-[2.5rem] border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                            <div className="bg-gray-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm text-3xl mb-6 font-black select-none">🤹</div>
                                 <h4 className="text-xl font-bold text-gray-900 mb-3">{t('deepwork_prob_2_title')}</h4>
                                 <p className="text-gray-500 leading-relaxed font-medium">{t('deepwork_prob_2_desc')}</p>
                             </div>
-                            <div className="bg-gray-50 p-10 rounded-[2.5rem] border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                            <div className="bg-gray-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm text-3xl mb-6 font-black select-none">🕰️</div>
                                 <h4 className="text-xl font-bold text-gray-900 mb-3">{t('deepwork_prob_3_title')}</h4>
                                 <p className="text-gray-500 leading-relaxed font-medium">{t('deepwork_prob_3_desc')}</p>
@@ -147,11 +147,11 @@ export default function SolutionDeepWorkPage() {
                 </section>
 
                 {/* SECTION 3: THE SYSTEM (THE ARCHITECTURE OF FOCUS) */}
-                <section className="py-32 bg-indigo-50/50 border-y border-indigo-100 text-left">
+                <section className="py-14 sm:py-20 lg:py-28 bg-indigo-50/50 border-y border-indigo-100 text-left">
                     <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                         <div className="order-2 md:order-1">
                             <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 text-white rounded-2xl text-2xl mb-6 shadow-lg shadow-indigo-200 font-black select-none">🏛️</div>
-                            <h2 className="text-5xl md:text-6xl mb-8 text-gray-900 leading-tight font-black">{t('deepwork_sol_title')}</h2>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-gray-900 leading-tight font-black">{t('deepwork_sol_title')}</h2>
                             <div className="space-y-8">
                                 <div className="flex gap-4 items-start">
                                     <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shrink-0 mt-1">1</div>
@@ -178,7 +178,7 @@ export default function SolutionDeepWorkPage() {
                         </div>
                         
                         {/* Visual Concept (Dark contrast box inside light section) */}
-                        <div className="order-1 md:order-2 bg-slate-900 p-12 rounded-[3rem] text-center border border-slate-800 shadow-2xl relative overflow-hidden group">
+                        <div className="order-1 md:order-2 bg-slate-900 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl text-center border border-slate-800 shadow-2xl relative overflow-hidden group">
                             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition duration-700"></div>
                             
@@ -192,10 +192,10 @@ export default function SolutionDeepWorkPage() {
                 </section>
 
                 {/* SECTION 4: THE FOCUS ARSENAL */}
-                <section className="py-32 bg-white text-left">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white text-left">
                     <div className="max-w-6xl mx-auto px-6">
                         <div className="text-center mb-20">
-                            <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('deepwork_feat_title')}</h2>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('deepwork_feat_title')}</h2>
                         </div>
                         <div className="grid md:grid-cols-2 gap-12">
                             <div className="flex gap-6 items-start p-8 rounded-[2rem] bg-indigo-50 border border-indigo-100">
@@ -217,7 +217,7 @@ export default function SolutionDeepWorkPage() {
                 </section>
 
                 {/* SECTION 5: FLOW STATE METRICS */}
-                <section className="py-32 bg-slate-50 relative overflow-hidden text-left border-y border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden text-left border-y border-gray-100">
                     <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                         <div className="relative order-2 md:order-1">
                             <div className="bg-indigo-600 rounded-[2.5rem] p-8 md:p-12 shadow-2xl transform -rotate-2 hover:rotate-0 transition duration-500">
@@ -234,8 +234,8 @@ export default function SolutionDeepWorkPage() {
                             </div>
                         </div>
                         <div className="order-1 md:order-2 space-y-6">
-                            <h2 className="text-5xl md:text-6xl text-gray-900 font-black">{t('deepwork_extra_1_title')}</h2>
-                            <p className="text-xl text-gray-500 leading-relaxed font-medium">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 font-black">{t('deepwork_extra_1_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed font-medium">
                                 {t('deepwork_extra_1_desc')}
                             </p>
                         </div>
@@ -243,13 +243,13 @@ export default function SolutionDeepWorkPage() {
                 </section>
 
                 {/* SECTION 6: ENVIRONMENTAL DESIGN */}
-                <section className="py-32 bg-white text-left">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white text-left">
                     <div className="max-w-5xl mx-auto px-6">
                         <div className="bg-slate-900 rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-12 opacity-10 text-9xl select-none">🌿</div>
                             <div className="relative z-10 max-w-2xl">
-                                <h2 className="text-5xl md:text-6xl mb-6 font-black">{t('deepwork_extra_2_title')}</h2>
-                                <p className="text-xl text-slate-400 leading-relaxed mb-8 font-medium">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 font-black">{t('deepwork_extra_2_title')}</h2>
+                                <p className="text-base sm:text-lg md:text-xl text-slate-400 leading-relaxed mb-8 font-medium">
                                     {t('deepwork_extra_2_desc')}
                                 </p>
                                 <ul className="space-y-4 text-indigo-300 font-bold">
@@ -268,7 +268,7 @@ export default function SolutionDeepWorkPage() {
                 </section>
 
                 {/* SECTION 7: SCIENTIFIC PILLAR */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
                     <div className="max-w-6xl mx-auto px-6 relative z-10">
                         <div className="flex flex-col lg:flex-row gap-16 items-center text-left">
                             <div className="flex-1">
@@ -276,7 +276,7 @@ export default function SolutionDeepWorkPage() {
                                     🧬 {t('deepwork_science_badge')}
                                 </div>
                                 
-                                <h2 className="text-5xl md:text-7xl text-gray-900 mb-8 leading-tight font-black">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 leading-tight font-black">
                                     {t('deepwork_science_title')}
                                 </h2>
                                 
@@ -315,9 +315,9 @@ export default function SolutionDeepWorkPage() {
                 </section>
 
                 {/* SECTION 8: FAQ ACCORDION */}
-                <section className="py-32 bg-slate-50 border-y border-slate-100 text-left">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 border-y border-slate-100 text-left">
                     <div className="max-w-4xl mx-auto px-6">
-                        <h2 className="text-5xl md:text-6xl text-center text-gray-900 mb-16 font-black">{t('deepwork_faq_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center text-gray-900 mb-16 font-black">{t('deepwork_faq_title')}</h2>
                         <div className="space-y-6">
                             {faqs.map((faq, idx) => (
                                 <div key={idx} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition">
@@ -334,8 +334,8 @@ export default function SolutionDeepWorkPage() {
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-indigo-100/50 to-transparent rounded-t-full -z-10"></div>
                     
                     <div className="max-w-3xl mx-auto mt-16 space-y-8">
-                        <h2 className="text-6xl md:text-7xl text-gray-900 tracking-tight leading-tight font-black">{t('deepwork_cta_title')}</h2>
-                        <p className="text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto font-medium">{t('deepwork_cta_desc')}</p>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 tracking-tight leading-tight font-black">{t('deepwork_cta_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto font-medium">{t('deepwork_cta_desc')}</p>
                         
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                             <Link href="/register" className="inline-flex items-center justify-center gap-3 bg-indigo-600 text-white px-10 py-5 rounded-2xl text-xl hover:bg-indigo-700 shadow-[0_15px_30px_rgba(79,70,229,0.3)] hover:shadow-[0_20px_40px_rgba(79,70,229,0.4)] transition transform hover:-translate-y-1 w-full sm:w-auto font-bold">

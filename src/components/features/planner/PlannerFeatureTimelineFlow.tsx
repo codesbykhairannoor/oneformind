@@ -10,14 +10,14 @@ export default function PlannerFeatureTimelineFlow({ t }: PlannerFeatureTimeline
     return (
         <>
             {/* SECTION 2: THE DAILY TIMELINE */}
-            <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
+            <section id="how-it-works" className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row gap-20 items-center">
                         <div className="flex-1 text-left animate-in fade-in slide-in-from-left-8 duration-700">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-6">
                                 {t('planner_timeline_badge')}
                             </div>
-                            <h2 className="text-5xl text-gray-900 mb-8 leading-tight font-black">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-8 leading-tight font-black">
                                 {t('planner_timeline_title')}
                             </h2>
                             <p className="text-gray-600 text-xl mb-10 leading-relaxed max-w-xl font-medium">
@@ -90,12 +90,12 @@ export default function PlannerFeatureTimelineFlow({ t }: PlannerFeatureTimeline
             </section>
 
             {/* SECTION 3: MORNING TO NIGHT FLOW */}
-            <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.05]"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     <div className="text-center max-w-3xl mx-auto mb-24 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <span className="text-indigo-400 font-bold uppercase tracking-[0.4em] text-xs mb-6 block">{t('planner_flow_badge')}</span>
-                        <h2 className="text-4xl md:text-6xl mb-8 font-black">{t('planner_flow_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 font-black">{t('planner_flow_title')}</h2>
                         <p className="text-indigo-100 text-xl opacity-80 leading-relaxed">{t('planner_flow_desc')}</p>
                     </div>
 

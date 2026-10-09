@@ -49,14 +49,14 @@ export default function PrivacyPage() {
                             {t('privacy_badge')}
                         </div>
 
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-tight mb-4 sm:mb-8 font-black">
                             {t('privacy_title_1')} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">
                                 {t('privacy_title_2')}
                             </span>
                         </h1>
 
-                        <p className="text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed mb-8 sm:mb-12 border-l-4 border-indigo-500/40 pl-6 sm:pl-8">
+                        <p className="text-lg md:text-base sm:text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed mb-8 sm:mb-12 border-l-4 border-indigo-500/40 pl-6 sm:pl-8">
                             {t('privacy_subtitle')}
                         </p>
 
@@ -116,7 +116,7 @@ export default function PrivacyPage() {
             </header>
 
             {/* MAIN SECTION */}
-            <section className="py-24 bg-[#fafafa]">
+            <section className="py-12 sm:py-16 lg:py-24 bg-[#fafafa]">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-20 relative">
                     {/* SIDEBAR NAV */}
                     <aside className="hidden lg:block w-1/4 shrink-0 relative">
@@ -192,7 +192,7 @@ export default function PrivacyPage() {
                                 {t('privacy_doc_intro')}
                             </p>
 
-                            <h2 id="collection" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('privacy_h2_collection')}</h2>
+                            <h2 id="collection" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('privacy_h2_collection')}</h2>
                             <p>{t('privacy_p_collection')}</p>
                             <ul className="marker:text-indigo-600">
                                 <li><strong>{t('privacy_li_collection_1_title')}:</strong> {t('privacy_li_collection_1_desc')}</li>
@@ -200,7 +200,7 @@ export default function PrivacyPage() {
                                 <li><strong>{t('privacy_li_collection_3_title')}:</strong> {t('privacy_li_collection_3_desc')}</li>
                             </ul>
 
-                            <h2 id="usage" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('privacy_h2_usage')}</h2>
+                            <h2 id="usage" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('privacy_h2_usage')}</h2>
                             <p>{t('privacy_p_usage')}</p>
                             <ul>
                                 <li>{t('privacy_li_usage_1')}</li>
@@ -216,13 +216,13 @@ export default function PrivacyPage() {
                                 </div>
                             </div>
 
-                            <h2 id="security" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('privacy_h2_security')}</h2>
+                            <h2 id="security" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('privacy_h2_security')}</h2>
                             <p>{t('privacy_p_security')}</p>
 
-                            <h2 id="thirdparty" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('privacy_h2_thirdparty')}</h2>
+                            <h2 id="thirdparty" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('privacy_h2_thirdparty')}</h2>
                             <p>{t('privacy_p_thirdparty')}</p>
 
-                            <h2 id="rights" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('privacy_h2_rights')}</h2>
+                            <h2 id="rights" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('privacy_h2_rights')}</h2>
                             <p>{t('privacy_p_rights')}</p>
                             <ul>
                                 <li>{t('privacy_li_rights_1')}</li>
@@ -230,10 +230,10 @@ export default function PrivacyPage() {
                                 <li>{t('privacy_li_rights_3')}</li>
                             </ul>
 
-                            <h2 id="contact" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('privacy_h2_contact')}</h2>
+                            <h2 id="contact" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('privacy_h2_contact')}</h2>
                             <p>{t('privacy_p_contact')}</p>
                             
-                            <div className="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-200 not-prose flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-inner">
+                            <div className="bg-slate-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-slate-200 not-prose flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-inner">
                                 <div>
                                     <p className="font-black text-slate-900 text-lg mb-1">{t('privacy_contact_role')}</p>
                                     <a href={`mailto:${t('privacy_contact_email')}`} className="text-indigo-600 font-black text-2xl tracking-tighter hover:underline">
@@ -267,7 +267,7 @@ export default function PrivacyPage() {
 
                         {/* FAQ SECTION */}
                         <div className="mb-24">
-                            <h2 className="text-4xl text-slate-900 mb-12 text-center tracking-tight font-black">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-12 text-center tracking-tight font-black">
                                 {t('privacy_faq_title')}
                             </h2>
                             <div className="max-w-3xl mx-auto space-y-4">
@@ -296,10 +296,10 @@ export default function PrivacyPage() {
             </section>
 
             {/* FINAL CTA */}
-            <section className="py-32 px-6 bg-white border-t border-slate-100 text-center relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 px-6 bg-white border-t border-slate-100 text-center relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-600/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="max-w-4xl mx-auto relative z-10">
-                    <h2 className="text-5xl md:text-7xl mb-8 text-slate-900 tracking-tighter leading-none font-black">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-slate-900 tracking-tighter leading-none font-black">
                         {t('privacy_cta_title')}
                     </h2>
                     <p className="text-2xl text-slate-500 mb-14 leading-relaxed max-w-2xl mx-auto">

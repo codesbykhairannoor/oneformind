@@ -61,7 +61,7 @@ export default function AboutPage() {
                         </span>
                     </h1>
 
-                    <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
+                    <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
                         {t('about_desc')}
                     </p>
                 </header>
@@ -125,7 +125,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* SECTION 3: STORY SECTION (FLOW) */}
-                <section className="py-40 bg-white relative overflow-hidden">
+                <section className="py-16 sm:py-24 lg:py-32 bg-white relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="grid lg:grid-cols-2 gap-24 lg:gap-32 items-center">
                             <div className="order-2 lg:order-1 relative">
@@ -159,7 +159,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* SECTION 4: MANIFESTO SECTION */}
-                <section className="py-40 bg-indigo-600 text-white relative overflow-hidden rounded-[5rem] mx-6">
+                <section className="py-16 sm:py-24 lg:py-32 bg-indigo-600 text-white relative overflow-hidden rounded-[5rem] mx-6">
                     <div className="max-w-7xl mx-auto px-10 relative z-10 space-y-24">
                         <div className="text-center space-y-8">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white font-black text-[10px] tracking-[0.4em] border border-white/20 uppercase">
@@ -187,7 +187,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* SECTION 5: CORE PHILOSOPHY */}
-                <section className="py-40 bg-white relative">
+                <section className="py-16 sm:py-24 lg:py-32 bg-white relative">
                     <div className="max-w-7xl mx-auto px-6 space-y-24">
                         <div className="flex flex-col lg:flex-row gap-12 items-end">
                             <div className="lg:w-2/3 space-y-4">
@@ -224,7 +224,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* SECTION 6: BOARD OF VISIONARIES / TEAM SECTION */}
-                <section className="py-40 bg-slate-950 text-white relative overflow-hidden">
+                <section className="py-16 sm:py-24 lg:py-32 bg-slate-950 text-white relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6 relative z-10 space-y-24">
                         <h2 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', fontWeight: 900 }} className="text-center tracking-tighter italic font-black">
                             {t('team_title')}
@@ -282,7 +282,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* SECTION 7: PRODUCT EVOLUTION (ROADMAP) */}
-                <section className="py-40 bg-white relative overflow-hidden">
+                <section className="py-16 sm:py-24 lg:py-32 bg-white relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6 space-y-24">
                         <div className="text-center space-y-8">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black tracking-[0.4em] uppercase">
@@ -337,7 +337,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* SECTION 8: FINAL CTA */}
-                <section className="py-32 bg-indigo-50 border-t border-indigo-100 text-center relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-indigo-50 border-t border-indigo-100 text-center relative overflow-hidden">
                     <div className="max-w-4xl mx-auto px-6 space-y-8 relative z-10">
                         <h2 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', fontWeight: 900, lineHeight: 1.05 }} className="text-indigo-950 font-black">
                             {t('cta_about_title')}

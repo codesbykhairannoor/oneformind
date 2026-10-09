@@ -8,10 +8,10 @@ export default function FreelancerBentoLifecycle() {
     return (
         <>
             {/* SECTION 5: BENTO ARSENAL */}
-            <section className="py-24 bg-white border-t border-gray-100">
+            <section className="py-12 sm:py-16 lg:py-24 bg-white border-t border-gray-100">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-5xl md:text-6xl text-gray-900 mb-4 font-black">{t('freelance_bento_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-4 font-black">{t('freelance_bento_title')}</h2>
                         <p className="text-gray-500 text-lg font-medium">{t('freelance_bento_desc')}</p>
                     </div>
 
@@ -45,7 +45,7 @@ export default function FreelancerBentoLifecycle() {
             </section>
 
             {/* SECTION 6: CLIENT LIFECYCLE */}
-            <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                     <div className="relative order-2 md:order-1">
                         <div className="bg-slate-900 rounded-[3rem] p-10 border border-slate-800 shadow-2xl">
@@ -66,8 +66,8 @@ export default function FreelancerBentoLifecycle() {
                         </div>
                     </div>
                     <div className="order-1 md:order-2 space-y-6">
-                        <h2 className="text-5xl md:text-6xl font-black leading-tight">{t('freelance_extra_1_title')}</h2>
-                        <p className="text-xl text-slate-400 leading-relaxed italic font-medium">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight">{t('freelance_extra_1_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-slate-400 leading-relaxed italic font-medium">
                             {t('freelance_extra_1_desc')}
                         </p>
                     </div>
@@ -75,10 +75,10 @@ export default function FreelancerBentoLifecycle() {
             </section>
 
             {/* SECTION 7: SUSTAINABLE INCOME */}
-            <section className="py-32 bg-white relative">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white relative">
                 <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h2 className="text-5xl md:text-6xl text-gray-900 mb-8 font-black">{t('freelance_extra_2_title')}</h2>
-                    <p className="text-xl text-gray-500 leading-relaxed mb-12 font-medium">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 font-black">{t('freelance_extra_2_title')}</h2>
+                    <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed mb-12 font-medium">
                         {t('freelance_extra_2_desc')}
                     </p>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">

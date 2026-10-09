@@ -30,7 +30,7 @@ export default function SecondBrainHero() {
                     </span>
                 </h1>
                 
-                <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
+                <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
                     {t('brain_hero_desc')}
                 </p>
                 

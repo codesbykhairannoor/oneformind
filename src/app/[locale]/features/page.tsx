@@ -161,7 +161,7 @@ export default function FeaturesIndexPage() {
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-medium leading-relaxed mb-8 sm:mb-10">
+            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-medium leading-relaxed mb-8 sm:mb-10">
               Replace a dozen disconnected productivity apps with one interconnected workspace. Tranvas harmonizes your daily habits, task scheduling, personal finance, journaling, and long-term milestones.
             </p>
 
@@ -184,7 +184,7 @@ export default function FeaturesIndexPage() {
         </section>
 
         {/* FEATURES GRID SECTION */}
-        <section className="py-24 px-6 max-w-7xl mx-auto">
+        <section className="py-12 sm:py-16 lg:py-24 px-6 max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
               Explore the 8 Core Modules
@@ -284,7 +284,7 @@ export default function FeaturesIndexPage() {
         </section>
 
         {/* BOTTOM CTA */}
-        <section className="py-24 px-6 text-center max-w-4xl mx-auto">
+        <section className="py-12 sm:py-16 lg:py-24 px-6 text-center max-w-4xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-6">
             Ready to upgrade how you run your life?
           </h2>

@@ -10,14 +10,14 @@ export default function CalendarFeatureLayeredPulse({ t }: CalendarFeatureLayere
     return (
         <>
             {/* SECTION 2: LAYERED TIME (3D STACK) */}
-            <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
+            <section id="how-it-works" className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row gap-24 items-center">
                         <div className="flex-1 text-left">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-xs uppercase tracking-[0.2em] mb-8 shadow-sm border border-indigo-100">
                                 {t('calendar_layered_badge')}
                             </div>
-                            <h2 className="text-6xl leading-[1.1] md:text-7xl text-gray-900 mb-10 tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.1] text-gray-900 mb-10 tracking-tight font-black">
                                 {t('calendar_layered_title')}
                             </h2>
                             <p className="text-gray-500 text-xl mb-12 leading-relaxed font-medium">
@@ -90,12 +90,12 @@ export default function CalendarFeatureLayeredPulse({ t }: CalendarFeatureLayere
             </section>
 
             {/* SECTION 3: DEADLINE PULSE (DARK MODE URGENCY) */}
-            <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:50px_50px] opacity-[0.05]"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     <div className="text-center max-w-3xl mx-auto mb-24">
                         <span className="text-rose-500 uppercase tracking-[0.5em] text-xs mb-6 block">{t('calendar_pulse_badge')}</span>
-                        <h2 className="text-5xl md:text-7xl mb-10 tracking-tight font-black">{t('calendar_pulse_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-10 tracking-tight font-black">{t('calendar_pulse_title')}</h2>
                         <p className="text-indigo-100 text-xl opacity-80 leading-relaxed font-medium">{t('calendar_pulse_desc')}</p>
                     </div>
 

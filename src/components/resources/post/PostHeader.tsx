@@ -18,7 +18,7 @@ export default function PostHeader({ title }: PostHeaderProps) {
                     Methodology
                 </span>
 
-                <h1 className="text-3xl md:text-7xl text-slate-900 leading-[1.1] mb-8 md:mb-12 tracking-tighter font-black">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-slate-900 leading-[1.1] mb-8 md:mb-12 tracking-tighter font-black">
                     {title}
                 </h1>
 

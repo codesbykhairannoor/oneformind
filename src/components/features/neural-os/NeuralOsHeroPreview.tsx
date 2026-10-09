@@ -28,14 +28,14 @@ export default function NeuralOsHeroPreview({ t }: NeuralOsHeroPreviewProps) {
                         {t('neural_hero_badge')}
                     </div>
                     
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight tracking-tight text-slate-900 animate-in fade-in slide-in-from-bottom-8 duration-1000 font-black">
                         {t('neural_hero_title_1')}<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800">
                             {t('neural_hero_title_2')}
                         </span>
                     </h1>
                     
-                    <p className="text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 fill-mode-both">
+                    <p className="text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 fill-mode-both">
                         {t('neural_hero_desc')}
                     </p>
                     
@@ -94,7 +94,7 @@ export default function NeuralOsHeroPreview({ t }: NeuralOsHeroPreviewProps) {
 
                             {/* Contextual Explanation */}
                             <div className="lg:w-2/5 p-12 flex flex-col justify-center text-left">
-                                <h2 className="text-4xl text-white mb-8 leading-tight font-black">
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-8 leading-tight font-black">
                                     {t('neural_gemini_powered')}<br />
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Gemini Pro API</span>
                                 </h2>

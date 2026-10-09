@@ -43,7 +43,7 @@ export default function SpendeeComparePage() {
                             {t('spendee_hero_title_1')} <br/>
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">{t('spendee_hero_title_2')}</span>
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('spendee_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('spendee_hero_desc') }} />
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="w-full sm:w-auto bg-purple-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-purple-500 transition-all shadow-[0_0_40px_rgba(168,85,247,0.3)] hover:shadow-[0_0_60px_rgba(168,85,247,0.5)]">
                                 {t('spendee_hero_cta')}
@@ -111,7 +111,7 @@ export default function SpendeeComparePage() {
                 {/* SECTION 3: THE SOLUTION */}
                 <section className="py-[80px] bg-purple-50">
                     <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-                        <div className="bg-white p-12 rounded-[3rem] shadow-xl border border-purple-100">
+                        <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl border border-purple-100">
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-xl">💡</div>
                                 <div>
@@ -160,7 +160,7 @@ export default function SpendeeComparePage() {
                                 <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="mb-6">{t('spendee_ai_title')}</h2>
                                 <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-slate-400 mb-8">{t('spendee_ai_desc')}</p>
                             </div>
-                            <div className="bg-gradient-to-br from-purple-600 to-indigo-800 p-10 rounded-[3rem] text-center shadow-2xl relative">
+                            <div className="bg-gradient-to-br from-purple-600 to-indigo-800 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl text-center shadow-2xl relative">
                                 <div className="absolute inset-0 bg-white/5 rounded-[3rem]"></div>
                                 <div className="text-4xl mb-4 relative z-10">🧠</div>
                                 <div className="text-white font-bold text-lg italic relative z-10">&quot;You overspend on days you are stressed. Let&apos;s schedule a walk in your planner.&quot;</div>
@@ -270,7 +270,7 @@ export default function SpendeeComparePage() {
 
                 {/* SECTION 7: CTA */}
                 <section className="py-[80px] bg-purple-600 text-center px-6">
-                    <h2 className="text-4xl md:text-6xl text-white font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('spendee_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('spendee_cta_title') }} />
                     <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-purple-200 mb-10">{t('spendee_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-white text-purple-900 font-black px-10 py-4 rounded-xl shadow-2xl hover:scale-105 transition-transform">{t('spendee_cta_btn')}</Link>
                 </section>

@@ -10,14 +10,14 @@ export default function FinanceFeatureWalletsFlow({ t }: FinanceFeatureWalletsFl
     return (
         <>
             {/* SECTION 2: GLASSMORPHISM WALLETS */}
-            <section className="py-24 bg-white relative overflow-hidden">
+            <section className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row gap-20 items-center">
                         <div className="flex-1 text-left animate-in fade-in slide-in-from-left-8 duration-700">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wider mb-6">
                                 {t('finance_wallet_badge')}
                             </div>
-                            <h2 className="text-5xl md:text-5xl text-gray-900 mb-6 leading-tight font-black">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight font-black">
                                 {t('finance_wallet_title')}
                             </h2>
                             <p className="text-gray-600 text-lg mb-8 leading-relaxed">
@@ -86,12 +86,12 @@ export default function FinanceFeatureWalletsFlow({ t }: FinanceFeatureWalletsFl
             </section>
 
             {/* SECTION 3: SPENDING FLOW */}
-            <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:48px_48px] opacity-10"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
                     <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <span className="text-emerald-400 font-bold uppercase tracking-[0.3em] text-xs mb-4 block">{t('finance_flow_badge')}</span>
-                        <h2 className="text-5xl md:text-6xl mb-8 font-black">{t('finance_flow_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 font-black">{t('finance_flow_title')}</h2>
                         <p className="text-indigo-200 text-xl opacity-80 max-w-3xl mx-auto mb-24">{t('finance_flow_desc')}</p>
                     </div>
 

@@ -43,7 +43,7 @@ export default function WalletComparePage() {
                                 {t('wallet_hero_title_1')} <br/>
                                 <span className="text-blue-600">{t('wallet_hero_title_2')}</span>
                             </h1>
-                            <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('wallet_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('wallet_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="w-full sm:w-auto bg-blue-600 text-white font-black px-10 py-5 rounded-2xl hover:bg-blue-700 transition-all shadow-[0_10px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1">
                                     {t('wallet_hero_cta')}
@@ -107,7 +107,7 @@ export default function WalletComparePage() {
                 {/* SECTION 3: THE SOLUTION */}
                 <section className="py-[80px] bg-blue-600 text-white">
                     <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-                        <div className="bg-blue-800 p-12 rounded-[3rem] shadow-2xl relative overflow-hidden border border-blue-700">
+                        <div className="bg-blue-800 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-2xl relative overflow-hidden border border-blue-700">
                             <div className="absolute top-0 right-0 p-8 opacity-10 text-9xl font-black">✍️</div>
                             <h3 className="font-black text-3xl mb-8 relative z-10">Active Intent</h3>
                             <div className="space-y-4 relative z-10">
@@ -263,7 +263,7 @@ export default function WalletComparePage() {
 
                 {/* SECTION 7: CTA */}
                 <section className="py-[80px] bg-white text-center px-6 border-t border-slate-200">
-                    <h2 className="text-4xl md:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('wallet_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('wallet_cta_title') }} />
                     <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-slate-500 mb-10 max-w-2xl mx-auto">{t('wallet_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-blue-600 text-white font-black px-12 py-5 rounded-2xl shadow-[0_15px_30px_rgba(37,99,235,0.3)] hover:scale-105 hover:bg-blue-700 transition-all">{t('wallet_cta_btn')}</Link>
                 </section>

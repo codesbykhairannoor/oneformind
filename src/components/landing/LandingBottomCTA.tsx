@@ -21,7 +21,7 @@ export default function LandingBottomCTA() {
                     <span>{isId ? 'SISTEM SIAP PAKAI' : 'READY-TO-USE LIFE OS'}</span>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-6 leading-tight tracking-tight text-white font-black max-w-3xl mx-auto">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-4 sm:mb-6 leading-tight tracking-tight text-white font-black max-w-3xl mx-auto">
                     {t('cta_final_title')}
                 </h2>
 

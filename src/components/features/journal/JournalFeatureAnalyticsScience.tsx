@@ -11,13 +11,13 @@ export default function JournalFeatureAnalyticsScience({ t }: JournalFeatureAnal
     return (
         <>
             {/* SECTION 3.5: SENTIMENT ANALYTICS (BENTO MOSAIC) */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] uppercase tracking-[0.2em] mb-8 shadow-sm border border-purple-200">
                             {t('journal_analytics_badge')}
                         </div>
-                        <h2 className="text-4xl md:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
                             {t('journal_analytics_title')}
                         </h2>
                         <p className="text-gray-600 text-xl leading-relaxed font-medium">
@@ -92,7 +92,7 @@ export default function JournalFeatureAnalyticsScience({ t }: JournalFeatureAnal
             </section>
 
             {/* SECTION: SCIENTIFIC PILLAR - WARM EDITORIAL RESEARCH CARDS */}
-            <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-[140px] pointer-events-none"></div>
                 <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-[140px] pointer-events-none"></div>
                 
@@ -101,7 +101,7 @@ export default function JournalFeatureAnalyticsScience({ t }: JournalFeatureAnal
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 text-purple-300 font-bold text-[10px] uppercase tracking-[0.25em] mb-6 border border-purple-500/20">
                             📖 Clinical Psychology & Expressive Writing
                         </div>
-                        <h2 className="text-3xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6 font-serif italic">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6 font-serif italic">
                             {t('journal_science_title_1')}{' '}
                             <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-amber-300 bg-clip-text text-transparent not-italic font-sans">
                                 {t('journal_science_title_highlight')}
@@ -115,7 +115,7 @@ export default function JournalFeatureAnalyticsScience({ t }: JournalFeatureAnal
                     {/* Warm Editorial Research Grid */}
                     <div className="grid md:grid-cols-2 gap-8">
                         {/* Card 1: Pennebaker Expressive Writing */}
-                        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-purple-500/40 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-purple-500/40 p-8 lg:p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl flex flex-col justify-between group transition duration-500 shadow-2xl">
                             <div>
                                 <div className="flex items-center justify-between mb-8">
                                     <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-2xl font-serif">
@@ -143,7 +143,7 @@ export default function JournalFeatureAnalyticsScience({ t }: JournalFeatureAnal
                         </div>
 
                         {/* Card 2: Ramirez & Beilock Working Memory Offload */}
-                        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-pink-500/40 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-pink-500/40 p-8 lg:p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl flex flex-col justify-between group transition duration-500 shadow-2xl">
                             <div>
                                 <div className="flex items-center justify-between mb-8">
                                     <div className="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-2xl font-serif">
@@ -174,14 +174,14 @@ export default function JournalFeatureAnalyticsScience({ t }: JournalFeatureAnal
             </section>
 
             {/* NEURAL PROMO: JOURNAL REFLECTION */}
-            <section className="py-32 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-purple-500/5 to-transparent"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10 flex flex-col lg:flex-row-reverse items-center gap-16 text-left">
                     <div className="lg:w-1/2">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-[10px] uppercase tracking-widest mb-8 border border-purple-500/20">
                             📖 {t('journal_ai_promo_badge')}
                         </div>
-                        <h2 className="text-4xl md:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
                             {t('journal_ai_promo_title')}
                         </h2>
                         <p className="text-slate-400 text-xl font-medium leading-relaxed mb-12">
@@ -208,10 +208,10 @@ export default function JournalFeatureAnalyticsScience({ t }: JournalFeatureAnal
             </section>
 
             {/* SECTION 7: PHILOSOPHICAL QUOTE */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <div className="text-9xl text-indigo-50 mb-4 font-serif leading-none italic select-none">"</div>
-                    <h2 className="text-3xl md:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
                         {t('journal_quote_text')}
                     </h2>
                     <div className="flex flex-col items-center">

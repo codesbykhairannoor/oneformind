@@ -11,13 +11,13 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
     return (
         <>
             {/* SECTION 3.5: EISENHOWER MATRIX (2x2 GRID) */}
-            <section className="py-32 bg-slate-50 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-[10px] uppercase tracking-[0.2em] mb-8 shadow-sm border border-indigo-200">
                             {t('planner_matrix_badge')}
                         </div>
-                        <h2 className="text-4xl md:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 leading-tight tracking-tight font-black">
                             {t('planner_matrix_title')}
                         </h2>
                         <p className="text-gray-600 text-xl leading-relaxed font-medium">
@@ -35,7 +35,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
                         </div>
 
                         {/* Q1: Urgent & Important */}
-                        <div className="bg-white p-10 rounded-[3rem] shadow-xl border-l-8 border-rose-500 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
+                        <div className="bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-xl border-l-8 border-rose-500 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-rose-50 rounded-bl-[3rem] group-hover:scale-110 transition duration-700"></div>
                             <div className="relative z-10">
                                 <div className="w-14 h-14 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:rotate-12 transition font-black select-none">🔥</div>
@@ -45,7 +45,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
                         </div>
 
                         {/* Q2: Not Urgent & Important */}
-                        <div className="bg-white p-10 rounded-[3rem] shadow-xl border-l-8 border-emerald-500 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
+                        <div className="bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-xl border-l-8 border-emerald-500 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-[3rem] group-hover:scale-110 transition duration-700"></div>
                             <div className="relative z-10">
                                 <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:rotate-12 transition font-black select-none">💎</div>
@@ -55,7 +55,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
                         </div>
 
                         {/* Q3: Urgent & Not Important */}
-                        <div className="bg-white p-10 rounded-[3rem] shadow-xl border-l-8 border-amber-500 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
+                        <div className="bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-xl border-l-8 border-amber-500 hover:shadow-2xl transition duration-500 group relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-bl-[3rem] group-hover:scale-110 transition duration-700"></div>
                             <div className="relative z-10">
                                 <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:rotate-12 transition font-black select-none">⚡</div>
@@ -65,7 +65,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
                         </div>
 
                         {/* Q4: Not Urgent & Not Important */}
-                        <div className="bg-white p-10 rounded-[3rem] shadow-xl border-l-8 border-slate-300 hover:shadow-2xl transition duration-500 group relative overflow-hidden opacity-80 hover:opacity-100">
+                        <div className="bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl shadow-xl border-l-8 border-slate-300 hover:shadow-2xl transition duration-500 group relative overflow-hidden opacity-80 hover:opacity-100">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-bl-[3rem] group-hover:scale-110 transition duration-700"></div>
                             <div className="relative z-10">
                                 <div className="w-14 h-14 bg-slate-100 text-slate-500 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:rotate-12 transition font-black select-none">🧹</div>
@@ -79,7 +79,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
             </section>
 
             {/* SECTION: SCIENTIFIC PILLAR - SPLIT SHIELD ATTENTION & ZEIGARNIK ARCHITECTURE */}
-            <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#818cf8_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
                 <div className="absolute top-1/2 -right-32 w-96 h-96 bg-purple-500/10 rounded-full blur-[140px] pointer-events-none"></div>
                 <div className="absolute bottom-0 -left-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none"></div>
@@ -89,7 +89,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-300 font-bold text-[10px] uppercase tracking-[0.25em] mb-6 border border-indigo-500/20">
                             🛡️ Cognitive Bandwidth Protection
                         </div>
-                        <h2 className="text-3xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
                             {t('planner_science_title_1')}{' '}
                             <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
                                 {t('planner_science_title_highlight')}
@@ -103,7 +103,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
                     {/* Split Shield Layout */}
                     <div className="grid md:grid-cols-2 gap-8 items-stretch">
                         {/* Shield 1: Attention Residue */}
-                        <div className="bg-slate-950/80 border border-slate-800 hover:border-indigo-500/50 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl relative overflow-hidden">
+                        <div className="bg-slate-950/80 border border-slate-800 hover:border-indigo-500/50 p-8 lg:p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl flex flex-col justify-between group transition duration-500 shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition"></div>
                             <div>
                                 <div className="flex items-center justify-between mb-8">
@@ -132,7 +132,7 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
                         </div>
 
                         {/* Shield 2: Zeigarnik Loops */}
-                        <div className="bg-slate-950/80 border border-slate-800 hover:border-purple-500/50 p-8 lg:p-10 rounded-[2.5rem] flex flex-col justify-between group transition duration-500 shadow-2xl relative overflow-hidden">
+                        <div className="bg-slate-950/80 border border-slate-800 hover:border-purple-500/50 p-8 lg:p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl flex flex-col justify-between group transition duration-500 shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition"></div>
                             <div>
                                 <div className="flex items-center justify-between mb-8">
@@ -164,14 +164,14 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
             </section>
 
             {/* NEURAL PROMO: PLANNER OPTIMIZATION */}
-            <section className="py-32 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
                 <div className="absolute inset-0 bg-pattern-grid opacity-10"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10 flex flex-col lg:flex-row items-center gap-16 text-left">
                     <div className="lg:w-1/2">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] uppercase tracking-widest mb-8 border border-indigo-500/20">
                             ⚡ {t('planner_ai_promo_badge')}
                         </div>
-                        <h2 className="text-4xl md:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
                             {t('planner_ai_promo_title')}
                         </h2>
                         <p className="text-slate-400 text-xl font-medium leading-relaxed mb-12">
@@ -205,10 +205,10 @@ export default function PlannerFeatureMatrixScience({ t }: PlannerFeatureMatrixS
             </section>
 
             {/* SECTION 7: PHILOSOPHICAL QUOTE */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <div className="text-9xl text-indigo-50 mb-4 font-serif leading-none italic select-none">"</div>
-                    <h2 className="text-3xl md:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
                         {t('planner_quote_text')}
                     </h2>
                     <div className="flex flex-col items-center">

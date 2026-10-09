@@ -19,7 +19,7 @@ export default function CustomAppsProblemCycle() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(250px,auto)]">
-                        <div className="md:col-span-7 bg-gradient-to-br from-purple-50 to-white p-10 rounded-[2.5rem] border border-purple-100 relative overflow-hidden group hover:border-purple-300 transition-all duration-300">
+                        <div className="md:col-span-7 bg-gradient-to-br from-purple-50 to-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-purple-100 relative overflow-hidden group hover:border-purple-300 transition-all duration-300">
                             <div className="absolute top-0 right-0 bg-purple-100 w-32 h-32 rounded-bl-[4rem] -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
                             <div className="relative z-10">
                                 <div className="w-14 h-14 bg-white text-purple-600 rounded-2xl flex items-center justify-center text-3xl shadow-sm mb-6 font-black">✨</div>
@@ -28,7 +28,7 @@ export default function CustomAppsProblemCycle() {
                             </div>
                         </div>
 
-                        <div className="md:col-span-5 row-span-2 bg-gray-900 text-white p-10 rounded-[2.5rem] relative overflow-hidden group shadow-xl">
+                        <div className="md:col-span-5 row-span-2 bg-gray-900 text-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl relative overflow-hidden group shadow-xl">
                             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_2px,transparent_2px)] [background-size:24px_24px]"></div>
                             <div className="relative z-10 h-full flex flex-col justify-between">
                                 <div>
@@ -50,7 +50,7 @@ export default function CustomAppsProblemCycle() {
                             </div>
                         </div>
 
-                        <div className="md:col-span-7 bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-lg shadow-gray-100 relative group hover:-translate-y-1 transition-transform duration-300">
+                        <div className="md:col-span-7 bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg shadow-gray-100 relative group hover:-translate-y-1 transition-transform duration-300">
                             <div className="flex flex-col md:flex-row gap-6 md:items-center">
                                 <div className="w-14 h-14 shrink-0 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-3xl font-black">🏚️</div>
                                 <div>

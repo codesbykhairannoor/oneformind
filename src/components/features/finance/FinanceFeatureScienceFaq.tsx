@@ -29,10 +29,10 @@ export default function FinanceFeatureScienceFaq({ t }: FinanceFeatureScienceFaq
     return (
         <>
             {/* SECTION 6: THE SUCCESS QUOTE */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <div className="text-9xl text-indigo-50 mb-4 font-serif leading-none italic select-none">"</div>
-                    <h2 className="text-4xl md:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
                         {t('finance_quote_text')}
                     </h2>
                     <div className="flex flex-col items-center">
@@ -44,7 +44,7 @@ export default function FinanceFeatureScienceFaq({ t }: FinanceFeatureScienceFaq
             </section>
 
             {/* SECTION: SCIENTIFIC PILLAR - BEHAVIORAL ECONOMICS & MENTAL ACCOUNTING */}
-            <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:32px_32px] pointer-events-none"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
                 
@@ -53,7 +53,7 @@ export default function FinanceFeatureScienceFaq({ t }: FinanceFeatureScienceFaq
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-400 font-bold text-[10px] uppercase tracking-[0.25em] mb-6 border border-amber-500/20">
                             💰 Behavioral Economics Architecture
                         </div>
-                        <h2 className="text-3xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-[900] tracking-tight leading-tight mb-6">
                             {t('finance_science_title_1')}{' '}
                             <span className="bg-gradient-to-r from-amber-400 via-orange-300 to-rose-400 bg-clip-text text-transparent">
                                 {t('finance_science_title_highlight')}
@@ -114,12 +114,12 @@ export default function FinanceFeatureScienceFaq({ t }: FinanceFeatureScienceFaq
             </section>
 
             {/* SECTION 8: CTA BANNER */}
-            <section className="py-24 px-6">
+            <section className="py-12 sm:py-16 lg:py-24 px-6">
                 <div className="max-w-6xl mx-auto bg-gradient-to-br from-indigo-900 to-indigo-950 rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl border border-indigo-800">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600 rounded-full mix-blend-screen filter blur-3xl opacity-30"></div>
                     
                     <div className="relative z-10 text-white">
-                        <h2 className="text-5xl md:text-6xl mb-8 tracking-tight font-black">{t('finance_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 tracking-tight font-black">{t('finance_cta_title')}</h2>
                         <p className="text-indigo-200 text-xl md:text-2xl mb-12 max-w-3xl mx-auto font-medium">
                             {t('finance_cta_desc')}
                         </p>

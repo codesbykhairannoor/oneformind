@@ -35,14 +35,14 @@ export default function RefundPage() {
                         🛑 {t('refund_badge')}
                     </div>
 
-                    <h1 className="text-5xl md:text-8xl text-white tracking-tighter leading-[0.85] mb-8 font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-[0.85] mb-8 font-black">
                         {t('refund_title_1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-rose-300">
                             {t('refund_title_2')}
                         </span>
                     </h1>
 
-                    <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-bold">
+                    <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-bold">
                         {t('refund_subtitle')}
                     </p>
 
@@ -54,7 +54,7 @@ export default function RefundPage() {
                 </div>
             </header>
 
-            <section className="py-24 bg-[#fafafa]">
+            <section className="py-12 sm:py-16 lg:py-24 bg-[#fafafa]">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-20 relative">
                     
                     <aside className="hidden lg:block w-1/4 shrink-0 relative">
@@ -100,16 +100,16 @@ export default function RefundPage() {
                                 </div>
                             </div>
 
-                            <h2 id="guarantee" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('refund_h2_guarantee')}</h2>
+                            <h2 id="guarantee" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('refund_h2_guarantee')}</h2>
                             <p className="font-bold text-slate-800">{t('refund_p_guarantee')}</p>
                             <ul className="marker:text-rose-600 font-bold italic">
                                 <li>{t('refund_li_guarantee_1')}</li>
                                 <li>{t('refund_li_guarantee_2')}</li>
                             </ul>
 
-                            <h2 id="process" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('refund_h2_process')}</h2>
+                            <h2 id="process" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('refund_h2_process')}</h2>
                             <p>{t('refund_p_process')}</p>
-                            <div className="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-200 not-prose mb-12 shadow-inner">
+                            <div className="bg-slate-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-slate-200 not-prose mb-12 shadow-inner">
                                 <div className="space-y-6">
                                     <p className="font-bold text-slate-900 m-0">{t('refund_user_responsibility_title')}</p>
                                     <div className="flex items-center gap-6">
@@ -127,14 +127,14 @@ export default function RefundPage() {
                                 </div>
                             </div>
 
-                            <h2 id="cancellation" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('refund_h2_cancellation')}</h2>
+                            <h2 id="cancellation" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('refund_h2_cancellation')}</h2>
                             <p>{t('refund_p_cancellation')}</p>
                             <ul className="font-bold">
                                 <li>{t('refund_li_cancellation_1')}</li>
                                 <li>{t('refund_li_cancellation_2')}</li>
                             </ul>
 
-                            <h2 id="exclusion" className="scroll-mt-32 font-black text-slate-900 text-4xl mb-8 font-black">{t('refund_h2_exclusion')}</h2>
+                            <h2 id="exclusion" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl scroll-mt-32 font-black text-slate-900 mb-8 font-black">{t('refund_h2_exclusion')}</h2>
                             <div className="p-8 bg-rose-50 rounded-3xl border border-rose-100 text-rose-900 text-sm leading-relaxed font-black uppercase">
                                 🚫 {t('refund_p_exclusion')}
                             </div>

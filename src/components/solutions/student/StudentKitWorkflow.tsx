@@ -8,10 +8,10 @@ export default function StudentKitWorkflow() {
     return (
         <>
             {/* SECTION 5: STUDENT SURVIVAL KIT (BENTO BOX) */}
-            <section className="py-24 bg-gray-50 border-t border-gray-100">
+            <section className="py-12 sm:py-16 lg:py-24 bg-gray-50 border-t border-gray-100">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-5xl md:text-6xl text-gray-900 mb-4 font-black">{t('student_bento_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-4 font-black">{t('student_bento_title')}</h2>
                         <p className="text-gray-500 text-lg font-medium">{t('student_bento_desc')}</p>
                     </div>
 
@@ -37,7 +37,7 @@ export default function StudentKitWorkflow() {
             </section>
 
             {/* SECTION: STUDY WORKFLOW (UNIQUE A) */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
                 <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                     <div className="bg-slate-900 rounded-[3rem] p-8 md:p-12 shadow-2xl relative">
                         <div className="absolute top-0 right-0 p-8 opacity-10 text-8xl font-black select-none">📝</div>
@@ -57,8 +57,8 @@ export default function StudentKitWorkflow() {
                         </div>
                     </div>
                     <div>
-                        <h2 className="text-5xl md:text-6xl text-gray-900 mb-6 font-black">{t('student_extra_1_title')}</h2>
-                        <p className="text-xl text-gray-500 leading-relaxed font-medium">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 font-black">{t('student_extra_1_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed font-medium">
                             {t('student_extra_1_desc')}
                         </p>
                     </div>
@@ -66,9 +66,9 @@ export default function StudentKitWorkflow() {
             </section>
 
             {/* SECTION: GRADES VS SLEEP (UNIQUE B) */}
-            <section className="py-32 bg-indigo-50 border-y border-indigo-100">
+            <section className="py-14 sm:py-20 lg:py-28 bg-indigo-50 border-y border-indigo-100">
                 <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h2 className="text-5xl md:text-6xl text-indigo-950 mb-8 font-black">{t('student_extra_2_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-indigo-950 mb-8 font-black">{t('student_extra_2_title')}</h2>
                     <p className="text-xl text-indigo-800/70 leading-relaxed mb-12">
                         {t('student_extra_2_desc')}
                     </p>

@@ -29,9 +29,9 @@ export default function NeuralOsFaqCta({ t }: NeuralOsFaqCtaProps) {
     return (
         <>
             {/* SECTION 7: FINAL CTA */}
-            <section className="py-40 px-6 text-center relative overflow-hidden bg-white">
+            <section className="py-16 sm:py-24 lg:py-32 px-6 text-center relative overflow-hidden bg-white">
                 <div className="max-w-5xl mx-auto">
-                    <h2 className="text-5xl md:text-[6rem] mb-10 leading-[0.9] tracking-tight text-slate-900 font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl md:text-[6rem] mb-10 leading-[0.9] tracking-tight text-slate-900 font-black">
                         {t('neural_cta_title')}
                     </h2>
                     <p className="text-slate-500 text-xl md:text-2xl mb-14 max-w-2xl mx-auto font-medium leading-relaxed">

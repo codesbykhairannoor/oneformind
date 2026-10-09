@@ -10,12 +10,12 @@ export default function JournalFeatureEditorialNebula({ t }: JournalFeatureEdito
     return (
         <>
             {/* SECTION 2: EDITORIAL REFLECTION (SERIF & CLEAN) */}
-            <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
+            <section id="how-it-works" className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] uppercase tracking-[0.2em] mb-10">
                         {t('journal_editorial_badge')}
                     </div>
-                    <h2 className="text-[42px] leading-[1.1] md:text-7xl font-serif italic text-gray-900 mb-10 tracking-tight font-black">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[42px] leading-[1.1] font-serif italic text-gray-900 mb-10 tracking-tight font-black">
                         {t('journal_editorial_title')}
                     </h2>
                     <p className="text-gray-500 text-xl font-medium leading-relaxed mb-16 max-w-2xl mx-auto">
@@ -40,7 +40,7 @@ export default function JournalFeatureEditorialNebula({ t }: JournalFeatureEdito
             </section>
 
             {/* SECTION 3: THE MOOD NEBULA */}
-            <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-purple-200/40 rounded-full blur-3xl -mr-96 -mt-96 animate-pulse"></div>
                 <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:40px_40px] opacity-10"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
@@ -80,7 +80,7 @@ export default function JournalFeatureEditorialNebula({ t }: JournalFeatureEdito
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-xs font-bold uppercase tracking-widest mb-8 shadow-sm">
                                 {t('journal_nebula_badge')}
                             </div>
-                            <h2 className="text-4xl md:text-6xl text-white mb-10 leading-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-10 leading-tight font-black">
                                 {t('journal_nebula_title')}
                             </h2>
                             <p className="text-white/80 text-xl md:text-2xl mb-12 leading-relaxed max-w-2xl font-medium">

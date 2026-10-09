@@ -6,13 +6,13 @@ export default function SecondBrainFramework() {
     const t = useTranslations();
 
     return (
-        <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+        <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-600/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
             
             <div className="max-w-4xl mx-auto px-6 relative z-10">
                 <div className="text-center mb-24">
-                    <h2 className="text-5xl md:text-7xl mb-6 font-black">{t('brain_sol_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 font-black">{t('brain_sol_title')}</h2>
                     <p className="text-indigo-300 text-xl font-medium">{t('brain_sol_desc')}</p>
                 </div>
 

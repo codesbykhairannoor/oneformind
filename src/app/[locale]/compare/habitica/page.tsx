@@ -46,7 +46,7 @@ export default function HabiticaComparePage() {
                                 {t('habitica_hero_title_1')} <br/>
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">{t('habitica_hero_title_2')}</span>
                             </h1>
-                            <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('habitica_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('habitica_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="w-full sm:w-auto bg-indigo-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-indigo-500 transition-all shadow-[0_0_40px_rgba(79,70,229,0.3)] hover:shadow-[0_0_60px_rgba(79,70,229,0.5)] text-center">
                                     {t('habitica_hero_cta')}
@@ -105,7 +105,7 @@ export default function HabiticaComparePage() {
                 {/* SECTION 3: THE SOLUTION */}
                 <section className="py-[80px] bg-indigo-50">
                     <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-                        <div className="bg-white p-12 rounded-[3rem] shadow-xl border border-indigo-100">
+                        <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl border border-indigo-100">
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-xl">🧘‍♂️</div>
                                 <div>
@@ -272,7 +272,7 @@ export default function HabiticaComparePage() {
 
                 {/* CTA */}
                 <section className="py-[80px] bg-indigo-600 text-center px-6">
-                    <h2 className="text-4xl md:text-6xl text-white font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('habitica_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('habitica_cta_title') }} />
                     <p className="text-indigo-200 text-xl mb-10">{t('habitica_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-white text-indigo-900 font-black px-10 py-4 rounded-xl shadow-2xl hover:scale-105 transition-transform">
                         {t('habitica_cta_btn')}

@@ -39,7 +39,7 @@ export default function NotesAppsComparePage() {
                             {t('notes_apps_hero_title_1')} <br/>
                             <span className="text-indigo-600 underline decoration-wavy decoration-indigo-200">{t('notes_apps_hero_title_2')}</span>
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notes_apps_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notes_apps_hero_desc') }} />
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="w-full sm:w-auto bg-slate-900 text-white font-bold px-10 py-5 rounded-2xl hover:bg-indigo-600 transition-colors shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-1 transform">
                                 {t('notes_apps_hero_cta')}
@@ -227,7 +227,7 @@ export default function NotesAppsComparePage() {
                 {/* SECTION 6: CTA */}
                 <section className="py-[80px] bg-white text-center border-t border-slate-100">
                     <div className="max-w-3xl mx-auto px-6">
-                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-8 tracking-tight">Stop hoarding.<br/>Start executing.</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-8 tracking-tight">Stop hoarding.<br/>Start executing.</h2>
                         <Link href="/register" className="inline-block bg-indigo-600 text-white px-12 py-5 rounded-full text-xl hover:bg-indigo-700 transition transform hover:-translate-y-1 shadow-[0_20px_40px_rgba(79,70,229,0.3)] font-bold">
                             Get Started Free
                         </Link>

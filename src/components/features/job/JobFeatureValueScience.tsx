@@ -24,7 +24,7 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
     return (
         <>
             {/* SECTION 3.5: MARKET VALUE (SPLIT CONTENT) */}
-            <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
                 
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
@@ -33,7 +33,7 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] uppercase tracking-[0.2em] mb-8 border border-cyan-500/20">
                                 {t('job_value_badge')}
                             </div>
-                            <h2 className="text-5xl md:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
                                 {t('job_value_title')}
                             </h2>
                             <p className="text-slate-400 text-xl leading-relaxed font-medium mb-12">
@@ -100,7 +100,7 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
             </section>
 
             {/* SCIENTIFIC PILLAR (E-E-A-T) - TERMINAL COMMAND STYLE */}
-            <section className="py-32 bg-slate-900 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
                 
                 <div className="max-w-5xl mx-auto px-6 relative z-10">
@@ -121,7 +121,7 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
                                 🧬 {t('job_science_badge')}
                             </div>
 
-                            <h2 className="text-4xl md:text-5xl font-mono text-emerald-400 mb-10 leading-tight font-black">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-mono text-emerald-400 mb-10 leading-tight font-black">
                                 <span className="text-white opacity-50 mr-4">&gt;</span>{t('job_science_title')}<span className="animate-pulse">_</span>
                             </h2>
 
@@ -155,14 +155,14 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
             </section>
 
             {/* NEURAL PROMO: JOB MATCHING */}
-            <section className="py-32 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 border-y border-slate-800 relative overflow-hidden">
                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-emerald-500/5 to-transparent"></div>
                 <div className="max-w-6xl mx-auto px-6 relative z-10 flex flex-col lg:flex-row-reverse items-center gap-16 text-left">
                     <div className="lg:w-1/2">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] uppercase tracking-widest mb-8 border border-emerald-500/20">
                             🎯 {t('job_ai_promo_badge')}
                         </div>
-                        <h2 className="text-5xl md:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight tracking-tight font-black">
                             {t('job_ai_promo_title')}
                         </h2>
                         <p className="text-slate-400 text-xl font-medium leading-relaxed mb-12">
@@ -190,10 +190,10 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
             </section>
 
             {/* SECTION 7: PHILOSOPHICAL QUOTE */}
-            <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <div className="text-9xl text-indigo-50 mb-4 font-serif leading-none italic select-none">"</div>
-                    <h2 className="text-4xl md:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-[1.4] mb-12 tracking-tight italic font-serif font-black">
                         {t('job_quote_text')}
                     </h2>
                     <div className="flex flex-col items-center">

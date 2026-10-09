@@ -55,14 +55,14 @@ export default function SecurityPage() {
                             {t('sec_badge')}
                         </div>
 
-                        <h1 className="text-6xl md:text-8xl text-white tracking-tighter leading-[0.9] mb-8 font-black">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-[0.9] mb-8 font-black">
                             {t('sec_title_1')} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-400">
                                 {t('sec_title_2')}
                             </span>
                         </h1>
 
-                        <p className="text-xl text-slate-400 max-w-xl leading-relaxed mb-12">
+                        <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed mb-12">
                             {t('sec_subtitle')}
                         </p>
 
@@ -101,7 +101,7 @@ export default function SecurityPage() {
                 </div>
             </header>
 
-            <section className="py-24 bg-[#fafafa]">
+            <section className="py-12 sm:py-16 lg:py-24 bg-[#fafafa]">
                 <div className="max-w-7xl mx-auto px-6">
                     
                     <div className="grid lg:grid-cols-4 gap-12 lg:gap-20 relative">
@@ -151,8 +151,8 @@ export default function SecurityPage() {
                                 <div className="flex flex-col md:flex-row gap-12 items-start">
                                     <div className="w-20 h-20 bg-slate-950 rounded-3xl flex items-center justify-center text-4xl shadow-2xl shadow-slate-200 shrink-0 group-hover:-rotate-6 transition duration-500 font-black">☁️</div>
                                     <div>
-                                        <h2 className="text-4xl md:text-5xl text-slate-900 mb-8 tracking-tighter font-black">{t('sec_h2_infrastructure')}</h2>
-                                        <p className="text-xl text-slate-500 font-medium mb-12 leading-relaxed">{t('sec_p_infrastructure')}</p>
+                                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-8 tracking-tighter font-black">{t('sec_h2_infrastructure')}</h2>
+                                        <p className="text-base sm:text-lg md:text-xl text-slate-500 font-medium mb-12 leading-relaxed">{t('sec_p_infrastructure')}</p>
                                         
                                         <div className="grid sm:grid-cols-3 gap-8">
                                             <div className="space-y-4">
@@ -178,7 +178,7 @@ export default function SecurityPage() {
                                 <div className="relative z-10 flex flex-col md:flex-row gap-12 items-start">
                                     <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center text-4xl border border-white/10 shrink-0 shadow-lg group-hover:rotate-6 transition duration-500 font-black">🔐</div>
                                     <div>
-                                        <h2 className="text-4xl md:text-5xl text-white mb-8 tracking-tighter font-black">{t('sec_h2_encryption')}</h2>
+                                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-8 tracking-tighter font-black">{t('sec_h2_encryption')}</h2>
                                         <p className="text-xl text-indigo-100 font-medium mb-12 leading-relaxed opacity-80 decoration-indigo-500 underline decoration-4 underline-offset-8">{t('sec_p_encryption')}</p>
                                         
                                         <div className="grid sm:grid-cols-2 gap-10">
@@ -202,8 +202,8 @@ export default function SecurityPage() {
                                 <div className="flex flex-col md:flex-row gap-12 items-start">
                                     <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center text-4xl shadow-2xl shadow-indigo-100 shrink-0 group-hover:scale-110 transition duration-500 text-white font-black">🛡️</div>
                                     <div>
-                                        <h2 className="text-4xl md:text-5xl text-slate-900 mb-8 tracking-tighter font-black">{t('sec_h2_application')}</h2>
-                                        <p className="text-xl text-slate-500 font-medium mb-12 leading-relaxed">{t('sec_p_application')}</p>
+                                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-8 tracking-tighter font-black">{t('sec_h2_application')}</h2>
+                                        <p className="text-base sm:text-lg md:text-xl text-slate-500 font-medium mb-12 leading-relaxed">{t('sec_p_application')}</p>
 
                                         <div className="grid sm:grid-cols-2 gap-8">
                                             <div className="flex gap-5 p-6 bg-slate-50 rounded-3xl">
@@ -230,7 +230,7 @@ export default function SecurityPage() {
                                 <div className="flex flex-col md:flex-row gap-12 items-start">
                                     <div className="w-20 h-20 bg-emerald-600 rounded-3xl flex items-center justify-center text-4xl shadow-2xl shadow-emerald-200 shrink-0 group-hover:rotate-12 transition duration-500 text-white font-black">👑</div>
                                     <div>
-                                        <h2 className="text-4xl md:text-5xl text-emerald-950 mb-8 tracking-tighter font-black">{t('sec_h2_sovereignty')}</h2>
+                                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-emerald-950 mb-8 tracking-tighter font-black">{t('sec_h2_sovereignty')}</h2>
                                         <p className="text-2xl text-emerald-900/80 font-black leading-relaxed italic border-l-8 border-emerald-300 pl-10">
                                             {t('sec_p_sovereignty')}
                                         </p>
@@ -268,12 +268,12 @@ export default function SecurityPage() {
                 </div>
             </section>
 
-            <section className="py-40 px-6 bg-white border-t border-slate-100 text-center relative overflow-hidden">
+            <section className="py-16 sm:py-24 lg:py-32 px-6 bg-white border-t border-slate-100 text-center relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[500px] bg-indigo-600/5 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <div className="max-w-4xl mx-auto relative z-10">
                     <div className="inline-flex items-center justify-center w-24 h-24 bg-slate-900 text-white rounded-[2.5rem] text-4xl mb-12 shadow-2xl rotate-3 font-black">🛡️</div>
-                    <h2 className="text-6xl md:text-8xl mb-10 text-slate-950 tracking-tighter leading-[0.8] font-black">{t('sec_cta_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-10 text-slate-950 tracking-tighter leading-[0.8] font-black">{t('sec_cta_title')}</h2>
                     <p className="text-2xl text-slate-500 mb-16 leading-relaxed max-w-3xl mx-auto font-medium">
                         {t('sec_cta_desc')}
                     </p>

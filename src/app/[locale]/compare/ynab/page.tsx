@@ -63,7 +63,7 @@ export default function YnabComparePage() {
                                 {t('ynab_hero_title_1')} <br/>
                                 <span className="text-indigo-400">{t('ynab_hero_title_2')}</span>
                             </h1>
-                            <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 leading-relaxed max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('ynab_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 leading-relaxed max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('ynab_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="bg-indigo-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-indigo-500 transition-colors shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:-translate-y-1 transform">
                                     {t('ynab_hero_cta')}
@@ -77,7 +77,7 @@ export default function YnabComparePage() {
                 {/* SECTION 2: THE PROBLEM */}
                 <section className="py-[80px] bg-white overflow-hidden">
                     <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-                        <div className="bg-slate-50 p-12 rounded-[3rem] border border-slate-200 relative group">
+                        <div className="bg-slate-50 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 relative group">
                             <div className="text-center text-4xl mb-4 font-mono text-slate-400 group-hover:scale-105 transition-transform">
                                 [ Spreadsheet Hell ]
                             </div>
@@ -139,7 +139,7 @@ export default function YnabComparePage() {
                 <section className="py-[80px] bg-white overflow-hidden border-t border-slate-100">
                     <div className="max-w-6xl mx-auto px-6">
                         <div className="grid lg:grid-cols-2 gap-16 mb-[80px] items-center">
-                            <div className="bg-red-50 p-10 rounded-[3rem] text-center border border-red-100">
+                            <div className="bg-red-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl text-center border border-red-100">
                                 <div className="text-red-900 font-black text-6xl mb-4">$109/yr</div>
                                 <div className="text-red-700 font-bold mb-8">For a glorified spreadsheet.</div>
                                 <div className="flex justify-center text-3xl">📉</div>
@@ -270,7 +270,7 @@ export default function YnabComparePage() {
 
                 {/* SECTION 7: CTA */}
                 <section className="py-[80px] bg-slate-50 text-center px-6 border-t border-slate-200">
-                    <h2 className="text-4xl md:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('ynab_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('ynab_cta_title') }} />
                     <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-slate-500 mb-10">{t('ynab_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-emerald-600 text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-emerald-200 hover:scale-105 transition-transform">{t('ynab_cta_btn')}</Link>
                 </section>

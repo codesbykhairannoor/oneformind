@@ -60,7 +60,7 @@ export default function SuccessStoriesPage() {
                                 </span>
                             </h1>
 
-                            <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
                                 {t('stories_hero_desc')}
                             </p>
                         </div>
@@ -123,10 +123,10 @@ export default function SuccessStoriesPage() {
                 </header>
 
                 {/* SECTION 2: WALL OF LOVE GRID */}
-                <section className="py-24 bg-gray-50 border-y border-gray-100">
+                <section className="py-12 sm:py-16 lg:py-24 bg-gray-50 border-y border-gray-100">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-5xl text-gray-900 mb-4 font-black">{t('stories_wall_title')}</h2>
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-4 font-black">{t('stories_wall_title')}</h2>
                             <p className="text-gray-500 text-lg">{t('stories_wall_desc')}</p>
                         </div>
 
@@ -184,7 +184,7 @@ export default function SuccessStoriesPage() {
                 </section>
 
                 {/* SECTION 3: METRICS OF IMPACT */}
-                <section className="py-32 bg-white">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
                             <div className="space-y-2">
@@ -208,7 +208,7 @@ export default function SuccessStoriesPage() {
                 </section>
 
                 {/* SECTION 4: BY THE NUMBERS */}
-                <section className="py-32 bg-indigo-600 text-white text-center">
+                <section className="py-14 sm:py-20 lg:py-28 bg-indigo-600 text-white text-center">
                     <div className="max-w-7xl mx-auto px-6 space-y-16">
                         <div className="space-y-4">
                             <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900 }} className="font-black">
@@ -234,10 +234,10 @@ export default function SuccessStoriesPage() {
                 </section>
 
                 {/* SECTION 5: FEATURED INTERVIEWS */}
-                <section className="py-24 bg-white">
+                <section className="py-12 sm:py-16 lg:py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6">
-                        <h2 className="text-4xl text-slate-900 mb-4 font-black">{t('sto_interviews_title')}</h2>
-                        <p className="text-xl text-slate-500 mb-16">{t('sto_interviews_desc')}</p>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 font-black">{t('sto_interviews_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-16">{t('sto_interviews_desc')}</p>
                         <div className="grid md:grid-cols-2 gap-8">
                             <div className="h-80 rounded-[3rem] bg-slate-900 overflow-hidden relative group">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -258,14 +258,14 @@ export default function SuccessStoriesPage() {
                 </section>
 
                 {/* SECTION 6: HALL OF FAME */}
-                <section className="py-32 bg-slate-50">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-50">
                     <div className="max-w-7xl mx-auto px-6 text-center">
-                        <h2 className="text-5xl text-slate-900 mb-6 font-black">{t('sto_hof_title')}</h2>
-                        <p className="text-xl text-slate-500 mb-16">{t('sto_hof_desc')}</p>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-6 font-black">{t('sto_hof_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-16">{t('sto_hof_desc')}</p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {hallOfFame.map((item) => (
-                                <div key={item.id} className="bg-white p-10 rounded-[3rem] border border-slate-200 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden text-left">
+                                <div key={item.id} className="bg-white p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden text-left">
                                     {/* Decorative Number */}
                                     <div className="absolute -top-4 -right-4 text-8xl text-slate-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-black">0{item.id}</div>
 
@@ -284,14 +284,14 @@ export default function SuccessStoriesPage() {
                 </section>
 
                 {/* SECTION 7: SHARE YOUR STORY CTA */}
-                <section className="py-24 px-6 bg-gray-50">
+                <section className="py-12 sm:py-16 lg:py-24 px-6 bg-gray-50">
                     <div className="max-w-6xl mx-auto bg-indigo-600 rounded-[4rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl border border-indigo-500">
                         {/* Animated orbs */}
                         <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-500 rounded-full blur-3xl opacity-50 animate-pulse" />
                         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-500 rounded-full blur-3xl opacity-50 animate-pulse delay-1000" />
 
                         <div className="relative z-10 space-y-8">
-                            <h2 className="text-4xl md:text-7xl mb-8 text-white tracking-tight leading-none font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-white tracking-tight leading-none font-black">
                                 {t('stories_cta_title')}
                             </h2>
                             <p className="text-indigo-100 text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-medium">

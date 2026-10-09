@@ -51,7 +51,7 @@ export default function NotionComparePage() {
                             <span className="text-indigo-600">{t('notion_hero_title_2')}</span>
                         </h1>
 
-                        <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notion_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('notion_hero_desc') }} />
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="bg-indigo-600 text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-xl font-bold text-base hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition-all transform hover:-translate-y-1">
@@ -227,7 +227,7 @@ export default function NotionComparePage() {
                 {/* SECTION 6: CTA */}
                 <section className="py-[80px] bg-white text-center">
                     <div className="max-w-3xl mx-auto px-6">
-                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-tight" dangerouslySetInnerHTML={{ __html: t.raw('notion_cta_title') }} />
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 leading-tight" dangerouslySetInnerHTML={{ __html: t.raw('notion_cta_title') }} />
                         <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-slate-500 mb-10">{t('notion_cta_desc')}</p>
                         <Link href="/register" className="inline-block bg-indigo-600 text-white px-10 py-5 rounded-2xl font-bold text-xl hover:bg-indigo-700 hover:shadow-2xl hover:shadow-indigo-600/30 transition transform hover:-translate-y-1">
                             {t('notion_cta_btn')}

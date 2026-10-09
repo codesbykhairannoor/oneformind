@@ -127,7 +127,7 @@ export default function FinanceAppsScienceFaqCta() {
                 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-white/5 rounded-3xl text-4xl mb-10 border border-white/10 shadow-2xl font-black">⚡</div>
-                    <h2 className="text-5xl md:text-7xl mb-8 text-white tracking-tight leading-tight font-black" dangerouslySetInnerHTML={{ __html: t.raw('finapp_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-white tracking-tight leading-tight font-black" dangerouslySetInnerHTML={{ __html: t.raw('finapp_cta_title') }} />
                     <p className="text-slate-400 text-xl md:text-2xl mb-12 font-medium max-w-2xl mx-auto leading-relaxed">
                         {t('finapp_cta_desc')}
                     </p>

@@ -23,7 +23,7 @@ export default function ManagementToolsHero() {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{t('pm_hero_title_2')}</span>
                         </h1>
                         
-                        <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('pm_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw('pm_hero_desc') }} />
                         
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link href="/register" className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition transform hover:-translate-y-1 text-center">

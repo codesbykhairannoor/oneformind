@@ -47,7 +47,7 @@ export default function SolutionPersonalGrowthPage() {
                                 </span>
                             </h1>
                             
-                            <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
                                 {t('growth_hero_desc')}
                             </p>
                             
@@ -105,7 +105,7 @@ export default function SolutionPersonalGrowthPage() {
                 </header>
 
                 {/* SECTION 3: STACKED CARD DECK */}
-                <section id="how-it-works" className="py-32 bg-white overflow-hidden border-b border-gray-100">
+                <section id="how-it-works" className="py-14 sm:py-20 lg:py-28 bg-white overflow-hidden border-b border-gray-100">
                     <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
                         
                         <div className="order-2 lg:order-1 relative h-[500px] flex items-center justify-center group perspective-1000">
@@ -126,7 +126,7 @@ export default function SolutionPersonalGrowthPage() {
 
                         <div className="order-1 lg:order-2">
                             <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl text-2xl mb-6 shadow-sm border border-indigo-100 font-black select-none">🔥</div>
-                            <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('growth_feat_1_title')}</h2>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('growth_feat_1_title')}</h2>
                             <p className="text-gray-500 text-lg leading-relaxed mb-8">
                                 {t('growth_feat_1_desc')}
                             </p>
@@ -145,13 +145,13 @@ export default function SolutionPersonalGrowthPage() {
                 </section>
 
                 {/* SECTION 4: IMMERSIVE GLASSMORPHISM */}
-                <section className="py-32 relative bg-indigo-950 flex items-center justify-center overflow-hidden min-h-[800px]">
+                <section className="py-14 sm:py-20 lg:py-28 relative bg-indigo-950 flex items-center justify-center overflow-hidden min-h-[800px]">
                     <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-600 rounded-full mix-blend-screen filter blur-3xl opacity-40 "></div>
                     <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-40 delay-1000"></div>
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
 
                     <div className="relative z-10 max-w-5xl w-full px-6 text-center">
-                        <h2 className="text-5xl md:text-7xl mb-8 text-white tracking-tight font-black">{t('growth_feat_2_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-white tracking-tight font-black">{t('growth_feat_2_title')}</h2>
                         <p className="text-indigo-200 text-xl leading-relaxed mb-16 max-w-2xl mx-auto">
                             {t('growth_feat_2_desc')}
                         </p>
@@ -176,7 +176,7 @@ export default function SolutionPersonalGrowthPage() {
                 </section>
 
                 {/* SECTION 5: HABIT CASCADE */}
-                <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative overflow-hidden">
                     <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                         <div className="relative order-2 md:order-1">
                             <div className="bg-indigo-900 border border-white/5 rounded-[3rem] p-10 shadow-2xl">
@@ -199,7 +199,7 @@ export default function SolutionPersonalGrowthPage() {
                             </div>
                         </div>
                         <div className="order-1 md:order-2">
-                            <h2 className="text-5xl md:text-6xl mb-6 font-black">{t('growth_extra_1_title')}</h2>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 font-black">{t('growth_extra_1_title')}</h2>
                             <p className="text-xl text-indigo-200 leading-relaxed italic">
                                 {t('growth_extra_1_desc')}
                             </p>
@@ -208,10 +208,10 @@ export default function SolutionPersonalGrowthPage() {
                 </section>
 
                 {/* SECTION 6: GROWTH TRAJECTORY */}
-                <section className="py-32 bg-white relative">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white relative">
                     <div className="max-w-4xl mx-auto px-6 text-center">
-                        <h2 className="text-5xl md:text-6xl text-gray-900 mb-8 font-black">{t('growth_extra_2_title')}</h2>
-                        <p className="text-xl text-gray-500 leading-relaxed mb-12 font-medium">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 font-black">{t('growth_extra_2_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed mb-12 font-medium">
                             {t('growth_extra_2_desc')}
                         </p>
                         <div className="inline-flex items-center gap-4 p-8 bg-indigo-50 rounded-3xl border border-indigo-100">
@@ -225,7 +225,7 @@ export default function SolutionPersonalGrowthPage() {
                 </section>
 
                 {/* SECTION 7: SCIENTIFIC PILLAR */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-3xl -z-10"></div>
                     
                     <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -251,7 +251,7 @@ export default function SolutionPersonalGrowthPage() {
                                     🧬 {t('growth_science_badge')}
                                 </div>
 
-                                <h2 className="text-5xl md:text-7xl text-gray-900 mb-10 leading-tight font-black">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-10 leading-tight font-black">
                                     {t('growth_science_title')}
                                 </h2>
 
@@ -282,9 +282,9 @@ export default function SolutionPersonalGrowthPage() {
                 </section>
 
                 {/* SECTION 8: FAQ */}
-                <section className="py-32 bg-gray-50 border-y border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-gray-50 border-y border-gray-100">
                     <div className="max-w-4xl mx-auto px-6">
-                        <h2 className="text-5xl md:text-6xl text-center text-gray-900 mb-16 font-black">{t('growth_faq_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center text-gray-900 mb-16 font-black">{t('growth_faq_title')}</h2>
                         <div className="space-y-6">
                             {faqs.map((faq, idx) => (
                                 <div key={idx} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition">
@@ -302,7 +302,7 @@ export default function SolutionPersonalGrowthPage() {
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-t from-indigo-200 to-transparent rounded-t-full blur-2xl -z-10"></div>
                     
                     <div className="max-w-4xl mx-auto text-center relative z-10 px-6 space-y-8">
-                        <h2 className="text-6xl md:text-7xl mb-8 text-indigo-950 tracking-tight leading-tight font-black">{t('growth_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-indigo-950 tracking-tight leading-tight font-black">{t('growth_cta_title')}</h2>
                         <p className="text-indigo-900/60 text-xl md:text-2xl mb-12 font-medium max-w-2xl mx-auto">
                             {t('growth_cta_desc')}
                         </p>

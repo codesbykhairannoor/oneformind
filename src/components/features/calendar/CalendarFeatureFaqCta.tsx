@@ -35,7 +35,7 @@ export default function CalendarFeatureFaqCta({ t }: CalendarFeatureFaqCtaProps)
 
                 <div className="max-w-3xl mx-auto text-center relative z-10">
                     <div className="w-20 h-20 bg-indigo-600/20 border border-indigo-500/30 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-8 font-black">🗓️</div>
-                    <h2 className="text-5xl md:text-6xl mb-8 text-white tracking-tight font-black">{t('calendar_cta_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-white tracking-tight font-black">{t('calendar_cta_title')}</h2>
                     <p className="text-indigo-200 text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
                         {t('calendar_cta_desc')}
                     </p>

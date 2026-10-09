@@ -24,7 +24,7 @@ export default function SecondBrainScienceFaqCta() {
     return (
         <>
             {/* SECTION 7: SCIENTIFIC PILLAR */}
-            <section className="py-40 bg-slate-900 relative overflow-hidden text-left border-y border-slate-950">
+            <section className="py-16 sm:py-24 lg:py-32 bg-slate-900 relative overflow-hidden text-left border-y border-slate-950">
                 <div className="absolute inset-0 z-0">
                     <svg className="w-full h-full opacity-10" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
                         <defs>
@@ -47,7 +47,7 @@ export default function SecondBrainScienceFaqCta() {
                                 🧬 {t('brain_science_badge')}
                             </div>
 
-                            <h2 className="text-5xl md:text-7xl text-white mb-10 leading-[1.1] font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-10 leading-[1.1] font-black">
                                 {t('brain_science_title')}
                             </h2>
 
@@ -92,9 +92,9 @@ export default function SecondBrainScienceFaqCta() {
             </section>
 
             {/* SECTION 8: FAQ */}
-            <section className="py-32 bg-slate-50 border-y border-slate-100">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 border-y border-slate-100">
                 <div className="max-w-4xl mx-auto px-6">
-                    <h2 className="text-5xl md:text-6xl text-center text-slate-900 mb-16 font-black">{t('brain_faq_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center text-slate-900 mb-16 font-black">{t('brain_faq_title')}</h2>
                     <div className="space-y-6">
                         {faqs.map((faq, idx) => (
                             <div key={idx} className="bg-white p-8 md:p-10 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition">
@@ -107,7 +107,7 @@ export default function SecondBrainScienceFaqCta() {
             </section>
 
             {/* SECTION 9: CTA */}
-            <section className="py-32 bg-slate-50 relative overflow-hidden text-center border-t border-slate-100">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden text-center border-t border-slate-100">
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-100 via-transparent to-transparent -z-10"></div>
                 
                 <div className="max-w-5xl mx-auto px-6 relative z-10">
@@ -118,7 +118,7 @@ export default function SecondBrainScienceFaqCta() {
                         
                         <div className="relative z-10">
                             <div className="text-6xl mb-8 font-black select-none">🕊️</div>
-                            <h2 className="text-6xl md:text-7xl text-white mb-6 tracking-tight leading-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-6 tracking-tight leading-tight font-black">
                                 {t('brain_cta_title')}
                             </h2>
                             <p className="text-lg md:text-xl text-indigo-200 mb-12 max-w-2xl mx-auto leading-relaxed">

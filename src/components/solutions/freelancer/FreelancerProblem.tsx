@@ -6,11 +6,11 @@ export default function FreelancerProblem() {
     const t = useTranslations();
 
     return (
-        <section className="py-24 bg-white bg-pattern-dots relative overflow-hidden">
+        <section className="py-12 sm:py-16 lg:py-24 bg-white bg-pattern-dots relative overflow-hidden">
             <div className="max-w-6xl mx-auto px-6">
                 <div className="text-center max-w-3xl mx-auto mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <h2 className="text-5xl md:text-5xl mb-6 text-gray-900 font-black">{t('freelance_prob_title')}</h2>
-                    <p className="text-xl text-gray-500">{t('freelance_prob_desc')}</p>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 text-gray-900 font-black">{t('freelance_prob_title')}</h2>
+                    <p className="text-base sm:text-lg md:text-xl text-gray-500">{t('freelance_prob_desc')}</p>
                 </div>
 
                 <div className="relative max-w-5xl mx-auto">

@@ -42,7 +42,7 @@ export default function EvernoteComparePage() {
                                 {t('evernote_hero_title_1')} <br/>
                                 <span className="text-emerald-600">{t('evernote_hero_title_2')}</span>
                             </h1>
-                            <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('evernote_hero_desc') }} />
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-xl leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('evernote_hero_desc') }} />
                             <div className="flex flex-col sm:flex-row items-start gap-4">
                                 <Link href="/register" className="w-full sm:w-auto bg-slate-900 text-white font-bold px-8 py-4 rounded-xl hover:bg-emerald-600 transition-colors shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-1 transform">
                                     {t('evernote_hero_cta')}
@@ -248,7 +248,7 @@ export default function EvernoteComparePage() {
                 {/* SECTION 6: CTA */}
                 <section className="py-[80px] px-6 bg-white text-center border-t border-slate-100">
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-8 tracking-tight">{t('evernote_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-8 tracking-tight">{t('evernote_cta_title')}</h2>
                         <Link href="/register" className="inline-block bg-emerald-600 text-white px-12 py-5 rounded-full text-xl hover:bg-emerald-700 transition transform hover:-translate-y-1 shadow-[0_20px_40px_rgba(16,185,129,0.3)] font-bold">
                             {t('evernote_cta_btn')}
                         </Link>

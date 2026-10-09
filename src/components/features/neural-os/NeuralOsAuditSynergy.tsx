@@ -10,7 +10,7 @@ export default function NeuralOsAuditSynergy({ t }: NeuralOsAuditSynergyProps) {
     return (
         <>
             {/* SECTION 3: FRICTION AUDIT */}
-            <section className="py-32 bg-white scroll-mt-20" id="audit">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white scroll-mt-20" id="audit">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row gap-20 items-center">
                         
@@ -18,7 +18,7 @@ export default function NeuralOsAuditSynergy({ t }: NeuralOsAuditSynergyProps) {
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-[10px] mb-8 uppercase tracking-widest border border-emerald-100 font-bold">
                                 {t('neural_audit_badge')}
                             </div>
-                            <h2 className="text-4xl md:text-6xl text-slate-900 mb-8 leading-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-8 leading-tight font-black">
                                 {t('neural_audit_title')}
                             </h2>
                             <p className="text-slate-500 text-xl font-medium leading-relaxed mb-12">
@@ -67,13 +67,13 @@ export default function NeuralOsAuditSynergy({ t }: NeuralOsAuditSynergyProps) {
             </section>
 
             {/* SECTION 4: DEEP SYNERGY */}
-            <section className="py-32 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-20">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-[10px] mb-6 tracking-widest border border-indigo-200 font-bold uppercase">
                             {t('neural_synergy_badge')}
                         </div>
-                        <h2 className="text-4xl md:text-6xl text-slate-900 mb-8 leading-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-8 leading-tight font-black">
                             {t('neural_synergy_title')}
                         </h2>
                         <p className="text-slate-500 text-xl font-medium leading-relaxed mb-0">
@@ -82,12 +82,12 @@ export default function NeuralOsAuditSynergy({ t }: NeuralOsAuditSynergyProps) {
                     </div>
 
                     <div className="grid lg:grid-cols-2 gap-12 relative text-left">
-                        <div className="bg-white p-12 rounded-[3rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 group cursor-default">
+                        <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 group cursor-default">
                             <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-4xl mb-10 group-hover:scale-110 transition font-black select-none">💰</div>
                             <h3 className="text-2xl text-slate-900 mb-4 font-black">{t('neural_synergy_fin_title')}</h3>
                             <p className="text-slate-500 font-bold leading-relaxed">{t('neural_synergy_fin_desc')}</p>
                         </div>
-                        <div className="bg-white p-12 rounded-[3rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 group cursor-default">
+                        <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 group cursor-default">
                             <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-4xl mb-10 group-hover:scale-110 transition font-black select-none">🌱</div>
                             <h3 className="text-2xl text-slate-900 mb-4 font-black">{t('neural_synergy_hab_title')}</h3>
                             <p className="text-slate-500 font-bold leading-relaxed">{t('neural_synergy_hab_desc')}</p>
@@ -97,7 +97,7 @@ export default function NeuralOsAuditSynergy({ t }: NeuralOsAuditSynergyProps) {
             </section>
 
             {/* SECTION 5: AI GROWTH COACH */}
-            <section className="py-32 bg-white relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         
@@ -131,7 +131,7 @@ export default function NeuralOsAuditSynergy({ t }: NeuralOsAuditSynergyProps) {
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 text-purple-700 text-[10px] mb-8 uppercase tracking-widest border border-purple-100 font-bold">
                                 {t('neural_coach_badge')}
                             </div>
-                            <h2 className="text-4xl md:text-6xl text-slate-900 mb-8 leading-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-8 leading-tight font-black">
                                 {t('neural_coach_title')}
                             </h2>
                             <p className="text-slate-500 text-xl font-medium leading-relaxed mb-12">

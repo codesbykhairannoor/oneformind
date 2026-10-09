@@ -46,7 +46,7 @@ export default function SolutionCareerAcceleratorPage() {
                                 </span>
                             </h1>
                             
-                            <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
                                 {t('solve_career_hero_desc')}
                             </p>
                             
@@ -103,21 +103,21 @@ export default function SolutionCareerAcceleratorPage() {
                 </header>
 
                 {/* SECTION 2: THE PROBLEM */}
-                <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
                     <div className="max-w-6xl mx-auto px-6 relative z-10">
                         <div className="text-center max-w-3xl mx-auto mb-24">
-                            <h2 className="text-4xl md:text-5xl mb-6 leading-tight font-black">{t('solve_career_prob_title')}</h2>
-                            <p className="text-xl text-slate-400 font-medium">{t('solve_career_prob_desc')}</p>
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 leading-tight font-black">{t('solve_career_prob_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-slate-400 font-medium">{t('solve_career_prob_desc')}</p>
                         </div>
 
                         <div className="space-y-12 md:space-y-0 text-left">
                             
                             {/* Card 1 */}
                             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16">
-                                <div className="w-full md:w-1/2 bg-white/5 p-10 rounded-[3rem] border border-white/10 shadow-2xl hover:bg-white/10 transition duration-300">
+                                <div className="w-full md:w-1/2 bg-white/5 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl hover:bg-white/10 transition duration-300">
                                     <div className="w-16 h-16 bg-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center text-3xl mb-8 font-black select-none">🕳️</div>
                                     <h3 className="text-2xl font-bold mb-4 text-white">{t('solve_career_prob_1_title')}</h3>
                                     <p className="text-slate-400 text-lg leading-relaxed">{t('solve_career_prob_1_desc')}</p>
@@ -126,7 +126,7 @@ export default function SolutionCareerAcceleratorPage() {
 
                             {/* Card 2 */}
                             <div className="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-16 md:-mt-16 relative z-10">
-                                <div className="w-full md:w-1/2 bg-indigo-600/20 p-10 rounded-[3rem] border border-indigo-500/30 shadow-2xl hover:bg-indigo-600/30 transition duration-300">
+                                <div className="w-full md:w-1/2 bg-indigo-600/20 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-indigo-500/30 shadow-2xl hover:bg-indigo-600/30 transition duration-300">
                                     <div className="w-16 h-16 bg-indigo-500/30 text-indigo-300 rounded-2xl flex items-center justify-center text-3xl mb-8 font-black select-none">📊</div>
                                     <h3 className="text-2xl font-bold mb-4 text-white">{t('solve_career_prob_2_title')}</h3>
                                     <p className="text-indigo-200 text-lg leading-relaxed">{t('solve_career_prob_2_desc')}</p>
@@ -135,7 +135,7 @@ export default function SolutionCareerAcceleratorPage() {
 
                             {/* Card 3 */}
                             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 md:-mt-16 relative z-20">
-                                <div className="w-full md:w-1/2 bg-white/5 p-10 rounded-[3rem] border border-white/10 shadow-2xl hover:bg-white/10 transition duration-300">
+                                <div className="w-full md:w-1/2 bg-white/5 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl hover:bg-white/10 transition duration-300">
                                     <div className="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center text-3xl mb-8 font-black select-none">👻</div>
                                     <h3 className="text-2xl font-bold mb-4 text-white">{t('solve_career_prob_3_title')}</h3>
                                     <p className="text-slate-400 text-lg leading-relaxed">{t('solve_career_prob_3_desc')}</p>
@@ -147,11 +147,11 @@ export default function SolutionCareerAcceleratorPage() {
                 </section>
 
                 {/* SECTION 3: THE SOLUTION (HORIZONTAL TIMELINE TRACKER) */}
-                <section className="py-32 bg-white overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center mb-24 max-w-3xl mx-auto">
                             <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 text-indigo-600 rounded-3xl text-3xl mb-8 shadow-sm border border-indigo-100 font-black select-none">⚙️</div>
-                            <h2 className="text-4xl md:text-5xl mb-6 text-slate-900 leading-tight font-black">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 text-slate-900 leading-tight font-black">
                                 {t('solve_career_sol_title')}
                             </h2>
                             <p className="text-slate-500 text-xl leading-relaxed font-medium">
@@ -192,7 +192,7 @@ export default function SolutionCareerAcceleratorPage() {
                 </section>
 
                 {/* SECTION 4: INTERVIEW PREP */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
                     <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                         <div className="bg-indigo-950 rounded-[3rem] p-8 md:p-12 shadow-2xl relative order-2 md:order-1 text-left">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-500/20 via-transparent to-transparent opacity-50"></div>
@@ -206,8 +206,8 @@ export default function SolutionCareerAcceleratorPage() {
                             </div>
                         </div>
                         <div className="order-1 md:order-2 text-left">
-                            <h2 className="text-4xl text-slate-900 mb-6 font-black">{t('solve_career_extra_1_title')}</h2>
-                            <p className="text-xl text-slate-500 leading-relaxed font-medium">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-6 font-black">{t('solve_career_extra_1_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-slate-500 leading-relaxed font-medium">
                                 {t('solve_career_extra_1_desc')}
                             </p>
                         </div>
@@ -215,10 +215,10 @@ export default function SolutionCareerAcceleratorPage() {
                 </section>
 
                 {/* SECTION 5: MARKET VALUE */}
-                <section className="py-32 bg-slate-50 border-y border-slate-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 border-y border-slate-100">
                     <div className="max-w-4xl mx-auto px-6 text-center">
-                        <h2 className="text-4xl text-slate-900 mb-8 font-black">{t('solve_career_extra_2_title')}</h2>
-                        <p className="text-xl text-slate-500 leading-relaxed mb-12 font-medium">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-8 font-black">{t('solve_career_extra_2_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 leading-relaxed mb-12 font-medium">
                             {t('solve_career_extra_2_desc')}
                         </p>
                         <div className="p-8 bg-white rounded-3xl border border-slate-200 shadow-sm inline-block">
@@ -238,7 +238,7 @@ export default function SolutionCareerAcceleratorPage() {
                 </section>
 
                 {/* SECTION 6: SCIENTIFIC PILLAR */}
-                <section className="py-32 bg-slate-900 relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#4f46e5_1px,transparent_1px)] [background-size:40px_40px] opacity-10"></div>
                     
                     <div className="max-w-6xl mx-auto px-6 relative z-10 text-left">
@@ -253,7 +253,7 @@ export default function SolutionCareerAcceleratorPage() {
                                         🧬 {t('solve_career_science_badge')}
                                     </div>
 
-                                    <h2 className="text-4xl md:text-5xl text-white mb-10 leading-tight font-black">
+                                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-10 leading-tight font-black">
                                         {t('solve_career_science_title')}
                                     </h2>
 
@@ -295,9 +295,9 @@ export default function SolutionCareerAcceleratorPage() {
                 </section>
 
                 {/* SECTION 7: FAQ */}
-                <section className="py-32 bg-white border-t border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white border-t border-gray-100">
                     <div className="max-w-4xl mx-auto px-6">
-                        <h2 className="text-4xl text-center text-slate-900 mb-16 font-black">{t('solve_career_faq_title')}</h2>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center text-slate-900 mb-16 font-black">{t('solve_career_faq_title')}</h2>
                         <div className="space-y-6 text-left">
                             {faqs.map((faq, idx) => (
                                 <div key={idx} className="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition">
@@ -310,13 +310,13 @@ export default function SolutionCareerAcceleratorPage() {
                 </section>
 
                 {/* SECTION 8: DRAMATIC DARK CTA */}
-                <section className="py-32 bg-indigo-950 relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-indigo-950 relative overflow-hidden">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/40 rounded-full blur-3xl pointer-events-none"></div>
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f46e5_1px,transparent_1px),linear-gradient(to_bottom,#4f46e5_1px,transparent_1px)] bg-[size:64px_64px] opacity-10"></div>
 
                     <div className="max-w-4xl mx-auto text-center relative z-10 px-6 space-y-8">
                         <div className="inline-flex items-center justify-center w-24 h-24 bg-white/10 rounded-full text-5xl border border-white/20 shadow-[0_0_50px_rgba(79,70,229,0.5)] font-black select-none">🚀</div>
-                        <h2 className="text-[42px] leading-[1.1] md:text-7xl text-white tracking-tight font-black">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[42px] leading-[1.1] text-white tracking-tight font-black">
                             {t('solve_career_cta_title')}
                         </h2>
                         <p className="text-indigo-200 text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">

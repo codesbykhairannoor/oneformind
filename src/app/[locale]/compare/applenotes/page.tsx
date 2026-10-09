@@ -43,7 +43,7 @@ export default function AppleNotesComparePage() {
                             {t('applenotes_hero_title_1')} <br/>
                             <span className="text-amber-600">{t('applenotes_hero_title_2')}</span>
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('applenotes_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('applenotes_hero_desc') }} />
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="w-full sm:w-auto bg-slate-900 text-white font-bold px-8 py-4 rounded-xl hover:bg-amber-600 transition-colors shadow-xl hover:shadow-amber-500/30 hover:-translate-y-1 transform">
                                 {t('applenotes_hero_cta')}
@@ -242,7 +242,7 @@ export default function AppleNotesComparePage() {
                 {/* SECTION 6: CTA */}
                 <section className="py-[80px] px-6 bg-white text-center border-t border-slate-100">
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-8 tracking-tight">{t('applenotes_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-8 tracking-tight">{t('applenotes_cta_title')}</h2>
                         <Link href="/register" className="inline-block bg-slate-900 text-white px-12 py-5 rounded-full text-xl hover:bg-amber-600 transition transform hover:-translate-y-1 shadow-xl font-bold">
                             {t('applenotes_cta_btn')}
                         </Link>

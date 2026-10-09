@@ -80,7 +80,7 @@ export default function HelpPage() {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">{t('help_hero_title_2')}</span>
                         </h1>
 
-                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
                             {t('help_hero_desc')}
                         </p>
 
@@ -110,13 +110,13 @@ export default function HelpPage() {
 
                 {/* SECTION 2: ICONIC CATEGORIES */}
                 {!search && (
-                    <section className="py-24 bg-white border-t border-slate-50">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-white border-t border-slate-50">
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {categories.map((cat, idx) => {
                                     const IconComponent = cat.icon;
                                     return (
-                                        <a href="#" key={idx} className="group p-10 rounded-[3rem] bg-slate-50/50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/30 transition-all duration-500 block">
+                                        <a href="#" key={idx} className="group p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-slate-50/50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/30 transition-all duration-500 block">
                                             <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-[1.5rem] flex items-center justify-center mb-10 group-hover:scale-110 group-hover:rotate-6 transition duration-500 border border-indigo-100 opacity-70 group-hover:opacity-100">
                                                 <IconComponent size={32} />
                                             </div>
@@ -138,7 +138,7 @@ export default function HelpPage() {
                 )}
 
                 {/* SECTION 3: POPULAR & FAQ SPLIT */}
-                <section className="py-32 bg-slate-50 relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6 relative z-10">
                         <div className="grid lg:grid-cols-2 gap-24">
                             {/* TOP ARTICLES */}
@@ -195,7 +195,7 @@ export default function HelpPage() {
 
                 {/* SECTION 4: PRODUCT SUPPORT */}
                 {!search && (
-                    <section className="py-32 bg-white">
+                    <section className="py-14 sm:py-20 lg:py-28 bg-white">
                         <div className="max-w-7xl mx-auto px-6 space-y-16">
                             <div className="text-center space-y-4">
                                 <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900 }} className="text-gray-900 font-black">
@@ -205,17 +205,17 @@ export default function HelpPage() {
                             </div>
 
                             <div className="grid md:grid-cols-3 gap-8">
-                                <div className="p-10 rounded-[2.5rem] bg-indigo-50/50 border border-indigo-100 text-center space-y-4 hover:bg-white hover:shadow-2xl transition">
+                                <div className="p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-indigo-50/50 border border-indigo-100 text-center space-y-4 hover:bg-white hover:shadow-2xl transition">
                                     <div className="text-4xl font-black">🎥</div>
                                     <h3 className="text-xl font-bold text-gray-900">{t('help_support_1_title')}</h3>
                                     <p className="text-gray-500 text-sm leading-relaxed">{t('help_support_1_desc')}</p>
                                 </div>
-                                <div className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-200 text-center space-y-4 hover:bg-white hover:shadow-2xl transition">
+                                <div className="p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-slate-50 border border-slate-200 text-center space-y-4 hover:bg-white hover:shadow-2xl transition">
                                     <div className="text-4xl font-black">📖</div>
                                     <h3 className="text-xl font-bold text-gray-900">{t('help_support_2_title')}</h3>
                                     <p className="text-gray-500 text-sm leading-relaxed">{t('help_support_2_desc')}</p>
                                 </div>
-                                <div className="p-10 rounded-[2.5rem] bg-indigo-50/50 border border-indigo-100 text-center space-y-4 hover:bg-white hover:shadow-2xl transition">
+                                <div className="p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-indigo-50/50 border border-indigo-100 text-center space-y-4 hover:bg-white hover:shadow-2xl transition">
                                     <div className="text-4xl font-black">🔧</div>
                                     <h3 className="text-xl font-bold text-gray-900">{t('help_support_3_title')}</h3>
                                     <p className="text-gray-500 text-sm leading-relaxed">{t('help_support_3_desc')}</p>
@@ -227,7 +227,7 @@ export default function HelpPage() {
 
                 {/* SECTION 5: VIDEO TUTORIALS */}
                 {!search && (
-                    <section className="py-24 bg-slate-50">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-slate-50">
                         <div className="max-w-7xl mx-auto px-6 space-y-12">
                             <div className="text-center space-y-4">
                                 <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900 }} className="text-slate-900 font-black">
@@ -248,7 +248,7 @@ export default function HelpPage() {
 
                 {/* SECTION 6: CHEATSHEETS */}
                 {!search && (
-                    <section className="py-24 bg-white">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-white">
                         <div className="max-w-7xl mx-auto px-6 space-y-12">
                             <div className="space-y-4">
                                 <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900 }} className="text-slate-900 font-black">
@@ -270,7 +270,7 @@ export default function HelpPage() {
 
                 {/* SECTION 7: SYSTEM SLA */}
                 {!search && (
-                    <section className="py-24 bg-slate-900 text-white">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-slate-900 text-white">
                         <div className="max-w-5xl mx-auto px-6 text-center space-y-12">
                             <div className="space-y-4">
                                 <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900 }} className="font-black">
@@ -293,7 +293,7 @@ export default function HelpPage() {
                 )}
 
                 {/* SECTION 8: CONTACT CTA */}
-                <section className="py-32 px-6 bg-slate-50 relative overflow-hidden border-t border-gray-200">
+                <section className="py-14 sm:py-20 lg:py-28 px-6 bg-slate-50 relative overflow-hidden border-t border-gray-200">
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-100 via-white to-white -z-10" />
 
                     <div className="max-w-6xl mx-auto bg-indigo-950 rounded-[4rem] p-16 md:p-24 text-center relative overflow-hidden shadow-2xl text-white">
@@ -304,7 +304,7 @@ export default function HelpPage() {
                             <div className="inline-flex items-center justify-center w-24 h-24 bg-white/10 rounded-[2rem] text-4xl mb-10 border border-white/20 shadow-inner font-black">
                                 🆘
                             </div>
-                            <h2 className="text-4xl md:text-7xl text-white mb-8 tracking-tight leading-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-8 tracking-tight leading-tight font-black">
                                 {t('help_cta_title')}
                             </h2>
                             <p className="text-lg md:text-2xl text-indigo-200 mb-16 max-w-2xl mx-auto leading-relaxed font-medium">

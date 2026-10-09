@@ -29,12 +29,12 @@ export default function JobFeatureFaqCta({ t }: JobFeatureFaqCtaProps) {
     return (
         <>
             {/* SECTION 8: BOTTOM CTA */}
-            <section className="py-24 px-6 text-center">
+            <section className="py-12 sm:py-16 lg:py-24 px-6 text-center">
                 <div className="max-w-5xl mx-auto bg-slate-900 rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-40"></div>
                     
                     <div className="relative z-10">
-                        <h2 className="text-5xl md:text-6xl mb-6 font-black">{t('job_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 font-black">{t('job_cta_title')}</h2>
                         <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto">
                             {t('job_cta_desc')}
                         </p>

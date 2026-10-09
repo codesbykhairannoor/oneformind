@@ -46,7 +46,7 @@ export default function SolutionFinanceMasteryPage() {
                                 </span>
                             </h1>
                             
-                            <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
                                 {t('solve_finance_hero_desc')}
                             </p>
                             
@@ -96,15 +96,15 @@ export default function SolutionFinanceMasteryPage() {
                 </header>
 
                 {/* SECTION 2: THE PROBLEM */}
-                <section className="py-32 bg-white border-b border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white border-b border-gray-100">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center max-w-3xl mx-auto mb-20">
-                            <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('solve_finance_prob_title')}</h2>
-                            <p className="text-xl text-gray-500">{t('solve_finance_prob_desc')}</p>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('solve_finance_prob_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500">{t('solve_finance_prob_desc')}</p>
                         </div>
 
                         <div className="flex flex-col md:flex-row gap-8">
-                            <div className="flex-1 bg-rose-50/50 p-10 rounded-[3rem] border border-rose-100">
+                            <div className="flex-1 bg-rose-50/50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-rose-100">
                                 <div className="text-5xl mb-6 font-black select-none">📉</div>
                                 <h3 className="text-2xl font-bold text-rose-900 mb-4">{t('solve_finance_prob_1_title')}</h3>
                                 <ul className="space-y-4 text-rose-800/70">
@@ -113,7 +113,7 @@ export default function SolutionFinanceMasteryPage() {
                                     <li className="flex items-center gap-3"><span className="text-rose-500 font-bold">✕</span> {t('solve_finance_prob_1_point_3')}</li>
                                 </ul>
                             </div>
-                            <div className="flex-1 bg-gray-50 p-10 rounded-[3rem] border border-gray-200">
+                            <div className="flex-1 bg-gray-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-gray-200">
                                 <div className="text-5xl mb-6 font-black select-none">📊</div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('solve_finance_prob_2_title')}</h3>
                                 <ul className="space-y-4 text-gray-500">
@@ -127,7 +127,7 @@ export default function SolutionFinanceMasteryPage() {
                 </section>
 
                 {/* SECTION 3: THE SOLUTION */}
-                <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
                     <div className="max-w-7xl mx-auto px-6">
@@ -152,7 +152,7 @@ export default function SolutionFinanceMasteryPage() {
 
                             {/* Right: Features */}
                             <div>
-                                <h2 className="text-5xl md:text-6xl mb-8 leading-tight font-black">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight font-black">
                                     {t('solve_finance_sol_title')}
                                 </h2>
                                 <div className="space-y-8">
@@ -176,9 +176,9 @@ export default function SolutionFinanceMasteryPage() {
                 </section>
 
                 {/* SECTION 4: THE SYNERGY */}
-                <section className="py-32 bg-indigo-50/50 border-t border-indigo-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-indigo-50/50 border-t border-indigo-100">
                     <div className="max-w-6xl mx-auto px-6 text-center">
-                        <h2 className="text-5xl md:text-6xl text-indigo-950 mb-6 font-black">{t('solve_finance_syn_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-indigo-950 mb-6 font-black">{t('solve_finance_syn_title')}</h2>
                         <p className="text-xl text-indigo-800/70 max-w-2xl mx-auto mb-16">{t('solve_finance_syn_desc')}</p>
 
                         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
@@ -198,7 +198,7 @@ export default function SolutionFinanceMasteryPage() {
                 </section>
 
                 {/* SECTION 5: PORTFOLIO REBALANCING */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
                     <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                         <div className="bg-slate-900 rounded-[3rem] p-10 border border-slate-800 shadow-2xl relative">
                             <div className="flex justify-center gap-4">
@@ -210,8 +210,8 @@ export default function SolutionFinanceMasteryPage() {
                             <div className="mt-8 text-center text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('finance_extra_1_label')}</div>
                         </div>
                         <div>
-                            <h2 className="text-5xl md:text-6xl text-gray-900 mb-6 font-black">{t('solve_finance_extra_1_title')}</h2>
-                            <p className="text-xl text-gray-500 leading-relaxed font-medium">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 font-black">{t('solve_finance_extra_1_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed font-medium">
                                 {t('solve_finance_extra_1_desc')}
                             </p>
                         </div>
@@ -219,10 +219,10 @@ export default function SolutionFinanceMasteryPage() {
                 </section>
 
                 {/* SECTION 6: FREEDOM RUNWAY */}
-                <section className="py-32 bg-slate-950 text-white relative text-center">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-950 text-white relative text-center">
                     <div className="max-w-4xl mx-auto px-6">
-                        <h2 className="text-5xl md:text-6xl mb-8 font-black">{t('solve_finance_extra_2_title')}</h2>
-                        <p className="text-xl text-slate-400 leading-relaxed mb-12 italic">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 font-black">{t('solve_finance_extra_2_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-slate-400 leading-relaxed mb-12 italic">
                             {t('solve_finance_extra_2_desc')}
                         </p>
                         <div className="inline-block p-8 bg-white/5 rounded-3xl border border-white/10 ">
@@ -233,7 +233,7 @@ export default function SolutionFinanceMasteryPage() {
                 </section>
 
                 {/* SECTION 7: SCIENTIFIC PILLAR */}
-                <section className="py-32 bg-slate-50 relative overflow-hidden border-y border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden border-y border-gray-100">
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(71,85,105,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(71,85,105,0.03)_1px,transparent_1px)] [background-size:60px_60px] opacity-40"></div>
                     
                     <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -245,7 +245,7 @@ export default function SolutionFinanceMasteryPage() {
                                         🧬 {t('solve_finance_science_badge')}
                                     </div>
 
-                                    <h2 className="text-5xl md:text-7xl text-slate-900 mb-10 leading-[1.1] font-black">
+                                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 mb-10 leading-[1.1] font-black">
                                         {t('solve_finance_science_title')}
                                     </h2>
 
@@ -292,9 +292,9 @@ export default function SolutionFinanceMasteryPage() {
                 </section>
 
                 {/* SECTION 8: FAQ */}
-                <section className="py-32 bg-gray-50 border-b border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-gray-50 border-b border-gray-100">
                     <div className="max-w-4xl mx-auto px-6">
-                        <h2 className="text-5xl md:text-6xl text-center text-gray-900 mb-16 font-black">{t('solve_finance_faq_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center text-gray-900 mb-16 font-black">{t('solve_finance_faq_title')}</h2>
                         <div className="space-y-6">
                             {faqs.map((faq, idx) => (
                                 <div key={idx} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
@@ -317,10 +317,10 @@ export default function SolutionFinanceMasteryPage() {
                 </section>
 
                 {/* SECTION 9: CTA */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden text-center">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden text-center">
                     <div className="max-w-4xl mx-auto relative z-10 px-6">
                         <div className="text-6xl mb-8 animate-bounce font-black select-none">📈</div>
-                        <h2 className="text-6xl md:text-7xl text-gray-900 mb-8 tracking-tight font-black">{t('solve_finance_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 tracking-tight font-black">{t('solve_finance_cta_title')}</h2>
                         <p className="text-gray-500 text-xl md:text-2xl mb-12 font-medium max-w-2xl mx-auto">
                             {t('solve_finance_cta_desc')}
                         </p>

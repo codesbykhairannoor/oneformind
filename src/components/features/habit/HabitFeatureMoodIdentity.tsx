@@ -10,7 +10,7 @@ export default function HabitFeatureMoodIdentity({ t }: HabitFeatureMoodIdentity
     return (
         <>
             {/* SECTION 4: MOOD CORRELATION */}
-            <section className="py-24 bg-white bg-pattern-dots relative overflow-hidden">
+            <section className="py-12 sm:py-16 lg:py-24 bg-white bg-pattern-dots relative overflow-hidden">
                 <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
                     <div className="relative animate-in zoom-in-95 duration-700 text-left">
                         <div className="absolute -inset-4 bg-indigo-50 rounded-[4rem] -z-10"></div>
@@ -42,7 +42,7 @@ export default function HabitFeatureMoodIdentity({ t }: HabitFeatureMoodIdentity
                     </div>
                     <div className="text-left animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
                         <div className="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm font-black">🧠</div>
-                        <h2 className="text-4xl md:text-5xl text-gray-900 mb-8 leading-tight font-black">{t('habit_mood_title')}</h2>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-8 leading-tight font-black">{t('habit_mood_title')}</h2>
                         <p className="text-gray-600 text-xl mb-10 leading-relaxed font-medium">
                             {t('habit_mood_desc')}
                         </p>
@@ -70,7 +70,7 @@ export default function HabitFeatureMoodIdentity({ t }: HabitFeatureMoodIdentity
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-[10px] uppercase tracking-[0.2em] mb-6 lg:mb-8 shadow-sm border border-orange-200">
                                 {t('habit_identity_badge')}
                             </div>
-                            <h2 className="text-3xl md:text-5xl lg:text-6xl text-gray-900 mb-6 lg:mb-8 leading-tight tracking-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 lg:mb-8 leading-tight tracking-tight font-black">
                                 {t('habit_identity_title')}
                             </h2>
                             <p className="text-gray-600 text-lg lg:text-xl leading-relaxed font-medium mb-10 lg:mb-12">

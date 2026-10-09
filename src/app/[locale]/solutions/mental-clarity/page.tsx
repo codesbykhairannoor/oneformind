@@ -46,7 +46,7 @@ export default function SolutionMentalClarityPage() {
                                 </span>
                             </h1>
                             
-                            <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
                                 {t('solve_mental_hero_desc')}
                             </p>
                             
@@ -96,10 +96,10 @@ export default function SolutionMentalClarityPage() {
                 </header>
 
                 {/* SECTION 2: THE PROBLEM */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                     <div className="max-w-4xl mx-auto px-6 text-center">
-                        <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('solve_mental_prob_title')}</h2>
-                        <p className="text-xl text-gray-500 mb-16 leading-relaxed font-medium">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('solve_mental_prob_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-16 leading-relaxed font-medium">
                             {t('solve_mental_prob_desc')}
                         </p>
 
@@ -119,7 +119,7 @@ export default function SolutionMentalClarityPage() {
                 </section>
 
                 {/* SECTION 3: THE SOLUTION */}
-                <section className="py-16 md:py-32 bg-slate-900 text-white relative overflow-hidden">
+                <section className="py-16 md:py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-900 to-slate-900"></div>
                     
                     <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -127,7 +127,7 @@ export default function SolutionMentalClarityPage() {
                             
                             {/* Left Text */}
                             <div className="lg:col-span-5 flex flex-col justify-center order-2 lg:order-1">
-                                <h2 className="text-5xl md:text-6xl mb-6 leading-tight font-black">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight font-black">
                                     {t('solve_mental_sol_title')}
                                 </h2>
                                 <p className="text-indigo-200 text-base md:text-lg leading-relaxed mb-8">
@@ -185,10 +185,10 @@ export default function SolutionMentalClarityPage() {
                 </section>
 
                 {/* SECTION 4: THE TOOLKIT */}
-                <section className="py-32 bg-indigo-50/50">
+                <section className="py-14 sm:py-20 lg:py-28 bg-indigo-50/50">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center max-w-3xl mx-auto mb-16">
-                            <h2 className="text-5xl md:text-6xl mb-6 text-gray-900 font-black">{t('solve_mental_feat_title')}</h2>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-gray-900 font-black">{t('solve_mental_feat_title')}</h2>
                         </div>
                         
                         <div className="grid md:grid-cols-2 gap-8">
@@ -207,7 +207,7 @@ export default function SolutionMentalClarityPage() {
                 </section>
 
                 {/* SECTION 5: COGNITIVE LOAD */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-b border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-b border-gray-100">
                     <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                         <div className="relative order-2 md:order-1">
                             <div className="bg-indigo-50 rounded-[3rem] p-10 border border-indigo-100 shadow-xl overflow-hidden relative">
@@ -223,8 +223,8 @@ export default function SolutionMentalClarityPage() {
                             </div>
                         </div>
                         <div className="order-1 md:order-2">
-                            <h2 className="text-5xl md:text-6xl text-gray-900 mb-6 font-black">{t('solve_mental_extra_1_title')}</h2>
-                            <p className="text-xl text-gray-500 leading-relaxed font-medium">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 font-black">{t('solve_mental_extra_1_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed font-medium">
                                 {t('solve_mental_extra_1_desc')}
                             </p>
                         </div>
@@ -232,9 +232,9 @@ export default function SolutionMentalClarityPage() {
                 </section>
 
                 {/* SECTION 6: JOURNALING LOOPS */}
-                <section className="py-32 bg-slate-900 text-white relative text-center">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white relative text-center">
                     <div className="max-w-4xl mx-auto px-6">
-                        <h2 className="text-5xl md:text-6xl mb-8 font-black">{t('solve_mental_extra_2_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 font-black">{t('solve_mental_extra_2_title')}</h2>
                         <p className="text-xl text-indigo-200 leading-relaxed mb-12 italic">
                             {t('solve_mental_extra_2_desc')}
                         </p>
@@ -247,7 +247,7 @@ export default function SolutionMentalClarityPage() {
                 </section>
 
                 {/* SECTION 7: SCIENTIFIC PILLAR */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-b border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-b border-gray-100">
                     <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none">
                         <svg className="w-full h-full" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M400 400C450 300 550 250 650 300" stroke="currentColor" strokeWidth="2" strokeDasharray="8 8" />
@@ -262,7 +262,7 @@ export default function SolutionMentalClarityPage() {
                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 text-[10px] uppercase tracking-widest mb-6 rounded-full font-bold">
                                 🧬 {t('solve_mental_science_badge')}
                             </div>
-                            <h2 className="text-5xl md:text-7xl text-gray-900 mb-8 max-w-4xl mx-auto leading-tight font-black">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 max-w-4xl mx-auto leading-tight font-black">
                                 {t('solve_mental_science_title')}
                             </h2>
                             <div className="w-24 h-1 bg-indigo-600 mx-auto rounded-full"></div>
@@ -308,9 +308,9 @@ export default function SolutionMentalClarityPage() {
                 </section>
 
                 {/* SECTION 8: FAQ */}
-                <section className="py-32 bg-gray-50 border-y border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-gray-50 border-y border-gray-100">
                     <div className="max-w-4xl mx-auto px-6">
-                        <h2 className="text-5xl md:text-6xl text-center text-gray-900 mb-16 font-black">{t('solve_mental_faq_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center text-gray-900 mb-16 font-black">{t('solve_mental_faq_title')}</h2>
                         <div className="space-y-6">
                             {faqs.map((faq, idx) => (
                                 <div key={idx} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
@@ -333,12 +333,12 @@ export default function SolutionMentalClarityPage() {
                 </section>
 
                 {/* SECTION 9: CTA */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden text-center">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden text-center">
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-purple-100 to-transparent rounded-full blur-3xl opacity-50 -z-10"></div>
                     
                     <div className="max-w-4xl mx-auto text-center relative z-10 px-6">
                         <div className="text-6xl mb-8 animate-pulse duration-3000 font-black select-none">🕊️</div>
-                        <h2 className="text-6xl md:text-7xl mb-8 text-gray-900 tracking-tight font-black">{t('solve_mental_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-gray-900 tracking-tight font-black">{t('solve_mental_cta_title')}</h2>
                         <p className="text-gray-500 text-xl md:text-2xl mb-12 font-medium max-w-2xl mx-auto">
                             {t('solve_mental_cta_desc')}
                         </p>

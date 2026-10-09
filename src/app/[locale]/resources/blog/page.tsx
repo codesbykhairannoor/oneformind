@@ -125,7 +125,7 @@ export default function BlogIndexPage() {
                 </header>
 
                 {/* SECTION 2: BLOG GRID */}
-                <section className="py-24 bg-slate-50/50">
+                <section className="py-12 sm:py-16 lg:py-24 bg-slate-50/50">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                             {remainingPosts.map((post, idx) => (
@@ -180,7 +180,7 @@ export default function BlogIndexPage() {
                 </section>
 
                 {/* SECTION 3: THE NEWSLETTER CTA */}
-                <section className="py-24 px-6 bg-white">
+                <section className="py-12 sm:py-16 lg:py-24 px-6 bg-white">
                     <div className="max-w-6xl mx-auto bg-gradient-to-br from-indigo-50 to-blue-50 rounded-[3rem] p-10 md:p-20 relative overflow-hidden shadow-sm flex flex-col md:flex-row items-center justify-between gap-12 border border-indigo-100">
                         {/* Light Decorative Blobs */}
                         <div className="absolute -right-20 -top-20 w-80 h-80 bg-white rounded-full blur-3xl opacity-60 pointer-events-none" />
@@ -190,7 +190,7 @@ export default function BlogIndexPage() {
                             <div className="inline-block bg-white text-indigo-600 font-bold text-xs px-4 py-2 rounded-full mb-6 uppercase tracking-widest border border-indigo-100 shadow-sm">
                                 💌 {t('blog_news_badge')}
                             </div>
-                            <h2 className="text-3xl md:text-5xl text-slate-900 mb-4 leading-tight font-black">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 leading-tight font-black">
                                 {t('blog_news_title')}
                             </h2>
                             <p className="text-slate-600 text-lg font-medium">

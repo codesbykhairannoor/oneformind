@@ -118,7 +118,7 @@ export default function ManagementToolsScienceFaqCta() {
             {/* CTA */}
             <section className="py-[80px] px-6 bg-white relative overflow-hidden border-t border-gray-100">
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <h2 className="text-5xl md:text-7xl mb-8 text-indigo-950 tracking-tight leading-tight font-black" dangerouslySetInnerHTML={{ __html: t.raw('pm_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-indigo-950 tracking-tight leading-tight font-black" dangerouslySetInnerHTML={{ __html: t.raw('pm_cta_title') }} />
                     <p className="text-indigo-900/60 text-xl md:text-2xl mb-12 font-medium max-w-2xl mx-auto">
                         {t('pm_cta_desc')}
                     </p>

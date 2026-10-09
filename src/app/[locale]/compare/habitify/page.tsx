@@ -49,7 +49,7 @@ export default function HabitifyComparePage() {
                             {t('habitify_hero_title_1')} <br/>
                             <span className="text-indigo-600">{t('habitify_hero_title_2')}</span>
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed bg-white/50 backdrop-blur-sm rounded-xl p-4 inline-block" dangerouslySetInnerHTML={{ __html: t.raw('habitify_hero_desc') }} />
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed bg-white/50 backdrop-blur-sm rounded-xl p-4 inline-block" dangerouslySetInnerHTML={{ __html: t.raw('habitify_hero_desc') }} />
                         
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/register" className="w-full sm:w-auto bg-indigo-600 text-white font-black px-10 py-5 rounded-2xl hover:bg-indigo-700 transition-all shadow-[0_10px_30px_rgba(79,70,229,0.3)] hover:-translate-y-1 text-center">
@@ -96,7 +96,7 @@ export default function HabitifyComparePage() {
                 {/* SECTION 3: THE SOLUTION */}
                 <section className="py-[80px] bg-white">
                     <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-                        <div className="bg-indigo-600 p-12 rounded-[3rem] shadow-2xl text-white relative overflow-hidden">
+                        <div className="bg-indigo-600 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-2xl text-white relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-8 opacity-10 text-9xl font-black">🧬</div>
                             <h3 className="font-black text-3xl mb-8 relative z-10">The Unified Brain</h3>
                             <div className="space-y-4 relative z-10">
@@ -187,7 +187,7 @@ export default function HabitifyComparePage() {
                 <section className="py-[80px] bg-white overflow-hidden">
                     <div className="max-w-6xl mx-auto px-6">
                         <div className="grid lg:grid-cols-2 gap-16 mb-24 items-center">
-                            <div className="bg-indigo-50 p-10 rounded-[3rem] text-center border border-indigo-100">
+                            <div className="bg-indigo-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl text-center border border-indigo-100">
                                 <div className="text-indigo-900 font-black text-6xl mb-4">$40/yr</div>
                                 <div className="text-indigo-700 font-bold mb-8">Just for a checklist.</div>
                                 <div className="flex justify-center text-3xl">💸</div>
@@ -271,7 +271,7 @@ export default function HabitifyComparePage() {
 
                 {/* CTA */}
                 <section className="py-[80px] bg-white text-center px-6">
-                    <h2 className="text-4xl md:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('habitify_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 font-black mb-6" dangerouslySetInnerHTML={{ __html: t.raw('habitify_cta_title') }} />
                     <p className="text-slate-500 text-xl mb-10 max-w-2xl mx-auto">{t('habitify_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-indigo-600 text-white font-black px-12 py-5 rounded-2xl shadow-[0_15px_30px_rgba(79,70,229,0.3)] hover:scale-105 hover:bg-indigo-700 transition-all">
                         {t('habitify_cta_btn')}

@@ -113,7 +113,7 @@ export default function CustomAppsScienceFaqCta() {
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 via-white to-purple-50 opacity-50"></div>
                 
                 <div className="max-w-5xl mx-auto text-center relative z-10">
-                    <h2 className="text-6xl md:text-8xl mb-8 text-gray-900 tracking-tighter font-black" dangerouslySetInnerHTML={{ __html: t.raw('blank_cta_title') }} />
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-gray-900 tracking-tighter font-black" dangerouslySetInnerHTML={{ __html: t.raw('blank_cta_title') }} />
                     <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-12">
                         <Link href="/register" className="group relative px-12 py-6 bg-gray-900 text-white rounded-full font-bold text-xl overflow-hidden shadow-2xl hover:shadow-gray-400/50 transition-all">
                             <div className="absolute inset-0 w-full h-full bg-indigo-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>

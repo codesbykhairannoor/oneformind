@@ -8,7 +8,7 @@ const RELATED_POSTS = [
 
 export default function PostRelatedPosts() {
     return (
-        <section className="bg-slate-50/50 py-24 border-t border-slate-100">
+        <section className="bg-slate-50/50 py-12 sm:py-16 lg:py-24 border-t border-slate-100">
             <div className="max-w-7xl mx-auto px-6">
                 <h3 className="text-2xl font-black text-slate-900 mb-12 uppercase tracking-tighter">
                     Synchronized Intelligence

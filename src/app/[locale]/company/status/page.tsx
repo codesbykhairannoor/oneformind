@@ -57,7 +57,7 @@ export default function StatusPage() {
                         {t('stat_hero_badge')}
                     </div>
                     
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl mb-6 sm:mb-10 text-slate-900 tracking-tight leading-tight font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 sm:mb-10 text-slate-900 tracking-tight leading-tight font-black">
                         {t('stat_hero_title')}
                     </h1>
 
@@ -73,7 +73,7 @@ export default function StatusPage() {
                 </div>
             </header>
 
-            <section className="py-16 md:py-24 bg-white border-b border-slate-100">
+            <section className="py-16 md:py-12 sm:py-16 lg:py-24 bg-white border-b border-slate-100">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-xl md:text-2xl font-black text-slate-900 mb-8 md:mb-12 text-center">{t('stat_metrics_title')}</h2>
                     
@@ -126,7 +126,7 @@ export default function StatusPage() {
                 </div>
             </section>
 
-            <section className="py-16 md:py-24 bg-slate-50">
+            <section className="py-16 md:py-12 sm:py-16 lg:py-24 bg-slate-50">
                 <div className="max-w-4xl mx-auto px-6">
                     <div className="mb-10 md:mb-12 text-center md:text-left">
                         <h2 className="text-2xl md:text-3xl text-slate-900 mb-3 font-black">{t('stat_service_title')}</h2>
@@ -185,7 +185,7 @@ export default function StatusPage() {
                 <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none"></div>
                 
                 <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-                    <h2 className="text-3xl md:text-5xl text-slate-900 mb-6 leading-tight font-black">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-6 leading-tight font-black">
                         {t('stat_cta_title')}
                     </h2>
                     <p className="text-slate-500 text-base md:text-lg mb-10 max-w-xl mx-auto font-medium">

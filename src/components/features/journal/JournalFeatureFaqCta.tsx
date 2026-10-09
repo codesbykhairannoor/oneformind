@@ -29,14 +29,14 @@ export default function JournalFeatureFaqCta({ t }: JournalFeatureFaqCtaProps) {
     return (
         <>
             {/* SECTION 8: CTA BANNER */}
-            <section className="py-32 bg-gray-50 px-6 relative overflow-hidden">
+            <section className="py-14 sm:py-20 lg:py-28 bg-gray-50 px-6 relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-100 rounded-full opacity-50 pointer-events-none"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-200 rounded-full opacity-40 pointer-events-none"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-300 rounded-full opacity-30 pointer-events-none"></div>
 
                 <div className="max-w-3xl mx-auto text-center relative z-10 bg-white/80 p-12 md:p-20 rounded-[3rem] shadow-2xl border border-white">
                     <div className="text-5xl mb-6 font-black select-none">🖋️</div>
-                    <h2 className="text-4xl md:text-5xl mb-6 text-gray-900 tracking-tight font-black">{t('journal_cta_title')}</h2>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 text-gray-900 tracking-tight font-black">{t('journal_cta_title')}</h2>
                     <p className="text-gray-500 text-xl mb-10 font-medium">
                         {t('journal_cta_desc')}
                     </p>

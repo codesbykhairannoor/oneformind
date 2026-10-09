@@ -27,7 +27,7 @@ export default function ContactPage() {
                         <h1 className="text-3xl sm:text-5xl md:text-6xl text-slate-900 dark:text-white tracking-tight mb-4 sm:mb-6 font-black leading-tight">
                             {t('contact_title')}
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
                             {t('contact_subtitle')}
                         </p>
                     </div>
@@ -86,7 +86,7 @@ export default function ContactPage() {
 
                         {/* Contact Form */}
                         <div className="lg:col-span-2">
-                            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-slate-200/50 dark:shadow-none animate-in fade-in slide-in-from-right-6 duration-700">
+                            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 md:p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none animate-in fade-in slide-in-from-right-6 duration-700">
                                 {submitted ? (
                                     <div className="text-center py-12 space-y-4">
                                         <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto">

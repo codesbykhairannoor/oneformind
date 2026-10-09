@@ -27,7 +27,7 @@ export default function LandingSynergy() {
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-4 sm:mb-5 tracking-wider uppercase border border-indigo-200">
                             {t('flow_badge')}
                         </div>
-                        <h2 className="text-3xl sm:text-4xl md:text-5xl text-slate-900 mb-4 sm:mb-6 leading-tight font-black tracking-tight">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 sm:mb-6 leading-tight font-black tracking-tight">
                             {t('home_flow_title')}
                         </h2>
                         <p className="text-slate-600 text-base sm:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
@@ -60,7 +60,7 @@ export default function LandingSynergy() {
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs mb-4 sm:mb-6 uppercase tracking-wider border border-indigo-100">
                                 🔗 {t('home_synergy_badge')}
                             </div>
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl text-slate-900 mb-4 sm:mb-6 leading-tight font-black tracking-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 sm:mb-6 leading-tight font-black tracking-tight">
                                 {t('home_synergy_title')}
                             </h2>
                             <p className="text-slate-600 text-base sm:text-lg font-normal leading-relaxed mb-6 sm:mb-8">

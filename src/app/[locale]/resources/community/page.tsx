@@ -70,7 +70,7 @@ export default function CommunityPage() {
                 </header>
 
                 {/* SECTION 2: THE HUB (Discord / TG) */}
-                <section className="py-24 bg-slate-50 border-y border-slate-100">
+                <section className="py-12 sm:py-16 lg:py-24 bg-slate-50 border-y border-slate-100">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="grid md:grid-cols-2 gap-10">
                             
@@ -81,7 +81,7 @@ export default function CommunityPage() {
                                     <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center mb-10 border border-white/20 group-hover:rotate-12 transition">
                                         <span className="text-4xl font-black">💬</span>
                                     </div>
-                                    <h2 className="text-5xl mb-6 tracking-tight font-black">{t('comm_discord_title')}</h2>
+                                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 tracking-tight font-black">{t('comm_discord_title')}</h2>
                                     <p className="text-indigo-100 text-xl mb-12 leading-relaxed opacity-80">{t('comm_discord_desc')}</p>
                                     <a href="#" className="inline-flex items-center gap-4 bg-white text-indigo-600 px-12 py-6 rounded-[2rem] font-black text-xl hover:shadow-2xl transition transform active:scale-95 shadow-lg shadow-indigo-900/20">
                                         {t('comm_btn_discord')} <ArrowRight size={20} />
@@ -95,7 +95,7 @@ export default function CommunityPage() {
                                     <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-10 border border-blue-100 group-hover:-rotate-12 transition">
                                         <span className="text-4xl font-black">✈️</span>
                                     </div>
-                                    <h2 className="text-5xl text-slate-900 mb-6 tracking-tight font-black">{t('comm_tg_title')}</h2>
+                                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-6 tracking-tight font-black">{t('comm_tg_title')}</h2>
                                     <p className="text-slate-500 text-xl mb-12 leading-relaxed opacity-70">{t('comm_tg_desc')}</p>
                                     <a href="#" className="inline-flex items-center gap-4 bg-slate-900 text-white px-12 py-6 rounded-[2rem] font-black text-xl hover:bg-slate-800 transition transform active:scale-95 shadow-xl shadow-slate-200">
                                         {t('comm_btn_tg')} <ArrowRight size={20} />
@@ -108,13 +108,13 @@ export default function CommunityPage() {
                 </section>
 
                 {/* SECTION 3: GUIDELINES & EVENTS */}
-                <section className="py-32 bg-white">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white">
                     <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-32">
                         
                         {/* GUIDELINES */}
                         <div className="space-y-12">
                             <div className="space-y-4">
-                                <h2 className="text-5xl text-slate-900 mb-6 tracking-tight font-black">{t('comm_guidelines_title')}</h2>
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-6 tracking-tight font-black">{t('comm_guidelines_title')}</h2>
                                 <div className="w-24 h-2 bg-indigo-600 rounded-full" />
                             </div>
                             <div className="space-y-8">
@@ -135,12 +135,12 @@ export default function CommunityPage() {
                         {/* EVENTS */}
                         <div className="space-y-12">
                             <div className="space-y-4">
-                                <h2 className="text-5xl text-slate-900 mb-6 tracking-tight font-black">{t('comm_events_title')}</h2>
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-6 tracking-tight font-black">{t('comm_events_title')}</h2>
                                 <div className="w-24 h-2 bg-slate-900 rounded-full" />
                             </div>
                             <div className="space-y-6">
                                 {[1, 2].map((e) => (
-                                    <div key={e} className="p-10 rounded-[3rem] border-2 border-slate-50 bg-white hover:border-indigo-100 hover:shadow-2xl hover:shadow-indigo-50 transition-all duration-500 group space-y-6">
+                                    <div key={e} className="p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border-2 border-slate-50 bg-white hover:border-indigo-100 hover:shadow-2xl hover:shadow-indigo-50 transition-all duration-500 group space-y-6">
                                         <div className="flex items-center justify-between mb-8">
                                             <span className="px-5 py-2 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest border border-indigo-100">{t('comm_event_badge')}</span>
                                             <span className="text-sm font-bold text-slate-300">{t('comm_event_date')}</span>
@@ -178,10 +178,10 @@ export default function CommunityPage() {
                 </section>
 
                 {/* SECTION: MENTORS */}
-                <section className="py-24 bg-white border-b border-slate-100">
+                <section className="py-12 sm:py-16 lg:py-24 bg-white border-b border-slate-100">
                     <div className="max-w-7xl mx-auto px-6">
-                        <h2 className="text-4xl text-slate-900 mb-4 font-black">{t('com_mentors_title')}</h2>
-                        <p className="text-xl text-slate-500 mb-16">{t('com_mentors_desc')}</p>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 font-black">{t('com_mentors_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-16">{t('com_mentors_desc')}</p>
                         <div className="grid md:grid-cols-3 gap-8">
                             <div className="p-8 border border-slate-100 rounded-[2rem] shadow-lg hover:-translate-y-2 transition-transform bg-slate-50 space-y-4">
                                 <div className="w-20 h-20 rounded-full bg-indigo-100 mb-6 flex items-center justify-center text-2xl">🧠</div>
@@ -200,10 +200,10 @@ export default function CommunityPage() {
                 </section>
 
                 {/* SECTION: GLOBAL NETWORK */}
-                <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
+                <section className="py-12 sm:py-16 lg:py-24 bg-slate-900 text-white relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
-                        <h2 className="text-5xl mb-6 z-10 text-center font-black">{t('com_global_title')}</h2>
-                        <p className="text-xl text-slate-400 mb-16 z-10 text-center">{t('com_global_desc')}</p>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 z-10 text-center font-black">{t('com_global_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-16 z-10 text-center">{t('com_global_desc')}</p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 w-full text-center z-10">
                             <div>
                                 <h4 className="text-7xl text-indigo-400 mb-2 font-black">10k+</h4>
@@ -222,17 +222,17 @@ export default function CommunityPage() {
                 </section>
 
                 {/* SECTION: VALUE */}
-                <section className="py-24 bg-slate-50">
+                <section className="py-12 sm:py-16 lg:py-24 bg-slate-50">
                     <div className="max-w-5xl mx-auto px-6 text-center">
-                        <h2 className="text-4xl text-slate-900 mb-6 font-black">{t('com_value_title')}</h2>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-6 font-black">{t('com_value_title')}</h2>
                         <p className="text-2xl text-slate-500 font-medium italic">"{t('com_value_desc')}"</p>
                     </div>
                 </section>
 
                 {/* SECTION 4: FINAL SOCIAL PROOF */}
-                <section className="py-32 bg-slate-50 border-t border-slate-200">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 border-t border-slate-200">
                     <div className="max-w-4xl mx-auto text-center px-6">
-                        <h2 className="text-4xl text-slate-900 mb-12 tracking-tight font-black">{t('comm_cta_title')}</h2>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-12 tracking-tight font-black">{t('comm_cta_title')}</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 opacity-30 grayscale hover:grayscale-0 transition-all duration-1000">
                             <span className="text-2xl font-black italic tracking-tighter">Mindful.</span>
                             <span className="text-2xl font-black italic tracking-tighter">Productive.</span>

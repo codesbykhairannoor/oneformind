@@ -62,7 +62,7 @@ export default function ChangelogPage() {
                             </span>
                         </h1>
                         
-                        <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed font-medium max-w-3xl mx-auto">
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed font-medium max-w-3xl mx-auto">
                             {t('cl_hero_desc')}
                         </p>
                         
@@ -131,13 +131,13 @@ export default function ChangelogPage() {
                 </section>
 
                 {/* SECTION 3: EVOLUTION TIMELINE */}
-                <section id="timeline" className="py-32 bg-slate-50 relative">
+                <section id="timeline" className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative">
                     <div className="max-w-6xl mx-auto px-6 space-y-24">
                         <div className="text-center space-y-4">
                             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900 }} className="text-gray-900 font-black">
                                 {t('cl_timeline_title')}
                             </h2>
-                            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto">
                                 {t('cl_timeline_desc')}
                             </p>
                         </div>
@@ -170,7 +170,7 @@ export default function ChangelogPage() {
                                                     </div>
                                                     {/* Right Content */}
                                                     <div className="pl-20 md:pl-16 md:w-1/2 w-full">
-                                                        <div className="p-10 rounded-[2.5rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2">
+                                                        <div className="p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2">
                                                             <span className={`md:hidden block text-xs font-black ${textColor} mb-4 uppercase tracking-widest`}>
                                                                 {t(`cl_item_${vMatch}_date`)}
                                                             </span>
@@ -196,7 +196,7 @@ export default function ChangelogPage() {
                                                 <>
                                                     {/* Left Content (Reverse) */}
                                                     <div className="pl-20 md:pl-0 md:pr-16 md:w-1/2 w-full order-2 md:order-1 text-left md:text-right">
-                                                        <div className="p-10 rounded-[2.5rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2">
+                                                        <div className="p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2">
                                                             <span className={`md:hidden block text-xs font-black ${textColor} mb-4 uppercase tracking-widest`}>
                                                                 {t(`cl_item_${vMatch}_date`)}
                                                             </span>
@@ -234,13 +234,13 @@ export default function ChangelogPage() {
                 </section>
 
                 {/* SECTION 4: THE ROADMAP (KANBAN) */}
-                <section className="py-32 bg-white">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white">
                     <div className="max-w-7xl mx-auto px-6 space-y-16">
                         <div className="text-center space-y-4">
                             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900 }} className="text-gray-900 font-black">
                                 {t('cl_roadmap_title')}
                             </h2>
-                            <p className="text-xl text-gray-500">{t('cl_roadmap_desc')}</p>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500">{t('cl_roadmap_desc')}</p>
                         </div>
 
                         <div className="grid md:grid-cols-3 gap-8">
@@ -281,14 +281,14 @@ export default function ChangelogPage() {
                 </section>
 
                 {/* SECTION 5: DARK ROADMAP */}
-                <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
+                <section className="py-12 sm:py-16 lg:py-24 bg-slate-900 text-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-30" />
                     <div className="max-w-7xl mx-auto px-6 relative z-10 space-y-12">
                         <div className="space-y-4">
                             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900 }} className="font-black">
                                 {t('chg_roadmap_title')}
                             </h2>
-                            <p className="text-xl text-slate-400">{t('chg_roadmap_desc')}</p>
+                            <p className="text-base sm:text-lg md:text-xl text-slate-400">{t('chg_roadmap_desc')}</p>
                         </div>
                         <div className="flex flex-col md:flex-row gap-8">
                             <div className="flex-1 p-8 rounded-3xl bg-slate-800 border-l-4 border-indigo-500 shadow-xl space-y-2">
@@ -308,13 +308,13 @@ export default function ChangelogPage() {
                 </section>
 
                 {/* SECTION 6: USER FEEDBACK */}
-                <section className="py-24 bg-white">
+                <section className="py-12 sm:py-16 lg:py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6 space-y-12">
                         <div className="text-center space-y-4">
                             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900 }} className="text-slate-900 font-black">
                                 {t('chg_feedback_title')}
                             </h2>
-                            <p className="text-xl text-slate-500">{t('chg_feedback_desc')}</p>
+                            <p className="text-base sm:text-lg md:text-xl text-slate-500">{t('chg_feedback_desc')}</p>
                         </div>
                         <div className="columns-1 md:columns-2 gap-8 space-y-8">
                             <div className="break-inside-avoid p-10 bg-indigo-50 rounded-3xl space-y-4">
@@ -334,7 +334,7 @@ export default function ChangelogPage() {
                 </section>
 
                 {/* SECTION 7: BETA ACCESS */}
-                <section className="py-32 bg-indigo-600 text-white text-center">
+                <section className="py-14 sm:py-20 lg:py-28 bg-indigo-600 text-white text-center">
                     <div className="max-w-4xl mx-auto px-6 space-y-8">
                         <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 900 }} className="font-black">
                             {t('chg_beta_title')}
@@ -349,7 +349,7 @@ export default function ChangelogPage() {
                 </section>
 
                 {/* SECTION 8: FEATURE REQUEST CTA */}
-                <section className="py-32 px-6 bg-slate-50 relative overflow-hidden border-t border-gray-200">
+                <section className="py-14 sm:py-20 lg:py-28 px-6 bg-slate-50 relative overflow-hidden border-t border-gray-200">
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-indigo-100/50 to-transparent rounded-t-full -z-10" />
                     
                     <div className="max-w-6xl mx-auto bg-white rounded-[4rem] p-16 md:p-24 text-center relative overflow-hidden shadow-2xl border border-gray-100 space-y-8">
@@ -363,7 +363,7 @@ export default function ChangelogPage() {
                             <h2 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', fontWeight: 900 }} className="text-gray-900 font-black">
                                 {t('cl_cta_title')}
                             </h2>
-                            <p className="text-xl text-gray-500 max-w-2xl mx-auto font-medium">
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto font-medium">
                                 {t('cl_cta_desc')}
                             </p>
                             <a href="mailto:hello@tranvas.com" className="inline-flex items-center justify-center gap-3 bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-indigo-700 shadow-[0_15px_30px_rgba(79,70,229,0.3)] transition transform hover:-translate-y-1">

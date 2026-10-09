@@ -24,7 +24,7 @@ export default function FreelancerHero() {
                         </span>
                     </h1>
                     
-                    <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
+                    <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed font-medium max-w-2xl">
                         {t('freelance_hero_desc')}
                     </p>
                     

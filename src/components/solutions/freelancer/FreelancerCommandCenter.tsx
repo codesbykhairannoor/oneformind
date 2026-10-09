@@ -8,7 +8,7 @@ export default function FreelancerCommandCenter() {
     return (
         <>
             {/* SECTION 3: COMMAND CENTER (DARK MODE HIGHLIGHT) */}
-            <section className="py-24 bg-slate-950 border-y border-slate-900 relative overflow-hidden">
+            <section className="py-12 sm:py-16 lg:py-24 bg-slate-950 border-y border-slate-900 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
                 <div className="absolute -right-40 -top-40 w-[600px] h-[600px] bg-indigo-600 rounded-full blur-3xl opacity-20"></div>
 
@@ -40,7 +40,7 @@ export default function FreelancerCommandCenter() {
                     
                     <div className="order-1 lg:order-2 animate-in fade-in slide-in-from-right-12 duration-700">
                         <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 rounded-2xl text-2xl mb-6 shadow-[0_0_15px_rgba(99,102,241,0.2)] font-black select-none">🛠️</div>
-                        <h2 className="text-5xl md:text-6xl mb-6 text-white font-black">{t('freelance_feat_1_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-white font-black">{t('freelance_feat_1_title')}</h2>
                         <p className="text-slate-400 text-lg leading-relaxed mb-8">
                             {t('freelance_feat_1_desc')}
                         </p>
@@ -53,11 +53,11 @@ export default function FreelancerCommandCenter() {
             </section>
 
             {/* SECTION 4: INVOICE & MONEY */}
-            <section className="py-24 bg-gray-50 border-b border-gray-100">
+            <section className="py-12 sm:py-16 lg:py-24 bg-gray-50 border-b border-gray-100">
                 <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
                     <div>
                         <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl text-2xl mb-6 font-black select-none">💰</div>
-                        <h2 className="text-4xl md:text-5xl mb-6 text-gray-900 font-black">The Ultimate Financial Dashboard for Freelancers</h2>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 text-gray-900 font-black">The Ultimate Financial Dashboard for Freelancers</h2>
                         <p className="text-gray-500 text-lg leading-relaxed mb-8 font-medium">
                             Stop paying $30/month for complex accounting software like QuickBooks, and stop wasting 10 hours building formulas in Excel. Get a real-time financial dashboard designed specifically for solopreneurs.
                         </p>

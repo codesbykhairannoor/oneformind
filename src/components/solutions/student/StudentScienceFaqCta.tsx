@@ -24,7 +24,7 @@ export default function StudentScienceFaqCta() {
     return (
         <>
             {/* SECTION 8: SCIENTIFIC PILLAR */}
-            <section className="py-32 bg-slate-50 relative overflow-hidden border-t border-gray-100">
+            <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden border-t border-gray-100">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(79,70,229,0.05)_2px,transparent_2px),linear-gradient(90deg,rgba(79,70,229,0.05)_2px,transparent_2px)] [background-size:100px_100px] opacity-30"></div>
                 
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -43,7 +43,7 @@ export default function StudentScienceFaqCta() {
                                     🧬 {t('student_science_badge')}
                                 </div>
                                 
-                                <h2 className="text-5xl leading-[1.1] md:text-6xl text-gray-900 mb-8 tracking-tight font-black animate-[fadeIn_0.5s]">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.1] text-gray-900 mb-8 tracking-tight font-black animate-[fadeIn_0.5s]">
                                     {t('student_science_title')}
                                 </h2>
                                 
@@ -85,9 +85,9 @@ export default function StudentScienceFaqCta() {
             </section>
 
             {/* SECTION 9: FAQ */}
-            <section className="py-32 bg-white border-t border-gray-100">
+            <section className="py-14 sm:py-20 lg:py-28 bg-white border-t border-gray-100">
                 <div className="max-w-4xl mx-auto px-6">
-                    <h2 className="text-5xl md:text-6xl text-center text-gray-900 mb-16 font-black">{t('student_faq_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center text-gray-900 mb-16 font-black">{t('student_faq_title')}</h2>
                     <div className="space-y-6">
                         {faqs.map((faq, idx) => (
                             <div key={idx} className="bg-gray-50 p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition">
@@ -100,12 +100,12 @@ export default function StudentScienceFaqCta() {
             </section>
 
             {/* SECTION 10: STUDENT CTA */}
-            <section className="py-24 px-6 relative overflow-hidden text-center">
+            <section className="py-12 sm:py-16 lg:py-24 px-6 relative overflow-hidden text-center">
                 <div className="absolute inset-0 bg-indigo-600 -z-20"></div>
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-40 -z-10 "></div>
 
                 <div className="max-w-4xl mx-auto text-center relative z-10 space-y-8">
-                    <h2 className="text-6xl md:text-6xl mb-8 text-white tracking-tight font-black leading-tight">{t('student_cta_title')}</h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 text-white tracking-tight font-black leading-tight">{t('student_cta_title')}</h2>
                     <p className="text-indigo-100 text-xl md:text-2xl mb-12 font-medium leading-relaxed max-w-2xl mx-auto">
                         {t('student_cta_desc')}
                     </p>

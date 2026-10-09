@@ -71,7 +71,7 @@ export default function GuidePage() {
                                 </span>
                             </h1>
 
-                            <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto font-medium">
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto font-medium">
                                 {t('guide_hero_desc')}
                             </p>
 
@@ -105,7 +105,7 @@ export default function GuidePage() {
                     </header>
 
                     {/* SECTION 2: MODULES GRID */}
-                    <section className="py-24 bg-gray-50/50">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-gray-50/50">
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="text-center mb-16">
                                 <h2 className="text-xs font-black text-indigo-400 mb-4 uppercase tracking-[0.3em]">{t('guide_modules_badge')}</h2>
@@ -130,7 +130,7 @@ export default function GuidePage() {
                     </section>
 
                     {/* SECTION 3: PATHWAY / GETTING STARTED */}
-                    <section className="py-24 bg-white border-y border-gray-100">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-white border-y border-gray-100">
                         <div className="max-w-4xl mx-auto px-6">
                             <div className="text-center mb-20 space-y-6">
                                 <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-gray-900 font-black">{t('guide_start_title')}</h2>
@@ -154,7 +154,7 @@ export default function GuidePage() {
                     </section>
 
                     {/* SECTION 4: ARTICLES */}
-                    <section className="py-24 bg-gray-50/50">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-gray-50/50">
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-16">
                                 <div className="text-center md:text-left space-y-2">
@@ -190,16 +190,16 @@ export default function GuidePage() {
                     </section>
 
                     {/* SECTION 5: PLAYBOOKS */}
-                    <section className="py-32 bg-white">
+                    <section className="py-14 sm:py-20 lg:py-28 bg-white">
                         <div className="max-w-7xl mx-auto px-6 space-y-6">
                             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-slate-900 font-black">{t('gui_playbooks_title')}</h2>
                             <p style={{ fontSize: '1.15rem', lineHeight: 1.8, color: 'var(--text-muted)' }} className="font-medium">{t('gui_playbooks_desc')}</p>
                             <div className="flex gap-8 overflow-x-auto pb-8 snap-x">
-                                <div className="min-w-[300px] md:min-w-[400px] bg-slate-900 text-white p-12 rounded-[3rem] snap-start hover:scale-[1.02] transition-transform space-y-6">
+                                <div className="min-w-[300px] md:min-w-[400px] bg-slate-900 text-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl snap-start hover:scale-[1.02] transition-transform space-y-6">
                                     <div className="w-16 h-16 bg-white/20 rounded-2xl mb-8" />
                                     <h3 className="text-3xl font-black">{t('gui_pb1')}</h3>
                                 </div>
-                                <div className="min-w-[300px] md:min-w-[400px] bg-indigo-600 text-white p-12 rounded-[3rem] snap-start hover:scale-[1.02] transition-transform space-y-6">
+                                <div className="min-w-[300px] md:min-w-[400px] bg-indigo-600 text-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl snap-start hover:scale-[1.02] transition-transform space-y-6">
                                     <div className="w-16 h-16 bg-white/20 rounded-2xl mb-8" />
                                     <h3 className="text-3xl font-black">{t('gui_pb2')}</h3>
                                 </div>
@@ -208,7 +208,7 @@ export default function GuidePage() {
                     </section>
 
                     {/* SECTION 6: VIDEO MASTERCLASSES */}
-                    <section className="py-24 bg-slate-50 border-t border-slate-100">
+                    <section className="py-12 sm:py-16 lg:py-24 bg-slate-50 border-t border-slate-100">
                         <div className="max-w-7xl mx-auto px-6 space-y-6">
                             <div className="text-center space-y-6">
                                 <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="text-slate-900 font-black">{t('gui_video_title')}</h2>
@@ -223,7 +223,7 @@ export default function GuidePage() {
                     </section>
 
                     {/* SECTION 7: CERTIFICATION */}
-                    <section className="py-32 bg-white">
+                    <section className="py-14 sm:py-20 lg:py-28 bg-white">
                         <div className="max-w-5xl mx-auto px-6 text-center space-y-16">
                             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800, lineHeight: 1.2 }} className="font-black">{t('gui_cert_title')}</h2>
                             <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-xl font-bold">
@@ -237,7 +237,7 @@ export default function GuidePage() {
                     </section>
 
                     {/* SECTION 8: SUPPORT HUB */}
-                    <section className="py-24 px-6 bg-white">
+                    <section className="py-12 sm:py-16 lg:py-24 px-6 bg-white">
                         <div className="max-w-6xl mx-auto bg-slate-900 rounded-[4rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl text-white">
                             <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-3xl opacity-20 -mr-20 -mt-20" />
 

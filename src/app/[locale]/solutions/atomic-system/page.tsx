@@ -57,7 +57,7 @@ export default function SolutionAtomicSystemPage() {
                         </h1>
                         
                         {/* Description */}
-                        <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
+                        <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 leading-relaxed font-medium max-w-3xl mx-auto">
                             {t('atomic_hero_desc')}
                         </p>
                         
@@ -111,20 +111,20 @@ export default function SolutionAtomicSystemPage() {
                 </header>
 
                 {/* SECTION 2: THE PROBLEM */}
-                <section className="py-32 bg-white relative">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white relative">
                     <div className="max-w-6xl mx-auto px-6">
                         <div className="text-center mb-20">
-                            <h2 className="text-4xl md:text-5xl mb-6 text-gray-900 font-black">{t('atomic_prob_title')}</h2>
-                            <p className="text-xl text-gray-500 max-w-2xl mx-auto font-medium">{t('atomic_prob_desc')}</p>
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 text-gray-900 font-black">{t('atomic_prob_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto font-medium">{t('atomic_prob_desc')}</p>
                         </div>
                         
                         <div className="grid md:grid-cols-2 gap-12 text-left">
-                            <div className="bg-rose-50/50 p-12 rounded-[3rem] border border-rose-100 hover:shadow-xl transition-shadow duration-300">
+                            <div className="bg-rose-50/50 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-rose-100 hover:shadow-xl transition-shadow duration-300">
                                 <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm text-4xl mb-6 font-black select-none">📉</div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('atomic_prob_1_title')}</h3>
                                 <p className="text-gray-600 leading-relaxed text-lg font-medium">{t('atomic_prob_1_desc')}</p>
                             </div>
-                            <div className="bg-gray-50 p-12 rounded-[3rem] border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <div className="bg-gray-50 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-gray-200 hover:shadow-xl transition-shadow duration-300">
                                 <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm text-4xl mb-6 font-black select-none">🔁</div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('atomic_prob_2_title')}</h3>
                                 <p className="text-gray-600 leading-relaxed text-lg font-medium">{t('atomic_prob_2_desc')}</p>
@@ -134,7 +134,7 @@ export default function SolutionAtomicSystemPage() {
                 </section>
 
                 {/* SECTION 3: HABIT HEATMAPS */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
                     <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                         <div className="relative">
                             <div className="bg-indigo-50 rounded-[3rem] p-8 md:p-12 border border-indigo-100 shadow-xl">
@@ -159,8 +159,8 @@ export default function SolutionAtomicSystemPage() {
                             </div>
                         </div>
                         <div className="text-left space-y-6">
-                            <h2 className="text-4xl text-gray-900 font-black">{t('atomic_extra_1_title')}</h2>
-                            <p className="text-xl text-gray-500 leading-relaxed font-medium">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-900 font-black">{t('atomic_extra_1_title')}</h2>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-500 leading-relaxed font-medium">
                                 {t('atomic_extra_1_desc')}
                             </p>
                         </div>
@@ -168,11 +168,11 @@ export default function SolutionAtomicSystemPage() {
                 </section>
 
                 {/* SECTION 4: COMPOUNDING FACTORY */}
-                <section className="py-32 bg-slate-900 text-white overflow-hidden relative">
+                <section className="py-14 sm:py-20 lg:py-28 bg-slate-900 text-white overflow-hidden relative">
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
                     <div className="max-w-5xl mx-auto px-6 relative z-10">
                         <div className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-[3rem] p-12 md:p-20 border border-white/10 text-center">
-                            <h2 className="text-4xl mb-8 font-black">{t('atomic_extra_2_title')}</h2>
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-8 font-black">{t('atomic_extra_2_title')}</h2>
                             <p className="text-xl text-indigo-200 leading-relaxed mb-12 max-w-3xl mx-auto font-medium">
                                 {t('atomic_extra_2_desc')}
                             </p>
@@ -189,7 +189,7 @@ export default function SolutionAtomicSystemPage() {
                 </section>
 
                 {/* SECTION 5: SCIENTIFIC PILLAR */}
-                <section className="py-32 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
+                <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden border-t border-gray-100">
                     {/* Floating Atoms Decoration */}
                     <div className="absolute top-20 left-10 w-4 h-4 bg-indigo-200 rounded-full animate-bounce"></div>
                     <div className="absolute bottom-20 right-10 w-6 h-6 bg-purple-200 rounded-full animate-bounce delay-700"></div>
@@ -206,7 +206,7 @@ export default function SolutionAtomicSystemPage() {
                                         🧬 {t('atomic_science_badge')}
                                     </div>
 
-                                    <h2 className="text-4xl md:text-6xl text-white mb-10 leading-tight font-black">
+                                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-10 leading-tight font-black">
                                         {t('atomic_science_title')}
                                     </h2>
 
@@ -283,12 +283,12 @@ export default function SolutionAtomicSystemPage() {
                 </section>
 
                 {/* SECTION 7: CTA */}
-                <section className="py-40 bg-white text-center px-6 relative overflow-hidden">
+                <section className="py-16 sm:py-24 lg:py-32 bg-white text-center px-6 relative overflow-hidden">
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-indigo-50 to-white rounded-t-full -z-10"></div>
                     
                     <div className="max-w-4xl mx-auto space-y-8">
-                        <h2 className="text-[42px] leading-[1.1] md:text-7xl text-gray-900 mb-8 tracking-tight font-black">{t('atomic_cta_title')}</h2>
-                        <p className="text-xl text-gray-500 mb-12 max-w-2xl mx-auto font-medium">{t('atomic_cta_desc')}</p>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[42px] leading-[1.1] text-gray-900 mb-8 tracking-tight font-black">{t('atomic_cta_title')}</h2>
+                        <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-12 max-w-2xl mx-auto font-medium">{t('atomic_cta_desc')}</p>
                         <Link href="/register" className="inline-block bg-indigo-950 text-white px-12 py-5 rounded-full text-xl font-bold hover:bg-indigo-800 shadow-2xl transition transform hover:-translate-y-1">
                             {t('atomic_cta_btn')}
                         </Link>

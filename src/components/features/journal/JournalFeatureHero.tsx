@@ -18,14 +18,14 @@ export default function JournalFeatureHero({ t }: JournalFeatureHeroProps) {
                         <span className="text-lg">📔</span> {t('journal_hero_badge')}
                     </div>
                     
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 leading-tight text-gray-900 tracking-tight font-black">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-gray-900 tracking-tight font-black">
                         {t('journal_hero_title_1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                             {t('journal_hero_title_2')}
                         </span>
                     </h1>
                     
-                    <p className="text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto font-medium">
+                    <p className="text-lg md:text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto font-medium">
                         {t('journal_hero_desc')}
                     </p>
                     

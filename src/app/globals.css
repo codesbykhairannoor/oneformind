@@ -63,6 +63,16 @@ body {
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Global SaaS Marketing Responsive Design Tokens */
+  .mkt-h1 { @apply text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1]; }
+  .mkt-h2 { @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.18]; }
+  .mkt-h2-lg { @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]; }
+  .mkt-h3 { @apply text-lg sm:text-xl md:text-2xl font-bold tracking-tight leading-snug; }
+  .mkt-lead { @apply text-base sm:text-lg md:text-xl font-medium leading-relaxed; }
+  .mkt-section { @apply py-14 sm:py-20 lg:py-28 px-4 sm:px-6; }
+  .mkt-section-hero { @apply pt-28 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 px-4 sm:px-6; }
+  .mkt-card { @apply p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl; }
 }
 
 @keyframes float {

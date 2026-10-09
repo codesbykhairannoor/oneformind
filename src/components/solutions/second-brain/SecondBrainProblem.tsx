@@ -6,11 +6,11 @@ export default function SecondBrainProblem() {
     const t = useTranslations();
 
     return (
-        <section className="py-32 bg-slate-50 relative overflow-hidden">
+        <section className="py-14 sm:py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
             <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                 <div className="relative z-10">
-                    <h2 className="text-5xl md:text-6xl mb-6 text-slate-900 leading-tight font-black">{t('brain_prob_title')}</h2>
-                    <p className="text-xl text-slate-500 leading-relaxed mb-10 font-medium">{t('brain_prob_desc')}</p>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-slate-900 leading-tight font-black">{t('brain_prob_title')}</h2>
+                    <p className="text-base sm:text-lg md:text-xl text-slate-500 leading-relaxed mb-10 font-medium">{t('brain_prob_desc')}</p>
                     
                     <div className="space-y-6">
                         <div className="flex items-start gap-4">

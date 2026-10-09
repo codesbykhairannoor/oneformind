@@ -44,7 +44,7 @@ export default function PlannerAppsComparePage() {
                                 Stop listing tasks. <br/>
                                 <span className="text-indigo-600">Start executing flow.</span>
                             </h1>
-                            <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-xl leading-relaxed">
+                            <p className="text-base sm:text-lg md:text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-xl leading-relaxed">
                                 Standard to-do and planner apps create guilt-inducing lists that disconnect from your reality. Tranvas transforms planning into a living, unified operating system.
                             </p>
                             <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -233,7 +233,7 @@ export default function PlannerAppsComparePage() {
                 {/* CTA */}
                 <section className="py-[80px] px-6 bg-white text-center border-t border-slate-100">
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-8 tracking-tight">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-8 tracking-tight">
                             Build Your Ideal Day with Tranvas
                         </h2>
                         <Link href="/register" className="inline-block bg-indigo-600 text-white px-12 py-5 rounded-full text-xl hover:bg-indigo-700 transition transform hover:-translate-y-1 shadow-[0_20px_40px_rgba(99,102,241,0.3)] font-bold">

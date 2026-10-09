@@ -36,7 +36,7 @@ export default function PlannerFeatureFaqCta({ t }: PlannerFeatureFaqCtaProps) {
                     <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-50"></div>
                     
                     <div className="relative z-10 text-white">
-                        <h2 className="text-4xl md:text-6xl mb-8 tracking-tight font-black">{t('planner_cta_title')}</h2>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-8 tracking-tight font-black">{t('planner_cta_title')}</h2>
                         <p className="text-indigo-100 text-xl md:text-2xl mb-12 max-w-3xl mx-auto">
                             {t('planner_cta_desc')}
                         </p>
