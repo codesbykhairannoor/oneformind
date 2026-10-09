@@ -93,10 +93,10 @@ export default function LandingHero() {
     };
 
     return (
-        <header className="relative pt-28 pb-32 lg:pt-36 lg:pb-48 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50">
-            {/* Ambient High-End Radial Lighting & Grid Mesh */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] h-[750px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(99,102,241,0.16),rgba(255,255,255,0))] pointer-events-none -z-10" />
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-emerald-500/5 blur-3xl pointer-events-none -z-10 rounded-full animate-pulse-glow" />
+        <header className="relative pt-20 pb-20 sm:pt-28 sm:pb-32 lg:pt-36 lg:pb-48 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50">
+            {/* Ambient High-End Radial Lighting & Grid Mesh (contained) */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] max-w-[100vw] h-[750px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(99,102,241,0.16),rgba(255,255,255,0))] pointer-events-none -z-10 overflow-hidden" />
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] max-w-[100vw] h-[400px] bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-emerald-500/5 blur-3xl pointer-events-none -z-10 rounded-full animate-pulse-glow overflow-hidden" />
             
             {/* Hardware Accelerated Background Grid */}
             <div 
@@ -106,16 +106,16 @@ export default function LandingHero() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-center">
                 
                 {/* 1. Micro-Badge Announcement Pill */}
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200/80 bg-indigo-50/80 text-indigo-700 font-bold text-xs mb-8 tracking-wide shadow-sm hover:bg-indigo-100/70 hover:scale-[1.02] transition-all cursor-default">
-                    <span className="relative flex h-2 w-2">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-200/80 bg-indigo-50/80 text-indigo-700 font-bold text-xs sm:text-sm mb-6 sm:mb-8 tracking-wide shadow-sm hover:bg-indigo-100/70 hover:scale-[1.02] transition-all cursor-default">
+                    <span className="relative flex h-2.5 w-2.5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600"></span>
                     </span>
                     <span>{t('hero_premium_badge')}</span>
                 </div>
                 
                 {/* 2. Authority H1 Headline */}
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl mb-8 tracking-[-0.035em] text-slate-900 font-black leading-[1.08] max-w-5xl mx-auto">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 sm:mb-8 tracking-[-0.03em] text-slate-900 font-black leading-[1.12] sm:leading-[1.08] max-w-5xl mx-auto">
                     {t('hero_premium_title_1')}{' '}
                     <span className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent block sm:inline mt-1 sm:mt-0">
                         {t('hero_premium_title_2')}
@@ -123,16 +123,16 @@ export default function LandingHero() {
                 </h1>
                 
                 {/* 3. Problem-Solving Subheading */}
-                <p className="text-base sm:text-lg lg:text-xl text-slate-600 mb-10 leading-relaxed max-w-3xl mx-auto font-normal">
+                <p className="text-base sm:text-lg lg:text-xl text-slate-600 mb-8 sm:mb-10 leading-relaxed max-w-3xl mx-auto font-medium">
                     {t('hero_premium_desc')}
                 </p>
                 
                 {/* 4. High-Converting Dual Action CTAs */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 max-w-md mx-auto sm:max-w-none">
+                <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 justify-center items-center mb-8 max-w-md mx-auto sm:max-w-none">
                     <Link 
                         href="/register" 
                         onClick={() => trackCTAClick('hero_primary', 'Start Free Today', '/register')}
-                        className="w-full sm:w-auto relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-base shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer before:absolute before:inset-0 before:-translate-x-full hover:before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent"
+                        className="w-full sm:w-auto relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group cursor-pointer before:absolute before:inset-0 before:-translate-x-full hover:before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent"
                     >
                         <span>{t('hero_premium_cta_primary')}</span>
                         <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,7 +146,7 @@ export default function LandingHero() {
                             trackCTAClick('hero_secondary', 'Explore 8 Modules', '#interactive-stage');
                             scrollToCanvas();
                         }}
-                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 px-8 py-4 rounded-xl font-bold text-base shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer group"
+                        className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 px-8 py-4 rounded-xl font-bold text-base sm:text-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer group"
                     >
                         <span>{t('hero_premium_cta_secondary')}</span>
                         <span className="text-sm text-slate-400 group-hover:translate-y-0.5 transition-transform">↓</span>
@@ -154,20 +154,20 @@ export default function LandingHero() {
                 </div>
 
                 {/* 5. Frictionless Trust Badges */}
-                <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-6 sm:gap-x-8 text-xs font-semibold text-slate-500 max-w-2xl mx-auto mb-16 sm:mb-20">
-                    <div className="flex items-center gap-1.5 hover:text-slate-700 transition-colors">
+                <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-6 sm:gap-x-8 text-xs sm:text-sm font-semibold text-slate-600 max-w-2xl mx-auto mb-12 sm:mb-20">
+                    <div className="flex items-center gap-2 hover:text-slate-900 transition-colors">
                         <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <span>{t('hero_trust_badge_1')}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 hover:text-slate-700 transition-colors">
+                    <div className="flex items-center gap-2 hover:text-slate-900 transition-colors">
                         <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <span>{t('hero_trust_badge_2')}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 hover:text-slate-700 transition-colors">
+                    <div className="flex items-center gap-2 hover:text-slate-900 transition-colors">
                         <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
@@ -190,7 +190,7 @@ export default function LandingHero() {
                     <div className="rounded-2xl sm:rounded-3xl border border-slate-700/60 bg-slate-900 shadow-[0_25px_70px_-15px_rgba(15,23,42,0.4)] overflow-hidden transition-all duration-300">
                         
                         {/* macOS Window Title Bar */}
-                        <div className="px-4 py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-4">
+                        <div className="px-3.5 py-2.5 sm:px-4 sm:py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-2">
                                 <span className="w-3 h-3 rounded-full bg-[#ff5f56] inline-block shadow-sm"></span>
                                 <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block shadow-sm"></span>
@@ -198,21 +198,21 @@ export default function LandingHero() {
                             </div>
 
                             {/* Breadcrumb URL Bar */}
-                            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px] font-mono text-slate-400">
+                            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-xs font-mono text-slate-400">
                                 <span className="text-slate-500">tranvas.app</span>
                                 <span className="text-slate-600">/</span>
                                 <span className="text-indigo-400 font-semibold">{activeTab}</span>
                             </div>
 
                             {/* Live System Indicator */}
-                            <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-400">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                                 <span>{t('hero_canvas_synced')}</span>
                             </div>
                         </div>
 
                         {/* Interactive Tab Switcher Bar */}
-                        <div className="px-3 pt-3 pb-2 bg-slate-950/40 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                        <div className="px-2.5 pt-2.5 pb-2 sm:px-3 sm:pt-3 bg-slate-950/40 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto no-scrollbar">
                             {TABS.map((tab) => {
                                 const isActive = activeTab === tab.id;
                                 return (
@@ -220,16 +220,16 @@ export default function LandingHero() {
                                         key={tab.id}
                                         type="button"
                                         onClick={() => handleTabClick(tab.id)}
-                                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shrink-0 cursor-pointer ${
+                                        className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shrink-0 cursor-pointer ${
                                             isActive
                                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-[1.02]'
                                                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                                         }`}
                                     >
-                                        <span className="text-sm">{tab.icon}</span>
+                                        <span className="text-base">{tab.icon}</span>
                                         <span>{tab.label}</span>
                                         {isActive && (
-                                            <span className="w-1 h-1 rounded-full bg-white animate-pulse"></span>
+                                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                                         )}
                                     </button>
                                 );
@@ -237,7 +237,7 @@ export default function LandingHero() {
                         </div>
 
                         {/* Dynamic Live Module Display */}
-                        <div className="p-5 sm:p-8 min-h-[360px] sm:min-h-[420px] bg-slate-900 text-slate-100 flex flex-col justify-between">
+                        <div className="p-4 sm:p-6 md:p-8 min-h-[340px] sm:min-h-[420px] bg-slate-900 text-slate-100 flex flex-col justify-between">
                             
                             {/* TAB: PLANNER */}
                             {activeTab === 'planner' && (
@@ -265,7 +265,7 @@ export default function LandingHero() {
                                                         {isId ? '08:30 • Deep Work: Arsitektur Sistem & Core Algorithm' : '08:30 • Deep Work: System Architecture & Core Algorithm'}
                                                     </span>
                                                 </div>
-                                                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">DONE</span>
+                                                <span className="text-xs px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold">DONE</span>
                                             </div>
 
                                             <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-between gap-3 hover:border-slate-600 transition-colors">
@@ -275,7 +275,7 @@ export default function LandingHero() {
                                                         {isId ? '11:00 • Sprint Review & Roadmap Alignment' : '11:00 • Sprint Review & Roadmap Alignment'}
                                                     </span>
                                                 </div>
-                                                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">DONE</span>
+                                                <span className="text-xs px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold">DONE</span>
                                             </div>
 
                                             <div className="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/40 flex items-center justify-between gap-3 shadow-sm hover:border-indigo-400 transition-colors">
@@ -285,7 +285,7 @@ export default function LandingHero() {
                                                         {isId ? '14:15 • Evaluasi Finansial & Habit Analytics' : '14:15 • Financial Review & Habit Analytics'}
                                                     </span>
                                                 </div>
-                                                <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-bold animate-pulse">FOCUS NOW</span>
+                                                <span className="text-xs px-2.5 py-1 rounded bg-indigo-500/30 text-indigo-300 font-bold animate-pulse">FOCUS NOW</span>
                                             </div>
 
                                             <div className="p-3.5 rounded-xl bg-slate-800/40 border border-slate-800 flex items-center justify-between gap-3">
@@ -295,20 +295,20 @@ export default function LandingHero() {
                                                         {isId ? '16:30 • Evening Reflection & Mindful Journaling' : '16:30 • Evening Reflection & Mindful Journaling'}
                                                     </span>
                                                 </div>
-                                                <span className="text-[10px] px-2 py-0.5 rounded bg-slate-700 text-slate-300 font-medium">SCHEDULED</span>
+                                                <span className="text-xs px-2.5 py-1 rounded bg-slate-700 text-slate-300 font-medium">SCHEDULED</span>
                                             </div>
                                         </div>
 
                                         <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-800 space-y-3">
                                             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Timeblock Cadence</div>
                                             <div className="space-y-2 text-xs">
-                                                <div className="p-2 rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
-                                                    <div className="font-bold">08:00 - 12:00</div>
-                                                    <div className="text-[11px] opacity-80">{isId ? 'Sesi Deep Work Pagi' : 'Morning Deep Work Flow'}</div>
+                                                <div className="p-2.5 rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                                                    <div className="font-bold text-sm">08:00 - 12:00</div>
+                                                    <div className="text-xs text-indigo-200/90 mt-0.5">{isId ? 'Sesi Deep Work Pagi' : 'Morning Deep Work Flow'}</div>
                                                 </div>
-                                                <div className="p-2 rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/30">
-                                                    <div className="font-bold">14:00 - 17:00</div>
-                                                    <div className="text-[11px] opacity-80">{isId ? 'Eksekusi & Strategi' : 'Execution & Strategy'}</div>
+                                                <div className="p-2.5 rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/30">
+                                                    <div className="font-bold text-sm">14:00 - 17:00</div>
+                                                    <div className="text-xs text-emerald-200/90 mt-0.5">{isId ? 'Eksekusi & Strategi' : 'Execution & Strategy'}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -388,7 +388,7 @@ export default function LandingHero() {
                                                     />
                                                 ))}
                                             </div>
-                                            <div className="text-[11px] text-slate-400 text-right mt-2 font-mono">
+                                            <div className="text-xs text-slate-300 text-right mt-2 font-mono font-medium">
                                                 {isId ? 'Tingkat Penyelesaian: 92.8%' : 'Monthly Completion: 92.8%'}
                                             </div>
                                         </div>
@@ -421,7 +421,7 @@ export default function LandingHero() {
                                             <div className="text-xl font-black text-white mt-1">
                                                 {isId ? 'Rp 28.450.000' : '$24,850.00'}
                                             </div>
-                                            <div className="text-[10px] text-emerald-400 mt-1 font-semibold">
+                                            <div className="text-xs text-emerald-400 mt-1 font-semibold">
                                                 {isId ? '↑ On-track target tabungan' : '↑ On-track savings goal'}
                                             </div>
                                         </div>
@@ -432,7 +432,7 @@ export default function LandingHero() {
                                             <div className="text-xl font-black text-indigo-400 mt-1">
                                                 {isId ? 'Rp 35.000.000' : '$35,000.00'}
                                             </div>
-                                            <div className="text-[10px] text-slate-400 mt-1">
+                                            <div className="text-xs text-slate-400 mt-1 font-medium">
                                                 {isId ? 'Gaji & Revenue Project' : 'Salary & Retainer'}
                                             </div>
                                         </div>
@@ -443,7 +443,7 @@ export default function LandingHero() {
                                             <div className="text-xl font-black text-amber-400 mt-1">
                                                 {isId ? 'Rp 6.550.000' : '$6,550.00'}
                                             </div>
-                                            <div className="text-[10px] text-emerald-400 mt-1">
+                                            <div className="text-xs text-emerald-400 mt-1 font-semibold">
                                                 {isId ? 'Hemat 24% dari budget batas' : 'Saved 24% under budget ceiling'}
                                             </div>
                                         </div>
@@ -482,7 +482,7 @@ export default function LandingHero() {
 
                                     <div className="grid sm:grid-cols-2 gap-3.5">
                                         <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/60 hover:border-slate-600 transition-colors">
-                                            <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
                                                 {isId ? 'W • Wish (Keinginan Inti)' : 'W • Wish (Core Aspiration)'}
                                             </div>
                                             <div className="text-sm font-bold text-white mt-1">
@@ -491,7 +491,7 @@ export default function LandingHero() {
                                         </div>
 
                                         <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/60 hover:border-slate-600 transition-colors">
-                                            <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
                                                 {isId ? 'O • Outcome (Hasil Terbaik)' : 'O • Outcome (Best Result)'}
                                             </div>
                                             <div className="text-sm font-bold text-white mt-1">
@@ -500,7 +500,7 @@ export default function LandingHero() {
                                         </div>
 
                                         <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/60 hover:border-slate-600 transition-colors">
-                                            <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-rose-400 uppercase tracking-wider">
                                                 {isId ? 'O • Obstacle (Rintangan Nyata)' : 'O • Obstacle (Real Friction)'}
                                             </div>
                                             <div className="text-sm font-bold text-white mt-1">
@@ -509,7 +509,7 @@ export default function LandingHero() {
                                         </div>
 
                                         <div className="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/40 hover:border-indigo-400 transition-colors">
-                                            <div className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
                                                 {isId ? 'P • Plan (If-Then Protocol)' : 'P • Plan (If-Then Protocol)'}
                                             </div>
                                             <div className="text-sm font-bold text-white mt-1">
@@ -547,10 +547,10 @@ export default function LandingHero() {
                                                 ? '“Sejak menggabungkan habit, keuangan, dan target harian ke dalam satu ekosistem Tranvas, kepala rasanya jauh lebih ringan. Tidak ada lagi catatan tercecer di 5 aplikasi terpisah. Semua ritme hidup terkoordinasi rapi di satu tempat...”'
                                                 : '“Consolidating habits, finances, and daily planning into Tranvas eliminated so much cognitive fatigue. No more notes scattered across 5 disconnected apps. My entire daily cadence is finally in complete harmony...”'}
                                         </p>
-                                        <div className="flex gap-2 pt-1">
-                                            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-700 text-slate-300">#mentalclarity</span>
-                                            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-700 text-slate-300">#deepwork</span>
-                                            <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300">#lifeos</span>
+                                        <div className="flex gap-2 pt-1 flex-wrap">
+                                            <span className="text-xs px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 font-medium">#mentalclarity</span>
+                                            <span className="text-xs px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 font-medium">#deepwork</span>
+                                            <span className="text-xs px-2.5 py-1 rounded-md bg-indigo-600/30 text-indigo-300 font-medium">#lifeos</span>
                                         </div>
                                     </div>
                                 </div>
@@ -647,21 +647,21 @@ export default function LandingHero() {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
                                         <div className="p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 hover:border-indigo-400 transition-colors">
                                             <div className="font-bold text-indigo-300">09:00 - 11:30</div>
                                             <div className="text-white font-semibold mt-1">Sprint Architecture & Deep Focus</div>
-                                            <div className="text-[10px] text-slate-400 mt-0.5">{isId ? 'Tersambung ke Task Planner' : 'Synced with Task Planner'}</div>
+                                            <div className="text-xs text-slate-400 mt-1">{isId ? 'Tersambung ke Task Planner' : 'Synced with Task Planner'}</div>
                                         </div>
                                         <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 hover:border-emerald-400 transition-colors">
                                             <div className="font-bold text-emerald-300">14:00 - 14:30</div>
                                             <div className="text-white font-semibold mt-1">Financial Budgeting & Cashflow</div>
-                                            <div className="text-[10px] text-slate-400 mt-0.5">{isId ? 'Tersambung ke Finance OS' : 'Synced with Finance OS'}</div>
+                                            <div className="text-xs text-slate-400 mt-1">{isId ? 'Tersambung ke Finance OS' : 'Synced with Finance OS'}</div>
                                         </div>
                                         <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/30 hover:border-purple-400 transition-colors">
                                             <div className="font-bold text-purple-300">20:30 - 21:00</div>
                                             <div className="text-white font-semibold mt-1">Refleksi Malam & Evaluasi WOOP</div>
-                                            <div className="text-[10px] text-slate-400 mt-0.5">{isId ? 'Tersambung ke Journal' : 'Synced with Journal'}</div>
+                                            <div className="text-xs text-slate-400 mt-1">{isId ? 'Tersambung ke Journal' : 'Synced with Journal'}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -688,10 +688,10 @@ export default function LandingHero() {
                             🔥
                         </div>
                         <div className="pr-2">
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                            <div className="text-xs font-bold uppercase tracking-wider text-amber-400">
                                 {isId ? 'Streak Konsistensi' : 'Consistency Streak'}
                             </div>
-                            <div className="text-xs font-bold text-white">
+                            <div className="text-sm font-bold text-white">
                                 {isId ? '24 Hari Berturut-turut' : '24 Consecutive Days'}
                             </div>
                         </div>
@@ -702,10 +702,10 @@ export default function LandingHero() {
                             ⚡
                         </div>
                         <div className="pr-2">
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+                            <div className="text-xs font-bold uppercase tracking-wider text-indigo-400">
                                 {isId ? '8 Modul Lengkap' : '8 Unified Modules'}
                             </div>
-                            <div className="text-xs font-bold text-white">
+                            <div className="text-sm font-bold text-white">
                                 100% Real-Time Sync
                             </div>
                         </div>
