@@ -60,6 +60,8 @@ export default function AuthSidebar({
         }
     };
 
+    const iconSize = isDesktop ? 18 : 17;
+
     return (
         <aside 
             aria-label="Application Navigation Drawer"
@@ -104,15 +106,15 @@ export default function AuthSidebar({
                 <button
                     type="button"
                     onClick={toggleCore}
-                    className={`w-full flex items-center justify-between px-2 py-1 mb-0.5 rounded-lg group transition-all duration-200 ${
+                    className={`w-full flex items-center justify-between px-2 py-1 md:py-1.5 mb-0.5 md:mb-1 rounded-lg group transition-all duration-200 ${
                         isSidebarCollapsed ? 'justify-center' : ''
                     }`}
                 >
                     {isSidebarCollapsed ? (
-                        <div className="h-px bg-slate-100 dark:bg-slate-800 w-full my-1.5" />
+                        <div className="h-px bg-slate-100 dark:bg-slate-800 w-full my-1.5 md:my-2" />
                     ) : (
                         <>
-                            <span className="text-[9.5px] font-black text-slate-400 dark:text-slate-500 tracking-wider uppercase ml-1 group-hover:text-slate-600 dark:group-hover:text-slate-400 transition-colors">
+                            <span className="text-[9.5px] md:text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-wider uppercase ml-1 group-hover:text-slate-600 dark:group-hover:text-slate-400 transition-colors">
                                 System Core
                             </span>
                             <ChevronDown size={10} className={`text-slate-300 transition-transform duration-200 ${coreExpanded ? '' : '-rotate-90'}`} />
@@ -127,17 +129,17 @@ export default function AuthSidebar({
                             href="/dashboard"
                             onClick={handleNavClick}
                             className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                             } ${
                                 isActive('/dashboard')
                                     ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                     : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                             }`}
                         >
-                            <LayoutDashboard size={17} className={isActive('/dashboard') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                            {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Dashboard</span>}
+                            <LayoutDashboard size={iconSize} className={isActive('/dashboard') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                            {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Dashboard</span>}
                             {isActive('/dashboard') && !isSidebarCollapsed && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                             )}
                         </Link>
 
@@ -147,17 +149,17 @@ export default function AuthSidebar({
                                 href="/habits"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/habits')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Flame size={17} className={isActive('/habits') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Habits</span>}
+                                <Flame size={iconSize} className={isActive('/habits') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Habits</span>}
                                 {isActive('/habits') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -168,17 +170,17 @@ export default function AuthSidebar({
                                 href="/planner"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/planner')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Calendar size={17} className={isActive('/planner') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Planner</span>}
+                                <Calendar size={iconSize} className={isActive('/planner') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Planner</span>}
                                 {isActive('/planner') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -189,17 +191,17 @@ export default function AuthSidebar({
                                 href="/finance"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/finance')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Wallet size={17} className={isActive('/finance') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Finance</span>}
+                                <Wallet size={iconSize} className={isActive('/finance') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Finance</span>}
                                 {isActive('/finance') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -210,17 +212,17 @@ export default function AuthSidebar({
                                 href="/study"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/study')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <GraduationCap size={17} className={isActive('/study') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Study</span>}
+                                <GraduationCap size={iconSize} className={isActive('/study') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Study</span>}
                                 {isActive('/study') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -233,15 +235,15 @@ export default function AuthSidebar({
                 <button
                     type="button"
                     onClick={togglePlatinum}
-                    className={`w-full flex items-center justify-between px-2 py-1 mb-0.5 rounded-lg group transition-all duration-200 ${
+                    className={`w-full flex items-center justify-between px-2 py-1 md:py-1.5 mb-0.5 md:mb-1 rounded-lg group transition-all duration-200 ${
                         isSidebarCollapsed ? 'justify-center' : ''
                     }`}
                 >
                     {isSidebarCollapsed ? (
-                        <div className="h-px bg-slate-100 dark:bg-slate-800 w-full my-1.5" />
+                        <div className="h-px bg-slate-100 dark:bg-slate-800 w-full my-1.5 md:my-2" />
                     ) : (
                         <>
-                            <span className="text-[9.5px] font-black text-slate-400 dark:text-slate-500 tracking-wider uppercase ml-1 group-hover:text-slate-600 dark:group-hover:text-slate-400 transition-colors">
+                            <span className="text-[9.5px] md:text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-wider uppercase ml-1 group-hover:text-slate-600 dark:group-hover:text-slate-400 transition-colors">
                                 Platinum Suite
                             </span>
                             <ChevronDown size={10} className={`text-slate-300 transition-transform duration-200 ${platinumExpanded ? '' : '-rotate-90'}`} />
@@ -257,17 +259,17 @@ export default function AuthSidebar({
                                 href="/journal"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/journal')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <BookOpen size={17} className={isActive('/journal') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Journal</span>}
+                                <BookOpen size={iconSize} className={isActive('/journal') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Journal</span>}
                                 {isActive('/journal') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -278,17 +280,17 @@ export default function AuthSidebar({
                                 href="/calendar"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/calendar')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <CalendarDays size={17} className={isActive('/calendar') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Calendar</span>}
+                                <CalendarDays size={iconSize} className={isActive('/calendar') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Calendar</span>}
                                 {isActive('/calendar') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -299,17 +301,17 @@ export default function AuthSidebar({
                                 href="/jobs"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/jobs')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Briefcase size={17} className={isActive('/jobs') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Jobs</span>}
+                                <Briefcase size={iconSize} className={isActive('/jobs') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Jobs</span>}
                                 {isActive('/jobs') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -320,17 +322,17 @@ export default function AuthSidebar({
                                 href="/goals"
                                 onClick={handleNavClick}
                                 className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                    isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                    isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                                 } ${
                                     isActive('/goals')
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                                 }`}
                             >
-                                <Target size={17} className={isActive('/goals') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                {!isSidebarCollapsed && <span className="text-[13.5px] font-semibold tracking-tight truncate">Goals</span>}
+                                <Target size={iconSize} className={isActive('/goals') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                                {!isSidebarCollapsed && <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate">Goals</span>}
                                 {isActive('/goals') && !isSidebarCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                                 )}
                             </Link>
                         )}
@@ -340,9 +342,9 @@ export default function AuthSidebar({
                 <div className="h-2" />
 
                 {/* ── 3. NEURAL OS SECTION ── */}
-                <div className="px-2 py-1 mb-0.5">
+                <div className="px-2 py-1 md:py-1.5 mb-0.5 md:mb-1">
                     {!isSidebarCollapsed && (
-                        <span className="text-[9.5px] font-black text-indigo-400/90 dark:text-indigo-500 tracking-wider uppercase ml-1">
+                        <span className="text-[9.5px] md:text-[10px] font-black text-indigo-400/90 dark:text-indigo-500 tracking-wider uppercase ml-1">
                             Neural OS
                         </span>
                     )}
@@ -352,45 +354,45 @@ export default function AuthSidebar({
                     href="/coach"
                     onClick={handleNavClick}
                     className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                        isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                        isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                     } ${
                         isActive('/coach')
                             ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                             : 'text-slate-500 dark:text-slate-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5 hover:text-indigo-700 font-medium'
                     }`}
                 >
-                    <Sparkles size={17} className="text-indigo-500 shrink-0" />
+                    <Sparkles size={iconSize} className="text-indigo-500 shrink-0" />
                     {!isSidebarCollapsed && (
                         <>
-                            <span className="text-[13.5px] font-semibold tracking-tight truncate flex-1 text-left">Coach</span>
+                            <span className="text-[13.5px] md:text-[15px] font-semibold tracking-tight truncate flex-1 text-left">Coach</span>
                             <span className="text-[7.5px] font-black text-indigo-600 dark:text-indigo-400 uppercase bg-indigo-100 dark:bg-indigo-500/20 px-1.5 py-0.5 rounded-full shrink-0 tracking-wider">
                                 QUANTUM
                             </span>
                         </>
                     )}
                     {isActive('/coach') && !isSidebarCollapsed && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-500 rounded-r-full" />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-500 rounded-r-full" />
                     )}
                 </Link>
 
 
                 {/* ── 4. TRIAL PROGRESS CARD ── */}
                 {trial.isActive && !isSidebarCollapsed && (
-                    <div className="pt-3 px-0.5">
-                        <div className="p-3 bg-gradient-to-br from-indigo-50/80 via-purple-50/60 to-pink-50/80 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 border border-indigo-100 dark:border-indigo-500/20 rounded-xl shadow-sm">
-                            <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-1.5 text-[9.5px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
+                    <div className="pt-3 md:pt-4 px-0.5 md:px-1">
+                        <div className="p-3 md:p-3.5 bg-gradient-to-br from-indigo-50/80 via-purple-50/60 to-pink-50/80 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/40 border border-indigo-100 dark:border-indigo-500/20 rounded-xl shadow-sm">
+                            <div className="flex items-center justify-between mb-1 md:mb-1.5">
+                                <div className="flex items-center gap-1.5 text-[9.5px] md:text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
                                     <Zap size={11} className="text-amber-500 fill-amber-500" />
                                     <span>Pro Free Trial</span>
                                 </div>
-                                <span className="text-[9.5px] font-black text-indigo-600 dark:text-indigo-400">
+                                <span className="text-[9.5px] md:text-[10px] font-black text-indigo-600 dark:text-indigo-400">
                                     {locale === 'id' ? `${trial.daysRemaining} hari` : `${trial.daysRemaining}d left`}
                                 </span>
                             </div>
-                            <p className="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2">
+                            <p className="text-[9.5px] md:text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2">
                                 {locale === 'id' ? 'Akses penuh seluruh modul aktif.' : 'Full access to all modules active.'}
                             </p>
-                            <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mb-2 overflow-hidden">
+                            <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mb-2 md:mb-2.5 overflow-hidden">
                                 <div 
                                     className="bg-gradient-to-r from-indigo-600 to-violet-600 h-1.5 rounded-full transition-all duration-500" 
                                     style={{ width: `${Math.min(100, Math.max(10, ((14 - trial.daysRemaining) / 14) * 100))}%` }}
@@ -399,7 +401,7 @@ export default function AuthSidebar({
                             <Link
                                 href="/billing"
                                 onClick={handleNavClick}
-                                className="flex items-center justify-center gap-1.5 w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9.5px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95"
+                                className="flex items-center justify-center gap-1.5 w-full py-1.5 md:py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[9.5px] md:text-[10px] font-black uppercase tracking-wider rounded-lg md:rounded-xl transition-all shadow-sm active:scale-95"
                             >
                                 <Crown size={10} />
                                 <span>{locale === 'id' ? 'Kunci Akses' : 'Keep Access'}</span>
@@ -417,26 +419,26 @@ export default function AuthSidebar({
                             href="/admin"
                             onClick={handleNavClick}
                             className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                                isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                                isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                             } ${
                                 isActive('/admin')
                                     ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/30'
                                     : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-medium'
                             }`}
                         >
-                            <ShieldCheck size={17} className={isActive('/admin') ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-500'} />
+                            <ShieldCheck size={iconSize} className={isActive('/admin') ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-500'} />
                             {!isSidebarCollapsed && (
                                 <>
-                                    <span className="text-[13px] font-bold tracking-tight truncate flex-1 text-left">
+                                    <span className="text-[13px] md:text-[14px] font-bold tracking-tight truncate flex-1 text-left">
                                         {locale === 'id' ? 'Konsol Admin' : 'Admin Console'}
                                     </span>
-                                    <span className="text-[7.5px] font-black text-emerald-700 dark:text-emerald-300 uppercase bg-emerald-100 dark:bg-emerald-500/20 px-1.5 py-0.5 rounded-full shrink-0 tracking-wider">
+                                    <span className="text-[7.5px] md:text-[8px] font-black text-emerald-700 dark:text-emerald-300 uppercase bg-emerald-100 dark:bg-emerald-500/20 px-1.5 py-0.5 rounded-full shrink-0 tracking-wider">
                                         ADMIN
                                     </span>
                                 </>
                             )}
                             {isActive('/admin') && !isSidebarCollapsed && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-emerald-500 rounded-r-full" />
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-emerald-500 rounded-r-full" />
                             )}
                         </Link>
                     )}
@@ -446,21 +448,21 @@ export default function AuthSidebar({
                         href="/settings"
                         onClick={handleNavClick}
                         className={`relative flex items-center w-full rounded-xl transition-all duration-150 ${
-                            isSidebarCollapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-1.5 gap-2.5'
+                            isSidebarCollapsed ? 'justify-center px-0 py-2 md:py-2.5' : 'px-2.5 py-1.5 md:py-2 gap-2.5 md:gap-3'
                         } ${
                             isActive('/settings')
                                 ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold'
                                 : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 font-medium'
                         }`}
                     >
-                        <Settings size={17} className={isActive('/settings') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
+                        <Settings size={iconSize} className={isActive('/settings') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                         {!isSidebarCollapsed && (
-                            <span className="text-[13px] font-semibold tracking-tight truncate">
+                            <span className="text-[13px] md:text-[14px] font-semibold tracking-tight truncate">
                                 {locale === 'id' ? 'Pengaturan' : 'Settings'}
                             </span>
                         )}
                         {isActive('/settings') && !isSidebarCollapsed && (
-                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-600 rounded-r-full" />
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 md:w-0.5 h-4 md:h-5 bg-indigo-600 rounded-r-full" />
                         )}
                     </Link>
                 </div>
