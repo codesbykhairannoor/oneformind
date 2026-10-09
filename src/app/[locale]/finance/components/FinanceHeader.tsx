@@ -144,7 +144,7 @@ export default function FinanceHeader({
             title={isIndo ? 'Manajemen Finansial & Arus Kas' : 'Financial Plan & Cashflow'}
             subtitle={isIndo ? 'Anggaran bulanan, pelacak pengeluaran & laporan fiskal' : 'Monthly budgets, expense tracking & cashflow reports'}
             actions={
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
                     {/* Custom Month Picker */}
                     <FinanceMonthPicker 
                         selectedMonthKey={selectedMonthKey} 
@@ -156,10 +156,10 @@ export default function FinanceHeader({
                         <button 
                             type="button"
                             onClick={() => { setIsCurrencyOpen(!isCurrencyOpen); setIsExportOpen(false); }}
-                            className="flex items-center justify-center h-10 px-3 transition border bg-slate-50 dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/80 rounded-xl gap-1.5 hover:bg-white dark:hover:bg-slate-700 shadow-xs group"
+                            className="flex items-center justify-center h-8 sm:h-10 px-2 sm:px-3 transition border bg-slate-50 dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/80 rounded-lg sm:rounded-xl gap-1 sm:gap-1.5 hover:bg-white dark:hover:bg-slate-700 shadow-xs group"
                         >
-                            <span className="text-base">{activeCurrencyObj.icon}</span>
-                            <span className="text-[11px] font-black text-slate-700 dark:text-slate-200">{activeCurrencyObj.code}</span>
+                            <span className="text-sm sm:text-base">{activeCurrencyObj.icon}</span>
+                            <span className="text-[10px] sm:text-[11px] font-black text-slate-700 dark:text-slate-200">{activeCurrencyObj.code}</span>
                         </button>
 
                         {isCurrencyOpen && (
@@ -190,9 +190,9 @@ export default function FinanceHeader({
                         <button 
                             type="button"
                             onClick={() => { setIsExportOpen(!isExportOpen); setIsCurrencyOpen(false); }}
-                            className={`flex items-center justify-center h-10 px-3.5 transition border rounded-xl gap-1.5 shadow-xs text-xs font-bold ${isExportOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 text-indigo-600' : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                            className={`flex items-center justify-center h-8 sm:h-10 px-2.5 sm:px-3.5 transition border rounded-lg sm:rounded-xl gap-1.5 shadow-xs text-[11px] sm:text-xs font-bold whitespace-nowrap ${isExportOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 text-indigo-600' : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                         >
-                            <Download size={14} className="text-slate-500 dark:text-slate-400" />
+                            <Download size={13} className="text-slate-500 dark:text-slate-400 sm:w-3.5 sm:h-3.5" />
                             <span>{t('export') || (isIndo ? 'Ekspor' : 'Export')}</span>
                         </button>
 
@@ -244,9 +244,9 @@ export default function FinanceHeader({
                     <button 
                         type="button"
                         onClick={onOpenTrxModal}
-                        className="flex items-center justify-center h-10 px-4 sm:px-5 transition shadow-md bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-indigo-500/20 text-white font-black text-xs gap-1.5 active:scale-95 whitespace-nowrap"
+                        className="flex items-center justify-center h-8 sm:h-10 px-3 sm:px-5 transition shadow-md bg-indigo-600 rounded-lg sm:rounded-xl hover:bg-indigo-700 shadow-indigo-500/20 text-white font-black text-[11px] sm:text-xs gap-1.5 active:scale-95 shrink-0 whitespace-nowrap"
                     >
-                        <Plus size={16} strokeWidth={3} />
+                        <Plus size={15} strokeWidth={3} className="sm:w-4 sm:h-4" />
                         <span>{t('btn_transaction') || (isIndo ? 'Tambah Transaksi' : 'Add Transaction')}</span>
                     </button>
                 </div>

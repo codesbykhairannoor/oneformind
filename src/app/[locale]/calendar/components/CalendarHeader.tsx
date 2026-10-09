@@ -74,33 +74,33 @@ export default function CalendarHeader({
             title={isIndo ? 'Kalender Terpadu & Jadwal' : 'Master Calendar & Schedules'}
             subtitle={isIndo ? 'Sinkronisasi agenda harian, time-blocking tugas & deadline' : 'Unified schedule, meetings, targets & habits'}
             actions={
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
                     {onGoToToday && (
                         <button
                             type="button"
                             onClick={onGoToToday}
-                            className="px-3 h-10 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black transition active:scale-95 shadow-xs"
+                            className="px-2.5 sm:px-3 h-8 sm:h-10 rounded-lg sm:rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] sm:text-xs font-black transition active:scale-95 shadow-xs shrink-0 whitespace-nowrap"
                         >
                             {isIndo ? 'Hari Ini' : 'Today'}
                         </button>
                     )}
 
                     {/* Month Nav Buttons + Dropdown */}
-                    <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 p-0.5 rounded-xl h-10">
+                    <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 p-0.5 rounded-lg sm:rounded-xl h-8 sm:h-10 shrink-0">
                         <button
                             type="button"
                             onClick={() => stepMonth(-1)}
-                            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition"
+                            className="p-1 sm:p-1.5 rounded-md sm:rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition"
                             title={isIndo ? 'Bulan Sebelumnya' : 'Previous Month'}
                         >
-                            <ChevronLeft size={15} />
+                            <ChevronLeft size={13} className="sm:w-3.5 sm:h-3.5" />
                         </button>
 
                         <div className="relative">
                             <button 
                                 type="button"
                                 onClick={() => setIsOpen(!isOpen)} 
-                                className="px-2.5 py-1 rounded-lg text-xs font-black text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-700 transition flex items-center gap-1.5 capitalize"
+                                className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-black text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-700 transition flex items-center gap-1 sm:gap-1.5 capitalize whitespace-nowrap"
                             >
                                 <span>{displayMonthStr}</span>
                                 <ChevronDown size={11} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -153,10 +153,10 @@ export default function CalendarHeader({
                         <button
                             type="button"
                             onClick={() => stepMonth(1)}
-                            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition"
+                            className="p-1 sm:p-1.5 rounded-md sm:rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition"
                             title={isIndo ? 'Bulan Selanjutnya' : 'Next Month'}
                         >
-                            <ChevronRight size={15} />
+                            <ChevronRight size={13} className="sm:w-3.5 sm:h-3.5" />
                         </button>
                     </div>
 
@@ -165,10 +165,10 @@ export default function CalendarHeader({
                         <button
                             type="button"
                             onClick={onOpenTaskDrawer}
-                            className="h-10 px-3.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-900/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-xs font-black flex items-center gap-1.5 transition active:scale-95 shadow-xs"
+                            className="h-8 sm:h-10 px-2.5 sm:px-3.5 rounded-lg sm:rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-900/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-[11px] sm:text-xs font-black flex items-center gap-1.5 transition active:scale-95 shadow-xs shrink-0 whitespace-nowrap"
                             title={isIndo ? 'Buka laci time-blocking tugas planner' : 'Open task time-blocking drawer'}
                         >
-                            <Zap size={14} />
+                            <Zap size={13} className="sm:w-3.5 sm:h-3.5" />
                             <span className="hidden sm:inline">{isIndo ? 'Time-Block Tugas' : 'Time-Block Tasks'}</span>
                         </button>
                     )}
@@ -179,9 +179,9 @@ export default function CalendarHeader({
                             type="button"
                             onClick={onOpenExportModal}
                             title={isIndo ? 'Ekspor Kalender (CSV/JSON)' : 'Export Calendar (CSV/JSON)'}
-                            className="h-10 px-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs shrink-0"
+                            className="h-8 sm:h-10 px-2.5 sm:px-3.5 rounded-lg sm:rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs shrink-0 whitespace-nowrap"
                         >
-                            <Download size={14} className="text-slate-500 dark:text-slate-400" />
+                            <Download size={13} className="text-slate-500 dark:text-slate-400 sm:w-3.5 sm:h-3.5" />
                             <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
                         </button>
                     )}
@@ -190,9 +190,9 @@ export default function CalendarHeader({
                     <button 
                         type="button"
                         onClick={onAddEvent} 
-                        className="h-10 px-4 sm:px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all active:scale-95 shrink-0"
+                        className="h-8 sm:h-10 px-3 sm:px-5 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] sm:text-xs font-black flex items-center gap-1.5 sm:gap-2 shadow-md shadow-indigo-500/20 transition-all active:scale-95 shrink-0 whitespace-nowrap"
                     >
-                        <Plus size={16} strokeWidth={3} />
+                        <Plus size={15} strokeWidth={3} className="sm:w-4 sm:h-4" />
                         <span>{isIndo ? 'Buat Agenda' : 'Add Event'}</span>
                     </button>
                 </div>

@@ -438,19 +438,19 @@ export default function JobsPage() {
                         title={isIndo ? 'Pusat Manajemen Lamaran & Karier' : 'Job Tracker & Career Command'}
                         subtitle={isIndo ? 'Pipeline lamaran, jadwal interview & optimasi ATS' : 'Application pipeline, interview schedule & ATS optimization'}
                         actions={
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
                                 {/* Master CV Setup Trigger */}
                                 <button 
                                     type="button"
                                     onClick={() => setIsMasterModalOpen(true)}
-                                    className="h-10 px-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all flex items-center gap-2 group relative shadow-xs"
+                                    className="h-8 sm:h-10 px-2.5 sm:px-3.5 rounded-lg sm:rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all flex items-center gap-1.5 sm:gap-2 group relative shadow-xs shrink-0 whitespace-nowrap"
                                 >
-                                    <Briefcase size={15} className={hasMasterCv ? 'text-emerald-500' : 'text-slate-400'} />
-                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200 hidden md:inline">
+                                    <Briefcase size={14} className={hasMasterCv ? 'text-emerald-500' : 'text-slate-400'} />
+                                    <span className="text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hidden md:inline">
                                         {hasMasterCv ? (isIndo ? 'Master CV Terhubung' : 'Master CV Connected') : (isIndo ? 'Setup Master CV' : 'Setup Master CV')}
                                     </span>
                                     {!hasMasterCv && (
-                                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500 animate-pulse" />
                                     )}
                                 </button>
 
@@ -458,9 +458,9 @@ export default function JobsPage() {
                                 <button 
                                     type="button"
                                     onClick={handleStartAddingRow}
-                                    className="h-10 px-4 sm:px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-1.5 shrink-0"
+                                    className="h-8 sm:h-10 px-3 sm:px-5 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] sm:text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                                 >
-                                    <Plus size={16} strokeWidth={3} />
+                                    <Plus size={15} strokeWidth={3} className="sm:w-4 sm:h-4" />
                                     <span>
                                         {isIndo ? 'Tambah Lamaran' : 'Add Application'}
                                     </span>

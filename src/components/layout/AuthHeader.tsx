@@ -69,11 +69,11 @@ export default function AuthHeader({
     isAdmin = false
 }: AuthHeaderProps) {
     return (
-        <header className="h-14 sm:h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/60 sticky top-0 z-[70] transition-all duration-500 shadow-sm">
-            <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
+        <header className="h-12 sm:h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/60 sticky top-0 z-[70] transition-all duration-500 shadow-sm">
+            <div className="flex h-full items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6">
                 
                 {/* LEFT: HAMBURGER + LOGO */}
-                <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
                     <button 
                         type="button"
                         onClick={() => {
@@ -83,14 +83,14 @@ export default function AuthHeader({
                                 toggleSidebar();
                             }
                         }}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-900 dark:text-slate-200 transition-all hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 focus:outline-none"
+                        className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl text-slate-900 dark:text-slate-200 transition-all hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 focus:outline-none"
                         aria-label="Toggle Menu"
                     >
                         {/* Mobile Hamburger Icon */}
-                        <div className="md:hidden w-5 flex flex-col items-end gap-[5px]">
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? 'rotate-45 translate-y-[7px] w-5' : 'w-5'}`} />
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? 'opacity-0' : 'w-3.5'}`} />
-                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? '-rotate-45 -translate-y-[7px] w-5' : 'w-4'}`} />
+                        <div className="md:hidden w-4 flex flex-col items-end gap-[4px]">
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? 'rotate-45 translate-y-[6px] w-4' : 'w-4'}`} />
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? 'opacity-0' : 'w-3'}`} />
+                            <span className={`h-[2px] bg-current transition-all duration-300 ${isMobileDrawerOpen ? '-rotate-45 -translate-y-[6px] w-4' : 'w-3.5'}`} />
                         </div>
                         {/* Desktop Sidebar Toggle Icon */}
                         <div className="hidden md:flex w-5 flex-col items-end gap-[5px]">
@@ -100,11 +100,11 @@ export default function AuthHeader({
                         </div>
                     </button>
 
-                    <Link href="/dashboard" className="group flex items-center gap-2 z-[110] hover:opacity-80 transition-opacity">
-                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-md shadow-indigo-200 dark:shadow-none shrink-0">
-                            <img src="/favicon.svg" alt="Tranvas Logo" className="w-4.5 h-4.5 brightness-0 invert" />
+                    <Link href="/dashboard" className="group flex items-center gap-1.5 sm:gap-2 z-[110] hover:opacity-80 transition-opacity">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-600 rounded-md sm:rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-md shadow-indigo-200 dark:shadow-none shrink-0">
+                            <img src="/favicon.svg" alt="Tranvas Logo" className="w-4 h-4 sm:w-4.5 sm:h-4.5 brightness-0 invert" />
                         </div>
-                        <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Tranvas</span>
+                        <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">Tranvas</span>
                     </Link>
                 </div>
 
@@ -155,9 +155,9 @@ export default function AuthHeader({
                     ) : null}
 
                     {/* Notifications */}
-                    <button type="button" className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all relative">
-                        <Bell size={18} />
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full" />
+                    <button type="button" className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all relative">
+                        <Bell size={16} className="sm:w-[18px] sm:h-[18px]" />
+                        <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full" />
                     </button>
 
                     {/* Help */}
@@ -189,13 +189,13 @@ export default function AuthHeader({
                         <button 
                             type="button"
                             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                            className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
+                            className="flex items-center gap-1.5 sm:gap-2 pl-0.5 sm:pl-1 pr-1 sm:pr-2 py-0.5 sm:py-1 rounded-lg sm:rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
                         >
                             <div className="relative">
                                 {user?.avatar_url ? (
-                                    <img src={user.avatar_url} alt={user.name} className="w-7 h-7 rounded-lg object-cover shadow-sm" />
+                                    <img src={user.avatar_url} alt={user.name} className="w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg object-cover shadow-sm" />
                                 ) : (
-                                    <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-[10px] font-black uppercase shadow-sm">
+                                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg bg-indigo-600 text-white flex items-center justify-center text-[10px] font-black uppercase shadow-sm">
                                         {user?.name?.charAt(0)}
                                     </div>
                                 )}

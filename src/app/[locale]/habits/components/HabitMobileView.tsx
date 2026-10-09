@@ -116,15 +116,15 @@ export default function HabitMobileView({
                     return (
                         <div
                             key={habit.id}
-                            className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-[1.8rem] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col gap-2.5 transition-all hover:border-indigo-100 dark:hover:border-slate-700"
+                            className="bg-white dark:bg-slate-900 p-3 sm:p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col gap-2 transition-all hover:border-indigo-100 dark:hover:border-slate-700"
                         >
                             {/* Card Top Row: Icon + Habit Details + Action Button */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2.5">
                                 {/* Habit Icon */}
                                 <button
                                     type="button"
                                     onClick={() => onSelectHabitDetail(habit)}
-                                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-transform active:scale-90"
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform active:scale-90"
                                     style={{ backgroundColor: `${habit.color}18`, color: habit.color }}
                                     title={isIndo ? 'Lihat Detail Habit' : 'View Habit Details'}
                                 >
@@ -165,16 +165,16 @@ export default function HabitMobileView({
                                 </div>
 
                                 {/* Right Action Buttons */}
-                                <div className="flex items-center gap-1.5 shrink-0">
+                                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                                     {/* Edit Habit Trigger */}
                                     {onEditHabit && (
                                         <button
                                             type="button"
                                             onClick={() => onEditHabit(habit)}
                                             title="Edit Habit"
-                                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all text-slate-300 dark:text-slate-600 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all text-slate-300 dark:text-slate-600 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                                         >
-                                            <Edit3 size={15} strokeWidth={2.5} />
+                                            <Edit3 size={14} strokeWidth={2.5} />
                                         </button>
                                     )}
 
@@ -188,13 +188,13 @@ export default function HabitMobileView({
                                                 notes: dayInfo.notes || ''
                                             })}
                                             title={isIndo ? 'Catatan Harian' : 'Daily Note'}
-                                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                                                 dayInfo.notes && dayInfo.notes.trim().length > 0
                                                     ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/40'
                                                     : 'text-slate-300 dark:text-slate-600 hover:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
                                             }`}
                                         >
-                                            <FileText size={15} strokeWidth={2.5} />
+                                            <FileText size={14} strokeWidth={2.5} />
                                         </button>
                                     )}
 
@@ -215,9 +215,9 @@ export default function HabitMobileView({
                                                         unit: habit.unit || '',
                                                         currentNotes: dayInfo.notes || ''
                                                     })}
-                                                    className="px-2.5 h-11 rounded-2xl font-bold text-xs flex items-center gap-1.5 bg-amber-50/70 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-500/30 transition-all active:scale-95 cursor-pointer"
+                                                    className="px-2.5 h-9 rounded-xl font-bold text-xs flex items-center gap-1.5 bg-amber-50/70 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-500/30 transition-all active:scale-95 cursor-pointer"
                                                 >
-                                                    <Coffee size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                                                    <Coffee size={13} className="text-amber-600 dark:text-amber-400 shrink-0" />
                                                     <span className="text-[10px] font-black">{isIndo ? 'Istirahat' : 'Rest'}</span>
                                                 </button>
                                             );
@@ -237,7 +237,7 @@ export default function HabitMobileView({
                                                     unit: habit.unit || '',
                                                     currentNotes: dayInfo.notes || ''
                                                 })}
-                                                className={`px-3.5 h-11 rounded-2xl font-black text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${
+                                                className={`px-3 h-9 rounded-xl font-black text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${
                                                     isDone
                                                         ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200 dark:shadow-none'
                                                         : hasProgress
@@ -269,7 +269,7 @@ export default function HabitMobileView({
                                                 }
                                                 onToggleStatus(habit.id, selectedMobileDate);
                                             }}
-                                            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all active:scale-90 cursor-pointer ${
+                                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90 cursor-pointer ${
                                                 isDone
                                                     ? 'shadow-md shadow-indigo-100 dark:shadow-none text-white'
                                                     : isRelapse
@@ -280,10 +280,10 @@ export default function HabitMobileView({
                                             }`}
                                             style={isDone ? { backgroundColor: habit.color } : {}}
                                         >
-                                            {isDone && <Check size={18} strokeWidth={3.5} />}
+                                            {isDone && <Check size={16} strokeWidth={3.5} />}
                                             {isRelapse && <span className="text-xs font-black">⚠️</span>}
-                                            {isRest && !isDone && !isRelapse && <Coffee size={18} className="text-amber-600 dark:text-amber-400" />}
-                                            {!isDone && !isRelapse && !isRest && <Plus size={16} strokeWidth={2.5} />}
+                                            {isRest && !isDone && !isRelapse && <Coffee size={15} className="text-amber-600 dark:text-amber-400" />}
+                                            {!isDone && !isRelapse && !isRest && <Plus size={15} strokeWidth={2.5} />}
                                         </button>
                                     )}
                                 </div>

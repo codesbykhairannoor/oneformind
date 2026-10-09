@@ -53,7 +53,7 @@ export default function AuthSidebar({
 }: AuthSidebarProps) {
     return (
         <aside 
-            className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out fixed top-14 sm:top-16 bottom-0 left-0 z-[61] w-full md:relative md:top-0 md:bottom-auto md:left-auto md:z-[10] ${
+            className={`bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none shrink-0 transition-all duration-300 ease-in-out fixed top-12 sm:top-16 bottom-0 left-0 z-[61] w-full md:relative md:top-0 md:bottom-auto md:left-auto md:z-[10] ${
                 isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
             } ${
                 isSidebarCollapsed ? 'md:w-[68px]' : 'md:w-[232px]'

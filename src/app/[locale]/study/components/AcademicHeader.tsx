@@ -143,16 +143,16 @@ export default function AcademicHeader({
             }
             subtitle={userSettings.major || (isIndo ? 'Teknik Informatika / Software Engineering' : 'Software Engineering')}
             actions={
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
                     {/* Semester Selector Dropdown */}
-                    <div className="relative min-w-0" ref={menuRef}>
+                    <div className="relative min-w-0 shrink-0" ref={menuRef}>
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 px-3.5 h-10 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition active:scale-95"
+                            className="flex items-center gap-1.5 sm:gap-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 px-2.5 sm:px-3.5 h-8 sm:h-10 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition active:scale-95 whitespace-nowrap"
                         >
                             <span>{terms.semester || 'Semester'} {selectedSemester}</span>
-                            <ChevronDown size={14} className="text-indigo-500" />
+                            <ChevronDown size={12} className="text-indigo-500 sm:w-3.5 sm:h-3.5" />
                         </button>
 
                         {isMenuOpen && (
@@ -198,13 +198,13 @@ export default function AcademicHeader({
                     <button
                         type="button"
                         onClick={() => onSelectTab('portfolio')}
-                        className={`flex items-center gap-1.5 px-3.5 h-10 rounded-xl text-xs font-black transition active:scale-95 border ${
+                        className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-10 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black transition active:scale-95 border shrink-0 whitespace-nowrap ${
                             activeTab === 'portfolio'
                                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20'
                                 : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-indigo-600 dark:text-indigo-400 border-slate-200/80 dark:border-slate-800'
                         }`}
                     >
-                        <Sparkles size={14} />
+                        <Sparkles size={13} className="sm:w-3.5 sm:h-3.5" />
                         <span className="hidden sm:inline">{isIndo ? 'Portofolio Bento' : 'Bento Portfolio'}</span>
                     </button>
 
@@ -214,9 +214,9 @@ export default function AcademicHeader({
                             type="button"
                             onClick={onOpenExportModal}
                             title={isIndo ? 'Ekspor Data Akademik (CSV/JSON)' : 'Export Academic Data (CSV/JSON)'}
-                            className="flex items-center gap-1.5 px-3.5 h-10 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
+                            className="flex items-center gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-10 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold shadow-xs active:scale-95 transition shrink-0 whitespace-nowrap"
                         >
-                            <Download size={14} className="text-slate-500 dark:text-slate-400" />
+                            <Download size={13} className="text-slate-500 dark:text-slate-400 sm:w-3.5 sm:h-3.5" />
                             <span className="hidden sm:inline">{isIndo ? 'Ekspor' : 'Export'}</span>
                         </button>
                     )}
@@ -225,9 +225,9 @@ export default function AcademicHeader({
                     <button
                         type="button"
                         onClick={onAddCourseClick}
-                        className="flex items-center gap-1.5 px-4 sm:px-5 h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-500/20 active:scale-95 transition"
+                        className="flex items-center gap-1.5 px-3 sm:px-5 h-8 sm:h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shadow-md shadow-indigo-500/20 active:scale-95 transition shrink-0 whitespace-nowrap"
                     >
-                        <Plus size={16} strokeWidth={3} />
+                        <Plus size={15} strokeWidth={3} className="sm:w-4 sm:h-4" />
                         <span>{t('study_add_course_btn') || (isIndo ? 'Tambah Matakuliah' : 'Add Course')}</span>
                     </button>
                 </div>
@@ -243,7 +243,7 @@ export default function AcademicHeader({
                             key={tab.id}
                             type="button"
                             onClick={() => onSelectTab(tab.id)}
-                            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition active:scale-95 ${
+                            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black whitespace-nowrap transition active:scale-95 [&>svg]:w-3.5 [&>svg]:h-3.5 ${
                                 isActive
                                     ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'

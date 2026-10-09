@@ -46,9 +46,9 @@ export default function JournalHeader({
             }
             subtitle={isIndo ? 'Ruang aman untuk menjernihkan pikiran, emosi & pola kognitif' : 'Declutter thoughts, track emotional trajectory & cognitive reframing'}
             actions={
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
                     {/* Streak Badge */}
-                    <div className="flex items-center gap-1.5 px-3 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-black text-xs shadow-xs">
+                    <div className="flex items-center gap-1.5 px-2.5 sm:px-3 h-8 sm:h-10 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-black text-[11px] sm:text-xs shadow-xs shrink-0 whitespace-nowrap">
                         <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-pulse" />
                         <span>{streakDays} {isIndo ? 'Hari' : 'Days'}</span>
                     </div>
@@ -92,9 +92,9 @@ export default function JournalHeader({
                             type="button"
                             onClick={onOpenExportModal}
                             title={isIndo ? 'Ekspor Data Jurnal (CSV/JSON)' : 'Export Journal Data (CSV/JSON)'}
-                            className="h-10 px-3.5 flex items-center justify-center gap-1.5 rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all shadow-xs"
+                            className="h-8 sm:h-10 px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-lg sm:rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800 font-bold text-[11px] sm:text-xs hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all shadow-xs shrink-0 whitespace-nowrap"
                         >
-                            <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 dark:text-slate-400" />
                             <span>{isIndo ? 'Ekspor' : 'Export'}</span>
                         </button>
                     )}
@@ -102,9 +102,9 @@ export default function JournalHeader({
                     {/* CTA: Write New Journal Button */}
                     <Link 
                         href="/journal/write" 
-                        className="h-10 px-4 sm:px-5 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all"
+                        className="h-8 sm:h-10 px-3 sm:px-5 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] sm:text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all shrink-0 whitespace-nowrap"
                     >
-                        <Plus className="w-4 h-4 stroke-[3]" />
+                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />
                         <span>{isIndo ? 'Tulis Cerita Hari Ini' : 'Write Today\'s Story'}</span>
                     </Link>
                 </div>

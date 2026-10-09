@@ -67,26 +67,26 @@ export default function PlannerHeader({
             title={isIndo ? 'Perencana Harian & Time-Block' : 'Daily Planner & Time-Blocking'}
             subtitle={isIndo ? 'Manajemen jadwal harian, fokus & eksekusi tugas' : 'Daily execution, focus scheduling & task breakdown'}
             actions={
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
                     {/* Date Navigation */}
-                    <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 h-10">
+                    <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-lg sm:rounded-xl p-0.5 h-8 sm:h-10 shrink-0">
                         <button 
                             type="button"
                             onClick={() => navigateDate(-1)} 
-                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-500 dark:text-slate-400 transition"
+                            className="p-1 sm:p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-md sm:rounded-lg text-slate-500 dark:text-slate-400 transition"
                             title={isIndo ? 'Hari sebelumnya' : 'Previous day'}
                         >
-                            <ChevronLeft size={14} />
+                            <ChevronLeft size={13} className="sm:w-3.5 sm:h-3.5" />
                         </button>
                         
                         <div className="relative">
                             <button 
                                 type="button"
                                 onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} 
-                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 transition"
+                                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg font-bold text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 transition"
                             >
-                                <Calendar size={13} className="text-indigo-500" />
-                                <span>{formatDateLabel(selectedDate)}</span>
+                                <Calendar size={12} className="text-indigo-500 sm:w-[13px] sm:h-[13px]" />
+                                <span className="whitespace-nowrap">{formatDateLabel(selectedDate)}</span>
                                 <ChevronDown size={10} strokeWidth={3} className={`text-slate-400 transition-transform ${isDatePickerOpen ? 'rotate-180' : ''}`} />
                             </button>
                             
@@ -105,10 +105,10 @@ export default function PlannerHeader({
                         <button 
                             type="button"
                             onClick={() => navigateDate(1)} 
-                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-500 dark:text-slate-400 transition"
+                            className="p-1 sm:p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-md sm:rounded-lg text-slate-500 dark:text-slate-400 transition"
                             title={isIndo ? 'Hari berikutnya' : 'Next day'}
                         >
-                            <ChevronRight size={14} />
+                            <ChevronRight size={13} className="sm:w-3.5 sm:h-3.5" />
                         </button>
                     </div>
 
@@ -118,9 +118,9 @@ export default function PlannerHeader({
                             type="button"
                             onClick={onOpenExportModal} 
                             title={isIndo ? 'Ekspor Data Planner (CSV/JSON)' : 'Export Planner Data (CSV/JSON)'} 
-                            className="h-10 px-3.5 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs active:scale-95 shadow-xs"
+                            className="h-8 sm:h-10 px-2.5 sm:px-3.5 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 rounded-lg sm:rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs active:scale-95 shadow-xs shrink-0 whitespace-nowrap"
                         >
-                            <Download size={14} className="text-slate-500 dark:text-slate-400" />
+                            <Download size={13} className="text-slate-500 dark:text-slate-400 sm:w-3.5 sm:h-3.5" />
                             <span>{isIndo ? 'Ekspor' : 'Export'}</span>
                         </button>
                     )}
@@ -130,18 +130,18 @@ export default function PlannerHeader({
                         type="button"
                         onClick={onResetBoard} 
                         title={isIndo ? "Kosongkan jadwal hari ini" : "Clear today's schedule"} 
-                        className="h-10 w-10 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-xl font-bold hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-xs"
+                        className="h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-lg sm:rounded-xl font-bold hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-xs shrink-0"
                     >
-                        <RotateCcw size={15} strokeWidth={2.5} />
+                        <RotateCcw size={14} strokeWidth={2.5} className="sm:w-[15px] sm:h-[15px]" />
                     </button>
 
                     {/* Add Task Button */}
                     <button 
                         type="button"
                         onClick={onOpenTaskModal} 
-                        className="h-10 px-4 sm:px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black transition shadow-md shadow-indigo-500/20 flex items-center justify-center gap-1.5 text-xs active:scale-95"
+                        className="h-8 sm:h-10 px-3 sm:px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg sm:rounded-xl font-black transition shadow-md shadow-indigo-500/20 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs active:scale-95 shrink-0 whitespace-nowrap"
                     >
-                        <Plus size={16} strokeWidth={3} />
+                        <Plus size={15} strokeWidth={3} className="sm:w-4 sm:h-4" />
                         <span>{isIndo ? 'Tambah Tugas' : 'Add Task'}</span>
                     </button>
                 </div>

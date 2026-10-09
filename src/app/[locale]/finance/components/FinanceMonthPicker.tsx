@@ -60,13 +60,13 @@ export default function FinanceMonthPicker({ selectedMonthKey, onMonthChange }: 
             <button 
                 type="button"
                 onClick={() => setIsOpen(!isOpen)} 
-                className={`flex items-center justify-center w-[90px] md:w-auto md:px-4 h-11 transition border rounded-xl gap-1.5 shadow-sm dark:shadow-none group transition-colors duration-300 ${isOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/40'}`}
+                className={`flex items-center justify-center px-2.5 sm:px-4 h-8 sm:h-10 transition border rounded-lg sm:rounded-xl gap-1 sm:gap-1.5 shadow-sm dark:shadow-none group transition-colors duration-300 ${isOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/40'}`}
             >
                 <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 tracking-tight whitespace-nowrap transition-colors duration-300">
                     <span className="md:hidden">{getShortMonthName(selectedMonthKey)}</span>
                     <span className="hidden md:inline">{getMonthName(selectedMonthKey)}</span>
                 </span>
-                <ChevronDown size={12} strokeWidth={3} className={`text-slate-400 group-hover:text-indigo-500 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={11} strokeWidth={3} className={`text-slate-400 group-hover:text-indigo-500 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (

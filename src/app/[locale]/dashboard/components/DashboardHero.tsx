@@ -44,7 +44,7 @@ export default function DashboardHero({ user, synergy, t, overallScore }: Dashbo
                 : (t('dash_status_boost') || 'Perlu Dorongan');
 
     return (
-        <header className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <header className="mb-5 sm:mb-8 flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-1.5">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-0.5 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-500/20">
@@ -57,20 +57,20 @@ export default function DashboardHero({ user, synergy, t, overallScore }: Dashbo
                     </span>
                 </div>
 
-                <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     {t(getGreetingKey() as any) || 'Selamat Datang'},{' '}
                     <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
                         {firstName}
                     </span>
                 </h1>
 
-                <p className="mt-2 max-w-xl text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="mt-1.5 sm:mt-2 max-w-xl text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                     {t('dash_hero_subtitle') || 'Jadikan hari ini mahakarya. Berikut adalah rangkuman sinergi rutinitas, tugas, akademik, dan keuanganmu hari ini.'}
                 </p>
             </div>
 
             {/* Synergy Score Hub */}
-            <div className="flex shrink-0 items-center gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-slate-900/90">
+            <div className="flex shrink-0 items-center gap-3 sm:gap-4 rounded-xl sm:rounded-2xl border border-slate-200/80 bg-white/90 p-3 sm:p-4 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-slate-900/90">
                 <div className="relative flex h-16 w-16 items-center justify-center">
                     <svg className="absolute h-full w-full -rotate-90" viewBox="0 0 100 100">
                         <circle
