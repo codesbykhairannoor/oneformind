@@ -32,7 +32,7 @@ export default function GuestFooter({
                                 : 'The unified productivity system designed to bring clarity to your life, habits, and finances.'}
                         </p>
                         <div className="text-xs text-slate-600 space-y-2 mt-4 font-bold">
-                            <p><strong>Email:</strong> <span dangerouslySetInnerHTML={{ __html: '<!--email_off--><a href="mailto:tranvasapp@gmail.com" class="hover:underline">tranvasapp@gmail.com</a><!--/email_off-->' }} /></p>
+                            <p><strong>Email:</strong> <span dangerouslySetInnerHTML={{ __html: '<!--email_off--><a href="mailto:hello@tranvas.com" class="hover:underline">hello@tranvas.com</a><!--/email_off-->' }} /></p>
                             <p><strong>Status:</strong> HQ Jakarta, ID</p>
                         </div>
                     </div>

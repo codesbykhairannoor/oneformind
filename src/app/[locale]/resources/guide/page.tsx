@@ -250,7 +250,7 @@ export default function GuidePage() {
                                     {t('guide_support_desc')}
                                 </p>
                                 <div className="flex flex-col sm:flex-row justify-center gap-6">
-                                    <a href="mailto:tranvasapp@gmail.com" className="bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-lg hover:bg-indigo-500 transition shadow-xl shadow-indigo-900/50 flex items-center justify-center gap-3">
+                                    <a href="mailto:hello@tranvas.com" className="bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-lg hover:bg-indigo-500 transition shadow-xl shadow-indigo-900/50 flex items-center justify-center gap-3">
                                         <Mail size={20} /> {t('guide_btn_contact')}
                                     </a>
                                     <Link href="/resources/community" className="bg-white/5 text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-lg hover:bg-white/10 transition flex items-center justify-center gap-3">

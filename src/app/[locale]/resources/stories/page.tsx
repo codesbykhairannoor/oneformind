@@ -298,7 +298,7 @@ export default function SuccessStoriesPage() {
                                 {t('stories_cta_desc')}
                             </p>
                             <div className="flex justify-center">
-                                <a href="mailto:tranvasapp@gmail.com" className="bg-white text-indigo-600 px-12 py-5 rounded-full font-black text-lg hover:bg-indigo-50 transition transform hover:scale-105 shadow-xl flex items-center gap-3">
+                                <a href="mailto:hello@tranvas.com" className="bg-white text-indigo-600 px-12 py-5 rounded-full font-black text-lg hover:bg-indigo-50 transition transform hover:scale-105 shadow-xl flex items-center gap-3">
                                     {t('stories_cta_btn')}
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />

@@ -123,7 +123,7 @@ export async function sendReminderEmail(payload: ReminderEmailPayload): Promise<
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: process.env.EMAIL_FROM || 'OneForMind Reminders <reminders@tranvas.com>',
+          from: process.env.EMAIL_FROM || 'Tranvas <hello@tranvas.com>',
           to: [toEmail],
           subject: `${currentMod.icon} ${subject}`,
           html: htmlContent,

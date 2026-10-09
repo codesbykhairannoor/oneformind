@@ -3,6 +3,7 @@
  */
 
 export const DEFAULT_ADMIN_EMAILS = [
+    'hello@tranvas.com',
     'tranvasapp@gmail.com',
     'admin@tranvas.com',
     'khairan@tranvas.com',

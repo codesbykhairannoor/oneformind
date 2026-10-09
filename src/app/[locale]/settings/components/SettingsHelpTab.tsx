@@ -20,7 +20,7 @@ export default function SettingsHelpTab() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <a 
-                    href="mailto:tranvasapp@gmail.com" 
+                    href="mailto:hello@tranvas.com" 
                     className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500 transition-all group"
                 >
                     <Mail className="w-8 h-8 text-indigo-600 mb-3" />
