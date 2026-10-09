@@ -93,7 +93,7 @@ export default function LandingHero() {
     };
 
     return (
-        <header className="relative pt-20 pb-20 sm:pt-28 sm:pb-32 lg:pt-36 lg:pb-48 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50">
+        <header className="relative pt-32 pb-20 sm:pt-36 sm:pb-32 lg:pt-40 lg:pb-48 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50">
             {/* Ambient High-End Radial Lighting & Grid Mesh (contained) */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] max-w-[100vw] h-[750px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(99,102,241,0.16),rgba(255,255,255,0))] pointer-events-none -z-10 overflow-hidden" />
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] max-w-[100vw] h-[400px] bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-emerald-500/5 blur-3xl pointer-events-none -z-10 rounded-full animate-pulse-glow overflow-hidden" />

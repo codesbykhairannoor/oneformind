@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
@@ -12,6 +12,12 @@ import AffiliateTracker from "@/components/AffiliateTracker";
 import TranvasDevHud from "@/components/dev/TranvasDevHud";
 
 import "../globals.css";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",

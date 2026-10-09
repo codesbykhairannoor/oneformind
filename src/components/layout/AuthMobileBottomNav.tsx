@@ -113,7 +113,7 @@ export default function AuthMobileBottomNav({ moduleSettings = {} }: AuthMobileB
                                 )}
                             </div>
 
-                            <span className={`text-[9.5px] font-black tracking-tight mt-0.5 transition-all ${
+                            <span className={`text-[11px] tracking-tight mt-0.5 transition-all ${
                                 active ? 'font-black scale-105' : 'font-semibold'
                             }`}>
                                 {item.label}

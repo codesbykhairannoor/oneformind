@@ -6,13 +6,18 @@
 }
 
 html {
-  zoom: 80%;
+  zoom: 100%;
   background-color: #f8fafc;
   height: 100%;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+@media (min-width: 1024px) {
+  html {
+    zoom: 80%;
+  }
 }
 html.dark {
   --text-muted: #94a3b8;
