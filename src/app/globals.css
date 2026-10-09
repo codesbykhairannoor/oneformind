@@ -15,7 +15,7 @@ html {
   text-rendering: optimizeLegibility;
 }
 html.app-authenticated {
-  zoom: 100%;
+  zoom: 88%;
 }
 @media (min-width: 768px) {
   html.app-authenticated {
