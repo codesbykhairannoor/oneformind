@@ -300,28 +300,19 @@ export default function GuestNavbar({
                     </div>
 
                     {/* MOBILE QUICK ACTIONS & HAMBURGER */}
-                    <div className="flex lg:hidden items-center gap-1.5 sm:gap-2">
+                    <div className="flex lg:hidden items-center gap-2">
                         {!user ? (
-                            <>
-                                <Link 
-                                    href="/login" 
-                                    onClick={() => trackCTAClick('header_nav_mobile', 'Log in', '/login')}
-                                    className="text-xs font-bold text-slate-600 hover:text-indigo-600 px-2 sm:px-2.5 py-1.5 transition"
-                                >
-                                    {locale === 'id' ? 'Masuk' : 'Log in'}
-                                </Link>
-                                <Link 
-                                    href="/register" 
-                                    onClick={() => trackCTAClick('header_nav_mobile', 'Get started', '/register')}
-                                    className="px-3 sm:px-3.5 py-1.5 bg-indigo-600 text-white rounded-full text-xs font-bold hover:bg-indigo-700 shadow-xs shadow-indigo-200 transition active:scale-95"
-                                >
-                                    {locale === 'id' ? 'Mulai' : 'Start'}
-                                </Link>
-                            </>
+                            <Link 
+                                href="/register" 
+                                onClick={() => trackCTAClick('header_nav_mobile', 'Get started', '/register')}
+                                className="px-3.5 py-1.5 bg-indigo-600 text-white rounded-full text-xs font-bold hover:bg-indigo-700 shadow-xs shadow-indigo-200 transition active:scale-95 shrink-0"
+                            >
+                                {locale === 'id' ? 'Mulai' : 'Start'}
+                            </Link>
                         ) : (
                             <Link 
                                 href="/dashboard" 
-                                className="px-3 py-1.5 bg-slate-900 text-white rounded-full text-xs font-bold shadow-xs transition"
+                                className="px-3 py-1.5 bg-slate-900 text-white rounded-full text-xs font-bold shadow-xs transition shrink-0"
                             >
                                 Dashboard
                             </Link>
