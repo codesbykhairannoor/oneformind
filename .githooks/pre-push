@@ -3,8 +3,6 @@
 # TRANVAS AUTOMATED RELEASE GATE & SDET QUALITY NET (PRE-PUSH HOOK)
 # Strictly prevents broken builds or failing tests from ever reaching remote/production
 # ==============================================================================
-export NODE_OPTIONS="--max-old-space-size=4096"
-
 echo ""
 echo "🛡️  ================================================================"
 echo "🛡️  TRANVAS SDET QUALITY GATE: ENFORCING PRE-PUSH INTEGRITY CHECK"
