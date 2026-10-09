@@ -44,11 +44,11 @@ export default function CommunityPage() {
                             {t('comm_hero_badge')}
                         </div>
 
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-slate-900 tracking-tighter font-black".replace(/s+/g, ' ').trim()}">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-slate-900 tracking-tighter font-black">
                             {t('comm_hero_title')}
                         </h1>
 
-                        <p className="text-2xl text-slate-400 mb-20 leading-relaxed max-w-3xl mx-auto font-medium italic">
+                        <p className="text-base sm:text-lg md:text-xl text-slate-500 mb-16 leading-relaxed max-w-3xl mx-auto font-medium">
                             {t('comm_hero_desc')}
                         </p>
 

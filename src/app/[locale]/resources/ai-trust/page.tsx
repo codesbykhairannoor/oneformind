@@ -42,7 +42,7 @@ export default function AiTrustPage() {
                                 System Transparency Report v2.5
                             </div>
 
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter font-black".replace(/s+/g, ' ').trim()}">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter font-black">
                                 Neural OS <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">
                                     Architecture
