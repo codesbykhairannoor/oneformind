@@ -102,7 +102,7 @@ export default function PlannerTimeline({
     const [density, setDensity] = useState<'compact' | 'normal'>('compact');
     const [isMobile, setIsMobile] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const [dragIndicator, setDragIndicator] = useState<{ top: number, time: string } | null>(null);
+    const [dragIndicator, setDragIndicator] = useState<{ top: number, time: string, endTime?: string } | null>(null);
 
     // Desktop / Laptop Pointer Drag-to-Scroll (Panning)
     const [isDraggingMouse, setIsDraggingMouse] = useState(false);
@@ -214,9 +214,38 @@ export default function PlannerTimeline({
     }, [startHour, density, selectedDate]);
 
     const handleDragStart = (e: React.DragEvent, taskId: number) => {
-        e.dataTransfer.dropEffect = 'move';
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.setData('text/plain', taskId.toString());
+
+        const task = activeTasks.find(t => t.id === taskId);
+        if (typeof document !== 'undefined') {
+            const ghost = document.createElement('div');
+            ghost.style.position = 'fixed';
+            ghost.style.top = '-9999px';
+            ghost.style.left = '-9999px';
+            ghost.style.padding = '8px 14px';
+            ghost.style.background = '#4f46e5';
+            ghost.style.color = '#ffffff';
+            ghost.style.borderRadius = '12px';
+            ghost.style.fontSize = '12px';
+            ghost.style.fontWeight = '700';
+            ghost.style.boxShadow = '0 10px 25px -5px rgba(79, 70, 229, 0.4)';
+            ghost.style.display = 'flex';
+            ghost.style.alignItems = 'center';
+            ghost.style.gap = '8px';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = '9999';
+            const cleanTitle = (task?.title || (isIndo ? 'Tugas' : 'Task')).slice(0, 22);
+            ghost.innerHTML = `<span style="font-size: 14px;">📋</span><span>${cleanTitle}</span>`;
+            document.body.appendChild(ghost);
+            
+            e.dataTransfer.setDragImage(ghost, 20, 18);
+            setTimeout(() => {
+                if (document.body.contains(ghost)) {
+                    document.body.removeChild(ghost);
+                }
+            }, 0);
+        }
     };
 
     const handleDrop = (e: React.DragEvent, newStartTime: string) => {
@@ -416,6 +445,8 @@ export default function PlannerTimeline({
 
     const handleTimelineDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+
         const rect = e.currentTarget.getBoundingClientRect();
         const y = e.clientY - rect.top;
         
@@ -430,15 +461,21 @@ export default function PlannerTimeline({
         
         const newStartTime = `${String(absoluteHours).padStart(2, '0')}:${String(absoluteMinutes).padStart(2, '0')}`;
         
+        let endHours = absoluteHours + 1;
+        if (endHours >= 24) endHours -= 24;
+        const newEndTime = `${String(endHours).padStart(2, '0')}:${String(absoluteMinutes).padStart(2, '0')}`;
+
         let relStart = absoluteHours * 60 + absoluteMinutes - (startHour * 60);
         if (relStart < 0) relStart += 1440;
         const topPx = (relStart / 60) * hourHeight;
         
-        setDragIndicator({ top: topPx, time: newStartTime });
+        setDragIndicator({ top: topPx, time: newStartTime, endTime: newEndTime });
     };
 
     const handleTimelineDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-        setDragIndicator(null);
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setDragIndicator(null);
+        }
     };
 
     const handleTimelineDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -594,7 +631,7 @@ export default function PlannerTimeline({
             <div 
                 ref={scrollContainerRef} 
                 onPointerDown={handlePointerDown}
-                className={`flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar select-none touch-pan-y ${isDraggingMouse ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar select-none touch-pan-y ${dragIndicator ? 'cursor-copy' : (isDraggingMouse ? 'cursor-grabbing' : 'cursor-grab')}`}
             >
                 <div 
                     className="relative w-full" 
@@ -604,20 +641,37 @@ export default function PlannerTimeline({
                     onDrop={handleTimelineDrop}
                 >
                     
-                    {/* Drag Drop Indicator */}
+                    {/* Drag Drop Indicator - High Precision Timeblock Ghost */}
                     {dragIndicator && (
                         <div 
-                            className="absolute z-40 rounded-xl border-2 border-dashed border-indigo-400 bg-indigo-50/50 dark:bg-indigo-500/20 flex items-center justify-center pointer-events-none transition-all duration-75"
+                            className="absolute z-40 rounded-2xl border-2 border-dashed border-indigo-500 dark:border-indigo-400 bg-indigo-50/85 dark:bg-indigo-950/70 backdrop-blur-[2px] flex flex-col justify-between p-2.5 pointer-events-none shadow-lg shadow-indigo-500/10 transition-none"
                             style={{ 
                                 top: `${dragIndicator.top}px`, 
-                                height: `${density === 'compact' ? 24 : 32}px`,
+                                height: `${hourHeight}px`,
                                 left: `${timeColWidth + 6}px`,
                                 right: '8px'
                             }}
                         >
-                            <span className="text-indigo-600 dark:text-indigo-300 text-[10px] font-black tracking-wider bg-white/90 dark:bg-slate-900/90 px-3 py-1 rounded-full shadow-sm">
-                                {isIndo ? 'Pindahkan ke ' : 'Move to '}{dragIndicator.time}
-                            </span>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                    <span className="text-sm shrink-0">🎯</span>
+                                    <span className="text-xs font-black text-indigo-950 dark:text-indigo-100 truncate">
+                                        {isIndo ? 'Jadwalkan Tugas' : 'Schedule Task'}
+                                    </span>
+                                </div>
+                                <span className="text-[10px] font-mono font-black text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md shadow-sm border border-indigo-200 dark:border-indigo-800 shrink-0">
+                                    {dragIndicator.time} - {dragIndicator.endTime}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                                <span className="flex items-center gap-1">
+                                    <span>✨</span>
+                                    <span>{isIndo ? 'Lepaskan untuk menjadwalkan' : 'Release to schedule'}</span>
+                                </span>
+                                <span className="text-[9px] bg-indigo-100 dark:bg-indigo-900/60 px-2 py-0.5 rounded font-semibold text-indigo-800 dark:text-indigo-200">
+                                    1 Jam (60m)
+                                </span>
+                            </div>
                         </div>
                     )}
 

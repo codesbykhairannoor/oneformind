@@ -108,7 +108,6 @@ export default function PlannerSidebar({
     const removeInboxTask = (id: number) => setTaskInbox(taskInbox.filter(t => t.id !== id));
 
     const handleInboxDragStart = (e: React.DragEvent, task: InboxTask) => {
-        e.dataTransfer.dropEffect = 'copy';
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.setData('application/json', JSON.stringify({
             type: 'INBOX_TASK',
@@ -117,10 +116,39 @@ export default function PlannerSidebar({
             taskType: task.type
         }));
         e.dataTransfer.setData('text/plain', task.title);
+
+        // Custom compact drag preview anchored precisely at cursor
+        if (typeof document !== 'undefined') {
+            const ghost = document.createElement('div');
+            ghost.style.position = 'fixed';
+            ghost.style.top = '-9999px';
+            ghost.style.left = '-9999px';
+            ghost.style.padding = '8px 14px';
+            ghost.style.background = '#4f46e5';
+            ghost.style.color = '#ffffff';
+            ghost.style.borderRadius = '12px';
+            ghost.style.fontSize = '12px';
+            ghost.style.fontWeight = '700';
+            ghost.style.boxShadow = '0 10px 25px -5px rgba(79, 70, 229, 0.4)';
+            ghost.style.display = 'flex';
+            ghost.style.alignItems = 'center';
+            ghost.style.gap = '8px';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = '9999';
+            const cleanTitle = (task.title || (isIndo ? 'Tugas Baru' : 'New Task')).slice(0, 22);
+            ghost.innerHTML = `<span style="font-size: 14px;">🎯</span><span>${cleanTitle}</span><span style="font-size: 10px; opacity: 0.85; background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 6px;">1 Jam</span>`;
+            document.body.appendChild(ghost);
+            
+            e.dataTransfer.setDragImage(ghost, 20, 18);
+            setTimeout(() => {
+                if (document.body.contains(ghost)) {
+                    document.body.removeChild(ghost);
+                }
+            }, 0);
+        }
     };
 
     const handleHabitDragStart = (e: React.DragEvent, habit: any) => {
-        e.dataTransfer.dropEffect = 'copy';
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.setData('application/json', JSON.stringify({
             type: 'HABIT',
@@ -130,6 +158,36 @@ export default function PlannerSidebar({
             color: habit.color || '#10b981'
         }));
         e.dataTransfer.setData('text/plain', habit.name);
+
+        // Custom compact habit drag preview
+        if (typeof document !== 'undefined') {
+            const ghost = document.createElement('div');
+            ghost.style.position = 'fixed';
+            ghost.style.top = '-9999px';
+            ghost.style.left = '-9999px';
+            ghost.style.padding = '8px 14px';
+            ghost.style.background = '#059669';
+            ghost.style.color = '#ffffff';
+            ghost.style.borderRadius = '12px';
+            ghost.style.fontSize = '12px';
+            ghost.style.fontWeight = '700';
+            ghost.style.boxShadow = '0 10px 25px -5px rgba(5, 150, 105, 0.4)';
+            ghost.style.display = 'flex';
+            ghost.style.alignItems = 'center';
+            ghost.style.gap = '8px';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = '9999';
+            const cleanName = (habit.name || 'Habit').slice(0, 22);
+            ghost.innerHTML = `<span style="font-size: 14px;">${habit.icon || '🌱'}</span><span>${cleanName}</span><span style="font-size: 10px; opacity: 0.85; background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 6px;">Habit</span>`;
+            document.body.appendChild(ghost);
+            
+            e.dataTransfer.setDragImage(ghost, 20, 18);
+            setTimeout(() => {
+                if (document.body.contains(ghost)) {
+                    document.body.removeChild(ghost);
+                }
+            }, 0);
+        }
     };
 
     // Calculate filled meals count
@@ -298,7 +356,13 @@ export default function PlannerSidebar({
                                             className={`group flex items-center justify-between gap-2 p-2 rounded-xl border bg-white dark:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all cursor-grab active:cursor-grabbing shadow-sm ${task.completed ? 'opacity-50 grayscale-[0.5] bg-slate-50 dark:bg-slate-800/50' : 'border-slate-100 dark:border-slate-800'}`}
                                             title={isIndo ? 'Tarik ke timeline untuk menjadwalkan' : 'Drag to timeline to schedule'}
                                         >
-                                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                                <div 
+                                                    className="text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors p-0.5 shrink-0 cursor-grab active:cursor-grabbing" 
+                                                    title={isIndo ? 'Tarik untuk menjadwalkan' : 'Drag to schedule'}
+                                                >
+                                                    <GripVertical size={13} />
+                                                </div>
                                                 <button 
                                                     onClick={() => toggleInboxTask(task.id)} 
                                                     className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-400'}`}
@@ -407,7 +471,13 @@ export default function PlannerSidebar({
                                             }`}
                                             title={isIndo ? 'Tarik ke timeline untuk menjadwalkan jam' : 'Drag to timeline to schedule time'}
                                         >
-                                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                                <div 
+                                                    className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors p-0.5 shrink-0 cursor-grab active:cursor-grabbing" 
+                                                    title={isIndo ? 'Tarik untuk menjadwalkan' : 'Drag to schedule'}
+                                                >
+                                                    <GripVertical size={13} />
+                                                </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => onToggleHabit && onToggleHabit(habit.id)}
