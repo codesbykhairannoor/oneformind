@@ -35,6 +35,15 @@ const formatDisplayTime = (timeStr: any): string => {
     return `${h}:${m}`;
 };
 
+const getEffectiveZoom = (el?: HTMLElement | null): number => {
+    if (typeof window === 'undefined') return 1;
+    if (el && (el as any).currentCSSZoom) {
+        return (el as any).currentCSSZoom;
+    }
+    const computed = parseFloat(window.getComputedStyle(document.documentElement).zoom || '1');
+    return isNaN(computed) || computed <= 0 ? 1 : computed;
+};
+
 interface PlannerTimelineProps {
     tasks: any[];
     scheduledHabits?: ScheduledHabitItem[];
@@ -142,7 +151,8 @@ export default function PlannerTimeline({
 
         const handleWindowPointerMove = (e: PointerEvent) => {
             if (!scrollContainerRef.current) return;
-            const dy = e.clientY - startYRef.current;
+            const zoom = getEffectiveZoom(scrollContainerRef.current);
+            const dy = (e.clientY - startYRef.current) / zoom;
             if (Math.abs(dy) > 3) {
                 hasDraggedRef.current = true;
             }
@@ -448,7 +458,8 @@ export default function PlannerTimeline({
         e.dataTransfer.dropEffect = 'copy';
 
         const rect = e.currentTarget.getBoundingClientRect();
-        const y = e.clientY - rect.top;
+        const zoom = getEffectiveZoom(e.currentTarget);
+        const y = Math.max(0, (e.clientY - rect.top) / zoom);
         
         const hoursFromTop = y / hourHeight;
         let totalHours = startHour + hoursFromTop;
@@ -483,7 +494,8 @@ export default function PlannerTimeline({
         setDragIndicator(null);
         
         const rect = e.currentTarget.getBoundingClientRect();
-        const y = e.clientY - rect.top;
+        const zoom = getEffectiveZoom(e.currentTarget);
+        const y = Math.max(0, (e.clientY - rect.top) / zoom);
         
         const hoursFromTop = y / hourHeight;
         let totalHours = startHour + hoursFromTop;
