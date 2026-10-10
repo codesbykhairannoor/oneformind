@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Primary SEO Tags -->
+  <title>Tranvas — The Unified Cognitive Life OS | Open Architecture & Documentation</title>
+  <meta name="title" content="Tranvas — The Unified Cognitive Life OS | Open Architecture & Documentation" />
+  <meta name="description" content="Tranvas synthesizes daily planning, habit architecture, cognitive CBT reflection, and career/academic execution into a unified Life OS powered by Anthropic Claude 3.5 Sonnet." />
+  <meta name="keywords" content="Tranvas, Life OS, Claude 3.5 Sonnet, Cognitive CBT Journaling, Daily Planner, Habit Tracker, Personal Finance, Goal Tracking, Productivity System, Anthropic Startup" />
+  <meta name="author" content="Tranvas Technologies" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://codesbykhairannoor.github.io/oneformind/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://codesbykhairannoor.github.io/oneformind/" />
+  <meta property="og:title" content="Tranvas — The Unified Cognitive Life OS" />
+  <meta property="og:description" content="The Unified Cognitive Life OS synthesizing daily planning, habit architecture, and CBT reflection powered by Claude 3.5 Sonnet." />
+  <meta property="og:image" content="https://tranvas.com/favicon.png" />
+  <meta property="og:site_name" content="Tranvas" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://codesbykhairannoor.github.io/oneformind/" />
+  <meta property="twitter:title" content="Tranvas — The Unified Cognitive Life OS" />
+  <meta property="twitter:description" content="Synthesizing daily planning, habit architecture, cognitive journaling, and career execution into a unified intelligence ecosystem." />
+  <meta property="twitter:image" content="https://tranvas.com/favicon.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Tranvas",
+    "alternateName": "Tranvas Life OS",
+    "operatingSystem": "Web, iOS, Android, macOS, Windows",
+    "applicationCategory": "ProductivityApplication",
+    "description": "An integrated all-in-one Life OS that synthesizes daily planning, habit architecture, cognitive journaling, and career execution into a unified productivity ecosystem powered by Anthropic Claude 3.5 Sonnet.",
+    "url": "https://tranvas.com",
+    "sameAs": [
+      "https://github.com/codesbykhairannoor/oneformind",
+      "https://codesbykhairannoor.github.io/oneformind/"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Autonomous Life Synergy Coach powered by Claude 3.5 Sonnet",
+      "Cognitive Reflection and CBT Thought Reframing",
+      "Intelligent Daily Timeboxed Planner",
+      "Habit Architecture and Streak Analytics",
+      "Wealth and Cashflow Engine",
+      "Strategic Goal Milestones and OKRs",
+      "Career Application Pipeline",
+      "Deep Study Pomodoro Hub",
+      "Unified Chrono Calendar"
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg-base: #06090e;
+      --bg-surface: #0c111c;
+      --bg-card: rgba(16, 24, 40, 0.75);
+      --bg-card-hover: rgba(22, 34, 56, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.35);
+      --accent-primary: #4f46e5;
+      --accent-hover: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.2);
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+    }
+
+    body {
+      line-height: 1.6;
+      background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                  var(--bg-base);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background mesh */
+    .bg-mesh {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(6, 9, 14, 0.8);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: all 0.3s ease;
+    }
+
+    .nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand img {
+      width: 32px;
+      height: 32px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #ffffff 20%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #818cf8 0%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      max-width: 760px;
+      margin: 0 auto 36px;
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 980px;
+      margin: 0 auto 60px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px 16px;
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      margin-bottom: 4px;
+    }
+
+    .stat-val.emerald {
+      color: #34d399;
+    }
+
+    .stat-val.indigo {
+      color: #818cf8;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    /* Section Headings */
+    .section-header {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 48px;
+    }
+
+    .section-tag {
+      color: #818cf8;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      color: var(--text-main);
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    /* Feature Grid / Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-highlight);
+      transform: translateY(-2px);
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.6), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .card-icon.emerald {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .check-mark {
+      color: #34d399;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* 8 Modules Matrix Grid */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 80px;
+    }
+
+    .module-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .module-card:hover {
+      border-color: rgba(99, 102, 241, 0.5);
+      background: var(--bg-card-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .module-emoji {
+      font-size: 1.5rem;
+    }
+
+    .module-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .module-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      flex-grow: 1;
+    }
+
+    .module-link-tag {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #818cf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .module-link-tag span {
+      transition: transform 0.2s ease;
+    }
+
+    .module-card:hover .module-link-tag span {
+      transform: translateX(4px);
+    }
+
+    /* Architecture Visualizer */
+    .arch-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 36px;
+      margin-bottom: 80px;
+    }
+
+    .arch-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .arch-layer {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .layer-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .layer-components {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .arch-badge {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      color: #c7d2fe;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .arch-badge.cyan {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: rgba(6, 182, 212, 0.25);
+      color: #a5f3fc;
+    }
+
+    .arch-badge.emerald {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: #a7f3d0;
+    }
+
+    .arch-badge.amber {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: #fde68a;
+    }
+
+    /* Code Terminal */
+    .terminal-box {
+      background: #04060a;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 80px;
+    }
+
+    .terminal-header {
+      background: #090e17;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .terminal-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-title {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: var(--text-faint);
+      margin-left: 8px;
+    }
+
+    .terminal-body {
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .code-comment {
+      color: #64748b;
+    }
+
+    .code-cmd {
+      color: #38bdf8;
+    }
+
+    /* Live CTA Banner */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.2) 0%, rgba(16, 185, 129, 0.15) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      border-radius: 20px;
+      padding: 48px;
+      text-align: center;
+      margin-bottom: 80px;
+      position: relative;
+    }
+
+    .cta-banner h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .cta-banner p {
+      max-width: 620px;
+      margin: 0 auto 30px;
+      color: #cbd5e1;
+      font-size: 1.1rem;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 60px 0 36px;
+      background: #040609;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+
+    .footer-brand p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 12px;
+      max-width: 340px;
+      line-height: 1.6;
+    }
+
+    .footer-col h4 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-col a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-col a:hover {
+      color: #fff;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-faint);
+      font-size: 0.82rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .modules-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+      .cta-banner {
+        padding: 32px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="https://tranvas.com" class="brand" target="_blank" title="Tranvas Official Platform">
+        <img src="favicon.svg" alt="Tranvas Logo" />
+        <span>Tranvas</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#intelligence">Claude Intelligence</a></li>
+        <li><a href="#modules">8 Core Modules</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#quality">Release Gates</a></li>
+        <li><a href="https://tranvas.com/company/security" target="_blank">Security & RLS</a></li>
+        <li><a href="https://tranvas.com/pricing" target="_blank">Pricing</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="https://github.com/codesbykhairannoor/oneformind" target="_blank" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          Repository
+        </a>
+        <a href="https://tranvas.com" target="_blank" class="btn btn-primary" title="Launch Tranvas Platform">
+          Launch App →
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero container">
+    <div class="badge-pill">
+      <span class="badge-dot"></span>
+      Autonomous Intelligence &amp; Next.js 16
+    </div>
+    
+    <h1 class="hero-title">
+      The Unified Cognitive <br />
+      <span class="gradient-text">Life OS</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Synthesizing daily planning, habit architecture, cognitive CBT reflection, and academic/career execution into a single, cohesive productivity ecosystem powered by <strong>Anthropic Claude 3.5 Sonnet</strong>.
+    </p>
+
+    <div class="hero-cta">
+      <a href="https://tranvas.com" target="_blank" class="btn btn-primary" style="padding: 12px 28px; font-size: 1rem;">
+        Launch Tranvas Live Platform →
+      </a>
+      <a href="https://github.com/codesbykhairannoor/oneformind" target="_blank" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1rem;">
+        Explore Source on GitHub
+      </a>
+    </div>
+
+    <!-- Live Performance Metrics Matrix -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val emerald">53 / 53</div>
+        <div class="stat-label">Automated Tests Passing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val indigo">8 Modul</div>
+        <div class="stat-label">Unified Full-Stack Domains</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val emerald">100% RLS</div>
+        <div class="stat-label">Multi-Tenant Isolation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">&lt; 85ms</div>
+        <div class="stat-label">Optimistic Edge Mutation</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Flagship Claude 3.5 Sonnet Intelligence Section -->
+    <section id="intelligence" style="padding-top: 40px;">
+      <div class="section-header">
+        <span class="section-tag">Flagship Intelligence Engine</span>
+        <h2 class="section-title">Powered by Anthropic Claude 3.5 Sonnet</h2>
+        <p class="section-desc">
+          Tranvas integrates Claude 3.5 Sonnet as the core cognitive engine for deep empathetic reasoning and cross-module behavioral synthesis.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="feature-card">
+          <div class="card-icon emerald">⚡</div>
+          <h3 class="card-title">Autonomous Life Synergy Coach</h3>
+          <p class="card-desc">
+            An intelligent agent analyzing multi-module behavioral patterns in real time to prevent burnout and dynamically optimize your daily agenda.
+          </p>
+          <ul class="card-list">
+            <li><span class="check-mark">✓</span> <strong>Cross-Module Correlation:</strong> Detects causal relationships between missed habits, low focus sessions, and schedule overcrowding.</li>
+            <li><span class="check-mark">✓</span> <strong>Adaptive Agenda Re-balancing:</strong> Dynamically recalculates daily timeboxes in the <a href="https://tranvas.com/planner" target="_blank" style="color:#a5b4fc; text-decoration: underline;">Planner</a> when fatigue indicators spike.</li>
+            <li><span class="check-mark">✓</span> <strong>Proactive Behavioral Nudges:</strong> Context-aware coaching prompts delivered before productivity drop-offs occur.</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">🧠</div>
+          <h3 class="card-title">Cognitive CBT Reflection &amp; Reframing</h3>
+          <p class="card-desc">
+            Clinical-grade cognitive restructuring assistant grounded in Cognitive Behavioral Therapy (CBT) principles.
+          </p>
+          <ul class="card-list">
+            <li><span class="check-mark">✓</span> <strong>10 Distortion Archetype Scans:</strong> Identifies catastrophizing, all-or-nothing thinking, emotional reasoning, and mental filtering in <a href="https://tranvas.com/journal" target="_blank" style="color:#a5b4fc; text-decoration: underline;">Journal entries</a>.</li>
+            <li><span class="check-mark">✓</span> <strong>Socratic Questioning Sequences:</strong> Empathetic guided prompts that decouple objective events from cognitive biases.</li>
+            <li><span class="check-mark">✓</span> <strong>Actionable Growth Extraction:</strong> Translates reframed cognitive clarity directly into actionable, calendar-ready tasks.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- The 8 Core Modules -->
+    <section id="modules">
+      <div class="section-header">
+        <span class="section-tag">Unified Productivity Matrix</span>
+        <h2 class="section-title">8 Fully Integrated Core Modules</h2>
+        <p class="section-desc">
+          Zero context switching. Every module communicates bidirectionally across the same high-performance relational graph.
+        </p>
+      </div>
+
+      <div class="modules-grid">
+        <a href="https://tranvas.com/planner" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">🗓️</span>
+              <h3 class="module-name">Daily Planner</h3>
+            </div>
+            <p class="module-desc">Timeboxed day scheduling, Eisenhower priority matrix, and drag-and-drop task sequencing.</p>
+          </div>
+          <div class="module-link-tag">Explore Planner <span>→</span></div>
+        </a>
+
+        <a href="https://tranvas.com/habits" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">🔄</span>
+              <h3 class="module-name">Habit Architecture</h3>
+            </div>
+            <p class="module-desc">Identity-reinforcing streak analytics, customizable cadences, and consistency heatmaps.</p>
+          </div>
+          <div class="module-link-tag">Explore Habits <span>→</span></div>
+        </a>
+
+        <a href="https://tranvas.com/finance" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">💰</span>
+              <h3 class="module-name">Wealth &amp; Cashflow</h3>
+            </div>
+            <p class="module-desc">Real-time ledger tracking, income/expense categorization, and predictive balance analytics.</p>
+          </div>
+          <div class="module-link-tag">Explore Finance <span>→</span></div>
+        </a>
+
+        <a href="https://tranvas.com/journal" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">🧠</span>
+              <h3 class="module-name">CBT Journal</h3>
+            </div>
+            <p class="module-desc">Structured reflection, sentiment trend tracking, and AI-assisted cognitive reframing.</p>
+          </div>
+          <div class="module-link-tag">Explore Journal <span>→</span></div>
+        </a>
+
+        <a href="https://tranvas.com/goals" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">🎯</span>
+              <h3 class="module-name">Strategic Goals</h3>
+            </div>
+            <p class="module-desc">Hierarchical OKR frameworks, Key Result metrics, and objective completion velocity.</p>
+          </div>
+          <div class="module-link-tag">Explore Goals <span>→</span></div>
+        </a>
+
+        <a href="https://tranvas.com/jobs" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">💼</span>
+              <h3 class="module-name">Career Pipeline</h3>
+            </div>
+            <p class="module-desc">Kanban application pipeline, interview preparation debriefs, and salary negotiation logs.</p>
+          </div>
+          <div class="module-link-tag">Explore Jobs <span>→</span></div>
+        </a>
+
+        <a href="https://tranvas.com/study" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">📚</span>
+              <h3 class="module-name">Deep Study Hub</h3>
+            </div>
+            <p class="module-desc">Integrated Pomodoro timer, syllabus mastery logs, and academic exam timeline tracking.</p>
+          </div>
+          <div class="module-link-tag">Explore Study <span>→</span></div>
+        </a>
+
+        <a href="https://tranvas.com/calendar" target="_blank" class="module-card">
+          <div>
+            <div class="module-header">
+              <span class="module-emoji">📆</span>
+              <h3 class="module-name">Chrono Calendar</h3>
+            </div>
+            <p class="module-desc">Aggregated visual timeline synchronizing planner blocks, habit checkpoints, and milestones.</p>
+          </div>
+          <div class="module-link-tag">Explore Calendar <span>→</span></div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Architecture & Engineering Rigor -->
+    <section id="architecture">
+      <div class="section-header">
+        <span class="section-tag">System Topology</span>
+        <h2 class="section-title">Engineered for Scalability &amp; Multi-Tenancy</h2>
+        <p class="section-desc">
+          Modern cloud infrastructure designed with zero cold starts, end-to-end type safety, and database-level tenancy barriers.
+        </p>
+      </div>
+
+      <div class="arch-container">
+        <div class="arch-layers">
+          <div class="arch-layer">
+            <div class="layer-title">Layer 1: Presentation &amp; Edge Delivery</div>
+            <div class="layer-components">
+              <span class="arch-badge">Next.js 16.3.2 (App Router)</span>
+              <span class="arch-badge">Turbopack Bundler</span>
+              <span class="arch-badge">React 19 &amp; React Compiler</span>
+              <span class="arch-badge">Tailwind CSS v4</span>
+              <span class="arch-badge">SWR Stale-While-Revalidate</span>
+              <span class="arch-badge">next-intl Multi-Language</span>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <div class="layer-title">Layer 2: Intelligence &amp; Autonomous Agents</div>
+            <div class="layer-components">
+              <span class="arch-badge cyan">Anthropic Claude 3.5 Sonnet API</span>
+              <span class="arch-badge cyan">Context Aggregation Engine</span>
+              <span class="arch-badge cyan">CBT Diagnostic Parser</span>
+              <span class="arch-badge cyan">Anonymized Tenant Boundary Guard</span>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <div class="layer-title">Layer 3: Realtime Compute &amp; Daemons</div>
+            <div class="layer-components">
+              <span class="arch-badge amber">Go 1.23 High-Concurrency Microservice</span>
+              <span class="arch-badge amber">Native Postgres Direct Pool</span>
+              <span class="arch-badge amber">Optimistic State Synchronization</span>
+            </div>
+          </div>
+
+          <div class="arch-layer">
+            <div class="layer-title">Layer 4: Persistence, Security &amp; Isolation</div>
+            <div class="layer-components">
+              <span class="arch-badge emerald">Supabase Managed PostgreSQL</span>
+              <span class="arch-badge emerald">PostgreSQL Row-Level Security (RLS)</span>
+              <span class="arch-badge emerald">AES-256 Encrypted Storage</span>
+              <span class="arch-badge emerald">Adversarial Leakage Net</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testing & Release Verification -->
+    <section id="quality">
+      <div class="section-header">
+        <span class="section-tag">Quality Assurance</span>
+        <h2 class="section-title">Rigorous Automated Release Gates</h2>
+        <p class="section-desc">
+          Every deployment is verified against 9 enterprise-grade automated security and integrity gates.
+        </p>
+      </div>
+
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <div class="terminal-circle" style="background: #ef4444;"></div>
+          <div class="terminal-circle" style="background: #eab308;"></div>
+          <div class="terminal-circle" style="background: #22c55e;"></div>
+          <div class="terminal-title">sdet-qa-release-gate-runner.sh — Vitest &amp; Invariants Engine</div>
+        </div>
+        <div class="terminal-body">
+          <div class="code-comment"># Running complete system regression verification</div>
+          <div><span class="code-cmd">$</span> npm run test</div>
+          <div style="color: #34d399;">✓ tests/data-integrity.test.ts (8 tests) [12ms]</div>
+          <div style="color: #34d399;">✓ tests/adversarial-rls.test.ts (25 tests) [24ms]</div>
+          <div style="color: #34d399;">✓ tests/concurrency-fuzz.test.ts (3 tests) [56ms]</div>
+          <div style="color: #34d399;">✓ tests/synthetic-factory.test.ts (5 tests) [25ms]</div>
+          <div style="color: #34d399;">✓ tests/contracts.test.ts (12 tests) [25ms]</div>
+          <div style="color: #818cf8; margin-top: 8px;">Test Files  5 passed (5) | Tests  53 passed (53) | Status: 100% HEALTHY</div>
+          <br />
+          <div class="code-comment"># Running multi-tenant adversarial release gates</div>
+          <div><span class="code-cmd">$</span> npm run test:qa</div>
+          <div style="color: #34d399;">⏳ Running [Vitest Unit &amp; Integration Engine (TypeScript)]... ✅ PASSED</div>
+          <div style="color: #34d399;">⏳ Running [Security, XSS Sanitization &amp; Subscription Hierarchy]... ✅ PASSED</div>
+          <div style="color: #34d399;">⏳ Running [Adversarial Multi-Tenant &amp; RLS Leak Guard]... ✅ PASSED</div>
+          <div style="color: #34d399;">⏳ Running [Concurrency, Race Condition &amp; Idempotency Guard]... ✅ PASSED</div>
+          <div style="color: #34d399;">⏳ Running [Mathematical Invariants &amp; Data Integrity Guard]... ✅ PASSED</div>
+          <div style="color: #34d399;">⏳ Running [SEO, Crawlability &amp; i18n Hydration Audit]... ✅ PASSED</div>
+          <div style="color: #38bdf8; font-weight: bold; margin-top: 8px;">🟢 FINAL VERDICT: RELEASABLE (All critical quality gates passed!)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Banner -->
+    <section class="cta-banner">
+      <h2>Experience The Future of Personal Productivity</h2>
+      <p>
+        Step into an integrated cognitive operating system designed for individuals who demand clarity, focus, and continuous growth.
+      </p>
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="https://tranvas.com" target="_blank" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.05rem;">
+          Get Started on Tranvas Free →
+        </a>
+        <a href="https://tranvas.com/about" target="_blank" class="btn btn-secondary" style="padding: 14px 28px; font-size: 1.05rem;">
+          About Tranvas Mission
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Comprehensive Footer with Full Contextual Dofollow Graph -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="https://tranvas.com" class="brand" target="_blank">
+            <img src="favicon.svg" alt="Tranvas Logo" />
+            <span>Tranvas</span>
+          </a>
+          <p>
+            The Unified Cognitive Life OS synthesizing daily planning, habit architecture, cognitive CBT reflection, and career execution. Powered by Claude 3.5 Sonnet.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Core Modules</h4>
+          <ul>
+            <li><a href="https://tranvas.com/planner" target="_blank">Daily Planner</a></li>
+            <li><a href="https://tranvas.com/habits" target="_blank">Habit Architecture</a></li>
+            <li><a href="https://tranvas.com/finance" target="_blank">Wealth &amp; Cashflow</a></li>
+            <li><a href="https://tranvas.com/journal" target="_blank">CBT Journal</a></li>
+            <li><a href="https://tranvas.com/goals" target="_blank">Goals &amp; OKRs</a></li>
+            <li><a href="https://tranvas.com/jobs" target="_blank">Career Pipeline</a></li>
+            <li><a href="https://tranvas.com/study" target="_blank">Deep Study</a></li>
+            <li><a href="https://tranvas.com/calendar" target="_blank">Chrono Calendar</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform &amp; Trust</h4>
+          <ul>
+            <li><a href="https://tranvas.com/about" target="_blank">About Us</a></li>
+            <li><a href="https://tranvas.com/company/security" target="_blank">Security &amp; Privacy</a></li>
+            <li><a href="https://tranvas.com/pricing" target="_blank">Pricing Plans</a></li>
+            <li><a href="https://tranvas.com/resources/blog" target="_blank">Engineering Blog</a></li>
+            <li><a href="https://tranvas.com/privacy" target="_blank">Privacy Policy</a></li>
+            <li><a href="https://tranvas.com/terms" target="_blank">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Open Ecosystem</h4>
+          <ul>
+            <li><a href="https://github.com/codesbykhairannoor/oneformind" target="_blank">GitHub Repository</a></li>
+            <li><a href="https://codesbykhairannoor.github.io/oneformind/" target="_blank">GitHub Pages Showcase</a></li>
+            <li><a href="https://tranvas.com/contact" target="_blank">Contact Support</a></li>
+            <li><a href="https://tranvas.com/login" target="_blank">Sign In</a></li>
+            <li><a href="https://tranvas.com/register" target="_blank">Create Account</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2026 <a href="https://tranvas.com" target="_blank" style="color: inherit; text-decoration: none;">Tranvas Technologies</a>. All rights reserved. Built with Next.js 16, Supabase, and Claude 3.5 Sonnet.
+        </div>
+        <div>
+          Hosted on <a href="https://github.com/codesbykhairannoor/oneformind" target="_blank" style="color: #818cf8; text-decoration: none;">GitHub Pages</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
