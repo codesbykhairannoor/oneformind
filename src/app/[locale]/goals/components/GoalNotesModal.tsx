@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useLocale } from 'next-intl';
 import useSWR from 'swr';
 import { 
     X, BookOpen, Compass, Award, ShieldAlert, 
     Save, Sparkles, Check, AlertCircle, Loader2,
-    Calendar, ArrowRight, PlusCircle, CheckCircle2
+    Calendar, ArrowRight, CheckCircle2, Info
 } from 'lucide-react';
 import ModalPortal from '@/components/ModalPortal';
 import { GoalItem, calculateGoalProgress } from '../lib/goalPaceCalculator';
@@ -22,6 +22,12 @@ interface GoalNotesModalProps {
         updatedNotes: string, 
         updatedWoop?: { core_why?: string; obstacle?: string; obstacle_plan?: string; reward?: string }
     ) => Promise<void>;
+}
+
+interface AlertState {
+    title: string;
+    message: string;
+    type: 'error' | 'warning' | 'success';
 }
 
 export default function GoalNotesModal({
@@ -48,6 +54,20 @@ export default function GoalNotesModal({
     const [isSavingWoop, setIsSavingWoop] = useState(false);
     const [woopSaveSuccess, setWoopSaveSuccess] = useState(false);
 
+    // Auto-save state
+    const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const savedValuesRef = useRef<{
+        notes: string;
+        coreWhy: string;
+        obstacle: string;
+        obstaclePlan: string;
+        reward: string;
+    }>({ notes: '', coreWhy: '', obstacle: '', obstaclePlan: '', reward: '' });
+
+    // Custom in-app alert modal state (replaces native browser alert)
+    const [customAlert, setCustomAlert] = useState<AlertState | null>(null);
+
     // Sync to Journal state
     const [isJournalSyncOpen, setIsJournalSyncOpen] = useState(false);
     const [journalMode, setJournalMode] = useState<'new' | 'existing'>('new');
@@ -57,7 +77,7 @@ export default function GoalNotesModal({
     const [isSyncingJournal, setIsSyncingJournal] = useState(false);
     const [journalSyncMessage, setJournalSyncMessage] = useState<string | null>(null);
 
-    // Fetch existing journals for Option B
+    // Fetch existing journals
     const { data: rawJournals, mutate: mutateJournals } = useSWR(
         isJournalSyncOpen ? '/api/journals' : null, 
         fetcher
@@ -74,61 +94,152 @@ export default function GoalNotesModal({
         }));
     }, [rawJournals, isIndo]);
 
+    // Preselect first existing journal if available and none selected yet
+    useEffect(() => {
+        if (existingJournals.length > 0 && !selectedExistingJournalId) {
+            setSelectedExistingJournalId(existingJournals[0].id);
+        }
+    }, [existingJournals, selectedExistingJournalId]);
+
     // Initialize inputs when goal changes
     useEffect(() => {
         if (goal) {
-            setNotes(goal.notes || '');
-            setCoreWhy(goal.core_why || '');
-            setObstacle(goal.obstacle || '');
-            setObstaclePlan(goal.obstacle_plan || '');
-            setReward(goal.reward || '');
+            const initialNotes = goal.notes || '';
+            const initialWhy = goal.core_why || '';
+            const initialObstacle = goal.obstacle || '';
+            const initialPlan = goal.obstacle_plan || '';
+            const initialReward = goal.reward || '';
+
+            setNotes(initialNotes);
+            setCoreWhy(initialWhy);
+            setObstacle(initialObstacle);
+            setObstaclePlan(initialPlan);
+            setReward(initialReward);
             setNewJournalTitle(isIndo ? `Refleksi Target: ${goal.title}` : `Goal Reflection: ${goal.title}`);
+
+            savedValuesRef.current = {
+                notes: initialNotes,
+                coreWhy: initialWhy,
+                obstacle: initialObstacle,
+                obstaclePlan: initialPlan,
+                reward: initialReward
+            };
+            setAutoSaveStatus('idle');
         }
     }, [goal, isIndo]);
+
+    // Core save function
+    const executeSave = useCallback(async (
+        targetNotes: string,
+        targetWhy: string,
+        targetObs: string,
+        targetPlan: string,
+        targetRew: string
+    ) => {
+        if (!goal) return;
+        try {
+            await onSaveNotes(goal, targetNotes, {
+                core_why: targetWhy,
+                obstacle: targetObs,
+                obstacle_plan: targetPlan,
+                reward: targetRew
+            });
+            savedValuesRef.current = {
+                notes: targetNotes,
+                coreWhy: targetWhy,
+                obstacle: targetObs,
+                obstaclePlan: targetPlan,
+                reward: targetRew
+            };
+            setAutoSaveStatus('saved');
+            setTimeout(() => {
+                setAutoSaveStatus(prev => prev === 'saved' ? 'idle' : prev);
+            }, 2500);
+        } catch (err) {
+            console.error('Failed to save goal notes/WOOP:', err);
+            setAutoSaveStatus('error');
+        }
+    }, [goal, onSaveNotes]);
+
+    // Debounced Auto-Save Watcher
+    useEffect(() => {
+        if (!goal) return;
+
+        const hasChanged = 
+            notes !== savedValuesRef.current.notes ||
+            coreWhy !== savedValuesRef.current.coreWhy ||
+            obstacle !== savedValuesRef.current.obstacle ||
+            obstaclePlan !== savedValuesRef.current.obstaclePlan ||
+            reward !== savedValuesRef.current.reward;
+
+        if (!hasChanged) return;
+
+        setAutoSaveStatus('saving');
+
+        if (autoSaveTimerRef.current) {
+            clearTimeout(autoSaveTimerRef.current);
+        }
+
+        autoSaveTimerRef.current = setTimeout(() => {
+            executeSave(notes, coreWhy, obstacle, obstaclePlan, reward);
+        }, 900);
+
+        return () => {
+            if (autoSaveTimerRef.current) {
+                clearTimeout(autoSaveTimerRef.current);
+            }
+        };
+    }, [notes, coreWhy, obstacle, obstaclePlan, reward, goal, executeSave]);
+
+    // Save on Close if pending changes
+    const handleCloseModal = () => {
+        if (autoSaveTimerRef.current) {
+            clearTimeout(autoSaveTimerRef.current);
+            executeSave(notes, coreWhy, obstacle, obstaclePlan, reward);
+        }
+        onClose();
+    };
 
     if (!isOpen || !goal) return null;
 
     const progress = calculateGoalProgress(goal);
 
-    // Save Notes handler
-    const handleSaveNotes = async () => {
+    // Manual Save Notes handler
+    const handleManualSaveNotes = async () => {
         setIsSavingNotes(true);
         setNotesSaveSuccess(false);
         try {
-            await onSaveNotes(goal, notes);
+            await executeSave(notes, coreWhy, obstacle, obstaclePlan, reward);
             setNotesSaveSuccess(true);
             setTimeout(() => setNotesSaveSuccess(false), 2500);
-        } catch (err) {
-            console.error('Failed to save notes:', err);
         } finally {
             setIsSavingNotes(false);
         }
     };
 
-    // Save WOOP handler
-    const handleSaveWoop = async () => {
+    // Manual Save WOOP handler
+    const handleManualSaveWoop = async () => {
         setIsSavingWoop(true);
         setWoopSaveSuccess(false);
         try {
-            await onSaveNotes(goal, notes, {
-                core_why: coreWhy,
-                obstacle: obstacle,
-                obstacle_plan: obstaclePlan,
-                reward: reward
-            });
+            await executeSave(notes, coreWhy, obstacle, obstaclePlan, reward);
             setWoopSaveSuccess(true);
             setTimeout(() => setWoopSaveSuccess(false), 2500);
-        } catch (err) {
-            console.error('Failed to save WOOP:', err);
         } finally {
             setIsSavingWoop(false);
         }
     };
 
-    // Sync to Journal handler (album logic: new vs existing)
+    // Sync to Journal handler with CLEAN formatting (no ** or ---)
     const handleExecuteJournalSync = async () => {
         if (!notes.trim()) {
-            alert(isIndo ? 'Tulis catatan terlebih dahulu sebelum dikirim ke jurnal!' : 'Write some notes before syncing to journal!');
+            setCustomAlert({
+                title: isIndo ? 'Catatan Masih Kosong' : 'Notes Are Empty',
+                message: isIndo 
+                    ? 'Tuliskan catatan progres atau refleksi terlebih dahulu sebelum disinkronkan ke jurnal!' 
+                    : 'Please write some progress notes or reflection before syncing to your journal!',
+                type: 'warning'
+            });
             return;
         }
 
@@ -142,12 +253,10 @@ export default function GoalNotesModal({
                 year: 'numeric'
             });
 
-            const formattedGoalSnippet = `\n\n---\n🎯 **${isIndo ? 'Catatan Refleksi Target' : 'Goal Reflection Note'}: ${goal.title}**\n📊 **${isIndo ? 'Progres' : 'Progress'}**: ${progress}%\n📅 **${isIndo ? 'Tanggal' : 'Date'}**: ${dateStr}\n\n${notes.trim()}\n---`;
-
             if (journalMode === 'new') {
-                // Option A: Create New Journal
+                // Option A: Create New Journal (Clean, human-readable formatting without markdown noise)
                 const finalTitle = newJournalTitle.trim() || (isIndo ? `Refleksi Target: ${goal.title}` : `Goal Reflection: ${goal.title}`);
-                const fullContent = `${isIndo ? 'Merekam perkembangan dan refleksi untuk pencapaian target:' : 'Recording progress and reflection for goal achievement:'} **${goal.title}**.\n${formattedGoalSnippet}`;
+                const fullContent = `${isIndo ? 'Refleksi Catatan Target' : 'Goal Reflection Note'}: ${goal.title} (${isIndo ? 'Progres' : 'Progress'} ${progress}% - ${dateStr})\n\n${notes.trim()}`;
 
                 const res = await fetch('/api/journals', {
                     method: 'POST',
@@ -171,22 +280,31 @@ export default function GoalNotesModal({
                         setJournalSyncMessage(null);
                     }, 1800);
                 } else {
-                    throw new Error('Failed to create journal');
+                    const errText = await res.text().catch(() => '');
+                    throw new Error(errText || 'Failed to create journal');
                 }
             } else {
                 // Option B: Append to Existing Journal
                 if (!selectedExistingJournalId) {
-                    alert(isIndo ? 'Silakan pilih entri jurnal yang ingin ditambahkan!' : 'Please select an existing journal entry!');
+                    setCustomAlert({
+                        title: isIndo ? 'Pilih Jurnal Tujuan' : 'Select Target Journal',
+                        message: isIndo 
+                            ? 'Silakan pilih salah satu entri jurnal dari daftar untuk menempelkan catatan ini!' 
+                            : 'Please select an existing journal from the list to append this note!',
+                        type: 'warning'
+                    });
                     setIsSyncingJournal(false);
                     return;
                 }
 
                 const targetJournal = existingJournals.find(j => String(j.id) === String(selectedExistingJournalId));
                 if (!targetJournal) {
-                    throw new Error('Journal not found');
+                    throw new Error(isIndo ? 'Jurnal yang dipilih tidak ditemukan' : 'Selected journal not found');
                 }
 
-                const updatedContent = `${targetJournal.content}${formattedGoalSnippet}`;
+                // Clean snippet without asterisks or horizontal lines
+                const cleanSnippet = `\n\n[${isIndo ? 'Refleksi Target' : 'Goal Reflection'}: ${goal.title} | ${isIndo ? 'Progres' : 'Progress'} ${progress}% | ${dateStr}]\n${notes.trim()}`;
+                const updatedContent = `${targetJournal.content.trim()}${cleanSnippet}`;
 
                 const res = await fetch(`/api/journals/${selectedExistingJournalId}`, {
                     method: 'PUT',
@@ -194,27 +312,31 @@ export default function GoalNotesModal({
                     body: JSON.stringify({
                         title: targetJournal.title,
                         content: updatedContent,
-                        mood: targetJournal.mood || 'awesome',
-                        imagePath: '',
-                        image_url: '',
-                        aiSentiment: ''
+                        mood: targetJournal.mood || 'awesome'
                     })
                 });
 
                 if (res.ok) {
-                    setJournalSyncMessage(isIndo ? '✅ Berhasil menambahkan catatan ke jurnal yang dipilih!' : '✅ Successfully appended notes to chosen journal!');
+                    setJournalSyncMessage(isIndo ? '✅ Catatan berhasil ditambahkan ke jurnal!' : '✅ Notes successfully added to chosen journal!');
                     mutateJournals();
                     setTimeout(() => {
                         setIsJournalSyncOpen(false);
                         setJournalSyncMessage(null);
                     }, 1800);
                 } else {
-                    throw new Error('Failed to update journal');
+                    const errText = await res.text().catch(() => '');
+                    throw new Error(errText || 'Failed to update journal');
                 }
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to sync to journal:', err);
-            alert(isIndo ? 'Gagal menyinkronkan ke jurnal. Coba lagi.' : 'Failed to sync to journal. Please try again.');
+            setCustomAlert({
+                title: isIndo ? 'Gagal Sinkronisasi Jurnal' : 'Journal Sync Failed',
+                message: isIndo 
+                    ? `Tidak dapat menyinkronkan ke jurnal (${err.message || 'Kesalahan server'}). Silakan coba lagi.` 
+                    : `Unable to sync to journal (${err.message || 'Server error'}). Please try again.`,
+                type: 'error'
+            });
         } finally {
             setIsSyncingJournal(false);
         }
@@ -228,7 +350,7 @@ export default function GoalNotesModal({
                     onClick={(e) => e.stopPropagation()}
                 >
                     
-                    {/* Header */}
+                    {/* Header with Auto-Save Indicator */}
                     <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
                         <div className="flex items-center gap-3 min-w-0">
                             <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100/60 dark:border-indigo-800/40 flex items-center justify-center shrink-0 shadow-xs">
@@ -249,13 +371,32 @@ export default function GoalNotesModal({
                             </div>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                        >
-                            <X size={18} />
-                        </button>
+                        <div className="flex items-center gap-3 shrink-0">
+                            {/* Auto-Save Status Badge */}
+                            <div className="hidden sm:flex items-center">
+                                {autoSaveStatus === 'saving' && (
+                                    <span className="text-[11px] font-bold text-indigo-500 dark:text-indigo-400 flex items-center gap-1.5 animate-pulse bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 rounded-full border border-indigo-200/50 dark:border-indigo-800/50">
+                                        <Loader2 size={12} className="animate-spin" />
+                                        <span>{isIndo ? 'Menyimpan...' : 'Saving...'}</span>
+                                    </span>
+                                )}
+                                {autoSaveStatus === 'saved' && (
+                                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200/50 dark:border-emerald-800/50">
+                                        <CheckCircle2 size={12} />
+                                        <span>{isIndo ? 'Tersimpan otomatis' : 'Auto-saved'}</span>
+                                    </span>
+                                )}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                title={isIndo ? 'Tutup' : 'Close'}
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Navigation Tabs */}
@@ -284,6 +425,22 @@ export default function GoalNotesModal({
                             <Compass size={14} />
                             <span>{isIndo ? 'Kompas Motivasi (WOOP)' : 'Motivation Compass (WOOP)'}</span>
                         </button>
+
+                        {/* Mobile Auto-Save Status */}
+                        <div className="sm:hidden ml-auto">
+                            {autoSaveStatus === 'saving' && (
+                                <span className="text-[10px] font-bold text-indigo-500 flex items-center gap-1">
+                                    <Loader2 size={10} className="animate-spin" />
+                                    <span>{isIndo ? 'Menyimpan...' : 'Saving...'}</span>
+                                </span>
+                            )}
+                            {autoSaveStatus === 'saved' && (
+                                <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-1">
+                                    <CheckCircle2 size={10} />
+                                    <span>{isIndo ? 'Tersimpan' : 'Saved'}</span>
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     {/* Body Content */}
@@ -319,7 +476,7 @@ export default function GoalNotesModal({
                                     <div className="flex items-center gap-2">
                                         <button
                                             type="button"
-                                            onClick={handleSaveNotes}
+                                            onClick={handleManualSaveNotes}
                                             disabled={isSavingNotes}
                                             className="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md shadow-indigo-500/20 flex items-center gap-2 active:scale-95 transition disabled:opacity-50"
                                         >
@@ -360,6 +517,7 @@ export default function GoalNotesModal({
                                                 type="button"
                                                 onClick={() => setIsJournalSyncOpen(false)}
                                                 className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"
+                                                title={isIndo ? 'Tutup panel' : 'Close panel'}
                                             >
                                                 <X size={14} />
                                             </button>
@@ -453,7 +611,10 @@ export default function GoalNotesModal({
                                                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                                                             }`}
                                                         >
-                                                            {m === 'awesome' ? '🔥 Hebat' : m === 'good' ? '😊 Baik' : m === 'neutral' ? '😐 Biasa' : '🌧️ Lesu'}
+                                                            {m === 'awesome' ? (isIndo ? '🔥 Hebat' : '🔥 Awesome') : 
+                                                             m === 'good' ? (isIndo ? '😊 Baik' : '😊 Good') : 
+                                                             m === 'neutral' ? (isIndo ? '😐 Biasa' : '😐 Neutral') : 
+                                                             (isIndo ? '🌧️ Lesu' : '🌧️ Low')}
                                                         </button>
                                                     ))}
                                                 </div>
@@ -472,7 +633,7 @@ export default function GoalNotesModal({
                                                         <option value="">{isIndo ? '-- Pilih Entri Jurnal --' : '-- Select Journal Entry --'}</option>
                                                         {existingJournals.map(j => (
                                                             <option key={j.id} value={j.id}>
-                                                                {j.date ? `${new Date(j.date).toLocaleDateString()} - ` : ''}{j.title}
+                                                                {j.date ? `${new Date(j.date).toLocaleDateString(isIndo ? 'id-ID' : 'en-US')} - ` : ''}{j.title}
                                                             </option>
                                                         ))}
                                                     </select>
@@ -575,7 +736,7 @@ export default function GoalNotesModal({
                                 <div className="flex items-center gap-2 pt-2">
                                     <button
                                         type="button"
-                                        onClick={handleSaveWoop}
+                                        onClick={handleManualSaveWoop}
                                         disabled={isSavingWoop}
                                         className="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md shadow-indigo-500/20 flex items-center gap-2 active:scale-95 transition disabled:opacity-50"
                                     >
@@ -596,10 +757,25 @@ export default function GoalNotesModal({
                     </div>
 
                     {/* Footer */}
-                    <div className="px-5 sm:px-6 py-3.5 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end">
+                    <div className="px-5 sm:px-6 py-3.5 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div className="text-[11px] text-slate-400">
+                            {autoSaveStatus === 'saving' && (
+                                <span className="text-indigo-500 font-medium flex items-center gap-1">
+                                    <Loader2 size={11} className="animate-spin" />
+                                    <span>{isIndo ? 'Menyimpan perubahan secara otomatis...' : 'Auto-saving changes...'}</span>
+                                </span>
+                            )}
+                            {autoSaveStatus === 'saved' && (
+                                <span className="text-emerald-500 font-medium flex items-center gap-1">
+                                    <CheckCircle2 size={11} />
+                                    <span>{isIndo ? 'Semua perubahan tersimpan' : 'All changes saved'}</span>
+                                </span>
+                            )}
+                        </div>
+
                         <button
                             type="button"
-                            onClick={onClose}
+                            onClick={handleCloseModal}
                             className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition"
                         >
                             {isIndo ? 'Tutup' : 'Close'}
@@ -608,6 +784,42 @@ export default function GoalNotesModal({
 
                 </div>
             </div>
+
+            {/* CUSTOM IN-APP ALERT DIALOG (No native browser alerts!) */}
+            {customAlert && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-150">
+                    <div 
+                        className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-center animate-in zoom-in-95 duration-150"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center text-xl shadow-xs" style={{
+                            backgroundColor: customAlert.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : customAlert.type === 'warning' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                            color: customAlert.type === 'error' ? '#ef4444' : customAlert.type === 'warning' ? '#f59e0b' : '#10b981'
+                        }}>
+                            {customAlert.type === 'error' ? <AlertCircle size={24} /> : customAlert.type === 'warning' ? <Info size={24} /> : <CheckCircle2 size={24} />}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <h3 className="text-base font-black text-slate-900 dark:text-white">
+                                {customAlert.title}
+                            </h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                {customAlert.message}
+                            </p>
+                        </div>
+
+                        <div className="pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setCustomAlert(null)}
+                                className="w-full h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition"
+                            >
+                                {isIndo ? 'Mengerti' : 'Got it'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </ModalPortal>
     );
 }

@@ -179,6 +179,7 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 		setParts := []string{}
 		args := []interface{}{userID, journalIdStr}
 		i := 3
+		seenCols := make(map[string]bool)
 
 		for k, v := range req {
 			if k == "id" || k == "userId" || k == "createdAt" || k == "updatedAt" {
@@ -205,6 +206,10 @@ func JournalsHandler(w http.ResponseWriter, r *http.Request) {
 			default:
 				continue
 			}
+			if seenCols[dbCol] {
+				continue
+			}
+			seenCols[dbCol] = true
 			setParts = append(setParts, fmt.Sprintf("%s = $%d", dbCol, i))
 			args = append(args, v)
 			i++
