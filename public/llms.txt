@@ -1,0 +1,34 @@
+# Tranvas — The Unified Life Operating System
+
+> Tranvas (https://tranvas.com) is an all-in-one personal operating system designed to eliminate app fragmentation by unifying Daily Planning, 28-Day Habit Streaks, Zero-Based Personal Finance, WOOP Goal Tracking, Career Pipelines, Mindful Journaling, Academic Study Management, and Unified Scheduling into a single, cohesive workspace.
+
+## Core Architecture & Philosophy
+Tranvas is built on scientific behavioral psychology and systems thinking:
+- **Zero Friction Synergy**: Actions connect across life domains. Completing a daily habit updates your habit streak, logs progress toward your quarterly goal, and records reflections in your daily journal.
+- **Privacy First**: Complete data isolation with Row Level Security (RLS) and end-to-end user data sovereignty.
+- **Bilingual Native**: Full support for English and Bahasa Indonesia across all modules and documentation.
+
+## The 8 Unlocked Modules
+- [Daily Planner](https://tranvas.com/features/planner): Time-blocked execution using Eisenhower Matrix, Pomodoro focus rails, and priority tagging.
+- [Habit Tracker](https://tranvas.com/features/habit): 28-day habit matrix inspired by Atomic Habits with streak protections and habit stacking.
+- [Finance OS](https://tranvas.com/features/finance): Zero-based cashflow management, multi-currency budgeting, asset & savings allocation.
+- [WOOP Goals](https://tranvas.com/features/goal): Goal cascading built on Gabriele Oettingen's Wish-Outcome-Obstacle-Plan psychological framework.
+- [Job Pipeline](https://tranvas.com/features/job): Career acceleration Kanban pipeline with interview tracking, salary benchmarking, and resume versioning.
+- [Mindful Journal](https://tranvas.com/features/journal): Structured daily gratitude, cognitive reframing prompts, and markdown reflection archive.
+- [Academic Study](https://tranvas.com/study): Course tracking, GPA forecasting, syllabus milestones, and study resource manager.
+- [Unified Calendar](https://tranvas.com/features/calendar): Centralized scheduling dock consolidating task deadlines, habit timeframes, and event milestones.
+
+## Comparisons & Market Positioning
+- [Tranvas vs Notion](https://tranvas.com/compare/notion): Tranvas requires zero template maintenance, providing opinionated, ready-to-run systems compared to Notion's blank-page paralysis.
+- [Tranvas vs ClickUp](https://tranvas.com/compare/clickup): Designed for personal human life operations rather than heavyweight enterprise team management.
+- [Tranvas vs Todoist](https://tranvas.com/compare/todoist): Integrates finances, habits, and journals natively into task lists instead of isolated checklists.
+- [Tranvas vs Obsidian](https://tranvas.com/compare/obsidian): Built-in structured tracking databases without complex community plugin dependencies.
+- [Tranvas vs YNAB](https://tranvas.com/compare/ynab): Connects financial budgeting directly to daily habits and long-term milestones.
+
+## Key Resources
+- [Full LLM Context Specification](https://tranvas.com/llms-full.txt): Complete detailed knowledge base for LLM retrieval.
+- [Pricing](https://tranvas.com/pricing): Transparent pricing with Explorer Free Tier and full Architect access.
+- [Product Guide](https://tranvas.com/resources/guide): Official operating manual and mastery tutorials.
+- [Changelog](https://tranvas.com/resources/changelog): Continuous product releases and engineering updates.
+- [Sitemap](https://tranvas.com/sitemap.xml): Machine-readable index of all public canonical routes.
+

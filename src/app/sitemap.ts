@@ -37,6 +37,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Resources Subpages
     { path: '/resources/blog', priority: 0.8, changeFrequency: 'weekly' as const },
+    // Blog Articles
+    { path: '/resources/blog/mastering-atomic-habits-in-daily-life', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/resources/blog/deep-work-framework-for-modern-professionals', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/resources/blog/financial-clarity-with-tranvas-finance-os', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/resources/blog/building-a-second-brain-for-personal-knowledge', priority: 0.75, changeFrequency: 'weekly' as const },
+    { path: '/resources/blog/why-habit-and-finance-in-one-app-beats-notion', priority: 0.75, changeFrequency: 'weekly' as const },
     { path: '/resources/guide', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/resources/changelog', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/resources/community', priority: 0.7, changeFrequency: 'weekly' as const },

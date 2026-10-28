@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import CompareVerdictBox from '@/components/compare/CompareVerdictBox';
 
 export default function TodoistComparePage() {
     const t = useTranslations();
@@ -49,6 +50,16 @@ export default function TodoistComparePage() {
                             </Link>
                         </div>
                         <p className="mt-4 text-xs text-slate-500 font-medium">{t('todoist_hero_note')}</p>
+                        <CompareVerdictBox
+                            competitorName="Todoist"
+                            competitorWeakness="Terisolasi hanya sebagai to-do list sederhana; tidak memiliki modul pelacak finansial, habit tracker berbasis sains, journal reflektif, atau job application tracker bawaan."
+                            tranvasStrength="Ekosistem Personal OS holistik 8-in-1 yang menghubungkan manajemen tugas harian secara langsung dengan kebiasaan, cashflow bulanan, dan target jangka panjang."
+                            bestForTranvas="Pengguna yang ingin satu dashboard komprehensif untuk mengatur seluruh aspek kehidupan tanpa harus berlangganan 5 aplikasi terpisah."
+                            bestForCompetitor="Pengguna yang hanya menginginkan aplikasi checklist tugas murni yang sangat minimalis dengan natural language date input untuk daftar belanja atau reminder cepat."
+                            keyTakeaway="Todoist hanyalah daftar checklist tugas murni, sementara Tranvas adalah Personal Life Operating System menyeluruh untuk eksekusi hidup terintegrasi."
+                            canonicalPath="/compare/todoist"
+                            faqs={faqs}
+                        />
                     </div>
 
                     {/* Visual Bottom: Focus Timeline */}

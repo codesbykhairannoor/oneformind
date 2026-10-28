@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import JsonLd from '@/components/seo/JsonLd';
+import { getFaqPageSchema } from '@/lib/schema';
 
 export default function LandingFAQ() {
     const t = useTranslations();
@@ -17,6 +19,7 @@ export default function LandingFAQ() {
 
     return (
         <section className="py-16 sm:py-28 lg:py-36 bg-slate-50 border-y border-slate-100">
+            <JsonLd data={getFaqPageSchema(faqs)} />
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-8 sm:mb-12 text-center tracking-tight font-black">
                     {t('faq_title')}

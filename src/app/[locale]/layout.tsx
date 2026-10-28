@@ -10,6 +10,8 @@ import { SessionProvider } from "@/components/SessionProvider";
 
 import AffiliateTracker from "@/components/AffiliateTracker";
 import TranvasDevHud from "@/components/dev/TranvasDevHud";
+import JsonLd from "@/components/seo/JsonLd";
+import { getSoftwareApplicationSchema, getOrganizationSchema, getWebSiteSchema } from "@/lib/schema";
 
 import "../globals.css";
 
@@ -105,6 +107,9 @@ export default async function RootLayout({
             `,
           }}
         />
+        <JsonLd data={getSoftwareApplicationSchema(locale)} />
+        <JsonLd data={getOrganizationSchema()} />
+        <JsonLd data={getWebSiteSchema(locale)} />
       </head>
       <body className="selection:bg-indigo-100 selection:text-indigo-700 font-sans min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100" suppressHydrationWarning>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-7PNK1P4WZN" strategy="afterInteractive" />

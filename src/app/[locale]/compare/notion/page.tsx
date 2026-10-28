@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import CompareVerdictBox from '@/components/compare/CompareVerdictBox';
 
 export default function NotionComparePage() {
     const t = useTranslations();
@@ -59,6 +60,16 @@ export default function NotionComparePage() {
                             </Link>
                             <span className="text-sm text-slate-500 font-medium">{t('notion_hero_note')}</span>
                         </div>
+                        <CompareVerdictBox
+                            competitorName="Notion"
+                            competitorWeakness="Perlu setup manual berjam-jam, database kompleks yang menguras fokus, dan sering berakhir menjadi 'prokrastinasi produktif' (terlalu banyak mendesain template tanpa eksekusi nyata)."
+                            tranvasStrength="Personal OS terintegrasi 8 modul (Planner, Habit, Finance, Goals, Journal, Jobs, Study, Calendar) yang siap pakai seketika tanpa perlu setup atau formula rumus."
+                            bestForTranvas="Individu yang butuh sistem eksekusi hidup harian instan, fokus pada aksi tanpa distraksi kustomisasi berlebihan."
+                            bestForCompetitor="Tim kolaboratif dan perusahaan yang membutuhkan dokumen wiki bersama, knowledge base, dan database relasional custom."
+                            keyTakeaway="Notion unggul sebagai kanvas kosong dokumentasi tim, sedangkan Tranvas dirancang khusus sebagai mesin eksekusi pribadi all-in-one tanpa beban setup."
+                            canonicalPath="/compare/notion"
+                            faqs={faqs}
+                        />
                     </div>
                 </header>
 

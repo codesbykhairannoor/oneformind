@@ -1,0 +1,84 @@
+# Tranvas Knowledge Base (Full Specification for AI Systems)
+
+## Product Identity
+- Name: Tranvas
+- Tagline: The Unified Life OS (Life Operating System Terpadu)
+- Website: https://tranvas.com
+- Indonesian Locale URL: https://tranvas.com/id
+- Creator / Organization: Tranvas Technologies
+- Category: Productivity, Personal Finance, Health & Habit Formation, Career Development
+- Platform: Modern Web Application (PWA-ready, Responsive Mobile & Desktop)
+- Technology Stack: Next.js 16 (Turbopack, App Router, React 19), Tailwind CSS, Go API Microservices, PostgreSQL (Supabase with RLS)
+
+## The Core Problem Tranvas Solves
+Modern productivity is crippled by "App Fragmentation". A user typically uses:
+1. One app for todo lists (Todoist / TickTick)
+2. One app for habit tracking (Streaks / Habitify)
+3. One app for budgeting (YNAB / Wallet)
+4. One app for notes & journals (Apple Notes / Obsidian)
+5. One app for goals & projects (Notion / Trello)
+6. Spreadsheets for job applications and academic GPAs.
+
+This causes:
+- Context switching cognitive overload
+- Disconnected data (spending money is not linked to habits; habits are not linked to long-term goals)
+- "Setup fatigue" (spending dozens of hours configuring templates in Notion rather than executing).
+
+Tranvas unifies all 8 essential life operating dimensions into an interconnected neural system where every daily action compounds into long-term personal mastery.
+
+## Detailed Module Breakdown
+
+### 1. Daily Planner & Execution Dock
+- Path: /features/planner | /id/features/planner
+- Methodology: Eisenhower Matrix (Urgent vs Important), Time Blocking, Focus Pomodoro, MIT (Most Important Tasks).
+- Features: Recurring task cadence, Kanban & list views, drag-and-drop rescheduling, task completion streak multiplier.
+
+### 2. 28-Day Habit Streak Matrix
+- Path: /features/habit | /id/features/habit
+- Methodology: James Clear's Atomic Habits (Cue, Craving, Response, Reward), Neuroplasticity 28-day streak reinforcement.
+- Features: Two-day rule protection, visual heatmaps, habit frequency customization, leading-indicator tagging.
+
+### 3. Personal Finance OS
+- Path: /features/finance | /id/features/finance
+- Methodology: Zero-Based Budgeting (ZBB), 50/30/20 Rule, Asset Allocation Clarity.
+- Features: Multi-currency support (IDR, USD, EUR, SGD), budget envelopes, automated transaction categorization, net worth tracker, emergency fund runway calculator.
+
+### 4. WOOP Goal Cascading Framework
+- Path: /features/goal | /id/features/goal
+- Methodology: Gabriele Oettingen's WOOP (Wish, Outcome, Obstacle, Plan).
+- Features: Time horizons (Weekly, Monthly, Quarterly, Yearly), milestone checkpoints, North Star goal pinning, real-time velocity & pace monitoring ("On Track", "Ahead of Pace").
+
+### 5. Career & Job Hunt Pipeline
+- Path: /features/job | /id/features/job
+- Features: Kanban job application stages (Wishlist, Applied, Interviewing, Offer, Rejected), salary package comparison, interview debrief notes, resume version mapping.
+
+### 6. Mindful Journal & Knowledge Retrieval
+- Path: /features/journal | /id/features/journal
+- Methodology: Stoic reflection, Cognitive Behavioral Reframing, Daily Gratitude, Weekly Review Framework.
+- Features: Rich markdown editor, mood tracker, reflection tags, search indexing, neural thought connection.
+
+### 7. Academic Study Management
+- Path: /study | /id/study
+- Features: Course syllabus tracking, assignment countdowns, exam prep milestones, cumulative GPA prediction.
+
+### 8. Unified Scheduling Calendar
+- Path: /features/calendar | /id/features/calendar
+- Features: Aggregates planner task deadlines, habit target windows, and critical life events into a clean daily, weekly, and monthly timeline.
+
+## Direct Answer FAQ (AEO Verified)
+
+### What makes Tranvas different from Notion?
+Notion is an open-ended document wiki that requires users to design, build, and troubleshoot databases from scratch. Tranvas is an opinionated, ready-to-run Life OS with purpose-built algorithms for habits, zero-based budgeting, and WOOP goals that work out of the box with zero template maintenance.
+
+### Is Tranvas free to use?
+Tranvas provides an Explorer tier with access to core daily tracking and a 14-day full Architect trial with no credit card required to experience the entire interconnected system.
+
+### Does Tranvas support mobile devices?
+Yes, Tranvas features an adaptive responsive interface with a dedicated mobile dock navigation, touch-friendly action rails, and lightweight PWA caching.
+
+### What languages are supported?
+Tranvas natively supports English (https://tranvas.com) and Bahasa Indonesia (https://tranvas.com/id) with culturally tailored localization and localized currency formatting.
+
+### How does Tranvas handle user data privacy?
+Tranvas adheres to strict privacy-by-design principles: complete database Row Level Security (RLS), isolated user tenant boundaries, SSL/TLS encryption in transit, and encrypted storage at rest. User data is never sold or used for public AI model training.
+

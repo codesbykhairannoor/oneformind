@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import CompareVerdictBox from '@/components/compare/CompareVerdictBox';
 
 export default function ClickUpComparePage() {
     const t = useTranslations();
@@ -57,6 +58,16 @@ export default function ClickUpComparePage() {
                             </Link>
                         </div>
                         <p className="mt-4 text-xs text-slate-500 font-medium">{t('clickup_hero_note')}</p>
+                        <CompareVerdictBox
+                            competitorName="ClickUp"
+                            competitorWeakness="Feature bloat ekstrem, performa terasa berat dan lambat saat loading, serta setup hierarki berlapis (Spaces, Folders, Lists, Tasks) yang membebani mental individu."
+                            tranvasStrength="Sistem personal ultra-ringan dengan 8 modul esensial terpadu, antarmuka minimalis tanpa delay, dan zero-bloat untuk eksekusi harian solo."
+                            bestForTranvas="Solo-preneurs, freelancer, mahasiswa, dan profesional mandiri yang butuh kecepatan eksekusi tinggi tanpa kerumitan administrasi proyek."
+                            bestForCompetitor="Manajer proyek perusahaan besar dan tim enterprise dengan puluhan anggota yang membutuhkan alur kerja sprint ketat, Gantt chart, dan alokasi resource time-tracking."
+                            keyTakeaway="ClickUp dibangun untuk orkestrasi tim enterprise dengan ratusan fitur kompleks, sedangkan Tranvas adalah personal productivity OS yang menghilangkan kelelahan kognitif dan bloat."
+                            canonicalPath="/compare/clickup"
+                            faqs={faqs}
+                        />
                     </div>
                 </header>
 

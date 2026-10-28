@@ -1,18 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
 import { Link } from '@/i18n/routing';
 import { ChevronDown, ArrowRight } from 'lucide-react';
+import { BLOG_POSTS } from '@/lib/blogPosts';
+import JsonLd from '@/components/seo/JsonLd';
+import { getBreadcrumbSchema, getFaqPageSchema } from '@/lib/schema';
 
 export default function BlogIndexPage() {
     const t = useTranslations();
+    const locale = useLocale();
+    const isIndo = locale === 'id';
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
     const faqs = [
         {
-            q: t('help_faq_q1') || 'Seberapa sering artikel artikel baru dipublikasikan di Blog Tranvas?',
+            q: t('help_faq_q1') || 'Seberapa sering artikel baru dipublikasikan di Blog Tranvas?',
             a: t('help_faq_a1') || 'Kami menerbitkan artikel panduan produktivitas dan wawasan manajemen diri 2-3 kali setiap minggu.'
         },
         {
@@ -25,54 +30,21 @@ export default function BlogIndexPage() {
         }
     ];
 
-    const posts = [
-        {
-            slug: 'mastering-atomic-habits-in-daily-life',
-            title: 'Mastering Atomic Habits: How Small 1% Improvements Compounding Every Day',
-            excerpt: 'Learn the exact psychological framework behind habit stacking, identity shift, and friction reduction.',
-            category: 'Methodology',
-            categoryColor: '#4f46e5',
-            date: 'Aug 18, 2026',
-            readTime: '5 min read',
-            icon: '🌱'
-        },
-        {
-            slug: 'deep-work-framework-for-modern-professionals',
-            title: 'The Deep Work Blueprint: Eliminating Context Switching for Peak Focus',
-            excerpt: 'How to structure your day into uninterrupted 90-minute focus blocks without burning out.',
-            category: 'Focus',
-            categoryColor: '#9333ea',
-            date: 'Aug 15, 2026',
-            readTime: '7 min read',
-            icon: '⚡'
-        },
-        {
-            slug: 'financial-clarity-with-tranvas-finance-os',
-            title: 'Financial Peace of Mind: Bridging Daily Spending with Long-Term Wealth',
-            excerpt: 'A zero-based budgeting system built inside your productivity workflow to eliminate money anxiety.',
-            category: 'Finance OS',
-            categoryColor: '#059669',
-            date: 'Aug 10, 2026',
-            readTime: '6 min read',
-            icon: '💰'
-        },
-        {
-            slug: 'building-a-second-brain-for-personal-knowledge',
-            title: 'Building a Second Brain: Organising Notes, Insights, and Ideas Effortlessly',
-            excerpt: 'Stop forgetting great ideas. Transform your digital journal into an active knowledge retrieval hub.',
-            category: 'Second Brain',
-            categoryColor: '#d97706',
-            date: 'Aug 05, 2026',
-            readTime: '8 min read',
-            icon: '🧠'
-        }
+    const breadcrumbs = [
+        { name: 'Home', url: isIndo ? '/id' : '/' },
+        { name: 'Resources', url: isIndo ? '/id/resources' : '/resources' },
+        { name: 'Blog', url: isIndo ? '/id/resources/blog' : '/resources/blog' },
     ];
 
+    const posts = BLOG_POSTS;
     const featuredPost = posts[0];
     const remainingPosts = posts.slice(1);
 
     return (
         <GuestLayout>
+            <JsonLd data={getBreadcrumbSchema(breadcrumbs)} />
+            <JsonLd data={getFaqPageSchema(faqs)} />
+
             <main id="blog-index" className="overflow-x-hidden bg-white">
                 {/* SECTION 1: HERO (EDITORIAL STYLE - MATCHED WITH STORIES) */}
                 <header className="pt-24 md:pt-32 pb-20 md:pb-32 px-6 relative overflow-hidden bg-white border-b border-gray-100">
@@ -82,7 +54,7 @@ export default function BlogIndexPage() {
 
                     <div className="max-w-5xl mx-auto text-center relative z-10">
                         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100 fill-mode-both space-y-8">
-                            
+
                             {/* Editorial Badge */}
                             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs uppercase tracking-wider shadow-xs border border-indigo-200">
                                 ⭐ {t('blog_hero_badge')}
@@ -97,14 +69,14 @@ export default function BlogIndexPage() {
                             {/* Featured Editorial Card */}
                             <div className="relative w-full max-w-4xl mx-auto group pt-4">
                                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[3rem] blur opacity-15 transition duration-500 group-hover:opacity-25" />
-                                
-                                <Link href="/resources/post" className="block relative bg-white rounded-[3rem] overflow-hidden border border-white shadow-2xl transform transition duration-500 hover:scale-[1.01]">
+
+                                <Link href={`/resources/blog/${featuredPost.slug}`} className="block relative bg-white rounded-[3rem] overflow-hidden border border-white shadow-2xl transform transition duration-500 hover:scale-[1.01]">
                                     <div className="h-[300px] md:h-[450px] relative overflow-hidden bg-indigo-900">
                                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700" />
-                                        
+
                                         {/* Pattern Overlay */}
                                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
-                                        
+
                                         {/* Featured Content Info (Overlay) */}
                                         <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 text-left bg-gradient-to-t from-black/80 via-transparent to-transparent space-y-2">
                                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/20 text-white text-[10px] font-black uppercase tracking-[0.2em] border border-white/20 w-fit">
@@ -130,9 +102,9 @@ export default function BlogIndexPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                             {remainingPosts.map((post, idx) => (
                                 <article key={idx} className="group relative flex flex-col bg-white rounded-3xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_50px_rgba(79,70,229,0.08)] hover:-translate-y-1 transition-all duration-500">
-                                    <Link href="/resources/post" className="block aspect-[16/10] overflow-hidden relative">
+                                    <Link href={`/resources/blog/${post.slug}`} className="block aspect-[16/10] overflow-hidden relative">
                                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center text-5xl italic text-indigo-200/30 tracking-tighter font-black">Tranvas</div>
-                                        
+
                                         {/* Category Badge */}
                                         <div className="absolute top-4 left-4 z-10">
                                             <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/90 shadow-sm border border-slate-100/50" style={{ color: post.categoryColor }}>
@@ -153,7 +125,7 @@ export default function BlogIndexPage() {
                                         </div>
 
                                         <h3 className="text-xl font-black text-slate-900 mb-4 group-hover:text-indigo-600 transition-colors duration-300 leading-tight">
-                                            <Link href="/resources/post">
+                                            <Link href={`/resources/blog/${post.slug}`}>
                                                 {post.title}
                                             </Link>
                                         </h3>
@@ -164,11 +136,13 @@ export default function BlogIndexPage() {
 
                                         <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-xs">✨</div>
-                                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Team Tranvas</span>
+                                                <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-xs font-black text-indigo-600">
+                                                    {post.author.avatar}
+                                                </div>
+                                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{post.author.name}</span>
                                             </div>
-                                            <Link href="/resources/post" className="text-indigo-600 hover:text-indigo-700 font-bold text-xs flex items-center gap-2 group/btn">
-                                                Read Post 
+                                            <Link href={`/resources/blog/${post.slug}`} className="text-indigo-600 hover:text-indigo-700 font-bold text-xs flex items-center gap-2 group/btn">
+                                                Read Post
                                                 <ArrowRight size={14} className="transform group-hover/btn:translate-x-1 transition-transform" />
                                             </Link>
                                         </div>
@@ -185,7 +159,7 @@ export default function BlogIndexPage() {
                         {/* Light Decorative Blobs */}
                         <div className="absolute -right-20 -top-20 w-80 h-80 bg-white rounded-full blur-3xl opacity-60 pointer-events-none" />
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-200/40 rounded-full blur-3xl pointer-events-none" />
-                        
+
                         <div className="relative z-10 md:w-1/2 space-y-4">
                             <div className="inline-block bg-white text-indigo-600 font-bold text-xs px-4 py-2 rounded-full mb-6 uppercase tracking-widest border border-indigo-100 shadow-sm">
                                 💌 {t('blog_news_badge')}
@@ -200,11 +174,11 @@ export default function BlogIndexPage() {
 
                         <div className="relative z-10 w-full md:w-1/2">
                             <form onSubmit={(e) => e.preventDefault()} className="flex flex-col sm:flex-row gap-3">
-                                <input 
-                                    type="email" 
-                                    placeholder={t('blog_news_placeholder')} 
-                                    className="w-full bg-white border border-slate-200 text-slate-900 font-medium px-6 py-4 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 placeholder-slate-400 transition shadow-sm" 
-                                    required 
+                                <input
+                                    type="email"
+                                    placeholder={t('blog_news_placeholder')}
+                                    className="w-full bg-white border border-slate-200 text-slate-900 font-medium px-6 py-4 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 placeholder-slate-400 transition shadow-sm"
+                                    required
                                 />
                                 <button type="submit" className="bg-indigo-600 text-white font-bold px-8 py-4 rounded-2xl hover:bg-indigo-700 transition shadow-md shrink-0">
                                     {t('blog_news_btn')}
