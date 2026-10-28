@@ -17,10 +17,10 @@ import GoalDeleteModal from './components/GoalDeleteModal';
 import GoalNotesModal from './components/GoalNotesModal';
 import GatedPage from '@/components/GatedPage';
 import { Milestone } from './components/MilestoneItem';
-import { 
-    calculateGoalProgress, 
-    calculateGoalPace, 
-    calculateGlobalGoalStats 
+import {
+    calculateGoalProgress,
+    calculateGoalPace,
+    calculateGlobalGoalStats
 } from './lib/goalPaceCalculator';
 import { Target, Sparkles, Plus } from 'lucide-react';
 import ExportModal from '@/components/export/ExportModal';
@@ -82,7 +82,7 @@ export default function GoalsPage() {
             let meta: any = {};
             const rawSpecific = g.specific_days || g.specificDays;
             if (rawSpecific && typeof rawSpecific === 'string') {
-                try { meta = JSON.parse(rawSpecific); } catch {}
+                try { meta = JSON.parse(rawSpecific); } catch { }
             } else if (rawSpecific && typeof rawSpecific === 'object') {
                 meta = rawSpecific;
             }
@@ -97,7 +97,7 @@ export default function GoalsPage() {
             let meta: any = {};
             const rawSpecific = g.specific_days || g.specificDays;
             if (rawSpecific && typeof rawSpecific === 'string') {
-                try { meta = JSON.parse(rawSpecific); } catch {}
+                try { meta = JSON.parse(rawSpecific); } catch { }
             } else if (rawSpecific && typeof rawSpecific === 'object') {
                 meta = rawSpecific;
             }
@@ -148,7 +148,7 @@ export default function GoalsPage() {
 
                     let hMeta: any = {};
                     if (h.status && typeof h.status === 'string' && h.status.startsWith('{')) {
-                        try { hMeta = JSON.parse(h.status); } catch {}
+                        try { hMeta = JSON.parse(h.status); } catch { }
                     } else if (h.status && typeof h.status === 'object') {
                         hMeta = h.status;
                     }
@@ -156,8 +156,8 @@ export default function GoalsPage() {
                     const norm = (h.name || '').trim().toLowerCase();
                     const isExplicitlyLinked = linkedHabitIdsSet.has(String(h.id)) || (norm && linkedHabitNamesSet.has(norm));
                     const isMatched = isExplicitlyLinked ||
-                                      (hMeta.goalId && String(hMeta.goalId) === String(g.id)) ||
-                                      (hMeta.goalTitle && hMeta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
+                        (hMeta.goalId && String(hMeta.goalId) === String(g.id)) ||
+                        (hMeta.goalTitle && hMeta.goalTitle.trim().toLowerCase() === (g.title || '').trim().toLowerCase());
 
                     if (isMatched && !seenHabitNames.has(norm)) {
                         seenHabitNames.add(norm);
@@ -488,8 +488,8 @@ export default function GoalsPage() {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title: form.title, 
-                        category: form.category, 
+                        title: form.title,
+                        category: form.category,
                         type: form.type || 'milestones',
                         status: form.status || 'active',
                         priority: form.priority || 'important',
@@ -510,7 +510,7 @@ export default function GoalsPage() {
                         obstacle_plan: form.obstacle_plan,
                         reward: form.reward,
                         color: form.color,
-                        startDate: form.start_date || null, 
+                        startDate: form.start_date || null,
                         start_date: form.start_date || null,
                         endDate: form.end_date || null,
                         end_date: form.end_date || null,
@@ -546,8 +546,8 @@ export default function GoalsPage() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title: form.title, 
-                        category: form.category, 
+                        title: form.title,
+                        category: form.category,
                         type: form.type || 'milestones',
                         status: 'active',
                         priority: form.priority || 'important',
@@ -568,7 +568,7 @@ export default function GoalsPage() {
                         obstacle_plan: form.obstacle_plan,
                         reward: form.reward,
                         color: form.color,
-                        startDate: form.start_date || null, 
+                        startDate: form.start_date || null,
                         start_date: form.start_date || null,
                         endDate: form.end_date || null,
                         end_date: form.end_date || null,
@@ -611,8 +611,8 @@ export default function GoalsPage() {
     };
 
     const handleSaveGoalNotes = async (
-        targetGoal: GoalItem, 
-        updatedNotes: string, 
+        targetGoal: GoalItem,
+        updatedNotes: string,
         updatedWoop?: { core_why?: string; obstacle?: string; obstacle_plan?: string; reward?: string }
     ) => {
         // Optimistically update goals state
@@ -632,7 +632,7 @@ export default function GoalsPage() {
 
         let meta: any = {};
         if (targetGoal.specific_days && typeof targetGoal.specific_days === 'string') {
-            try { meta = JSON.parse(targetGoal.specific_days); } catch {}
+            try { meta = JSON.parse(targetGoal.specific_days); } catch { }
         } else if (targetGoal.specific_days && typeof targetGoal.specific_days === 'object') {
             meta = Object.assign({}, targetGoal.specific_days as Record<string, any>);
         }
@@ -733,10 +733,10 @@ export default function GoalsPage() {
         setIsCelebrationOpen(true);
 
         try {
-            await fetch(`/api/goals/${goal.id}`, { 
-                method: 'PUT', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ status: 'completed' }) 
+            await fetch(`/api/goals/${goal.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'completed' })
             });
             mutateGoals();
         } catch (error) {
@@ -801,10 +801,10 @@ export default function GoalsPage() {
     const handleMarkAsActive = async (goal: GoalItem) => {
         setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: 'active' } : g));
         try {
-            await fetch(`/api/goals/${goal.id}`, { 
-                method: 'PUT', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ status: 'active' }) 
+            await fetch(`/api/goals/${goal.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'active' })
             });
             mutateGoals();
         } catch (error) {
@@ -860,19 +860,19 @@ export default function GoalsPage() {
             const res = await fetch(`/api/goals/${goal.id}/milestones`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    title: isIndo ? 'Langkah Baru' : 'New Step', 
-                    completed: false, 
-                    order: (goal.milestones?.length || 0) + 1 
+                body: JSON.stringify({
+                    title: isIndo ? 'Langkah Baru' : 'New Step',
+                    completed: false,
+                    order: (goal.milestones?.length || 0) + 1
                 })
             });
             if (res.ok) {
                 const data = await res.json();
-                const newMs: Milestone = { 
-                    id: data.id, 
-                    title: data.title, 
-                    is_completed: data.completed, 
-                    completed: data.completed 
+                const newMs: Milestone = {
+                    id: data.id,
+                    title: data.title,
+                    is_completed: data.completed,
+                    completed: data.completed
                 };
                 setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: [...(g.milestones || []), newMs] } : g));
             }
@@ -897,7 +897,7 @@ export default function GoalsPage() {
     const handleToggleMilestone = async (goal: GoalItem, m: Milestone) => {
         const nextState = !(m.is_completed || m.completed);
         const updatedMilestones = (goal.milestones || []).map(ms => ms.id === m.id ? { ...ms, is_completed: nextState, completed: nextState } : ms);
-        
+
         setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, milestones: updatedMilestones } : g));
 
         const updatedGoal = { ...goal, milestones: updatedMilestones };
@@ -985,29 +985,27 @@ export default function GoalsPage() {
         <AuthenticatedLayout>
             <GatedPage feature="goals">
                 <div className="goal-tracker-page min-h-screen bg-slate-50/50 dark:bg-slate-950/50 w-full max-w-full overflow-x-hidden">
-                    
+
                     {/* Header Top Bar */}
                     <GoalHeader onAddClick={handleOpenCreateModal} />
 
                     <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 pb-24 min-w-0">
                         {/* TABS NAVIGATION (Active / In Progress vs Completed) */}
                         <div className="flex items-center gap-2 mb-4 bg-white dark:bg-slate-900 p-1.5 rounded-2xl w-fit max-w-full overflow-x-auto no-scrollbar shadow-sm border border-slate-200/80 dark:border-slate-800 relative z-10">
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => setCurrentTab('active')}
-                                className={`px-5 py-2 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${
-                                    currentTab === 'active' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                }`}
+                                className={`px-5 py-2 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${currentTab === 'active' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    }`}
                             >
                                 {isIndo ? 'Sedang Berjalan' : 'In Progress'}
                                 <span className="ml-1 opacity-70">({globalStats.activeCount})</span>
                             </button>
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => setCurrentTab('completed')}
-                                className={`px-5 py-2 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${
-                                    currentTab === 'completed' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                }`}
+                                className={`px-5 py-2 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${currentTab === 'completed' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    }`}
                             >
                                 {isIndo ? 'Telah Tercapai 🏆' : 'Completed 🏆'}
                                 <span className="ml-1 opacity-70">({globalStats.completedCount})</span>
@@ -1018,7 +1016,7 @@ export default function GoalsPage() {
                         <GoalStats stats={globalStats} goals={goals} />
 
                         {/* Search, Time Horizon & Multi-View Filter Bar */}
-                        <GoalFilterBar 
+                        <GoalFilterBar
                             searchQuery={searchQuery}
                             setSearchQuery={setSearchQuery}
                             selectedCategory={selectedCategory}
@@ -1051,13 +1049,13 @@ export default function GoalsPage() {
                                     {isIndo ? 'Rancang Target & Visi Pertama Anda' : 'Begin Your First Vision'}
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto mb-8 leading-relaxed text-xs sm:text-sm">
-                                    {isIndo 
+                                    {isIndo
                                         ? 'Pilih tipe target (Angka, Finansial, OKR), tetapkan tanggal, dan tentukan motivasi utama untuk mulai mewujudkannya.'
                                         : 'Define your vision using metric counter, financial currency, or OKR milestones to start executing today.'}
                                 </p>
-                                <button 
+                                <button
                                     type="button"
-                                    onClick={handleOpenCreateModal} 
+                                    onClick={handleOpenCreateModal}
                                     className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-500/25 active:scale-95 transition-all flex items-center gap-2 text-xs sm:text-sm"
                                 >
                                     <Plus className="w-4.5 h-4.5 stroke-[3]" />
@@ -1100,7 +1098,7 @@ export default function GoalsPage() {
 
                                 {/* 2. KANBAN PIPELINE VIEW */}
                                 {viewMode === 'kanban' && (
-                                    <GoalKanbanView 
+                                    <GoalKanbanView
                                         goals={filteredGoals}
                                         onEdit={handleOpenEditModal}
                                         onDelete={handleRequestDeleteGoal}
@@ -1114,7 +1112,7 @@ export default function GoalsPage() {
 
                                 {/* 3. TIMELINE ROADMAP VIEW */}
                                 {viewMode === 'timeline' && (
-                                    <GoalTimelineView 
+                                    <GoalTimelineView
                                         goals={filteredGoals}
                                         onEdit={handleOpenEditModal}
                                     />
@@ -1122,7 +1120,7 @@ export default function GoalsPage() {
 
                                 {/* 4. WHEEL OF LIFE BALANCE VIEW */}
                                 {viewMode === 'wheel_of_life' && (
-                                    <GoalWheelOfLifeView 
+                                    <GoalWheelOfLifeView
                                         goals={goals}
                                         onEdit={handleOpenEditModal}
                                     />
@@ -1133,7 +1131,7 @@ export default function GoalsPage() {
                     </div>
 
                     {/* Create / Edit Goal Modal */}
-                    <GoalModal 
+                    <GoalModal
                         show={isModalOpen}
                         goal={editingGoal}
                         allGoals={goals}
