@@ -44,8 +44,8 @@ export default function GuestNavbar({
             <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex justify-between items-center relative">
                 {/* UNIFIED LOGO */}
                 <Link href="/" className="group flex items-center gap-2 z-[110] hover:opacity-90 transition-opacity">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-xs shadow-indigo-200 shrink-0">
-                        <img src="/favicon.svg" alt="Tranvas Logo" className="w-4 h-4 sm:w-4.5 sm:h-4.5 brightness-0 invert" />
+                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-transform duration-500 group-hover:rotate-[360deg] shadow-xs shadow-indigo-200 shrink-0">
+                        <img src="/favicon.svg" alt="Tranvas Logo" className="w-4.5 h-4.5 brightness-0 invert" />
                     </div>
                     <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 block">Tranvas</span>
                 </Link>

@@ -87,7 +87,7 @@ export default function AuthMobileBottomNav({ moduleSettings = {} }: AuthMobileB
     return (
         <nav 
             aria-label="Mobile Navigation Dock"
-            className="fixed bottom-2.5 inset-x-2 sm:inset-x-auto sm:w-[440px] sm:left-1/2 sm:-translate-x-1/2 z-[65] md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-800/90 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] px-1 py-1 transition-all duration-300"
+            className="fixed bottom-2.5 inset-x-2 sm:inset-x-auto sm:w-[440px] sm:left-1/2 sm:-translate-x-1/2 z-[65] md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-800/90 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] px-1.5 py-1.5 transition-all duration-300"
         >
             <div className="grid grid-cols-6 items-center gap-0.5">
                 {navItems.map((item) => {
@@ -98,19 +98,19 @@ export default function AuthMobileBottomNav({ moduleSettings = {} }: AuthMobileB
                         <Link
                             key={item.key}
                             href={item.href}
-                            className={`flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all duration-150 active:scale-95 relative ${
+                            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all duration-150 active:scale-95 relative ${
                                 active
                                     ? `${item.activeColor} ${item.activeBg}`
                                     : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                             }`}
                         >
                             <Icon 
-                                className={`w-[17px] h-[17px] transition-transform duration-150 ${
+                                className={`w-[19px] h-[19px] transition-transform duration-150 ${
                                     active ? 'scale-105 stroke-[2.2]' : 'stroke-[1.8]'
                                 }`} 
                             />
 
-                            <span className={`text-[9.5px] tracking-tight mt-0.5 leading-none transition-all select-none ${
+                            <span className={`text-[10px] tracking-tight mt-0.5 leading-none transition-all select-none ${
                                 active ? 'font-bold' : 'font-medium'
                             }`}>
                                 {item.label}
