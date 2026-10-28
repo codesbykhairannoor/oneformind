@@ -373,9 +373,11 @@ export default function GoalsPage() {
                 if (!matchTitle && !matchCat && !matchWhy && !matchMilestone) return false;
             }
 
-            // Category Filter
-            if (selectedCategory !== 'all' && g.category !== selectedCategory) {
-                return false;
+            // Category Filter (Case-insensitive)
+            if (selectedCategory !== 'all') {
+                const goalCat = (g.category || 'other').toLowerCase().trim();
+                const filterCat = selectedCategory.toLowerCase().trim();
+                if (goalCat !== filterCat) return false;
             }
 
             // Priority Filter

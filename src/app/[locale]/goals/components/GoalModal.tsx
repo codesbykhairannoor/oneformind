@@ -260,7 +260,7 @@ export default function GoalModal({
             setCustomCatText('');
             setShowAdvanced(false);
         }
-    }, [goal, show, isIndo, existingCustomCategories]);
+    }, [goal, show, isIndo]);
 
     if (!show) return null;
 
@@ -285,22 +285,41 @@ export default function GoalModal({
             return;
         }
 
+        let finalCategory = form.category || 'other';
+        let finalIcon = form.icon || '🎯';
+        let finalColor = form.color || '#6366f1';
+
         // Save category bundle if custom category is created or used
-        if (categoryMode === 'new' && customCatText.trim()) {
+        if (categoryMode === 'new') {
+            const trimmedCat = customCatText.trim();
+            if (trimmedCat) {
+                finalCategory = trimmedCat;
+                finalIcon = newCatIcon || form.icon || '🎯';
+                finalColor = newCatColor || form.color || '#6366f1';
+                saveCategoryBundle({
+                    name: trimmedCat,
+                    icon: finalIcon,
+                    color: finalColor
+                });
+            } else {
+                finalCategory = 'other';
+            }
+        } else if (finalCategory && finalCategory !== 'other') {
             saveCategoryBundle({
-                name: customCatText.trim(),
-                icon: form.icon || newCatIcon || '🎯',
-                color: form.color || newCatColor || '#6366f1'
-            });
-        } else if (form.category && form.category !== 'other') {
-            saveCategoryBundle({
-                name: form.category,
-                icon: form.icon || '🎯',
-                color: form.color || '#6366f1'
+                name: finalCategory,
+                icon: finalIcon,
+                color: finalColor
             });
         }
 
-        onSave(form);
+        const finalForm: GoalItem = {
+            ...form,
+            category: finalCategory,
+            icon: finalIcon,
+            color: finalColor
+        };
+
+        onSave(finalForm);
     };
 
     const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -430,11 +449,6 @@ export default function GoalModal({
             icon: icon,
             color: color
         }));
-
-        if (trimmed) {
-            saveCategoryBundle({ name: trimmed, icon, color });
-            setCategoryBundles(getCategoryBundles(allGoals));
-        }
     };
 
     const handleDeleteCategoryClick = (catName?: string | null) => {

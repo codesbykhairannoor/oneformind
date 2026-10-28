@@ -33,24 +33,26 @@ export interface GoalItem {
     child_goals_expected_count?: number;
     child_goals_avg_progress?: number;
     child_goals?: { id: string | number; title: string; progress: number; time_horizon?: string; status?: string }[];
-    
+
     // Numeric & Metric targets
     start_value?: number;
     current_value?: number;
     target_value?: number;
     unit?: string;
     currency?: 'IDR' | 'USD' | string;
-    
+
     // Psychological & WOOP Framework
     core_why?: string;
     obstacle?: string;
     obstacle_plan?: string;
     reward?: string;
     notes?: string;
-    
+
     // Dates & Visuals
     start_date?: string | null;
     end_date?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
     cover_image_url?: string;
     milestones?: GoalMilestone[];
     is_saving?: boolean;
@@ -201,10 +203,12 @@ export function calculateGoalPace(goal: GoalItem): GoalPaceResult {
 
     const now = new Date();
     const end = new Date(goal.end_date);
-    const start = goal.start_date ? new Date(goal.start_date) : new Date(now.getTime() - 86400000 * 30);
+    const start = goal.start_date
+        ? new Date(goal.start_date)
+        : (goal.created_at ? new Date(goal.created_at) : now);
 
-    const totalDurationMs = end.getTime() - start.getTime();
-    const elapsedMs = now.getTime() - start.getTime();
+    const totalDurationMs = Math.max(1, end.getTime() - start.getTime());
+    const elapsedMs = Math.max(0, now.getTime() - start.getTime());
     const remainingMs = end.getTime() - now.getTime();
 
     const daysTotal = Math.max(1, Math.round(totalDurationMs / (1000 * 3600 * 24)));
@@ -220,9 +224,9 @@ export function calculateGoalPace(goal: GoalItem): GoalPaceResult {
             daysLeft,
             paceRatio: 0,
             paceStatus: 'overdue',
-            paceLabel: { 
-                id: `Lewat ${overdueDays} Hari`, 
-                en: `${overdueDays}d Overdue` 
+            paceLabel: {
+                id: `Lewat ${overdueDays} Hari`,
+                en: `${overdueDays}d Overdue`
             },
             paceColor: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30',
             runRateNotice: {
@@ -232,18 +236,23 @@ export function calculateGoalPace(goal: GoalItem): GoalPaceResult {
         };
     }
 
-    const timeElapsedPercent = Math.min(100, Math.max(1, (daysElapsed / daysTotal) * 100));
-    const paceRatio = progressPercent / timeElapsedPercent;
+    const timeElapsedPercent = Math.min(100, Math.max(0, (daysElapsed / daysTotal) * 100));
+    const paceRatio = timeElapsedPercent > 0 ? (progressPercent / timeElapsedPercent) : 1;
 
     let paceStatus: GoalPaceResult['paceStatus'] = 'on_track';
     let paceLabel = { id: 'Tepat Waktu 🟢', en: 'On Track 🟢' };
     let paceColor = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30';
 
-    if (paceRatio >= 1.25 || (progressPercent >= 50 && timeElapsedPercent <= 30)) {
+    // Grace Period for newly created goals (first 2 days or first 15% elapsed time)
+    if (daysElapsed <= 2 || timeElapsedPercent <= 15) {
+        paceStatus = 'on_track';
+        paceLabel = { id: 'Tepat Waktu 🟢', en: 'On Track 🟢' };
+        paceColor = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30';
+    } else if (paceRatio >= 1.25 || (progressPercent >= 50 && timeElapsedPercent <= 30)) {
         paceStatus = 'ahead';
         paceLabel = { id: 'Mendahului Jadwal 🚀', en: 'Ahead of Pace 🚀' };
         paceColor = 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/30';
-    } else if (paceRatio < 0.75 || (timeElapsedPercent >= 70 && progressPercent < 40)) {
+    } else if (timeElapsedPercent > 15 && (paceRatio < 0.7 || (timeElapsedPercent >= 60 && progressPercent < 30))) {
         paceStatus = 'behind';
         paceLabel = { id: 'Perlu Akselerasi ⚠️', en: 'Behind Pace ⚠️' };
         paceColor = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30';
@@ -258,7 +267,7 @@ export function calculateGoalPace(goal: GoalItem): GoalPaceResult {
         const remainingUnits = Math.max(0, goal.target_value - (goal.current_value || 0));
         const unit = goal.unit || 'unit';
         const perWeek = (remainingUnits / remainingWeeks).toFixed(1).replace('.0', '');
-        
+
         runRateNotice = {
             id: `Perlu rata-rata +${perWeek} ${unit}/minggu (sisa ${daysLeft} hari lagi).`,
             en: `Need approx +${perWeek} ${unit}/week (${daysLeft} days remaining).`
@@ -266,7 +275,7 @@ export function calculateGoalPace(goal: GoalItem): GoalPaceResult {
     } else if (goal.type === 'currency' && goal.target_value && goal.current_value !== undefined) {
         const remainingAmount = Math.max(0, goal.target_value - (goal.current_value || 0));
         const curr = goal.currency || 'IDR';
-        
+
         let formattedPerMonth = '';
         if (curr === 'IDR') {
             const perMonthVal = Math.round(remainingAmount / remainingMonths);
@@ -378,9 +387,9 @@ export function calculateGlobalGoalStats(goals: GoalItem[]) {
     const avgProgress = Math.round(totalProgressSum / goals.length);
 
     // 1. Identify True North Star: First explicitly pinned goal, else first Vital goal, else first active goal
-    const northStarGoal = activeGoals.find(g => g.is_north_star) 
-        || activeGoals.find(g => g.priority === 'vital') 
-        || activeGoals[0] 
+    const northStarGoal = activeGoals.find(g => g.is_north_star)
+        || activeGoals.find(g => g.priority === 'vital')
+        || activeGoals[0]
         || null;
 
     // 2. Identify Most Urgent Goal: Active goal with smallest non-negative daysLeft (or nearest deadline)
