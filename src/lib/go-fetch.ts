@@ -1,12 +1,36 @@
 import { createClient } from '@/utils/supabase/server';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 /**
  * Returns the Go API base URL for internal server-side fetches.
- * - In Docker/Coolify: uses NEXT_PUBLIC_API_URL env var (e.g. http://api:8080/api)
- * - Ensures /api path is always present to match Go Chi router
+ * - Dynamic resolution handles Vercel preview/production, custom domain, and local dev automatically.
+ * - Ensures /api path is always present to match Go router.
  */
-function getGoApiBase(): string {
+async function getGoApiBase(): Promise<string> {
+  // 1. Explicit NEXT_PUBLIC_API_URL override (except docker internal alias when not in container)
+  if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('api:8080')) {
+    const raw = process.env.NEXT_PUBLIC_API_URL;
+    return raw.endsWith('/api') ? raw : `${raw}/api`;
+  }
+
+  // 2. Dynamic host resolution from active HTTP request (seamless on Vercel, tranvas.com, and localhost)
+  try {
+    const headerList = await headers();
+    const host = headerList.get('x-forwarded-host') || headerList.get('host');
+    const proto = headerList.get('x-forwarded-proto') || 'https';
+    if (host) {
+      return `${proto}://${host}/api`;
+    }
+  } catch {
+    // Headers might not be available during background tasks or static generation
+  }
+
+  // 3. Fallback to Vercel system environment variable
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/api`;
+  }
+
+  // 4. Default fallback for local Docker/Coolify container
   const raw = process.env.NEXT_PUBLIC_API_URL || 'http://api:8080/api';
   return raw.endsWith('/api') ? raw : `${raw}/api`;
 }
@@ -90,18 +114,18 @@ export async function goFetch(
     throw new Error('No session token available for Go API fetch');
   }
 
-  const base = getGoApiBase();
+  const base = await getGoApiBase();
   const qs = params ? `&${params}` : '';
   const url = `${base}?route=${route}${qs}`;
 
-  const headers: Record<string, string> = {
+  const headersMap: Record<string, string> = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
   };
 
   const options: RequestInit = {
     method,
-    headers,
+    headers: headersMap,
     cache: 'no-store',
   };
 

@@ -1,8 +1,8 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 import type { NextConfig } from 'next';
- 
+
 const withNextIntl = createNextIntlPlugin();
- 
+
 const nextConfig: NextConfig = {
     // Standalone is required for Docker/Coolify, but must be undefined on Vercel to prevent .next/next-server.js.nft.json ENOENT crash
     output: process.env.VERCEL ? undefined : 'standalone',
@@ -87,5 +87,5 @@ const nextConfig: NextConfig = {
         ];
     },
 };
- 
+
 export default withNextIntl(nextConfig);

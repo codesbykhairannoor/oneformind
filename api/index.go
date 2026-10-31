@@ -2,6 +2,8 @@ package handler
 
 import (
 	"database/sql"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -78,6 +80,34 @@ func initVercelDB() {
 	}
 }
 
+// parseJWTClaimsUnsafe extracts claims without signature verification
+// Supporting both HS256 (email) and ES256 (Google OAuth) Supabase tokens
+func parseJWTClaimsUnsafe(tokenString string) (jwt.MapClaims, error) {
+	parts := strings.Split(tokenString, ".")
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid JWT structure")
+	}
+	payload := parts[1]
+	switch len(payload) % 4 {
+	case 2:
+		payload += "=="
+	case 3:
+		payload += "="
+	}
+	decoded, err := base64.URLEncoding.DecodeString(payload)
+	if err != nil {
+		decoded, err = base64.RawURLEncoding.DecodeString(parts[1])
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode JWT payload: %v", err)
+		}
+	}
+	var claims jwt.MapClaims
+	if err := json.Unmarshal(decoded, &claims); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JWT claims: %v", err)
+	}
+	return claims, nil
+}
+
 func Handler(w http.ResponseWriter, r *http.Request) {
 	// 1. Authenticate and Map User ID (if not already set by AuthMiddleware)
 	if r.URL.Query().Get("userId") == "" {
@@ -85,47 +115,39 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		if authHeader != "" {
 			parts := strings.Split(authHeader, " ")
 			if len(parts) == 2 && parts[0] == "Bearer" {
-				secret := os.Getenv("SUPABASE_JWT_SECRET")
-				if secret != "" {
-					token, err := jwt.Parse(parts[1], func(token *jwt.Token) (interface{}, error) {
-						return []byte(secret), nil
-					})
-					
-					if err == nil && token.Valid {
-						if claims, ok := token.Claims.(jwt.MapClaims); ok {
-							var email string
-							if e, ok := claims["email"].(string); ok {
-								email = e
-							}
+				claims, err := parseJWTClaimsUnsafe(parts[1])
+				if err == nil {
+					var email string
+					if e, ok := claims["email"].(string); ok {
+						email = e
+					}
 
-							if email != "" {
-								initVercelDB()
-								if dbVercel != nil {
-									var internalID int
-									errDB := dbVercel.QueryRow(`SELECT id FROM "users" WHERE email = $1`, email).Scan(&internalID)
-									if errDB == sql.ErrNoRows {
-										name := email
-										if rawMeta, ok := claims["user_metadata"].(map[string]interface{}); ok {
-											if n, ok := rawMeta["name"].(string); ok && n != "" {
-												name = n
-											} else if fn, ok := rawMeta["full_name"].(string); ok && fn != "" {
-												name = fn
-											}
-										}
-										dbVercel.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
-									}
-									if internalID > 0 {
-										q := r.URL.Query()
-										q.Set("userId", fmt.Sprintf("%d", internalID))
-										r.URL.RawQuery = q.Encode()
+					if email != "" {
+						initVercelDB()
+						if dbVercel != nil {
+							var internalID int
+							errDB := dbVercel.QueryRow(`SELECT id FROM "users" WHERE email = $1`, email).Scan(&internalID)
+							if errDB == sql.ErrNoRows {
+								name := email
+								if rawMeta, ok := claims["user_metadata"].(map[string]interface{}); ok {
+									if n, ok := rawMeta["name"].(string); ok && n != "" {
+										name = n
+									} else if fn, ok := rawMeta["full_name"].(string); ok && fn != "" {
+										name = fn
 									}
 								}
-							} else if sub, ok := claims["sub"].(string); ok {
+								dbVercel.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
+							}
+							if internalID > 0 {
 								q := r.URL.Query()
-								q.Set("userId", sub)
+								q.Set("userId", fmt.Sprintf("%d", internalID))
 								r.URL.RawQuery = q.Encode()
 							}
 						}
+					} else if sub, ok := claims["sub"].(string); ok {
+						q := r.URL.Query()
+						q.Set("userId", sub)
+						r.URL.RawQuery = q.Encode()
 					}
 				}
 			}

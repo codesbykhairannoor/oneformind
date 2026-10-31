@@ -8,10 +8,13 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
       return NextResponse.json({ error: 'Invalid route parameter' }, { status: 400 });
     }
 
-    const proto = req.headers.get('x-forwarded-proto') || 'http';
-    const host = req.headers.get('host') || 'localhost:3000';
+    const proto = req.headers.get('x-forwarded-proto') || 'https';
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3000';
     
-    const baseApi = process.env.NEXT_PUBLIC_API_URL || `${proto}://${host}/api`;
+    let baseApi = `${proto}://${host}/api`;
+    if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('api:8080')) {
+      baseApi = process.env.NEXT_PUBLIC_API_URL;
+    }
     const targetUrl = new URL(baseApi);
     targetUrl.searchParams.set('route', safeRoute);
 
