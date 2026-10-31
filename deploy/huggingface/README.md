@@ -17,3 +17,4 @@ High-performance Go Chi REST API backend powering [tranvas.com](https://tranvas.
 - **Port**: 7860 (Hugging Face default)
 - **Database**: Supabase PostgreSQL (via pgx pool)
 - **Healthcheck**: `GET /health`
+

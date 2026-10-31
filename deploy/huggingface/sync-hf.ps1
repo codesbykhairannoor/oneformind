@@ -63,3 +63,4 @@ finally {
     Pop-Location
     Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
 }
+

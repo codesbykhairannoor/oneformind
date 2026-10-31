@@ -52,3 +52,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 # Launch Tranvas Go backend
 CMD ["./tranvas-api"]
+

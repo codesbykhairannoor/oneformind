@@ -99,3 +99,4 @@ Setelah domain `tranvas.com` aktif mengarah ke Vercel dan memanggil backend Hugg
 1. Cek semua modul Tranvas (Planner, Habits, Finance, Journal, Goals, Jobs, Study, Calendar).
 2. Jika semua lancar, login ke provider VPS lama lo dan **CANCEL / TERMINATE SERVER**.
 3. **Mulai hari ini, biaya operasional Tranvas adalah Rp 0 / $0 selamanya!**
+
