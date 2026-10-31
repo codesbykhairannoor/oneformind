@@ -11,7 +11,7 @@ export default function ForgotPassword({ searchParams }: { searchParams?: { stat
 
     return (
         <div className="relative min-h-screen w-full flex flex-col items-center justify-start bg-white selection:bg-indigo-100 selection:text-indigo-700 px-4 py-8 sm:px-6 sm:py-12 overflow-x-hidden overflow-y-auto">
-            
+
             <div className="absolute top-0 w-full h-96 bg-gradient-to-r from-indigo-50/50 via-purple-50/50 to-blue-50/50 blur-3xl -z-10 pointer-events-none" />
 
             <div className="w-full max-w-[420px] my-auto flex flex-col relative z-10">
@@ -64,7 +64,7 @@ export default function ForgotPassword({ searchParams }: { searchParams?: { stat
                         </Link>
                     </div>
                 </form>
-                
+
                 <div className="mt-8 sm:mt-10 text-center font-medium">
                     <Link href="/resources/help" className="text-[11px] text-slate-500 hover:text-indigo-600 transition-colors">{t('auth_footer_help') || 'Help Center'}</Link>
                 </div>
