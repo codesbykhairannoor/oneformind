@@ -29,9 +29,9 @@ export function usePlannerTaskCrud(selectedDate: string) {
     const toggleTask = async (id: number) => {
         const task = tasks.find(t => t.id === id);
         if (!task) return;
-        
+
         updateTasksState(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-        
+
         try {
             await fetch(`/api/planner/tasks/${id}`, {
                 method: 'PUT',
@@ -47,7 +47,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
     const openNewTaskModal = (defaultTime?: string, prefill?: { title?: string; type?: number }) => {
         setEditingTaskId(null);
         setTaskTitle(prefill?.title || '');
-        
+
         const cleanDate = normalizeDate(selectedDate);
         let start = defaultTime || '09:00';
         if (!defaultTime) {
@@ -73,36 +73,36 @@ export function usePlannerTaskCrud(selectedDate: string) {
         }
 
         setTaskStartTime(start);
-        
+
         const [h, m] = start.split(':').map(Number);
         const endH = String((h + 1) % 24).padStart(2, '0');
         const endM = String(m).padStart(2, '0');
         setTaskEndTime(`${endH}:${endM}`);
-        
+
         setTaskType(prefill?.type || 2);
         setTaskNotes('');
         setShowTaskModal(true);
     };
 
     const editTask = (task: TaskItem) => {
-        setEditingTaskId(task.id); 
-        setTaskTitle(task.title); 
-        setTaskStartTime(task.start_time); 
+        setEditingTaskId(task.id);
+        setTaskTitle(task.title);
+        setTaskStartTime(task.start_time);
         setTaskEndTime(task.end_time);
-        setTaskType(task.type); 
-        setTaskNotes(task.notes || ''); 
+        setTaskType(task.type);
+        setTaskNotes(task.notes || '');
         setShowTaskModal(true);
     };
 
     const submitSingleTask = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!taskTitle.trim()) return;
-        
+
         const conflictRes = checkTimeConflictDetails(
-            taskStartTime, 
-            taskEndTime, 
-            tasks, 
-            selectedDate, 
+            taskStartTime,
+            taskEndTime,
+            tasks,
+            selectedDate,
             editingTaskId,
             true
         );
@@ -124,13 +124,13 @@ export function usePlannerTaskCrud(selectedDate: string) {
         try {
             const cleanDate = normalizeDate(selectedDate);
             if (currentEditingId) {
-                updateTasksState(prev => prev.map(t => t.id === currentEditingId ? { 
-                    ...t, 
-                    title: currentTitle, 
-                    start_time: currentStart, 
-                    end_time: currentEnd, 
-                    type: currentType, 
-                    notes: currentNotes 
+                updateTasksState(prev => prev.map(t => t.id === currentEditingId ? {
+                    ...t,
+                    title: currentTitle,
+                    start_time: currentStart,
+                    end_time: currentEnd,
+                    type: currentType,
+                    notes: currentNotes
                 } : t));
 
                 await fetch(`/api/planner/tasks/${currentEditingId}`, {
@@ -142,15 +142,15 @@ export function usePlannerTaskCrud(selectedDate: string) {
                 });
             } else {
                 const tempId = Date.now();
-                const newTaskItem: TaskItem = { 
-                    id: tempId, 
-                    date: cleanDate, 
-                    title: currentTitle, 
-                    start_time: currentStart, 
-                    end_time: currentEnd, 
-                    type: currentType, 
-                    notes: currentNotes, 
-                    completed: false 
+                const newTaskItem: TaskItem = {
+                    id: tempId,
+                    date: cleanDate,
+                    title: currentTitle,
+                    start_time: currentStart,
+                    end_time: currentEnd,
+                    type: currentType,
+                    notes: currentNotes,
+                    completed: false
                 };
 
                 updateTasksState(prev => [...prev, newTaskItem]);
@@ -178,12 +178,12 @@ export function usePlannerTaskCrud(selectedDate: string) {
     const handleMoveTask = async (taskId: number, newStartTime: string) => {
         const task = tasks.find(t => t.id === taskId);
         if (!task) return;
-        
+
         const [startH, startM] = task.start_time.split(':').map(Number);
         let [endH, endM] = task.end_time ? task.end_time.split(':').map(Number) : [startH + 1, startM];
         let duration = (endH * 60 + endM) - (startH * 60 + startM);
         if (duration < 0) duration += 1440;
-        
+
         const [newStartH, newStartM] = newStartTime.split(':').map(Number);
         const newEndMinutes = (newStartH * 60 + newStartM) + duration;
         const finalEndH = String(Math.floor(newEndMinutes / 60) % 24).padStart(2, '0');
@@ -191,10 +191,10 @@ export function usePlannerTaskCrud(selectedDate: string) {
         const newEndTime = `${finalEndH}:${finalEndM}`;
 
         const conflictRes = checkTimeConflictDetails(
-            newStartTime, 
-            newEndTime, 
-            tasks, 
-            selectedDate, 
+            newStartTime,
+            newEndTime,
+            tasks,
+            selectedDate,
             taskId,
             true
         );
@@ -218,7 +218,7 @@ export function usePlannerTaskCrud(selectedDate: string) {
     };
 
     // Schedule an inbox task directly onto the timeline
-    const scheduleInboxTask = async (inboxTask: { id: number; title: string; type: number }, startTime: string, durationMinutes: number = 60) => {
+    const scheduleInboxTask = async (inboxTask: { id: number | string; title: string; type: number }, startTime: string, durationMinutes: number = 60) => {
         const cleanDate = normalizeDate(selectedDate);
         const [sH, sM] = startTime.split(':').map(Number);
         const endMinutes = (sH * 60 + sM) + durationMinutes;

@@ -76,18 +76,17 @@ export default function HabitStatsHeader({
                 </span>
             }
             actions={
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                     {/* Numeric Mode Switcher */}
                     <div className="flex items-center bg-slate-50 dark:bg-slate-800/80 p-0.5 sm:p-1 rounded-lg sm:rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-[11px] sm:text-xs font-black">
                         <button
                             type="button"
                             onClick={() => onToggleNumericViewMode('value')}
                             title={isIndo ? 'Tampilkan Nilai / Angka' : 'Show Numeric Values'}
-                            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg flex items-center gap-1 transition-all ${
-                                numericViewMode === 'value'
+                            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg flex items-center gap-1 transition-all ${numericViewMode === 'value'
                                     ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                                     : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                            }`}
+                                }`}
                         >
                             <span>🔢</span>
                             <span className="hidden sm:inline">{isIndo ? 'Angka' : 'Values'}</span>
@@ -96,11 +95,10 @@ export default function HabitStatsHeader({
                             type="button"
                             onClick={() => onToggleNumericViewMode('percent')}
                             title={isIndo ? 'Tampilkan Persentase (%)' : 'Show Percentages (%)'}
-                            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg flex items-center gap-1 transition-all ${
-                                numericViewMode === 'percent'
+                            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg flex items-center gap-1 transition-all ${numericViewMode === 'percent'
                                     ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                                     : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                            }`}
+                                }`}
                         >
                             <span>%</span>
                         </button>
@@ -110,11 +108,10 @@ export default function HabitStatsHeader({
                     <button
                         type="button"
                         onClick={toggleSound}
-                        className={`h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center rounded-lg sm:rounded-xl border transition-all shrink-0 ${
-                            soundActive
+                        className={`h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center rounded-lg sm:rounded-xl border transition-all shrink-0 ${soundActive
                                 ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400'
                                 : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/80 text-slate-400'
-                        }`}
+                            }`}
                         title={soundActive ? (isIndo ? 'Suara Dopamine Aktif' : 'Sound Effects ON') : (isIndo ? 'Suara Hening' : 'Sound Effects Muted')}
                     >
                         {soundActive ? <Volume2 size={14} className="sm:w-[15px] sm:h-[15px]" /> : <VolumeX size={14} className="sm:w-[15px] sm:h-[15px]" />}
@@ -137,17 +134,17 @@ export default function HabitStatsHeader({
                         {isPeriodDropdownOpen && (
                             <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-[60]">
                                 <div className="flex items-center justify-between mb-4">
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setSelectedYear(selectedYear - 1)} 
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedYear(selectedYear - 1)}
                                         className="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500"
                                     >
                                         <ChevronLeft size={16} />
                                     </button>
                                     <span className="text-lg font-black text-slate-800 dark:text-slate-100">{selectedYear}</span>
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setSelectedYear(selectedYear + 1)} 
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedYear(selectedYear + 1)}
                                         className="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500"
                                     >
                                         <ChevronRight size={16} />
@@ -163,11 +160,10 @@ export default function HabitStatsHeader({
                                                 setSelectedMonthIndex(index);
                                                 setIsPeriodDropdownOpen(false);
                                             }}
-                                            className={`py-2.5 rounded-xl text-xs font-black transition-all ${
-                                                selectedMonthIndex === index
+                                            className={`py-2.5 rounded-xl text-xs font-black transition-all ${selectedMonthIndex === index
                                                     ? 'bg-indigo-600 text-white'
                                                     : 'hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-slate-500'
-                                            }`}
+                                                }`}
                                         >
                                             {month.slice(0, 3)}
                                         </button>
@@ -243,55 +239,50 @@ export default function HabitStatsHeader({
                 <button
                     type="button"
                     onClick={() => setActiveFilter('all')}
-                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${
-                        activeFilter === 'all'
+                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${activeFilter === 'all'
                             ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                             : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
+                        }`}
                 >
                     {t('habits_filter_all') || 'Semua'} ({processedHabits.length})
                 </button>
                 <button
                     type="button"
                     onClick={() => setActiveFilter('morning')}
-                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${
-                        activeFilter === 'morning'
+                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${activeFilter === 'morning'
                             ? 'bg-amber-500 text-white shadow-xs'
                             : 'text-slate-500 hover:bg-amber-50 dark:hover:bg-amber-950/30'
-                    }`}
+                        }`}
                 >
                     🌅 {isIndo ? 'Pagi' : 'Morning'}
                 </button>
                 <button
                     type="button"
                     onClick={() => setActiveFilter('afternoon')}
-                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${
-                        activeFilter === 'afternoon'
+                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${activeFilter === 'afternoon'
                             ? 'bg-orange-500 text-white shadow-xs'
                             : 'text-slate-500 hover:bg-orange-50 dark:hover:bg-orange-950/30'
-                    }`}
+                        }`}
                 >
                     ☀️ {isIndo ? 'Siang' : 'Afternoon'}
                 </button>
                 <button
                     type="button"
                     onClick={() => setActiveFilter('evening')}
-                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${
-                        activeFilter === 'evening'
+                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${activeFilter === 'evening'
                             ? 'bg-indigo-600 text-white shadow-xs'
                             : 'text-slate-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/30'
-                    }`}
+                        }`}
                 >
                     🌙 {isIndo ? 'Malam' : 'Evening'}
                 </button>
                 <button
                     type="button"
                     onClick={() => setActiveFilter('quit')}
-                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${
-                        activeFilter === 'quit'
+                    className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black shrink-0 transition-all ${activeFilter === 'quit'
                             ? 'bg-rose-500 text-white shadow-xs'
                             : 'text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-950/30'
-                    }`}
+                        }`}
                 >
                     🛡️ {isIndo ? 'Bebas' : 'Quit'}
                 </button>

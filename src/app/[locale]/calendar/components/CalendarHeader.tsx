@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
-import { 
-    Calendar as CalendarIcon, 
-    ChevronLeft, 
-    ChevronRight, 
-    ChevronDown, 
-    Plus, 
-    Download, 
-    Zap 
+import {
+    Calendar as CalendarIcon,
+    ChevronLeft,
+    ChevronRight,
+    ChevronDown,
+    Plus,
+    Download,
+    Zap
 } from 'lucide-react';
 import ModuleHeader from '@/components/layout/ModuleHeader';
 
@@ -74,7 +74,7 @@ export default function CalendarHeader({
             title={isIndo ? 'Kalender Terpadu & Jadwal' : 'Master Calendar & Schedules'}
             subtitle={isIndo ? 'Sinkronisasi agenda harian, time-blocking tugas & deadline' : 'Unified schedule, meetings, targets & habits'}
             actions={
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                     {onGoToToday && (
                         <button
                             type="button"
@@ -97,9 +97,9 @@ export default function CalendarHeader({
                         </button>
 
                         <div className="relative">
-                            <button 
+                            <button
                                 type="button"
-                                onClick={() => setIsOpen(!isOpen)} 
+                                onClick={() => setIsOpen(!isOpen)}
                                 className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-black text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-700 transition flex items-center gap-1 sm:gap-1.5 capitalize whitespace-nowrap"
                             >
                                 <span>{displayMonthStr}</span>
@@ -109,11 +109,11 @@ export default function CalendarHeader({
                             {isOpen && (
                                 <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-[70] origin-top-right">
                                     <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)}></div>
-                                    
+
                                     <div className="flex items-center justify-between mb-3 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-2xl">
-                                        <button 
-                                            type="button" 
-                                            onClick={(e) => { e.stopPropagation(); changeYear(-1); }} 
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); changeYear(-1); }}
                                             className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"
                                         >
                                             <ChevronLeft size={14} />
@@ -121,26 +121,25 @@ export default function CalendarHeader({
                                         <span className="text-sm font-black text-slate-800 dark:text-white font-mono">
                                             {activeYear}
                                         </span>
-                                        <button 
-                                            type="button" 
-                                            onClick={(e) => { e.stopPropagation(); changeYear(1); }} 
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); changeYear(1); }}
                                             className="p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"
                                         >
                                             <ChevronRight size={14} />
                                         </button>
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-3 gap-1.5">
                                         {monthsList.map((monthName, idx) => (
-                                            <button 
+                                            <button
                                                 key={monthName}
                                                 type="button"
                                                 onClick={() => selectMonth(idx)}
-                                                className={`py-2 rounded-xl text-xs font-black transition-all ${
-                                                    activeMonthNum === idx + 1
-                                                        ? 'bg-indigo-600 text-white shadow-md' 
+                                                className={`py-2 rounded-xl text-xs font-black transition-all ${activeMonthNum === idx + 1
+                                                        ? 'bg-indigo-600 text-white shadow-md'
                                                         : 'hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-600 dark:text-slate-400'
-                                                }`}
+                                                    }`}
                                             >
                                                 {monthName.slice(0, 3)}
                                             </button>
@@ -187,9 +186,9 @@ export default function CalendarHeader({
                     )}
 
                     {/* Add Event Button */}
-                    <button 
+                    <button
                         type="button"
-                        onClick={onAddEvent} 
+                        onClick={onAddEvent}
                         className="h-8 sm:h-10 px-3 sm:px-5 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] sm:text-xs font-black flex items-center gap-1.5 sm:gap-2 shadow-md shadow-indigo-500/20 transition-all active:scale-95 shrink-0 whitespace-nowrap"
                     >
                         <Plus size={15} strokeWidth={3} className="sm:w-4 sm:h-4" />

@@ -43,19 +43,19 @@ export default function PlannerHeader({
     const formatDateLabel = (dateStr: string) => {
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        
+
         if (dateStr === todayStr) return isIndo ? 'Hari ini' : 'Today';
-        
+
         const [y, m, d] = dateStr.split('-').map(Number);
         const localDate = new Date(y, m - 1, d);
-        
+
         const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const diffTime = localDate.getTime() - todayMidnight.getTime();
         const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays === 1) return isIndo ? 'Besok' : 'Tomorrow';
         if (diffDays === -1) return isIndo ? 'Kemarin' : 'Yesterday';
-        
+
         return localDate.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' });
     };
 
@@ -67,32 +67,32 @@ export default function PlannerHeader({
             title={isIndo ? 'Perencana Harian & Time-Block' : 'Daily Planner & Time-Blocking'}
             subtitle={isIndo ? 'Manajemen jadwal harian, fokus & eksekusi tugas' : 'Daily execution, focus scheduling & task breakdown'}
             actions={
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                     {/* Date Navigation */}
                     <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-lg sm:rounded-xl p-0.5 h-8 sm:h-10 shrink-0">
-                        <button 
+                        <button
                             type="button"
-                            onClick={() => navigateDate(-1)} 
+                            onClick={() => navigateDate(-1)}
                             className="p-1 sm:p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-md sm:rounded-lg text-slate-500 dark:text-slate-400 transition"
                             title={isIndo ? 'Hari sebelumnya' : 'Previous day'}
                         >
                             <ChevronLeft size={13} className="sm:w-3.5 sm:h-3.5" />
                         </button>
-                        
+
                         <div className="relative">
-                            <button 
+                            <button
                                 type="button"
-                                onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} 
+                                onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
                                 className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg font-bold text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 transition"
                             >
                                 <Calendar size={12} className="text-indigo-500 sm:w-[13px] sm:h-[13px]" />
                                 <span className="whitespace-nowrap">{formatDateLabel(selectedDate)}</span>
                                 <ChevronDown size={10} strokeWidth={3} className={`text-slate-400 transition-transform ${isDatePickerOpen ? 'rotate-180' : ''}`} />
                             </button>
-                            
+
                             {isDatePickerOpen && (
                                 <div className="absolute right-0 top-full mt-2 z-[100] origin-top-right">
-                                    <PlannerDatePicker 
+                                    <PlannerDatePicker
                                         selectedDate={selectedDate}
                                         onDateChange={onDateChange}
                                         tasks={tasks}
@@ -101,10 +101,10 @@ export default function PlannerHeader({
                                 </div>
                             )}
                         </div>
-                        
-                        <button 
+
+                        <button
                             type="button"
-                            onClick={() => navigateDate(1)} 
+                            onClick={() => navigateDate(1)}
                             className="p-1 sm:p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-md sm:rounded-lg text-slate-500 dark:text-slate-400 transition"
                             title={isIndo ? 'Hari berikutnya' : 'Next day'}
                         >
@@ -114,10 +114,10 @@ export default function PlannerHeader({
 
                     {/* Export Button */}
                     {onOpenExportModal && (
-                        <button 
+                        <button
                             type="button"
-                            onClick={onOpenExportModal} 
-                            title={isIndo ? 'Ekspor Data Planner (CSV/JSON)' : 'Export Planner Data (CSV/JSON)'} 
+                            onClick={onOpenExportModal}
+                            title={isIndo ? 'Ekspor Data Planner (CSV/JSON)' : 'Export Planner Data (CSV/JSON)'}
                             className="h-8 sm:h-10 px-2.5 sm:px-3.5 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 rounded-lg sm:rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs active:scale-95 shadow-xs shrink-0 whitespace-nowrap"
                         >
                             <Download size={13} className="text-slate-500 dark:text-slate-400 sm:w-3.5 sm:h-3.5" />
@@ -126,19 +126,19 @@ export default function PlannerHeader({
                     )}
 
                     {/* Reset Board Button */}
-                    <button 
+                    <button
                         type="button"
-                        onClick={onResetBoard} 
-                        title={isIndo ? "Kosongkan jadwal hari ini" : "Clear today's schedule"} 
+                        onClick={onResetBoard}
+                        title={isIndo ? "Kosongkan jadwal hari ini" : "Clear today's schedule"}
                         className="h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 rounded-lg sm:rounded-xl font-bold hover:bg-rose-100 dark:hover:bg-rose-500/20 transition border border-rose-100 dark:border-rose-500/20 active:scale-95 shadow-xs shrink-0"
                     >
                         <RotateCcw size={14} strokeWidth={2.5} className="sm:w-[15px] sm:h-[15px]" />
                     </button>
 
                     {/* Add Task Button */}
-                    <button 
+                    <button
                         type="button"
-                        onClick={onOpenTaskModal} 
+                        onClick={onOpenTaskModal}
                         className="h-8 sm:h-10 px-3 sm:px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg sm:rounded-xl font-black transition shadow-md shadow-indigo-500/20 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs active:scale-95 shrink-0 whitespace-nowrap"
                     >
                         <Plus size={15} strokeWidth={3} className="sm:w-4 sm:h-4" />
@@ -166,9 +166,9 @@ export default function PlannerHeader({
                     </div>
                 </div>
                 <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/40 dark:border-slate-700/60">
-                    <div 
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out" 
-                        style={{ width: `${stats.percent}%` }} 
+                    <div
+                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out"
+                        style={{ width: `${stats.percent}%` }}
                     />
                 </div>
             </div>

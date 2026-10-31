@@ -20,7 +20,7 @@ interface JournalHeaderProps {
     onOpenExportModal?: () => void;
 }
 
-export default function JournalHeader({ 
+export default function JournalHeader({
     totalJournals = 0,
     totalWords = 0,
     streakDays = 1,
@@ -29,7 +29,7 @@ export default function JournalHeader({
 }: JournalHeaderProps) {
     const locale = useLocale();
     const isIndo = locale === 'id';
-    
+
     const tasksCompleted = synergy?.tasks_completed ?? 0;
     const tasksTotal = synergy?.tasks_total ?? 0;
     const habitsCompleted = synergy?.habits_completed ?? 0;
@@ -46,7 +46,7 @@ export default function JournalHeader({
             }
             subtitle={isIndo ? 'Ruang aman untuk menjernihkan pikiran, emosi & pola kognitif' : 'Declutter thoughts, track emotional trajectory & cognitive reframing'}
             actions={
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                     {/* Streak Badge */}
                     <div className="flex items-center gap-1.5 px-2.5 sm:px-3 h-8 sm:h-10 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-black text-[11px] sm:text-xs shadow-xs shrink-0 whitespace-nowrap">
                         <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-pulse" />
@@ -100,8 +100,8 @@ export default function JournalHeader({
                     )}
 
                     {/* CTA: Write New Journal Button */}
-                    <Link 
-                        href="/journal/write" 
+                    <Link
+                        href="/journal/write"
                         className="h-8 sm:h-10 px-3 sm:px-5 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] sm:text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all shrink-0 whitespace-nowrap"
                     >
                         <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />

@@ -10,7 +10,7 @@ export interface TaskItem {
 }
 
 export interface InboxTask {
-    id: number;
+    id: number | string;
     title: string;
     completed: boolean;
     type: number;

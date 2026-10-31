@@ -4,9 +4,9 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
-import { 
-    ChevronDown, Trash2, Plus, BookOpen, 
-    Calendar, Clock, BrainCircuit, Sparkles, 
+import {
+    ChevronDown, Trash2, Plus, BookOpen,
+    Calendar, Clock, BrainCircuit, Sparkles,
     ExternalLink, Layers, CheckSquare, Bookmark, Download, Leaf, GraduationCap
 } from 'lucide-react';
 import ModuleHeader from '@/components/layout/ModuleHeader';
@@ -55,9 +55,9 @@ export default function AcademicHeader({
         if (!rawHabits || !Array.isArray(rawHabits)) return null;
         const studyHabits = rawHabits.filter((h: any) => {
             const name = (h.name || '').toLowerCase();
-            return name.includes('belajar') || name.includes('study') || name.includes('baca') || 
-                   name.includes('read') || name.includes('kuliah') || name.includes('fokus') || 
-                   name.includes('coding') || name.includes('matkul');
+            return name.includes('belajar') || name.includes('study') || name.includes('baca') ||
+                name.includes('read') || name.includes('kuliah') || name.includes('fokus') ||
+                name.includes('coding') || name.includes('matkul');
         });
         if (studyHabits.length === 0) return null;
 
@@ -131,7 +131,7 @@ export default function AcademicHeader({
                         {terms.semester || 'Semester'} {selectedSemester}
                     </span>
                     {studyHabitStats && (
-                        <span 
+                        <span
                             className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-black flex items-center gap-1"
                             title={isIndo ? 'Konsistensi kebiasaan belajar bulan ini' : 'Study habit consistency this month'}
                         >
@@ -143,7 +143,7 @@ export default function AcademicHeader({
             }
             subtitle={userSettings.major || (isIndo ? 'Teknik Informatika / Software Engineering' : 'Software Engineering')}
             actions={
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                     {/* Semester Selector Dropdown */}
                     <div className="relative min-w-0 shrink-0" ref={menuRef}>
                         <button
@@ -162,11 +162,10 @@ export default function AcademicHeader({
                                         <button
                                             type="button"
                                             onClick={() => { onSelectSemester(sem); setIsMenuOpen(false); }}
-                                            className={`flex-1 text-left px-4 py-2.5 rounded-2xl text-xs font-black transition-all ${
-                                                Number(selectedSemester) === sem
+                                            className={`flex-1 text-left px-4 py-2.5 rounded-2xl text-xs font-black transition-all ${Number(selectedSemester) === sem
                                                     ? 'bg-indigo-600 text-white shadow-md'
                                                     : 'hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-600 dark:text-slate-300'
-                                            }`}
+                                                }`}
                                         >
                                             {terms.semester || 'Semester'} {sem}
                                         </button>
@@ -198,11 +197,10 @@ export default function AcademicHeader({
                     <button
                         type="button"
                         onClick={() => onSelectTab('portfolio')}
-                        className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-10 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black transition active:scale-95 border shrink-0 whitespace-nowrap ${
-                            activeTab === 'portfolio'
+                        className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-10 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black transition active:scale-95 border shrink-0 whitespace-nowrap ${activeTab === 'portfolio'
                                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20'
                                 : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-indigo-600 dark:text-indigo-400 border-slate-200/80 dark:border-slate-800'
-                        }`}
+                            }`}
                     >
                         <Sparkles size={13} className="sm:w-3.5 sm:h-3.5" />
                         <span className="hidden sm:inline">{isIndo ? 'Portofolio Bento' : 'Bento Portfolio'}</span>
@@ -243,11 +241,10 @@ export default function AcademicHeader({
                             key={tab.id}
                             type="button"
                             onClick={() => onSelectTab(tab.id)}
-                            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black whitespace-nowrap transition active:scale-95 [&>svg]:w-3.5 [&>svg]:h-3.5 ${
-                                isActive
+                            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black whitespace-nowrap transition active:scale-95 [&>svg]:w-3.5 [&>svg]:h-3.5 ${isActive
                                     ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                            }`}
+                                }`}
                         >
                             {tab.icon}
                             <span>{tab.label}</span>

@@ -47,21 +47,21 @@ export function usePlannerDailyData(selectedDate: string) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-        .then(res => {
-            if (res.ok) {
-                setSaveStatus('saved');
-                if (savedIndicatorTimeoutRef.current) clearTimeout(savedIndicatorTimeoutRef.current);
-                savedIndicatorTimeoutRef.current = setTimeout(() => {
+            .then(res => {
+                if (res.ok) {
+                    setSaveStatus('saved');
+                    if (savedIndicatorTimeoutRef.current) clearTimeout(savedIndicatorTimeoutRef.current);
+                    savedIndicatorTimeoutRef.current = setTimeout(() => {
+                        setSaveStatus('idle');
+                    }, 2000);
+                } else {
                     setSaveStatus('idle');
-                }, 2000);
-            } else {
+                }
+            })
+            .catch(e => {
+                console.error("Sync daily network error:", e);
                 setSaveStatus('idle');
-            }
-        })
-        .catch(e => {
-            console.error("Sync daily network error:", e);
-            setSaveStatus('idle');
-        });
+            });
     }, []);
 
     const scheduleSync = (payload: Partial<{
@@ -128,21 +128,23 @@ export function usePlannerDailyData(selectedDate: string) {
         setMeals(daily.meals || { breakfast: '', lunch: '', dinner: '' });
         setWaterGlasses(daily.waterGlasses ?? 0);
 
-        if (Array.isArray(daily.inbox) && daily.inbox.length > 0) {
+        if (Array.isArray(daily.inbox)) {
             setTaskInbox(daily.inbox);
             try {
                 localStorage.setItem(INBOX_STORAGE_KEY, JSON.stringify(daily.inbox));
-            } catch (e) {}
+            } catch (e) { }
         } else {
-            // If this date has no inbox saved yet, carry over from global storage
+            // If this date has no inbox record saved in database yet, carry over from global storage
             try {
                 const stored = localStorage.getItem(INBOX_STORAGE_KEY);
                 if (stored) {
                     const parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
+                    if (Array.isArray(parsed)) {
                         setTaskInbox(parsed);
-                        // Silently sync to current day so it's linked
-                        scheduleSync({ inbox: parsed }, true);
+                        if (parsed.length > 0) {
+                            // Silently sync to current day so it's linked
+                            scheduleSync({ inbox: parsed }, true);
+                        }
                     } else {
                         setTaskInbox([]);
                     }

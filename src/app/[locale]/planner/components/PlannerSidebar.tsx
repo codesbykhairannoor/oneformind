@@ -102,10 +102,10 @@ export default function PlannerSidebar({
         setNewInboxTitle('');
     };
 
-    const toggleInboxTask = (id: number) => setTaskInbox(taskInbox.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-    const cycleInboxTaskType = (id: number) => setTaskInbox(taskInbox.map(t => t.id === id ? { ...t, type: t.type >= 4 ? 1 : t.type + 1 } : t));
-    const updateInboxTask = (id: number, val: string) => setTaskInbox(taskInbox.map(t => t.id === id ? { ...t, title: val } : t));
-    const removeInboxTask = (id: number) => setTaskInbox(taskInbox.filter(t => t.id !== id));
+    const toggleInboxTask = (id: number | string) => setTaskInbox(taskInbox.map(t => String(t.id) === String(id) ? { ...t, completed: !t.completed } : t));
+    const cycleInboxTaskType = (id: number | string) => setTaskInbox(taskInbox.map(t => String(t.id) === String(id) ? { ...t, type: t.type >= 4 ? 1 : t.type + 1 } : t));
+    const updateInboxTask = (id: number | string, val: string) => setTaskInbox(taskInbox.map(t => String(t.id) === String(id) ? { ...t, title: val } : t));
+    const removeInboxTask = (id: number | string) => setTaskInbox(taskInbox.filter(t => String(t.id) !== String(id)));
 
     const handleInboxDragStart = (e: React.DragEvent, task: InboxTask) => {
         e.dataTransfer.effectAllowed = 'copyMove';
@@ -138,7 +138,7 @@ export default function PlannerSidebar({
             const cleanTitle = (task.title || (isIndo ? 'Tugas Baru' : 'New Task')).slice(0, 22);
             ghost.innerHTML = `<span style="font-size: 14px;">🎯</span><span>${cleanTitle}</span><span style="font-size: 10px; opacity: 0.85; background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 6px;">1 Jam</span>`;
             document.body.appendChild(ghost);
-            
+
             e.dataTransfer.setDragImage(ghost, 20, 18);
             setTimeout(() => {
                 if (document.body.contains(ghost)) {
@@ -180,7 +180,7 @@ export default function PlannerSidebar({
             const cleanName = (habit.name || 'Habit').slice(0, 22);
             ghost.innerHTML = `<span style="font-size: 14px;">${habit.icon || '🌱'}</span><span>${cleanName}</span><span style="font-size: 10px; opacity: 0.85; background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 6px;">Habit</span>`;
             document.body.appendChild(ghost);
-            
+
             e.dataTransfer.setDragImage(ghost, 20, 18);
             setTimeout(() => {
                 if (document.body.contains(ghost)) {
@@ -195,7 +195,7 @@ export default function PlannerSidebar({
 
     return (
         <div className="flex flex-col gap-4 select-none">
-            
+
             {/* COMPACT HEADER / STATUS BAR */}
             <div className="flex items-center justify-between px-1">
                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
@@ -231,7 +231,7 @@ export default function PlannerSidebar({
                             </span>
                         )}
                     </div>
-                    
+
                     {/* Presets */}
                     {setTimerPreset && (
                         <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-xl">
@@ -258,17 +258,17 @@ export default function PlannerSidebar({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <button 
-                            onClick={toggleTimer} 
+                        <button
+                            onClick={toggleTimer}
                             className={`h-11 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 active:scale-95 flex items-center justify-center gap-1.5 ${isTimerRunning ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200 dark:shadow-none'}`}
                         >
                             {isTimerRunning ? <Pause size={14} strokeWidth={3} /> : <Play size={14} strokeWidth={3} />}
                             <span>{isTimerRunning ? (isIndo ? 'Jeda' : 'Pause') : (isIndo ? 'Fokus' : 'Focus')}</span>
                         </button>
-                        
-                        <button 
-                            onClick={resetTimer} 
-                            title={isIndo ? 'Reset Timer' : 'Reset Timer'} 
+
+                        <button
+                            onClick={resetTimer}
+                            title={isIndo ? 'Reset Timer' : 'Reset Timer'}
                             className="w-11 h-11 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/50 dark:border-slate-700 transition"
                         >
                             <RotateCcw size={14} strokeWidth={2.5} />
@@ -279,17 +279,16 @@ export default function PlannerSidebar({
 
             {/* 2. PERSISTENT TRAY: INBOX & KEBIASAAN (DRAG-TO-TIMELINE) */}
             <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-[2rem] shadow-sm border border-slate-200/80 dark:border-slate-800 transition-colors">
-                
+
                 {/* Segmented Switcher: Inbox vs Kebiasaan */}
                 <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3 overflow-x-auto no-scrollbar">
                     <button
                         type="button"
                         onClick={() => setSidebarTrayTab('inbox')}
-                        className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${
-                            sidebarTrayTab === 'inbox'
+                        className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${sidebarTrayTab === 'inbox'
                                 ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                        }`}
+                            }`}
                     >
                         <span>📥 {isIndo ? 'Kotak' : 'Inbox'}</span>
                         <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-mono">
@@ -300,11 +299,10 @@ export default function PlannerSidebar({
                     <button
                         type="button"
                         onClick={() => setSidebarTrayTab('habits')}
-                        className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${
-                            sidebarTrayTab === 'habits'
+                        className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shrink-0 ${sidebarTrayTab === 'habits'
                                 ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm'
                                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                        }`}
+                            }`}
                     >
                         <span>🌱 {isIndo ? 'Kebiasaan' : 'Habits'}</span>
                         {activeMonthHabits.length > 0 && (
@@ -337,7 +335,7 @@ export default function PlannerSidebar({
                                 </button>
                             </div>
                         </form>
-                        
+
                         {taskInbox.length === 0 ? (
                             <div className="text-center py-5 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl bg-slate-50/40 dark:bg-slate-800/20">
                                 <p className="text-[11px] text-slate-400 font-bold">
@@ -349,38 +347,38 @@ export default function PlannerSidebar({
                                 {taskInbox.map((task) => {
                                     const theme = getInboxTaskTheme(task.type);
                                     return (
-                                        <div 
-                                            key={task.id} 
+                                        <div
+                                            key={task.id}
                                             draggable
                                             onDragStart={(e) => handleInboxDragStart(e, task)}
                                             className={`group flex items-center justify-between gap-2 p-2 rounded-xl border bg-white dark:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all cursor-grab active:cursor-grabbing shadow-sm ${task.completed ? 'opacity-50 grayscale-[0.5] bg-slate-50 dark:bg-slate-800/50' : 'border-slate-100 dark:border-slate-800'}`}
                                             title={isIndo ? 'Tarik ke timeline untuk menjadwalkan' : 'Drag to timeline to schedule'}
                                         >
                                             <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                                <div 
-                                                    className="text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors p-0.5 shrink-0 cursor-grab active:cursor-grabbing" 
+                                                <div
+                                                    className="text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors p-0.5 shrink-0 cursor-grab active:cursor-grabbing"
                                                     title={isIndo ? 'Tarik untuk menjadwalkan' : 'Drag to schedule'}
                                                 >
                                                     <GripVertical size={13} />
                                                 </div>
-                                                <button 
-                                                    onClick={() => toggleInboxTask(task.id)} 
+                                                <button
+                                                    onClick={() => toggleInboxTask(task.id)}
                                                     className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-400'}`}
                                                 >
                                                     {task.completed && <Check size={10} strokeWidth={4} />}
                                                 </button>
-                                                <button 
-                                                    onClick={() => cycleInboxTaskType(task.id)} 
+                                                <button
+                                                    onClick={() => cycleInboxTaskType(task.id)}
                                                     className={`w-6 h-6 rounded-lg border flex items-center justify-center text-[10px] transition active:scale-90 shrink-0 ${theme.style}`}
                                                     title={isIndo ? 'Ubah Kategori' : 'Change Category'}
                                                 >
                                                     {theme.icon}
                                                 </button>
-                                                <input 
-                                                    value={task.title} 
-                                                    onChange={(e) => updateInboxTask(task.id, e.target.value)} 
-                                                    className={`flex-1 bg-transparent border-0 focus:ring-0 p-0 text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-300 dark:placeholder-slate-700 truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-600' : ''}`} 
-                                                    placeholder="..." 
+                                                <input
+                                                    value={task.title}
+                                                    onChange={(e) => updateInboxTask(task.id, e.target.value)}
+                                                    className={`flex-1 bg-transparent border-0 focus:ring-0 p-0 text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-300 dark:placeholder-slate-700 truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-600' : ''}`}
+                                                    placeholder="..."
                                                 />
                                             </div>
                                             <div className="flex items-center gap-1 shrink-0">
@@ -396,8 +394,8 @@ export default function PlannerSidebar({
                                                     </button>
                                                 )}
                                                 <GripVertical size={12} className="hidden sm:block text-slate-300 dark:text-slate-600 group-hover:text-indigo-400" />
-                                                <button 
-                                                    onClick={() => removeInboxTask(task.id)} 
+                                                <button
+                                                    onClick={() => removeInboxTask(task.id)}
                                                     className="opacity-70 sm:opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all p-0.5"
                                                 >
                                                     <X size={12} strokeWidth={2.5} />
@@ -466,14 +464,13 @@ export default function PlannerSidebar({
                                             key={`tray-habit-${habit.id}`}
                                             draggable
                                             onDragStart={(e) => handleHabitDragStart(e, habit)}
-                                            className={`group flex items-center justify-between gap-2 p-2 rounded-xl border bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-600/40 transition-all cursor-grab active:cursor-grabbing shadow-sm ${
-                                                isDone ? 'opacity-60 grayscale-[0.3] bg-slate-50 dark:bg-slate-800/40' : 'border-slate-100 dark:border-slate-800'
-                                            }`}
+                                            className={`group flex items-center justify-between gap-2 p-2 rounded-xl border bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-600/40 transition-all cursor-grab active:cursor-grabbing shadow-sm ${isDone ? 'opacity-60 grayscale-[0.3] bg-slate-50 dark:bg-slate-800/40' : 'border-slate-100 dark:border-slate-800'
+                                                }`}
                                             title={isIndo ? 'Tarik ke timeline untuk menjadwalkan jam' : 'Drag to timeline to schedule time'}
                                         >
                                             <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                                <div 
-                                                    className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors p-0.5 shrink-0 cursor-grab active:cursor-grabbing" 
+                                                <div
+                                                    className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors p-0.5 shrink-0 cursor-grab active:cursor-grabbing"
                                                     title={isIndo ? 'Tarik untuk menjadwalkan' : 'Drag to schedule'}
                                                 >
                                                     <GripVertical size={13} />
@@ -481,9 +478,8 @@ export default function PlannerSidebar({
                                                 <button
                                                     type="button"
                                                     onClick={() => onToggleHabit && onToggleHabit(habit.id)}
-                                                    className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
-                                                        isDone ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 dark:border-slate-700 hover:border-emerald-400'
-                                                    }`}
+                                                    className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${isDone ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 dark:border-slate-700 hover:border-emerald-400'
+                                                        }`}
                                                     title={isDone ? (isIndo ? 'Selesai hari ini' : 'Completed today') : (isIndo ? 'Tandai selesai' : 'Mark done')}
                                                 >
                                                     {isDone && <Check size={10} strokeWidth={4} />}
@@ -497,9 +493,8 @@ export default function PlannerSidebar({
                                                 </span>
 
                                                 <div className="min-w-0 flex-1">
-                                                    <h4 className={`text-xs font-bold truncate leading-tight ${
-                                                        isDone ? 'line-through text-slate-400 dark:text-slate-600' : 'text-slate-700 dark:text-slate-200'
-                                                    }`}>
+                                                    <h4 className={`text-xs font-bold truncate leading-tight ${isDone ? 'line-through text-slate-400 dark:text-slate-600' : 'text-slate-700 dark:text-slate-200'
+                                                        }`}>
                                                         {habit.name}
                                                     </h4>
                                                     {scheduled ? (
@@ -542,7 +537,7 @@ export default function PlannerSidebar({
 
             {/* 3. UNIFIED COMPACT DAILY HUB (CATATAN, MAKAN, HIDRASI TABBED) */}
             <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-[2rem] shadow-sm border border-slate-200/80 dark:border-slate-800 transition-colors">
-                
+
                 {/* Switcher Tabs */}
                 <div className="flex items-center justify-between gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-3 overflow-x-auto no-scrollbar">
                     <button
@@ -582,10 +577,10 @@ export default function PlannerSidebar({
                 {/* Tab 1: Catatan Cepat */}
                 {dailyHubTab === 'notes' && (
                     <div className="p-3 bg-yellow-50/70 dark:bg-yellow-950/20 rounded-2xl border border-yellow-200/70 dark:border-yellow-900/30 animate-in fade-in">
-                        <textarea 
+                        <textarea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            className="w-full bg-transparent border-0 focus:ring-0 text-xs font-medium text-slate-700 dark:text-yellow-200 placeholder-yellow-400/70 dark:placeholder-yellow-700 p-0 h-24 resize-none leading-[20px] custom-scrollbar" 
+                            className="w-full bg-transparent border-0 focus:ring-0 text-xs font-medium text-slate-700 dark:text-yellow-200 placeholder-yellow-400/70 dark:placeholder-yellow-700 p-0 h-24 resize-none leading-[20px] custom-scrollbar"
                             placeholder={isIndo ? 'Tulis memo atau ide penting hari ini...' : 'Write notes or daily reflections...'}
                         />
                     </div>
@@ -601,11 +596,11 @@ export default function PlannerSidebar({
                         ].map(meal => (
                             <div key={meal.key} className="flex items-center gap-2.5 p-2 rounded-xl bg-orange-50/40 dark:bg-orange-500/5 border border-orange-100/60 dark:border-orange-900/20 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all">
                                 <span className="text-sm shrink-0">{meal.icon}</span>
-                                <input 
-                                    value={meals[meal.key as keyof typeof meals] || ''} 
+                                <input
+                                    value={meals[meal.key as keyof typeof meals] || ''}
                                     onChange={(e) => setMeals({ ...meals, [meal.key]: e.target.value })}
-                                    className="w-full text-xs font-bold border-0 focus:ring-0 p-0 bg-transparent text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600" 
-                                    placeholder={meal.placeholder} 
+                                    className="w-full text-xs font-bold border-0 focus:ring-0 p-0 bg-transparent text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600"
+                                    placeholder={meal.placeholder}
                                 />
                             </div>
                         ))}
@@ -622,9 +617,9 @@ export default function PlannerSidebar({
                             <span className="text-xs font-black text-cyan-600 dark:text-cyan-400">{waterGlasses * 250} ml / 2000 ml</span>
                         </div>
                         <div className="grid grid-cols-4 gap-1.5">
-                            {[1,2,3,4,5,6,7,8].map(glass => (
-                                <button 
-                                    key={glass} 
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map(glass => (
+                                <button
+                                    key={glass}
                                     type="button"
                                     onClick={() => setWaterGlasses(glass === waterGlasses ? glass - 1 : glass)}
                                     className={`h-8 flex items-center justify-center transition-all duration-200 transform active:scale-75 rounded-lg ${glass <= waterGlasses ? 'bg-white dark:bg-slate-700 shadow-sm text-cyan-500 font-bold scale-105' : 'opacity-30 grayscale'}`}

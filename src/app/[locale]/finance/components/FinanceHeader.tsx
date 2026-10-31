@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { 
-    Download, 
-    Plus, 
+import {
+    Download,
+    Plus,
     FileText,
     PieChart
 } from 'lucide-react';
@@ -49,7 +49,7 @@ export default function FinanceHeader({
     const t = useTranslations();
     const locale = useLocale();
     const isIndo = locale === 'id';
-    
+
     const [isExportOpen, setIsExportOpen] = useState(false);
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
@@ -58,10 +58,10 @@ export default function FinanceHeader({
 
     const exportTaxReport = () => {
         if (!transactions.length) return alert('No transactions to export.');
-        
+
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
-        
+
         let html = `
             <html>
             <head>
@@ -92,18 +92,18 @@ export default function FinanceHeader({
                     </thead>
                     <tbody>
         `;
-        
+
         let totalIncome = 0;
         let totalExpense = 0;
-        
+
         const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        
+
         sorted.forEach(t => {
             const date = new Date(t.date).toLocaleDateString('en-CA');
             const amt = Number(t.amount);
             if (t.type === 'income') totalIncome += amt;
             else totalExpense += amt;
-            
+
             html += `
                 <tr>
                     <td>${date}</td>
@@ -114,7 +114,7 @@ export default function FinanceHeader({
                 </tr>
             `;
         });
-        
+
         html += `
                     </tbody>
                 </table>
@@ -130,7 +130,7 @@ export default function FinanceHeader({
             </body>
             </html>
         `;
-        
+
         printWindow.document.write(html);
         printWindow.document.close();
         setIsExportOpen(false);
@@ -144,16 +144,16 @@ export default function FinanceHeader({
             title={isIndo ? 'Manajemen Finansial & Arus Kas' : 'Financial Plan & Cashflow'}
             subtitle={isIndo ? 'Anggaran bulanan, pelacak pengeluaran & laporan fiskal' : 'Monthly budgets, expense tracking & cashflow reports'}
             actions={
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap sm:flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                     {/* Custom Month Picker */}
-                    <FinanceMonthPicker 
-                        selectedMonthKey={selectedMonthKey} 
-                        onMonthChange={onMonthChange} 
+                    <FinanceMonthPicker
+                        selectedMonthKey={selectedMonthKey}
+                        onMonthChange={onMonthChange}
                     />
 
                     {/* Currency Selector Dropdown */}
                     <div className="relative shrink-0">
-                        <button 
+                        <button
                             type="button"
                             onClick={() => { setIsCurrencyOpen(!isCurrencyOpen); setIsExportOpen(false); }}
                             className="flex items-center justify-center h-8 sm:h-10 px-2 sm:px-3 transition border bg-slate-50 dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/80 rounded-lg sm:rounded-xl gap-1 sm:gap-1.5 hover:bg-white dark:hover:bg-slate-700 shadow-xs group"
@@ -167,13 +167,13 @@ export default function FinanceHeader({
                                 <div className="fixed inset-0 z-[-1]" onClick={() => setIsCurrencyOpen(false)}></div>
                                 <div className="relative z-10 space-y-0.5">
                                     {SUPPORTED_CURRENCIES.map(c => (
-                                        <button 
+                                        <button
                                             key={c.code}
                                             type="button"
                                             onClick={() => {
                                                 onCurrencyChange(c.code);
                                                 setIsCurrencyOpen(false);
-                                            }} 
+                                            }}
                                             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-colors ${activeCurrency === c.code ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'}`}
                                         >
                                             <span className="text-lg">{c.icon}</span>
@@ -187,7 +187,7 @@ export default function FinanceHeader({
 
                     {/* Export Actions */}
                     <div className="relative shrink-0">
-                        <button 
+                        <button
                             type="button"
                             onClick={() => { setIsExportOpen(!isExportOpen); setIsCurrencyOpen(false); }}
                             className={`flex items-center justify-center h-8 sm:h-10 px-2.5 sm:px-3.5 transition border rounded-lg sm:rounded-xl gap-1.5 shadow-xs text-[11px] sm:text-xs font-bold whitespace-nowrap ${isExportOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 text-indigo-600' : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
@@ -200,9 +200,9 @@ export default function FinanceHeader({
                             <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-1.5 z-[100] origin-top-right">
                                 <div className="fixed inset-0 z-[-1]" onClick={() => setIsExportOpen(false)}></div>
                                 <div className="relative z-10 space-y-0.5">
-                                    <button 
+                                    <button
                                         type="button"
-                                        onClick={() => { setIsExportOpen(false); setIsExportModalOpen(true); }} 
+                                        onClick={() => { setIsExportOpen(false); setIsExportModalOpen(true); }}
                                         className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item text-left"
                                     >
                                         <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
@@ -213,9 +213,9 @@ export default function FinanceHeader({
                                             <p className="text-[10px] text-slate-400 font-medium">{isIndo ? 'Tahunan / Bulanan' : 'Yearly / Monthly'}</p>
                                         </div>
                                     </button>
-                                    <button 
+                                    <button
                                         type="button"
-                                        onClick={exportTaxReport} 
+                                        onClick={exportTaxReport}
                                         className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all group/item text-left"
                                     >
                                         <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500">
@@ -241,7 +241,7 @@ export default function FinanceHeader({
                     </div>
 
                     {/* Primary Action Button */}
-                    <button 
+                    <button
                         type="button"
                         onClick={onOpenTrxModal}
                         className="flex items-center justify-center h-8 sm:h-10 px-3 sm:px-5 transition shadow-md bg-indigo-600 rounded-lg sm:rounded-xl hover:bg-indigo-700 shadow-indigo-500/20 text-white font-black text-[11px] sm:text-xs gap-1.5 active:scale-95 shrink-0 whitespace-nowrap"

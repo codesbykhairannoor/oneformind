@@ -66,7 +66,7 @@ interface PlannerTimelineProps {
     toggleTask: (id: number) => void;
     onOpenTaskModal: (defaultTime?: string) => void;
     onMoveTask: (taskId: number, newStartTime: string) => void;
-    onScheduleInboxTask?: (inboxTaskId: number, startTime: string) => void;
+    onScheduleInboxTask?: (inboxTaskId: number | string, startTime: string) => void;
     showRolloverBanner?: boolean;
     unfinishedYesterdayTasks?: TaskItem[];
     onAcceptRollover?: () => void;
@@ -195,14 +195,14 @@ export default function PlannerTimeline({
             if (saved === 'normal' || saved === 'compact') {
                 setDensity(saved);
             }
-        } catch (e) {}
+        } catch (e) { }
     }, []);
 
     const toggleDensity = (newDensity: 'compact' | 'normal') => {
         setDensity(newDensity);
         try {
             localStorage.setItem('planner_timeline_density', newDensity);
-        } catch (e) {}
+        } catch (e) { }
     };
 
     const scrollToCurrentTime = (smooth = true) => {
@@ -248,7 +248,7 @@ export default function PlannerTimeline({
             const cleanTitle = (task?.title || (isIndo ? 'Tugas' : 'Task')).slice(0, 22);
             ghost.innerHTML = `<span style="font-size: 14px;">📋</span><span>${cleanTitle}</span>`;
             document.body.appendChild(ghost);
-            
+
             e.dataTransfer.setDragImage(ghost, 20, 18);
             setTimeout(() => {
                 if (document.body.contains(ghost)) {
@@ -260,7 +260,7 @@ export default function PlannerTimeline({
 
     const handleDrop = (e: React.DragEvent, newStartTime: string) => {
         e.preventDefault();
-        
+
         // Check if dragged from Inbox, Study, or Goals Tray
         const jsonStr = e.dataTransfer.getData('application/json');
         if (jsonStr) {
@@ -282,7 +282,7 @@ export default function PlannerTimeline({
                     onScheduleGoalMilestone(parsed.milestone, parsed.goal, newStartTime);
                     return;
                 }
-            } catch (err) {}
+            } catch (err) { }
         }
 
         // Standard timeline move
@@ -344,7 +344,7 @@ export default function PlannerTimeline({
         const rawStart = task.start_time || task.startTime;
         const rawEnd = task.end_time || task.endTime;
         if (!rawStart) return 30;
-        
+
         const startM = parseTimeMinutes(rawStart);
         let endM = rawEnd ? parseTimeMinutes(rawEnd) : startM + 30;
         let duration = endM - startM;
@@ -357,7 +357,7 @@ export default function PlannerTimeline({
         const rawStart = task.start_time || task.startTime;
         const rawEnd = task.end_time || task.endTime;
         if (!rawStart) return { display: 'none' };
-        
+
         const taskStartMinutes = parseTimeMinutes(rawStart);
         let duration = getDurationMinutes(task);
 
@@ -383,15 +383,15 @@ export default function PlannerTimeline({
         return {
             top: `${topPx}px`,
             height: `${finalHeight}px`,
-            left: `${timeColWidth + 6}px`,  
-            right: '8px', 
+            left: `${timeColWidth + 6}px`,
+            right: '8px',
             zIndex: duration < 30 ? 20 : 10
         };
     };
 
     const getTimelineSlotStyle = (rawStart: string, rawEnd?: string, zIndex = 15) => {
         if (!rawStart) return { display: 'none' };
-        
+
         const startM = parseTimeMinutes(rawStart);
         let endM = rawEnd ? parseTimeMinutes(rawEnd) : startM + 30;
         let duration = endM - startM;
@@ -419,8 +419,8 @@ export default function PlannerTimeline({
         return {
             top: `${topPx}px`,
             height: `${finalHeight}px`,
-            left: `${timeColWidth + 6}px`,  
-            right: '8px', 
+            left: `${timeColWidth + 6}px`,
+            right: '8px',
             zIndex
         };
     };
@@ -442,7 +442,7 @@ export default function PlannerTimeline({
         const currentH = now.getHours();
         const currentM = now.getMinutes();
         let diff = currentH - startHour;
-        if (diff < 0) diff += 24; 
+        if (diff < 0) diff += 24;
         if (diff >= VIEW_LIMIT) return { display: 'none' };
         const minutesFromStart = (diff * 60) + currentM;
         return { top: `${(minutesFromStart / 60) * hourHeight}px`, left: `0px`, right: '0px' };
@@ -460,18 +460,18 @@ export default function PlannerTimeline({
         const rect = e.currentTarget.getBoundingClientRect();
         const zoom = getEffectiveZoom(e.currentTarget);
         const y = Math.max(0, (e.clientY - rect.top) / zoom);
-        
+
         const hoursFromTop = y / hourHeight;
         let totalHours = startHour + hoursFromTop;
-        
+
         let absoluteHours = Math.floor(totalHours);
         let remainder = totalHours - absoluteHours;
         let absoluteMinutes = remainder < 0.5 ? 0 : 30;
-        
+
         if (absoluteHours >= 24) absoluteHours -= 24;
-        
+
         const newStartTime = `${String(absoluteHours).padStart(2, '0')}:${String(absoluteMinutes).padStart(2, '0')}`;
-        
+
         let endHours = absoluteHours + 1;
         if (endHours >= 24) endHours -= 24;
         const newEndTime = `${String(endHours).padStart(2, '0')}:${String(absoluteMinutes).padStart(2, '0')}`;
@@ -479,7 +479,7 @@ export default function PlannerTimeline({
         let relStart = absoluteHours * 60 + absoluteMinutes - (startHour * 60);
         if (relStart < 0) relStart += 1440;
         const topPx = (relStart / 60) * hourHeight;
-        
+
         setDragIndicator({ top: topPx, time: newStartTime, endTime: newEndTime });
     };
 
@@ -492,27 +492,27 @@ export default function PlannerTimeline({
     const handleTimelineDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDragIndicator(null);
-        
+
         const rect = e.currentTarget.getBoundingClientRect();
         const zoom = getEffectiveZoom(e.currentTarget);
         const y = Math.max(0, (e.clientY - rect.top) / zoom);
-        
+
         const hoursFromTop = y / hourHeight;
         let totalHours = startHour + hoursFromTop;
-        
+
         let absoluteHours = Math.floor(totalHours);
         let remainder = totalHours - absoluteHours;
         let absoluteMinutes = remainder < 0.5 ? 0 : 30;
-        
+
         if (absoluteHours >= 24) absoluteHours -= 24;
-        
+
         const newStartTime = `${String(absoluteHours).padStart(2, '0')}:${String(absoluteMinutes).padStart(2, '0')}`;
         handleDrop(e, newStartTime);
     };
 
     return (
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden select-none flex flex-col h-full transition-colors duration-500">
-            
+
             {/* Timeline Header */}
             <div className="px-3 sm:px-5 py-2.5 sm:py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none flex min-w-0 justify-between items-center gap-2 shrink-0 transition-colors duration-500">
                 <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-2.5">
@@ -533,7 +533,7 @@ export default function PlannerTimeline({
                         </p>
                     </div>
                 </div>
-                
+
                 {/* Header Controls: Now Jump + Density Switcher + Start Hour */}
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                     {isToday && (
@@ -576,7 +576,7 @@ export default function PlannerTimeline({
                                 <ChevronDown size={10} strokeWidth={3} className={`text-slate-400 dark:text-slate-600 group-hover:text-indigo-500 transition-transform ${isStartHourOpen ? 'rotate-180' : ''}`} />
                             </div>
                         </button>
-                        
+
                         {isStartHourOpen && (
                             <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 p-3 z-[60] animate-in fade-in zoom-in-95 duration-200 transition-colors duration-500">
                                 <div className="flex justify-between items-center mb-2.5 px-1">
@@ -588,8 +588,8 @@ export default function PlannerTimeline({
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-4 gap-1">
-                                    {Array.from({length: 24}).map((_, h) => (
-                                        <button 
+                                    {Array.from({ length: 24 }).map((_, h) => (
+                                        <button
                                             key={h}
                                             onClick={() => { setStartHour(h); setIsStartHourOpen(false); }}
                                             className={`py-1.5 flex items-center justify-center rounded-xl text-[10px] font-black font-mono transition-all border ${startHour === h ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600'}`}
@@ -640,25 +640,25 @@ export default function PlannerTimeline({
             )}
 
             {/* Timeline Body */}
-            <div 
-                ref={scrollContainerRef} 
+            <div
+                ref={scrollContainerRef}
                 onPointerDown={handlePointerDown}
                 className={`flex-1 relative w-full bg-white dark:bg-slate-900 overflow-y-auto overflow-x-hidden transition-colors duration-500 custom-scrollbar select-none touch-pan-y ${dragIndicator ? 'cursor-copy' : (isDraggingMouse ? 'cursor-grabbing' : 'cursor-grab')}`}
             >
-                <div 
-                    className="relative w-full" 
+                <div
+                    className="relative w-full"
                     style={{ height: `${VIEW_LIMIT * hourHeight}px` }}
                     onDragOver={handleTimelineDragOver}
                     onDragLeave={handleTimelineDragLeave}
                     onDrop={handleTimelineDrop}
                 >
-                    
+
                     {/* Drag Drop Indicator - High Precision Timeblock Ghost */}
                     {dragIndicator && (
-                        <div 
+                        <div
                             className="absolute z-40 rounded-2xl border-2 border-dashed border-indigo-500 dark:border-indigo-400 bg-indigo-50/85 dark:bg-indigo-950/70 backdrop-blur-[2px] flex flex-col justify-between p-2.5 pointer-events-none shadow-lg shadow-indigo-500/10 transition-none"
-                            style={{ 
-                                top: `${dragIndicator.top}px`, 
+                            style={{
+                                top: `${dragIndicator.top}px`,
                                 height: `${hourHeight}px`,
                                 left: `${timeColWidth + 6}px`,
                                 right: '8px'
@@ -690,13 +690,13 @@ export default function PlannerTimeline({
                     {/* Grid Lines & Time Slots */}
                     {timeSlots.map((time, i) => (
                         <div key={time} className="absolute w-full flex border-b border-slate-100 dark:border-slate-800" style={{ top: `${i * hourHeight}px`, height: `${hourHeight}px` }}>
-                            <div 
+                            <div
                                 style={{ width: `${timeColWidth}px` }}
                                 className="shrink-0 border-r border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 flex justify-center pt-2 transition-colors duration-500"
                             >
                                 <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 font-mono transition-colors duration-500">{time}</span>
                             </div>
-                            <div 
+                            <div
                                 onClick={() => {
                                     if (hasDraggedRef.current) {
                                         hasDraggedRef.current = false;
@@ -734,7 +734,7 @@ export default function PlannerTimeline({
                         const viewMode = (cardHeight < 46 || duration < 40) ? 'MICRO' : 'NORMAL';
 
                         return (
-                            <div 
+                            <div
                                 key={task.id}
                                 data-timeline-card="true"
                                 onClick={() => editTask(task)}
@@ -744,7 +744,7 @@ export default function PlannerTimeline({
                                 style={style}
                             >
                                 <div className="w-full h-full relative" title={task.notes ? `📝 ${task.notes}` : ''}>
-                                    
+
                                     {viewMode === 'MICRO' ? (
                                         <div className="flex items-center justify-between h-full px-3 gap-2">
                                             <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
@@ -760,7 +760,7 @@ export default function PlannerTimeline({
                                                 {onFocusTask && (
                                                     <button
                                                         onClick={(e) => {
-                                                             e.stopPropagation();
+                                                            e.stopPropagation();
                                                             onFocusTask(task.title);
                                                         }}
                                                         title={isIndo ? "Fokus tugas ini dengan timer" : "Focus on task with timer"}
@@ -769,7 +769,7 @@ export default function PlannerTimeline({
                                                         🎯
                                                     </button>
                                                 )}
-                                                <button 
+                                                <button
                                                     onClick={(e) => { e.stopPropagation(); toggleTask(task.id); }}
                                                     className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors bg-white dark:bg-slate-800 hover:scale-110 ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : theme.check}`}
                                                 >
@@ -804,7 +804,7 @@ export default function PlannerTimeline({
                                                             <span>{isIndo ? '🎯 Fokus' : '🎯 Focus'}</span>
                                                         </button>
                                                     )}
-                                                    <button 
+                                                    <button
                                                         onClick={(e) => { e.stopPropagation(); toggleTask(task.id); }}
                                                         className={`w-5 h-5 rounded-lg border bg-white dark:bg-slate-800 flex items-center justify-center hover:scale-110 transition-transform shrink-0 shadow-sm ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : theme.check}`}
                                                     >
@@ -849,11 +849,10 @@ export default function PlannerTimeline({
                                     e.dataTransfer.setData('text/plain', habit.name);
                                 }}
                                 onClick={() => onHabitClick ? onHabitClick(habit) : (onToggleHabit && onToggleHabit(habit.id))}
-                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-grab active:cursor-grabbing overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
-                                    habit.completed
+                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-grab active:cursor-grabbing overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${habit.completed
                                         ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'
                                         : 'bg-emerald-50/85 dark:bg-emerald-950/25 border-emerald-300/80 dark:border-emerald-800/60 hover:border-emerald-400 dark:hover:border-emerald-700'
-                                }`}
+                                    }`}
                                 style={style}
                                 title={habit.notes ? `🌱 ${habit.name}: ${habit.notes}` : `🌱 Rutinitas Habit: ${habit.name}`}
                             >
@@ -867,9 +866,8 @@ export default function PlannerTimeline({
                                         </span>
 
                                         {/* Name */}
-                                        <span className={`font-black text-xs sm:text-sm truncate ${
-                                            habit.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
-                                        }`}>
+                                        <span className={`font-black text-xs sm:text-sm truncate ${habit.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
+                                            }`}>
                                             {habit.name}
                                         </span>
 
@@ -917,11 +915,10 @@ export default function PlannerTimeline({
                                 key={`interview-${interview.id}`}
                                 data-timeline-card="true"
                                 onClick={() => onInterviewClick && onInterviewClick(interview)}
-                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
-                                    isDone
+                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${isDone
                                         ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'
                                         : 'bg-blue-50/90 dark:bg-blue-950/30 border-blue-300/80 dark:border-blue-800/60 hover:border-blue-400 dark:hover:border-blue-700'
-                                }`}
+                                    }`}
                                 style={style}
                                 title={`💼 ${interview.company} • ${interview.roundTitle}`}
                             >
@@ -932,9 +929,8 @@ export default function PlannerTimeline({
                                             <span>INTERVIEW</span>
                                         </span>
 
-                                        <span className={`font-black text-xs sm:text-sm truncate ${
-                                            isDone ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
-                                        }`}>
+                                        <span className={`font-black text-xs sm:text-sm truncate ${isDone ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
+                                            }`}>
                                             {interview.company} • {interview.roundTitle}
                                         </span>
 
@@ -979,11 +975,10 @@ export default function PlannerTimeline({
                                 key={`study-${study.id}`}
                                 data-timeline-card="true"
                                 onClick={() => onStudyClick && onStudyClick(study)}
-                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${
-                                    study.completed
+                                className={`group absolute rounded-2xl border px-3 py-1.5 shadow-sm cursor-pointer overflow-hidden transition-all hover:shadow-md hover:scale-[1.003] select-none ${study.completed
                                         ? 'bg-slate-50/85 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 opacity-60 grayscale filter'
                                         : 'bg-purple-50/90 dark:bg-purple-950/30 border-purple-300/80 dark:border-purple-800/60 hover:border-purple-400 dark:hover:border-purple-700'
-                                }`}
+                                    }`}
                                 style={style}
                                 title={`📚 ${study.courseName}: ${study.title}`}
                             >
@@ -994,9 +989,8 @@ export default function PlannerTimeline({
                                             <span>STUDY</span>
                                         </span>
 
-                                        <span className={`font-black text-xs sm:text-sm truncate ${
-                                            study.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
-                                        }`}>
+                                        <span className={`font-black text-xs sm:text-sm truncate ${study.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
+                                            }`}>
                                             {study.courseName}: {study.title}
                                         </span>
 

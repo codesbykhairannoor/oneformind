@@ -43,13 +43,13 @@ export default function ModuleHeader({
         <header className={`relative z-40 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 shadow-xs transition-colors ${className}`}>
             <div className="w-full max-w-[1800px] mx-auto px-3.5 md:px-6 lg:px-8 py-2.5 md:py-3.5 space-y-2 md:space-y-3">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
-                    
+
                     {/* Left: Module Identity */}
                     <div className="flex items-center gap-2.5 md:gap-3 min-w-0 shrink-0">
                         {iconHref ? (
-                            <Link 
-                                href={iconHref} 
-                                title={iconTitle} 
+                            <Link
+                                href={iconHref}
+                                title={iconTitle}
                                 className="group hover:opacity-90 active:scale-95 transition-transform"
                             >
                                 {iconElement}
@@ -73,9 +73,9 @@ export default function ModuleHeader({
                         </div>
                     </div>
 
-                    {/* Right: Controls & Actions (Grouped naturally together on the right, horizontally scrollable on mobile) */}
+                    {/* Right: Controls & Actions (Grouped naturally together on the right, flex-wrap without clipping dropdowns) */}
                     {(centerContent || actions) && (
-                        <div className="flex items-center gap-1.5 md:gap-2.5 overflow-x-auto no-scrollbar py-0.5 max-w-full shrink-0 justify-start md:justify-end">
+                        <div className="flex items-center gap-1.5 md:gap-2.5 flex-wrap py-0.5 max-w-full shrink-0 justify-start md:justify-end">
                             {centerContent}
                             {actions}
                         </div>

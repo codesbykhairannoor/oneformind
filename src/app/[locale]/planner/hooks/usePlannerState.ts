@@ -25,7 +25,7 @@ export function usePlannerState() {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     const todayStr = `${year}-${month}-${day}`;
-    
+
     const [selectedDate, setSelectedDate] = useState(dateParam || todayStr);
 
     const handleDateChange = (date: string) => {
@@ -68,7 +68,7 @@ export function usePlannerState() {
     const [startHour, setStartHour] = useState(6);
     const [now, setNow] = useState(new Date());
     const [isLoaded, setIsLoaded] = useState(false);
-    
+
     // Rollover state
     const [unfinishedYesterdayTasks, setUnfinishedYesterdayTasks] = useState<TaskItem[]>([]);
     const [showRolloverBanner, setShowRolloverBanner] = useState(false);
@@ -86,7 +86,7 @@ export function usePlannerState() {
     useEffect(() => {
         const savedStart = localStorage.getItem('planner_start_time');
         if (savedStart) setStartHour(parseInt(savedStart));
-        
+
         setIsLoaded(false);
 
         // Compute yesterday's date string
@@ -178,7 +178,7 @@ export function usePlannerState() {
         rawHabits.forEach((h: any) => {
             let meta: any = {};
             if (typeof h.status === 'string' && h.status.startsWith('{')) {
-                try { meta = JSON.parse(h.status); } catch {}
+                try { meta = JSON.parse(h.status); } catch { }
             } else if (typeof h.status === 'object' && h.status !== null) {
                 meta = h.status;
             }
@@ -549,7 +549,7 @@ export function usePlannerState() {
 
         let meta: any = {};
         if (typeof habit.status === 'string' && habit.status.startsWith('{')) {
-            try { meta = JSON.parse(habit.status); } catch {}
+            try { meta = JSON.parse(habit.status); } catch { }
         } else if (typeof habit.status === 'object' && habit.status !== null) {
             meta = { ...habit.status };
         }
@@ -663,7 +663,7 @@ export function usePlannerState() {
 
         let meta: any = {};
         if (typeof habit.status === 'string' && habit.status.startsWith('{')) {
-            try { meta = JSON.parse(habit.status); } catch {}
+            try { meta = JSON.parse(habit.status); } catch { }
         } else if (typeof habit.status === 'object' && habit.status !== null) {
             meta = { ...habit.status };
         }
@@ -730,7 +730,7 @@ export function usePlannerState() {
         const yesterdayStr = `${yesterdayObj.getFullYear()}-${String(yesterdayObj.getMonth() + 1).padStart(2, '0')}-${String(yesterdayObj.getDate()).padStart(2, '0')}`;
         try {
             localStorage.setItem('planner_rollover_handled_' + yesterdayStr, 'true');
-        } catch (e) {}
+        } catch (e) { }
 
         setShowRolloverBanner(false);
         if (unfinishedYesterdayTasks.length > 0) {
@@ -745,22 +745,27 @@ export function usePlannerState() {
         const yesterdayStr = `${yesterdayObj.getFullYear()}-${String(yesterdayObj.getMonth() + 1).padStart(2, '0')}-${String(yesterdayObj.getDate()).padStart(2, '0')}`;
         try {
             localStorage.setItem('planner_rollover_handled_' + yesterdayStr, 'true');
-        } catch (e) {}
+        } catch (e) { }
 
         setShowRolloverBanner(false);
         setUnfinishedYesterdayTasks([]);
     };
 
     // Handle scheduling an inbox item to timeline
-    const handleScheduleInboxTask = async (inboxTaskId: number, startTime: string) => {
-        const found = daily.taskInbox.find(i => i.id === inboxTaskId);
+    const handleScheduleInboxTask = async (inboxTaskId: number | string, startTime: string) => {
+        const found = daily.taskInbox.find(i => String(i.id) === String(inboxTaskId));
         if (!found) return;
 
-        // Schedule on timeline
-        await taskCrud.scheduleInboxTask(found, startTime, 60);
+        // 1. Immediately remove from inbox state & localStorage (optimistic & synchronous)
+        const updatedInbox = daily.taskInbox.filter(i => String(i.id) !== String(inboxTaskId));
+        daily.handleSetTaskInbox(updatedInbox);
 
-        // Remove from inbox
-        daily.handleSetTaskInbox(daily.taskInbox.filter(i => i.id !== inboxTaskId));
+        // 2. Schedule on timeline
+        try {
+            await taskCrud.scheduleInboxTask(found, startTime, 60);
+        } catch (err) {
+            console.error('Failed to schedule inbox task:', err);
+        }
     };
 
     const handleSetStartHour = (h: number) => {
