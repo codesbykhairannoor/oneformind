@@ -73,36 +73,36 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
     const canResetPassword = true;
 
     return (
-        <div className="relative min-h-screen flex flex-col items-center justify-center bg-white selection:bg-indigo-100 selection:text-indigo-700 p-6 overflow-hidden">
+        <div className="relative min-h-screen w-full flex flex-col items-center justify-start bg-white selection:bg-indigo-100 selection:text-indigo-700 px-4 py-8 sm:px-6 sm:py-12 overflow-x-hidden overflow-y-auto">
             
             <div className="absolute top-0 w-full h-96 bg-gradient-to-r from-indigo-50/50 via-purple-50/50 to-blue-50/50 blur-3xl -z-10 pointer-events-none" />
 
-            <div className="w-full max-w-[420px] flex flex-col relative z-10">
-                <div className="flex justify-center mb-8">
+            <div className="w-full max-w-[420px] my-auto flex flex-col relative z-10">
+                <div className="flex justify-center mb-4 sm:mb-6">
                     <Link href="/" className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none transition-transform duration-500 hover:rotate-[360deg]">
                         <img src="/favicon.svg?v=2" alt="Tranvas Logo" className="h-8 w-8 brightness-0 invert" />
                     </Link>
                 </div>
 
-                <div className="text-center mb-8">
-                    <h1 className="text-2xl font-black text-slate-900 mb-1.5 tracking-tight">
+                <div className="text-center mb-5 sm:mb-6">
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1.5 tracking-tight">
                         {t('auth_login_title') || 'Selamat Datang Kembali'}
                     </h1>
-                    <p className="text-sm font-medium text-slate-500">
+                    <p className="text-xs sm:text-sm font-medium text-slate-500">
                         {t('auth_no_account') || 'Belum memiliki akun?'}{' '}
                         <Link href="/register" className="text-indigo-600 hover:text-indigo-800 transition font-bold">{t('auth_link_register') || 'Daftar sekarang'}</Link>
                     </p>
                 </div>
 
                 {status && (
-                    <div className="mb-6 font-bold text-sm text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 p-4 rounded-xl border border-indigo-100/50 dark:border-indigo-500/20 flex items-center gap-3 shadow-sm dark:shadow-none">
-                        <span className="text-lg">✨</span> {status}
+                    <div className="mb-4 sm:mb-5 font-bold text-xs sm:text-sm text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 p-3.5 sm:p-4 rounded-xl border border-indigo-100/50 dark:border-indigo-500/20 flex items-center gap-3 shadow-sm dark:shadow-none">
+                        <span className="text-base sm:text-lg">✨</span> {status}
                     </div>
                 )}
                 
                 {state?.error && (
-                    <div className="mb-6 font-bold text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100 flex items-center gap-3">
-                        <span className="text-lg">⚠️</span> {state.error}
+                    <div className="mb-4 sm:mb-5 font-bold text-xs sm:text-sm text-red-600 bg-red-50 p-3.5 sm:p-4 rounded-xl border border-red-100 flex items-center gap-3">
+                        <span className="text-base sm:text-lg">⚠️</span> {state.error}
                     </div>
                 )}
 
@@ -110,7 +110,7 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
                     type="button"
                     onClick={handleGoogleLogin}
                     disabled={isPending}
-                    className="flex items-center justify-center w-full px-4 py-3 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm dark:shadow-none bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 mb-6 group active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed">
+                    className="flex items-center justify-center w-full px-4 py-2.5 sm:py-3 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm dark:shadow-none bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 mb-4 sm:mb-5 group active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed">
                     {isPending ? (
                         <span className="font-bold text-slate-700 text-sm">Memproses...</span>
                     ) : (
@@ -121,19 +121,19 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
                     )}
                 </button>
 
-                <div className="relative flex items-center justify-center mb-6">
+                <div className="relative flex items-center justify-center mb-4 sm:mb-5">
                     <div className="border-t border-slate-200 w-full" />
                     <span className="bg-white px-3 text-[10px] font-black uppercase text-slate-400 absolute tracking-wider">atau</span>
                 </div>
 
-                <form onSubmit={handleEmailLogin} className="space-y-4">
+                <form onSubmit={handleEmailLogin} className="space-y-3 sm:space-y-3.5">
                     <div>
                         <input
                             id="email"
                             name="email"
                             type="email"
                             placeholder={t('auth_placeholder_email') || 'Alamat Email'}
-                            className="w-full px-4 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 transition-all outline-none focus:border-indigo-500 focus:ring-indigo-500/10"
+                            className="w-full px-3.5 py-2.5 sm:px-4 sm:py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 transition-all outline-none focus:border-indigo-500 focus:ring-indigo-500/10"
                             required
                         />
                     </div>
@@ -144,7 +144,7 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
                             name="password"
                             type={showPassword ? 'text' : 'password'}
                             placeholder={t('auth_placeholder_pass') || 'Password'}
-                            className="w-full pl-4 pr-10 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 transition-all outline-none focus:border-indigo-500 focus:ring-indigo-500/10"
+                            className="w-full pl-3.5 pr-10 py-2.5 sm:pl-4 sm:py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 transition-all outline-none focus:border-indigo-500 focus:ring-indigo-500/10"
                             required
                         />
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-indigo-600 transition-colors focus:outline-none">
@@ -167,7 +167,7 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
                     <button
                         type="submit"
                         disabled={isPending}
-                        className="w-full mt-2 bg-indigo-600 text-white font-black py-3.5 rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-75 flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full mt-2 bg-indigo-600 text-white font-black py-3 sm:py-3.5 rounded-xl shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-75 flex items-center justify-center gap-2 cursor-pointer"
                     >
                         <span>{isPending ? 'Memproses...' : (t('auth_btn_login') || 'Masuk dengan Email')}</span>
                         {!isPending && (
@@ -175,12 +175,12 @@ export default function Login({ searchParams }: { searchParams?: { status?: stri
                         )}
                     </button>
 
-                    <p className="text-[10px] text-slate-400 text-center leading-relaxed mt-4">
+                    <p className="text-[10px] text-slate-400 text-center leading-relaxed mt-3 sm:mt-4">
                         {t('auth_consent_notice') || 'Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi kami.'}
                     </p>
                 </form>
 
-                <div className="mt-10 text-center font-medium">
+                <div className="mt-6 sm:mt-8 text-center font-medium">
                     <div className="text-[11px] text-slate-500 leading-relaxed">
                         <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 font-medium">
                             <Link href="/privacy-policy" className="text-[11px] text-slate-500 hover:text-indigo-600 transition-colors">{t('footer_privacy') || 'Kebijakan Privasi'}</Link>
