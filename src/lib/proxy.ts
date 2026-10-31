@@ -10,7 +10,7 @@ export async function proxyToGo(req: Request, route: string, queryParams: string
 
     const proto = req.headers.get('x-forwarded-proto') || 'https';
     const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3000';
-    
+
     let baseApi = `${proto}://${host}/api`;
     if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('api:8080')) {
       baseApi = process.env.NEXT_PUBLIC_API_URL;

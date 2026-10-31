@@ -5,9 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -33,52 +31,11 @@ import (
 	"tranvas-api/backend/plannerdaily"
 	"tranvas-api/backend/plannertasks"
 	"tranvas-api/backend/relations"
+	"tranvas-api/backend/shareddb"
 	"tranvas-api/backend/studyarchives"
 	"tranvas-api/backend/studycourses"
 	"tranvas-api/backend/user"
 )
-
-var dbVercel *sql.DB
-
-func initVercelDB() {
-	if dbVercel != nil {
-		return
-	}
-	connStr := os.Getenv("POSTGRES_PRISMA_URL")
-	if connStr == "" {
-		connStr = os.Getenv("POSTGRES_URL_NON_POOLING")
-	}
-	if connStr == "" {
-		connStr = os.Getenv("POSTGRES_URL")
-	}
-	if connStr == "" {
-		connStr = os.Getenv("DATABASE_URL")
-	}
-	if connStr == "" {
-		log.Println("WARNING: No database connection string found")
-		return
-	}
-
-	connStr = strings.Replace(connStr, "pgbouncer=true", "", -1)
-	connStr = strings.Replace(connStr, "?&", "?", -1)
-	connStr = strings.Replace(connStr, "&&", "&", -1)
-	if strings.HasSuffix(connStr, "?") {
-		connStr = strings.TrimSuffix(connStr, "?")
-	}
-	if !strings.Contains(connStr, "sslmode=") {
-		if strings.Contains(connStr, "?") {
-			connStr += "&sslmode=require"
-		} else {
-			connStr += "?sslmode=require"
-		}
-	}
-
-	var err error
-	dbVercel, err = sql.Open("pgx", connStr)
-	if err != nil {
-		log.Printf("Error opening db in vercel: %v\n", err)
-	}
-}
 
 // parseJWTClaimsUnsafe extracts claims without signature verification
 // Supporting both HS256 (email) and ES256 (Google OAuth) Supabase tokens
@@ -123,10 +80,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 					}
 
 					if email != "" {
-						initVercelDB()
-						if dbVercel != nil {
+						db := shareddb.Get()
+						if db != nil {
 							var internalID int
-							errDB := dbVercel.QueryRow(`SELECT id FROM "users" WHERE email = $1`, email).Scan(&internalID)
+							errDB := db.QueryRow(`SELECT id FROM "users" WHERE LOWER(email) = LOWER($1)`, email).Scan(&internalID)
 							if errDB == sql.ErrNoRows {
 								name := email
 								if rawMeta, ok := claims["user_metadata"].(map[string]interface{}); ok {
@@ -136,7 +93,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 										name = fn
 									}
 								}
-								dbVercel.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
+								db.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
 							}
 							if internalID > 0 {
 								q := r.URL.Query()
@@ -144,10 +101,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 								r.URL.RawQuery = q.Encode()
 							}
 						}
-					} else if sub, ok := claims["sub"].(string); ok {
-						q := r.URL.Query()
-						q.Set("userId", sub)
-						r.URL.RawQuery = q.Encode()
 					}
 				}
 			}
