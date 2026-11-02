@@ -53,17 +53,21 @@ export default function HabitMatrixTable({
     onToggleStatus
 }: HabitMatrixTableProps) {
     const tableContainerRef = useRef<HTMLDivElement>(null);
+    const lastModalOpenRef = useRef(0);
+
+    const triggerModalSafely = (data: { habit: HabitItem; dateStr: string; notes: string }) => {
+        const now = Date.now();
+        if (now - lastModalOpenRef.current < 250) return;
+        lastModalOpenRef.current = now;
+        onOpenNoteModal(data);
+    };
 
     // Native capture-phase prevention: guarantees browser native context menu NEVER appears
     useEffect(() => {
         const el = tableContainerRef.current;
         if (!el) return;
         const handleNativeContextMenu = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
-            // Always prevent default if right-clicking inside habit cells or interactive table rows
-            if (target && target.closest('[data-habit-cell], button, [data-habit-row]')) {
-                e.preventDefault();
-            }
+            e.preventDefault();
         };
         el.addEventListener('contextmenu', handleNativeContextMenu, { capture: true });
         return () => {
@@ -255,11 +259,32 @@ export default function HabitMatrixTable({
                                                         onContextMenu={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            onOpenNoteModal({
+                                                            triggerModalSafely({
                                                                 habit,
                                                                 dateStr: day.dateString,
                                                                 notes: info.notes || ''
                                                             });
+                                                        }}
+                                                        onAuxClick={(e) => {
+                                                            if (e.button === 2) {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                triggerModalSafely({
+                                                                    habit,
+                                                                    dateStr: day.dateString,
+                                                                    notes: info.notes || ''
+                                                                });
+                                                            }
+                                                        }}
+                                                        onMouseDown={(e) => {
+                                                            if (e.button === 2) {
+                                                                e.preventDefault();
+                                                                triggerModalSafely({
+                                                                    habit,
+                                                                    dateStr: day.dateString,
+                                                                    notes: info.notes || ''
+                                                                });
+                                                            }
                                                         }}
                                                         data-habit-cell="true"
                                                         aria-disabled={day.isFuture}
@@ -314,11 +339,32 @@ export default function HabitMatrixTable({
                                                     onContextMenu={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        onOpenNoteModal({
+                                                        triggerModalSafely({
                                                             habit,
                                                             dateStr: day.dateString,
                                                             notes: info.notes || ''
                                                         });
+                                                    }}
+                                                    onAuxClick={(e) => {
+                                                        if (e.button === 2) {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            triggerModalSafely({
+                                                                habit,
+                                                                dateStr: day.dateString,
+                                                                notes: info.notes || ''
+                                                            });
+                                                        }
+                                                    }}
+                                                    onMouseDown={(e) => {
+                                                        if (e.button === 2) {
+                                                            e.preventDefault();
+                                                            triggerModalSafely({
+                                                                habit,
+                                                                dateStr: day.dateString,
+                                                                notes: info.notes || ''
+                                                            });
+                                                        }
                                                     }}
                                                     data-habit-cell="true"
                                                     aria-disabled={day.isFuture}
