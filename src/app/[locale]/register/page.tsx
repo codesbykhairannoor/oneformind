@@ -145,11 +145,11 @@ export default function Register() {
     }, [state?.success, router]);
 
     return (
-        <div className="relative min-h-screen w-full flex flex-col items-center justify-start bg-white selection:bg-indigo-100 selection:text-indigo-700 px-4 py-8 sm:px-6 sm:py-12 overflow-x-hidden overflow-y-auto">
+        <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-white selection:bg-indigo-100 selection:text-indigo-700 px-4 py-10 sm:px-6 sm:py-12 overflow-x-hidden overflow-y-auto">
 
             <div className="absolute top-0 w-full h-96 bg-gradient-to-r from-indigo-50/50 via-purple-50/50 to-blue-50/50 blur-3xl -z-10 pointer-events-none" />
 
-            <div className="w-full max-w-[420px] my-auto flex flex-col relative z-10">
+            <div className="w-full max-w-[420px] flex flex-col relative z-10 my-auto">
                 <div className="flex justify-center mb-4 sm:mb-6">
                     <Link href="/" className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none transition-transform duration-500 hover:rotate-[360deg]">
                         <img src="/favicon.svg?v=2" alt="Tranvas Logo" className="h-8 w-8 brightness-0 invert" />

@@ -54,7 +54,7 @@ export default function HabitMatrixTable({
 }: HabitMatrixTableProps) {
     return (
         <div className="hidden md:block bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
-            <div className="overflow-x-auto custom-scrollbar select-none relative">
+            <div className="overflow-x-auto custom-scrollbar select-none relative" onContextMenu={(e) => e.preventDefault()}>
                 
                 {/* Sticky Table Header */}
                 <div className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 flex shadow-xs">

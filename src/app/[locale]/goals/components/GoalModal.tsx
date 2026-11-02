@@ -110,6 +110,7 @@ export default function GoalModal({
         return allGoals.filter(g => {
             if (form.id && String(g.id) === String(form.id)) return false;
             if (goal?.id && String(g.id) === String(goal.id)) return false;
+            if (g.status === 'completed') return false;
             const gHorizon = g.time_horizon || 'yearly';
 
             if (curHorizon === 'weekly') {
