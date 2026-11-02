@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
     Check,
     GripVertical,
@@ -52,8 +52,27 @@ export default function HabitMatrixTable({
     onOpenNoteModal,
     onToggleStatus
 }: HabitMatrixTableProps) {
+    const tableContainerRef = useRef<HTMLDivElement>(null);
+
+    // Native capture-phase prevention: guarantees browser native context menu NEVER appears
+    useEffect(() => {
+        const el = tableContainerRef.current;
+        if (!el) return;
+        const handleNativeContextMenu = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            // Always prevent default if right-clicking inside habit cells or interactive table rows
+            if (target && target.closest('[data-habit-cell], button, [data-habit-row]')) {
+                e.preventDefault();
+            }
+        };
+        el.addEventListener('contextmenu', handleNativeContextMenu, { capture: true });
+        return () => {
+            el.removeEventListener('contextmenu', handleNativeContextMenu, { capture: true });
+        };
+    }, []);
+
     return (
-        <div className="hidden md:block bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+        <div ref={tableContainerRef} className="hidden md:block bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
             <div className="overflow-x-auto custom-scrollbar select-none relative" onContextMenu={(e) => e.preventDefault()}>
 
                 {/* Sticky Table Header */}
@@ -70,8 +89,8 @@ export default function HabitMatrixTable({
                                     onClick={() => onToggleNumericViewMode('value')}
                                     title={isIndo ? 'Tampilkan Angka/Nilai' : 'Show Values'}
                                     className={`px-1.5 py-0.5 rounded-md transition ${numericViewMode === 'value'
-                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
-                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                                         }`}
                                 >
                                     123
@@ -81,8 +100,8 @@ export default function HabitMatrixTable({
                                     onClick={() => onToggleNumericViewMode('percent')}
                                     title={isIndo ? 'Tampilkan Persentase (%)' : 'Show Percentage (%)'}
                                     className={`px-1.5 py-0.5 rounded-md transition ${numericViewMode === 'percent'
-                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
-                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                                         }`}
                                 >
                                     %
@@ -100,8 +119,8 @@ export default function HabitMatrixTable({
                             <div key={day.dateString} className="w-8 shrink-0 flex flex-col items-center gap-0.5">
                                 <span className="text-[9px] font-bold text-slate-400">{day.dayName}</span>
                                 <span className={`text-xs font-black px-1.5 py-0.5 rounded-md ${day.isToday
-                                        ? 'bg-indigo-600 text-white shadow-xs'
-                                        : 'text-slate-600 dark:text-slate-300'
+                                    ? 'bg-indigo-600 text-white shadow-xs'
+                                    : 'text-slate-600 dark:text-slate-300'
                                     }`}>
                                     {day.dayNumber}
                                 </span>
@@ -242,30 +261,20 @@ export default function HabitMatrixTable({
                                                                 notes: info.notes || ''
                                                             });
                                                         }}
-                                                        onAuxClick={(e) => {
-                                                            if (e.button === 2) {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                onOpenNoteModal({
-                                                                    habit,
-                                                                    dateStr: day.dateString,
-                                                                    notes: info.notes || ''
-                                                                });
-                                                            }
-                                                        }}
+                                                        data-habit-cell="true"
                                                         aria-disabled={day.isFuture}
                                                         title={isRest && !hasProgress
                                                             ? (isIndo ? 'Hari Istirahat (☕) • Klik kanan untuk ubah/batalkan' : 'Rest Day (☕) • Right-click to edit/cancel')
                                                             : `${habitVal} / ${target} ${habit.unit || ''} (${percentVal}%)`}
                                                         className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${isDone
-                                                                ? 'shadow-xs text-white'
-                                                                : hasProgress
-                                                                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
-                                                                    : isRest
-                                                                        ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
-                                                                        : day.isFuture
-                                                                            ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
-                                                                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-indigo-400'
+                                                            ? 'shadow-xs text-white'
+                                                            : hasProgress
+                                                                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                                                                : isRest
+                                                                    ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
+                                                                    : day.isFuture
+                                                                        ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
+                                                                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-indigo-400'
                                                             }`}
                                                         style={isDone ? { backgroundColor: habit.color } : {}}
                                                     >
@@ -311,17 +320,7 @@ export default function HabitMatrixTable({
                                                             notes: info.notes || ''
                                                         });
                                                     }}
-                                                    onAuxClick={(e) => {
-                                                        if (e.button === 2) {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            onOpenNoteModal({
-                                                                habit,
-                                                                dateStr: day.dateString,
-                                                                notes: info.notes || ''
-                                                            });
-                                                        }
-                                                    }}
+                                                    data-habit-cell="true"
                                                     aria-disabled={day.isFuture}
                                                     title={
                                                         day.isFuture
@@ -335,16 +334,16 @@ export default function HabitMatrixTable({
                                                                         : (isIndo ? 'Klik kiri: Centang • Klik kanan: Mode Istirahat (☕) / Lewati' : 'Left-click: Complete • Right-click: Rest Mode (☕) / Skip')
                                                     }
                                                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${isDone
-                                                            ? 'shadow-xs text-white'
-                                                            : isRelapse
-                                                                ? 'bg-rose-500 text-white shadow-xs'
-                                                                : isRest
-                                                                    ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
-                                                                    : isSkipped
-                                                                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-400'
-                                                                        : day.isFuture
-                                                                            ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
-                                                                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400'
+                                                        ? 'shadow-xs text-white'
+                                                        : isRelapse
+                                                            ? 'bg-rose-500 text-white shadow-xs'
+                                                            : isRest
+                                                                ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
+                                                                : isSkipped
+                                                                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400'
+                                                                    : day.isFuture
+                                                                        ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
+                                                                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400'
                                                         } ${day.isToday && !isDone && !isRest ? 'ring-2 ring-indigo-500 ring-offset-1' : ''}`}
                                                     style={isDone ? { backgroundColor: habit.color, boxShadow: `0 3px 10px ${habit.color}30` } : {}}
                                                 >

@@ -13,16 +13,16 @@ interface HabitMobileViewProps {
     filteredHabits: ProcessedHabitItem[];
     numericViewMode: 'value' | 'percent';
     onSelectHabitDetail: (habit: HabitItem) => void;
-    onOpenNumericPopover: (data: { 
-        habitId: number; 
-        habitName?: string; 
-        habitIcon?: string; 
-        habitColor?: string; 
-        dateStr: string; 
-        currentVal: number; 
-        targetVal: number; 
-        unit: string; 
-        currentNotes?: string; 
+    onOpenNumericPopover: (data: {
+        habitId: number;
+        habitName?: string;
+        habitIcon?: string;
+        habitColor?: string;
+        dateStr: string;
+        currentVal: number;
+        targetVal: number;
+        unit: string;
+        currentNotes?: string;
     }) => void;
     onToggleStatus: (habitId: number, dateStr: string) => void;
     onOpenNoteModal?: (d: { habit: HabitItem; dateStr: string; notes: string }) => void;
@@ -45,6 +45,23 @@ export default function HabitMobileView({
     const isIndo = locale === 'id';
     const dateStripRef = useRef<HTMLDivElement>(null);
     const activeDateBtnRef = useRef<HTMLButtonElement>(null);
+    const mobileContainerRef = useRef<HTMLDivElement>(null);
+
+    // Native capture-phase prevention: guarantees browser native context menu NEVER appears on mobile/touch
+    useEffect(() => {
+        const el = mobileContainerRef.current;
+        if (!el) return;
+        const handleNativeContextMenu = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            if (target && target.closest('[data-habit-cell], button')) {
+                e.preventDefault();
+            }
+        };
+        el.addEventListener('contextmenu', handleNativeContextMenu, { capture: true });
+        return () => {
+            el.removeEventListener('contextmenu', handleNativeContextMenu, { capture: true });
+        };
+    }, []);
 
     // Auto-scroll the date strip to center the active date
     useEffect(() => {
@@ -58,10 +75,10 @@ export default function HabitMobileView({
     }, [selectedMobileDate]);
 
     return (
-        <div className="md:hidden space-y-4 pb-28">
-            
+        <div ref={mobileContainerRef} className="md:hidden space-y-4 pb-28">
+
             {/* Horizontal Date Strip with Auto-Scroll & Progress Dots */}
-            <div 
+            <div
                 ref={dateStripRef}
                 className="flex gap-2 overflow-x-auto no-scrollbar px-3 py-2 scroll-smooth"
             >
@@ -78,22 +95,20 @@ export default function HabitMobileView({
                             ref={isSelected ? activeDateBtnRef : null}
                             type="button"
                             onClick={() => setSelectedMobileDate(day.dateString)}
-                            className={`flex-shrink-0 w-12 py-2 rounded-2xl flex flex-col items-center gap-0.5 transition-all duration-200 active:scale-95 ${
-                                isSelected
+                            className={`flex-shrink-0 w-12 py-2 rounded-2xl flex flex-col items-center gap-0.5 transition-all duration-200 active:scale-95 ${isSelected
                                     ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105 ring-2 ring-indigo-600/30'
                                     : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-800'
-                            }`}
+                                }`}
                         >
                             <span className="text-[9px] font-black uppercase tracking-tighter opacity-75">{day.dayName}</span>
                             <span className="text-sm font-black">{day.dayNumber}</span>
-                            <span 
-                                className={`w-1.5 h-1.5 rounded-full transition-all mt-0.5 ${
-                                    isSelected 
-                                        ? 'bg-white' 
-                                        : hasCompletedHabit 
-                                        ? 'bg-emerald-500 shadow-sm' 
-                                        : 'bg-transparent'
-                                }`} 
+                            <span
+                                className={`w-1.5 h-1.5 rounded-full transition-all mt-0.5 ${isSelected
+                                        ? 'bg-white'
+                                        : hasCompletedHabit
+                                            ? 'bg-emerald-500 shadow-sm'
+                                            : 'bg-transparent'
+                                    }`}
                             />
                         </button>
                     );
@@ -188,11 +203,10 @@ export default function HabitMobileView({
                                                 notes: dayInfo.notes || ''
                                             })}
                                             title={isIndo ? 'Catatan Harian' : 'Daily Note'}
-                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
-                                                dayInfo.notes && dayInfo.notes.trim().length > 0
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${dayInfo.notes && dayInfo.notes.trim().length > 0
                                                     ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/40'
                                                     : 'text-slate-300 dark:text-slate-600 hover:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                            }`}
+                                                }`}
                                         >
                                             <FileText size={14} strokeWidth={2.5} />
                                         </button>
@@ -248,26 +262,13 @@ export default function HabitMobileView({
                                                         });
                                                     }
                                                 }}
-                                                onAuxClick={(e) => {
-                                                    if (e.button === 2) {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        if (onOpenNoteModal) {
-                                                            onOpenNoteModal({
-                                                                habit,
-                                                                dateStr: selectedMobileDate,
-                                                                notes: dayInfo.notes || ''
-                                                            });
-                                                        }
-                                                    }
-                                                }}
-                                                className={`px-3 h-9 rounded-xl font-black text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${
-                                                    isDone
+                                                data-habit-cell="true"
+                                                className={`px-3 h-9 rounded-xl font-black text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${isDone
                                                         ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200 dark:shadow-none'
                                                         : hasProgress
-                                                        ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
-                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                                }`}
+                                                            ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                                    }`}
                                             >
                                                 {numericViewMode === 'percent' ? (
                                                     <span className="pointer-events-none">{hasProgress ? `${percentVal}%` : '0%'}</span>
@@ -304,28 +305,15 @@ export default function HabitMobileView({
                                                     });
                                                 }
                                             }}
-                                            onAuxClick={(e) => {
-                                                if (e.button === 2) {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    if (onOpenNoteModal) {
-                                                        onOpenNoteModal({
-                                                            habit,
-                                                            dateStr: selectedMobileDate,
-                                                            notes: dayInfo.notes || ''
-                                                        });
-                                                    }
-                                                }
-                                            }}
-                                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90 cursor-pointer ${
-                                                isDone
+                                            data-habit-cell="true"
+                                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90 cursor-pointer ${isDone
                                                     ? 'shadow-md shadow-indigo-100 dark:shadow-none text-white'
                                                     : isRelapse
-                                                    ? 'bg-rose-500 text-white shadow-sm'
-                                                    : isRest
-                                                    ? 'bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/70 dark:border-amber-500/30 text-amber-600 dark:text-amber-400'
-                                                    : 'bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-400'
-                                            }`}
+                                                        ? 'bg-rose-500 text-white shadow-sm'
+                                                        : isRest
+                                                            ? 'bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/70 dark:border-amber-500/30 text-amber-600 dark:text-amber-400'
+                                                            : 'bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-400'
+                                                }`}
                                             style={isDone ? { backgroundColor: habit.color } : {}}
                                         >
                                             {isDone && <Check size={16} strokeWidth={3.5} className="pointer-events-none" />}
@@ -339,7 +327,7 @@ export default function HabitMobileView({
 
                             {/* Card Bottom Row: Micro-Note Display (if exists) */}
                             {dayInfo.notes && dayInfo.notes.trim().length > 0 && (
-                                <div 
+                                <div
                                     onClick={() => onOpenNoteModal && onOpenNoteModal({
                                         habit,
                                         dateStr: selectedMobileDate,
