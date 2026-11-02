@@ -237,6 +237,30 @@ export default function HabitMobileView({
                                                     unit: habit.unit || '',
                                                     currentNotes: dayInfo.notes || ''
                                                 })}
+                                                onContextMenu={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    if (onOpenNoteModal) {
+                                                        onOpenNoteModal({
+                                                            habit,
+                                                            dateStr: selectedMobileDate,
+                                                            notes: dayInfo.notes || ''
+                                                        });
+                                                    }
+                                                }}
+                                                onAuxClick={(e) => {
+                                                    if (e.button === 2) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        if (onOpenNoteModal) {
+                                                            onOpenNoteModal({
+                                                                habit,
+                                                                dateStr: selectedMobileDate,
+                                                                notes: dayInfo.notes || ''
+                                                            });
+                                                        }
+                                                    }
+                                                }}
                                                 className={`px-3 h-9 rounded-xl font-black text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${
                                                     isDone
                                                         ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200 dark:shadow-none'
@@ -246,11 +270,11 @@ export default function HabitMobileView({
                                                 }`}
                                             >
                                                 {numericViewMode === 'percent' ? (
-                                                    <span>{hasProgress ? `${percentVal}%` : '0%'}</span>
+                                                    <span className="pointer-events-none">{hasProgress ? `${percentVal}%` : '0%'}</span>
                                                 ) : (
                                                     <>
-                                                        <span>{val}</span>
-                                                        <span className="text-[9px] opacity-70">/{habit.targetValue}</span>
+                                                        <span className="pointer-events-none">{val}</span>
+                                                        <span className="text-[9px] opacity-70 pointer-events-none">/{habit.targetValue}</span>
                                                     </>
                                                 )}
                                             </button>
@@ -269,6 +293,30 @@ export default function HabitMobileView({
                                                 }
                                                 onToggleStatus(habit.id, selectedMobileDate);
                                             }}
+                                            onContextMenu={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                if (onOpenNoteModal) {
+                                                    onOpenNoteModal({
+                                                        habit,
+                                                        dateStr: selectedMobileDate,
+                                                        notes: dayInfo.notes || ''
+                                                    });
+                                                }
+                                            }}
+                                            onAuxClick={(e) => {
+                                                if (e.button === 2) {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    if (onOpenNoteModal) {
+                                                        onOpenNoteModal({
+                                                            habit,
+                                                            dateStr: selectedMobileDate,
+                                                            notes: dayInfo.notes || ''
+                                                        });
+                                                    }
+                                                }
+                                            }}
                                             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90 cursor-pointer ${
                                                 isDone
                                                     ? 'shadow-md shadow-indigo-100 dark:shadow-none text-white'
@@ -280,10 +328,10 @@ export default function HabitMobileView({
                                             }`}
                                             style={isDone ? { backgroundColor: habit.color } : {}}
                                         >
-                                            {isDone && <Check size={16} strokeWidth={3.5} />}
-                                            {isRelapse && <span className="text-xs font-black">⚠️</span>}
-                                            {isRest && !isDone && !isRelapse && <Coffee size={15} className="text-amber-600 dark:text-amber-400" />}
-                                            {!isDone && !isRelapse && !isRest && <Plus size={15} strokeWidth={2.5} />}
+                                            {isDone && <Check size={16} strokeWidth={3.5} className="pointer-events-none" />}
+                                            {isRelapse && <span className="text-xs font-black pointer-events-none">⚠️</span>}
+                                            {isRest && !isDone && !isRelapse && <Coffee size={15} className="text-amber-600 dark:text-amber-400 pointer-events-none" />}
+                                            {!isDone && !isRelapse && !isRest && <Plus size={15} strokeWidth={2.5} className="pointer-events-none" />}
                                         </button>
                                     )}
                                 </div>

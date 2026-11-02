@@ -23,14 +23,14 @@ interface HabitMatrixTableProps {
     onSelectHabitDetail: (habit: HabitItem) => void;
     onEditHabit: (habit: HabitItem) => void;
     onConfirmDelete: (habit: HabitItem) => void;
-    onOpenNumericPopover: (data: { 
-        habitId: number; 
+    onOpenNumericPopover: (data: {
+        habitId: number;
         habitName?: string;
         habitIcon?: string;
         habitColor?: string;
-        dateStr: string; 
-        currentVal: number; 
-        targetVal: number; 
+        dateStr: string;
+        currentVal: number;
+        targetVal: number;
         unit: string;
         currentNotes?: string;
     }) => void;
@@ -55,10 +55,10 @@ export default function HabitMatrixTable({
     return (
         <div className="hidden md:block bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
             <div className="overflow-x-auto custom-scrollbar select-none relative" onContextMenu={(e) => e.preventDefault()}>
-                
+
                 {/* Sticky Table Header */}
                 <div className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 flex shadow-xs">
-                    
+
                     {/* Left Sticky Header */}
                     <div className="sticky left-0 z-40 bg-slate-50 dark:bg-slate-950 w-72 shrink-0 border-r border-slate-100 dark:border-slate-800 p-4 flex items-center justify-between font-bold text-slate-400 text-xs shadow-md">
                         <span>{isIndo ? 'Nama Habit' : 'Habit Name'}</span>
@@ -69,11 +69,10 @@ export default function HabitMatrixTable({
                                     type="button"
                                     onClick={() => onToggleNumericViewMode('value')}
                                     title={isIndo ? 'Tampilkan Angka/Nilai' : 'Show Values'}
-                                    className={`px-1.5 py-0.5 rounded-md transition ${
-                                        numericViewMode === 'value'
+                                    className={`px-1.5 py-0.5 rounded-md transition ${numericViewMode === 'value'
                                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
-                                    }`}
+                                        }`}
                                 >
                                     123
                                 </button>
@@ -81,11 +80,10 @@ export default function HabitMatrixTable({
                                     type="button"
                                     onClick={() => onToggleNumericViewMode('percent')}
                                     title={isIndo ? 'Tampilkan Persentase (%)' : 'Show Percentage (%)'}
-                                    className={`px-1.5 py-0.5 rounded-md transition ${
-                                        numericViewMode === 'percent'
+                                    className={`px-1.5 py-0.5 rounded-md transition ${numericViewMode === 'percent'
                                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
-                                    }`}
+                                        }`}
                                 >
                                     %
                                 </button>
@@ -101,11 +99,10 @@ export default function HabitMatrixTable({
                         {monthDates.map(day => (
                             <div key={day.dateString} className="w-8 shrink-0 flex flex-col items-center gap-0.5">
                                 <span className="text-[9px] font-bold text-slate-400">{day.dayName}</span>
-                                <span className={`text-xs font-black px-1.5 py-0.5 rounded-md ${
-                                    day.isToday 
-                                        ? 'bg-indigo-600 text-white shadow-xs' 
+                                <span className={`text-xs font-black px-1.5 py-0.5 rounded-md ${day.isToday
+                                        ? 'bg-indigo-600 text-white shadow-xs'
                                         : 'text-slate-600 dark:text-slate-300'
-                                }`}>
+                                    }`}>
                                     {day.dayNumber}
                                 </span>
                             </div>
@@ -122,14 +119,14 @@ export default function HabitMatrixTable({
                 <div className="divide-y divide-slate-50 dark:divide-slate-800/60">
                     {filteredHabits.map(habit => (
                         <div key={habit.id} className="flex transition-colors duration-150 group relative hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
-                            
+
                             {/* Left Sticky Info Column */}
                             <div className="sticky left-0 z-30 w-72 shrink-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/60 border-r border-slate-100 dark:border-slate-800 p-3.5 flex items-center gap-3 shadow-md">
                                 <div className="cursor-grab text-slate-300 dark:text-slate-700 hover:text-indigo-500 opacity-30 group-hover:opacity-100 transition-opacity p-0.5">
                                     <GripVertical size={15} />
                                 </div>
 
-                                <div 
+                                <div
                                     onClick={() => onSelectHabitDetail(habit)}
                                     className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 cursor-pointer shadow-xs transition-transform hover:scale-105"
                                     style={{ backgroundColor: `${habit.color}15`, color: habit.color }}
@@ -139,7 +136,7 @@ export default function HabitMatrixTable({
 
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5">
-                                        <h4 
+                                        <h4
                                             onClick={() => onSelectHabitDetail(habit)}
                                             className="font-bold text-xs truncate text-slate-800 dark:text-slate-200 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition"
                                         >
@@ -165,26 +162,26 @@ export default function HabitMatrixTable({
 
                                 {/* Quick Action Floating Hover Bubble */}
                                 <div className="flex items-center gap-1 bg-white dark:bg-slate-800 px-2 py-1 rounded-full absolute right-2 shadow-lg border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 z-50">
-                                    <button 
+                                    <button
                                         type="button"
-                                        onClick={() => onSelectHabitDetail(habit)} 
-                                        className="p-1 text-slate-400 hover:text-indigo-600" 
+                                        onClick={() => onSelectHabitDetail(habit)}
+                                        className="p-1 text-slate-400 hover:text-indigo-600"
                                         title={t('habits_detail_tooltip') || 'Detail'}
                                     >
                                         <BarChart2 size={12} />
                                     </button>
-                                    <button 
+                                    <button
                                         type="button"
-                                        onClick={() => onEditHabit(habit)} 
-                                        className="p-1 text-slate-400 hover:text-indigo-600" 
+                                        onClick={() => onEditHabit(habit)}
+                                        className="p-1 text-slate-400 hover:text-indigo-600"
                                         title="Edit"
                                     >
                                         <Edit3 size={12} />
                                     </button>
-                                    <button 
+                                    <button
                                         type="button"
-                                        onClick={() => onConfirmDelete(habit)} 
-                                        className="p-1 text-slate-400 hover:text-rose-500" 
+                                        onClick={() => onConfirmDelete(habit)}
+                                        className="p-1 text-slate-400 hover:text-rose-500"
                                         title="Delete"
                                     >
                                         <Trash2 size={12} />
@@ -203,7 +200,7 @@ export default function HabitMatrixTable({
 
                                     return (
                                         <div key={day.dateString} className="w-8 shrink-0 flex justify-center relative">
-                                            
+
                                             {/* Quantitative Cell */}
                                             {habit.measurementType === 'numeric' ? (() => {
                                                 const habitVal = info.value !== undefined ? info.value : (isDone ? (habit.targetValue || 10) : 0);
@@ -215,6 +212,7 @@ export default function HabitMatrixTable({
                                                     <button
                                                         type="button"
                                                         onClick={() => {
+                                                            if (day.isFuture) return;
                                                             if (isRest) {
                                                                 onOpenNoteModal({
                                                                     habit,
@@ -237,43 +235,53 @@ export default function HabitMatrixTable({
                                                         }}
                                                         onContextMenu={(e) => {
                                                             e.preventDefault();
-                                                            if (day.isFuture) return;
+                                                            e.stopPropagation();
                                                             onOpenNoteModal({
                                                                 habit,
                                                                 dateStr: day.dateString,
                                                                 notes: info.notes || ''
                                                             });
                                                         }}
-                                                        disabled={day.isFuture}
-                                                        title={isRest && !hasProgress 
-                                                            ? (isIndo ? 'Hari Istirahat (☕) • Klik kanan untuk ubah/batalkan' : 'Rest Day (☕) • Right-click to edit/cancel') 
+                                                        onAuxClick={(e) => {
+                                                            if (e.button === 2) {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                onOpenNoteModal({
+                                                                    habit,
+                                                                    dateStr: day.dateString,
+                                                                    notes: info.notes || ''
+                                                                });
+                                                            }
+                                                        }}
+                                                        aria-disabled={day.isFuture}
+                                                        title={isRest && !hasProgress
+                                                            ? (isIndo ? 'Hari Istirahat (☕) • Klik kanan untuk ubah/batalkan' : 'Rest Day (☕) • Right-click to edit/cancel')
                                                             : `${habitVal} / ${target} ${habit.unit || ''} (${percentVal}%)`}
-                                                        className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${
-                                                            isDone
+                                                        className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 text-[9px] font-black ${isDone
                                                                 ? 'shadow-xs text-white'
                                                                 : hasProgress
-                                                                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
-                                                                : isRest
-                                                                ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
-                                                                : day.isFuture
-                                                                ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
-                                                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-indigo-400'
-                                                        }`}
+                                                                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                                                                    : isRest
+                                                                        ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
+                                                                        : day.isFuture
+                                                                            ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
+                                                                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-indigo-400'
+                                                            }`}
                                                         style={isDone ? { backgroundColor: habit.color } : {}}
                                                     >
                                                         {isRest && !hasProgress ? (
-                                                            <Coffee size={12} className="opacity-60" />
+                                                            <Coffee size={12} className="opacity-60 pointer-events-none" />
                                                         ) : numericViewMode === 'percent' ? (
-                                                            hasProgress ? <span>{percentVal}%</span> : <span className="opacity-30 text-[9px] font-bold">-</span>
+                                                            hasProgress ? <span className="pointer-events-none">{percentVal}%</span> : <span className="opacity-30 text-[9px] font-bold pointer-events-none">-</span>
                                                         ) : (
                                                             hasProgress ? (
-                                                                <span>
+                                                                <span className="pointer-events-none">
                                                                     {habitVal >= 1000
                                                                         ? `${(habitVal / 1000).toFixed(habitVal % 1000 === 0 ? 0 : 1)}k`
                                                                         : habitVal}
                                                                 </span>
                                                             ) : (
-                                                                <span className="opacity-30 text-[9px] font-bold">-</span>
+                                                                <span className="opacity-30 text-[9px] font-bold pointer-events-none">-</span>
                                                             )
                                                         )}
                                                     </button>
@@ -283,6 +291,7 @@ export default function HabitMatrixTable({
                                                 <button
                                                     type="button"
                                                     onClick={() => {
+                                                        if (day.isFuture) return;
                                                         if (isRest || isSkipped) {
                                                             onOpenNoteModal({
                                                                 habit,
@@ -295,44 +304,54 @@ export default function HabitMatrixTable({
                                                     }}
                                                     onContextMenu={(e) => {
                                                         e.preventDefault();
-                                                        if (day.isFuture) return;
+                                                        e.stopPropagation();
                                                         onOpenNoteModal({
                                                             habit,
                                                             dateStr: day.dateString,
                                                             notes: info.notes || ''
                                                         });
                                                     }}
-                                                    disabled={day.isFuture}
+                                                    onAuxClick={(e) => {
+                                                        if (e.button === 2) {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            onOpenNoteModal({
+                                                                habit,
+                                                                dateStr: day.dateString,
+                                                                notes: info.notes || ''
+                                                            });
+                                                        }
+                                                    }}
+                                                    aria-disabled={day.isFuture}
                                                     title={
-                                                        day.isFuture 
-                                                            ? (isIndo ? 'Tanggal mendatang' : 'Future date')
-                                                            : isRest 
-                                                            ? (isIndo ? 'Hari Istirahat (☕) • Klik untuk catatan / klik kanan untuk opsi' : 'Rest Day (☕) • Click for notes / right-click for options')
-                                                            : isSkipped
-                                                            ? (isIndo ? 'Hari Dilewati (⏸️) • Klik untuk catatan / klik kanan untuk opsi' : 'Skipped Day (⏸️) • Click for notes / right-click for options')
-                                                            : isDone 
-                                                            ? (isIndo ? 'Selesai (✓) • Klik kiri untuk batalkan centang, atau klik kanan untuk opsi' : 'Completed (✓) • Left-click to uncheck, or right-click for options')
-                                                            : (isIndo ? 'Klik kiri: Centang • Klik kanan: Mode Istirahat (☕) / Lewati' : 'Left-click: Complete • Right-click: Rest Mode (☕) / Skip')
+                                                        day.isFuture
+                                                            ? (isIndo ? 'Tanggal mendatang (Klik kanan untuk atur Libur / Catatan)' : 'Future date (Right-click for Rest / Notes)')
+                                                            : isRest
+                                                                ? (isIndo ? 'Hari Istirahat (☕) • Klik untuk catatan / klik kanan untuk opsi' : 'Rest Day (☕) • Click for notes / right-click for options')
+                                                                : isSkipped
+                                                                    ? (isIndo ? 'Hari Dilewati (⏸️) • Klik untuk catatan / klik kanan untuk opsi' : 'Skipped Day (⏸️) • Click for notes / right-click for options')
+                                                                    : isDone
+                                                                        ? (isIndo ? 'Selesai (✓) • Klik kiri untuk batalkan centang, atau klik kanan untuk opsi' : 'Completed (✓) • Left-click to uncheck, or right-click for options')
+                                                                        : (isIndo ? 'Klik kiri: Centang • Klik kanan: Mode Istirahat (☕) / Lewati' : 'Left-click: Complete • Right-click: Rest Mode (☕) / Skip')
                                                     }
-                                                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${
-                                                        isDone
+                                                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${isDone
                                                             ? 'shadow-xs text-white'
                                                             : isRelapse
-                                                            ? 'bg-rose-500 text-white shadow-xs'
-                                                            : isRest
-                                                            ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
-                                                            : isSkipped
-                                                            ? 'bg-slate-200 dark:bg-slate-800 text-slate-400'
-                                                            : day.isFuture
-                                                            ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
-                                                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400'
-                                                    } ${day.isToday && !isDone && !isRest ? 'ring-2 ring-indigo-500 ring-offset-1' : ''}`}
+                                                                ? 'bg-rose-500 text-white shadow-xs'
+                                                                : isRest
+                                                                    ? 'bg-slate-100/70 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 hover:border-indigo-400 border border-transparent'
+                                                                    : isSkipped
+                                                                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-400'
+                                                                        : day.isFuture
+                                                                            ? 'bg-slate-50 dark:bg-slate-950 opacity-30 cursor-not-allowed'
+                                                                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400'
+                                                        } ${day.isToday && !isDone && !isRest ? 'ring-2 ring-indigo-500 ring-offset-1' : ''}`}
                                                     style={isDone ? { backgroundColor: habit.color, boxShadow: `0 3px 10px ${habit.color}30` } : {}}
                                                 >
-                                                    {isDone && <Check size={13} strokeWidth={3.5} className="animate-in zoom-in duration-200" />}
-                                                    {isRelapse && <span className="text-[10px] font-black">⚠️</span>}
-                                                    {isRest && <Coffee size={12} className="opacity-60" />}
-                                                    {isSkipped && <span className="text-xs font-black">-</span>}
+                                                    {isDone && <Check size={13} strokeWidth={3.5} className="animate-in zoom-in duration-200 pointer-events-none" />}
+                                                    {isRelapse && <span className="text-[10px] font-black pointer-events-none">⚠️</span>}
+                                                    {isRest && <Coffee size={12} className="opacity-60 pointer-events-none" />}
+                                                    {isSkipped && <span className="text-xs font-black pointer-events-none">-</span>}
                                                 </button>
                                             )}
 

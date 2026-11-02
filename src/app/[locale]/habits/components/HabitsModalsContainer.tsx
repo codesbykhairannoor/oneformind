@@ -6,9 +6,9 @@ import { HabitItem, LifeOSTab } from '../types';
 import HabitFormModal from './HabitFormModal';
 import HabitDeleteModal from './HabitDeleteModal';
 import HabitBatchModal, { BatchRow } from './HabitBatchModal';
+import HabitNoteModal from './HabitNoteModal';
 
 const HabitDetailModal = dynamic(() => import('./HabitDetailModal'), { ssr: false });
-const HabitNoteModal = dynamic(() => import('./HabitNoteModal'), { ssr: false });
 const HabitHallOfFameModal = dynamic(() => import('./HabitHallOfFameModal'), { ssr: false });
 
 interface HabitsModalsContainerProps {
