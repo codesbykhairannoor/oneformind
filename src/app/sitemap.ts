@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.APP_URL || 'https://tranvas.com';
-  
+
   // Public indexable routes
   const routes = [
     { path: '', priority: 1.0, changeFrequency: 'daily' as const },
@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/contact', priority: 0.8, changeFrequency: 'monthly' as const },
     { path: '/privacy-policy', priority: 0.5, changeFrequency: 'monthly' as const },
     { path: '/terms-of-service', priority: 0.5, changeFrequency: 'monthly' as const },
-    
+
     // Feature Subpages
     { path: '/features/planner', priority: 0.85, changeFrequency: 'weekly' as const },
     { path: '/features/habit', priority: 0.85, changeFrequency: 'weekly' as const },

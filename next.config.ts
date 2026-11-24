@@ -73,7 +73,7 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Security headers for all pages
+                // Security headers for all pages (OWASP Secure Headers & rfc-st/humble A+ baseline)
                 source: '/(.*)',
                 headers: [
                     { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -82,6 +82,25 @@ const nextConfig: NextConfig = {
                     { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
                     { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
                     { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=()' },
+                    { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+                    { key: 'Cross-Origin-Resource-Policy', value: 'same-site' },
+                    {
+                        key: 'Content-Security-Policy',
+                        value: [
+                            "default-src 'self'",
+                            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.paypal.com https://www.sandbox.paypal.com https://app.lemonsqueezy.com https://static.cloudflareinsights.com",
+                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                            "img-src 'self' data: blob: https:",
+                            "font-src 'self' data: https://fonts.gstatic.com",
+                            "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://api.lemonsqueezy.com https://passport.duitku.com https://sandbox.duitku.com https://cloudflareinsights.com",
+                            "frame-src 'self' https://www.paypal.com https://www.sandbox.paypal.com https://app.lemonsqueezy.com https://passport.duitku.com https://sandbox.duitku.com",
+                            "object-src 'none'",
+                            "base-uri 'self'",
+                            "form-action 'self' https://accounts.google.com https://*.supabase.co",
+                            "frame-ancestors 'none'",
+                            "upgrade-insecure-requests",
+                        ].join('; '),
+                    },
                 ],
             },
         ];

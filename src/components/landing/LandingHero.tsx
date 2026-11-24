@@ -178,6 +178,9 @@ export default function LandingHero() {
                     onMouseLeave={() => setIsPaused(false)}
                     className="relative max-w-5xl mx-auto text-left"
                 >
+                    <h2 className="sr-only">
+                        {isId ? 'Pratinjau Interaktif 8 Modul Tranvas Life OS' : 'Interactive Preview of the 8 Tranvas Life OS Modules'}
+                    </h2>
                     {/* Lightweight Static Aura Behind Window (Zero GPU Lag) */}
                     <div className="absolute -inset-2 bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-emerald-500/10 rounded-2xl blur-xl -z-10 opacity-60 pointer-events-none" />
 

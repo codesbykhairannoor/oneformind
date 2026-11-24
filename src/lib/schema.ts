@@ -92,6 +92,12 @@ export function getOrganizationSchema() {
     logo: `${BASE_URL}/favicon.svg`,
     image: `${BASE_URL}/icon.png`,
     description: 'Tranvas develops the unified Life Operating System designed to eliminate productivity fragmentation for ambitious individuals.',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Jakarta',
+      addressRegion: 'DKI Jakarta',
+      addressCountry: 'ID',
+    },
     sameAs: [
       'https://twitter.com/tranvas_app',
       'https://github.com/codesbykhairannoor/oneformind',
@@ -100,6 +106,8 @@ export function getOrganizationSchema() {
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',
+      email: 'support@tranvas.com',
+      availableLanguage: ['English', 'Indonesian'],
       url: `${BASE_URL}/contact`,
     },
   };

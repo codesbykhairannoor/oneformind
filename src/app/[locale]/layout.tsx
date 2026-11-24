@@ -109,6 +109,7 @@ export default async function RootLayout({
         />
         <link rel="help" href="/llms.txt" />
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context Specification" />
+        <link rel="alternate" type="application/rss+xml" title="Tranvas RSS Feed" href="/rss.xml" />
         <JsonLd data={getSoftwareApplicationSchema(locale)} />
         <JsonLd data={getOrganizationSchema()} />
         <JsonLd data={getWebSiteSchema(locale)} />

@@ -58,7 +58,7 @@ Tranvas unifies all 8 essential life operating dimensions into an interconnected
 - Features: Rich markdown editor, mood tracker, reflection tags, search indexing, neural thought connection.
 
 ### 7. Academic Study Management
-- Path: /study | /id/study
+- Path: /solutions/student | /id/solutions/student
 - Features: Course syllabus tracking, assignment countdowns, exam prep milestones, cumulative GPA prediction.
 
 ### 8. Unified Scheduling Calendar
