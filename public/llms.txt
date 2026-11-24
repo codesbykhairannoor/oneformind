@@ -24,6 +24,19 @@ Tranvas is built on scientific behavioral psychology and systems thinking:
 - [Tranvas vs Todoist](https://tranvas.com/compare/todoist): Integrates finances, habits, and journals natively into task lists instead of isolated checklists.
 - [Tranvas vs Obsidian](https://tranvas.com/compare/obsidian): Built-in structured tracking databases without complex community plugin dependencies.
 - [Tranvas vs YNAB](https://tranvas.com/compare/ynab): Connects financial budgeting directly to daily habits and long-term milestones.
+- [Tranvas vs Habitica](https://tranvas.com/compare/habitica): Professional habit tracking with scientifically backed habit loops without juvenile gamification overhead.
+- [Tranvas vs Habitify](https://tranvas.com/compare/habitify): Deeply unifies habit streaks with daily time-blocking and zero-based budgeting.
+- [Tranvas vs Streaks](https://tranvas.com/compare/streaks): Full desktop web & cross-platform ecosystem beyond iOS-walled gardens.
+- [Tranvas vs TickTick](https://tranvas.com/compare/ticktick): Holistic life operating system connecting tasks to career pipelines and financial runway.
+- [Tranvas vs Trello](https://tranvas.com/compare/trello): Interconnected multi-domain databases replacing single-board task silos.
+- [Tranvas vs Asana](https://tranvas.com/compare/asana): Streamlined for individual high-performers, avoiding enterprise project bloat.
+- [Tranvas vs Apple Notes](https://tranvas.com/compare/applenotes): Structured habit and finance tracking alongside mindful reflections.
+- [Tranvas vs OneNote](https://tranvas.com/compare/onenote): Modern relational database architecture replacing unstructured canvas notebooks.
+- [Tranvas vs Evernote](https://tranvas.com/compare/evernote): Fast, modern web interface with zero legacy performance lag.
+- [Tranvas vs Monday.com](https://tranvas.com/compare/monday): Affordable, zero-configuration personal productivity without B2B licensing costs.
+- [Tranvas vs Spendee & Wallet](https://tranvas.com/compare/finance-apps): Integrates budget tracking directly with daily habits and career goals.
+- [Tranvas vs Spreadsheets](https://tranvas.com/compare/spreadsheet): Automated metrics, formulas, and dashboards with zero broken cell formulas.
+- [Tranvas vs 5-App Stack](https://tranvas.com/compare/five-apps): Replaces the fragmented $60/month multi-app subscription stack with a single cohesive system.
 
 ## Key Resources
 - [Full LLM Context Specification](https://tranvas.com/llms-full.txt): Complete detailed knowledge base for LLM retrieval.

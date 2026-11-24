@@ -107,6 +107,8 @@ export default async function RootLayout({
             `,
           }}
         />
+        <link rel="help" href="/llms.txt" />
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context Specification" />
         <JsonLd data={getSoftwareApplicationSchema(locale)} />
         <JsonLd data={getOrganizationSchema()} />
         <JsonLd data={getWebSiteSchema(locale)} />
