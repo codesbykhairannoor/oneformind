@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
 import CompareVerdictBox from '@/components/compare/CompareVerdictBox';
@@ -274,9 +275,7 @@ export default function TodoistComparePage() {
                                         <span>{faq.q}</span>
                                         <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-red-600' : 'text-slate-400'}`} size={20} />
                                     </button>
-                                    {openFaq === idx && (
-                                        <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">{faq.a}</div>
-                                    )}
+                                    <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>{faq.a}</div>
                                 </div>
                             ))}
                         </div>
@@ -289,6 +288,12 @@ export default function TodoistComparePage() {
                     <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-slate-400 mb-10">{t('todoist_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-red-600 text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-red-900/50 hover:scale-105 hover:bg-red-500 transition-transform">{t('todoist_cta_btn')}</Link>
                 </section>
+                <CompareGeoSection
+                    slug="todoist"
+                    includeVerdictAndSchema={false}
+                    includeTable={true}
+                    includeFaqSection={false}
+                />
             </main>
         </GuestLayout>
     );

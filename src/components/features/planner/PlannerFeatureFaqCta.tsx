@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import JsonLd from '@/components/seo/JsonLd';
+import { getFaqPageSchema } from '@/lib/schema';
 
 interface PlannerFeatureFaqCtaProps {
     t: any;
@@ -28,6 +30,7 @@ export default function PlannerFeatureFaqCta({ t }: PlannerFeatureFaqCtaProps) {
 
     return (
         <>
+            <JsonLd data={getFaqPageSchema(faqs)} />
             {/* SECTION 8: CTA BANNER */}
             <section className="pb-32 bg-gray-50 px-6">
                 <div className="max-w-6xl mx-auto bg-indigo-600 rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-[0_20px_50px_rgba(79,70,229,0.3)] hover:-translate-y-2 transition duration-500">
@@ -64,11 +67,9 @@ export default function PlannerFeatureFaqCta({ t }: PlannerFeatureFaqCtaProps) {
                                     <span>{faq.q}</span>
                                     <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={20} />
                                 </button>
-                                {openFaq === idx && (
-                                    <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                         {faq.a}
                                     </div>
-                                )}
                             </div>
                         ))}
                     </div>

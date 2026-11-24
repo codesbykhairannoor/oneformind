@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { constructPageMetadata } from '@/lib/seo';
+import { getComparePageMetadata } from '@/lib/compareSeoData';
 
 export async function generateMetadata({
   params,
@@ -7,12 +7,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return constructPageMetadata({
-    locale,
-    path: '/compare/onenote',
-    title: 'Tranvas vs Onenote',
-    description: 'Compare Tranvas and Onenote. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
-  });
+  return getComparePageMetadata('onenote', locale);
 }
 
 export default function CompareOnenoteLayout({ children }: { children: React.ReactNode }) {

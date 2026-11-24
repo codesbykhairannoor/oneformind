@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import JsonLd from '@/components/seo/JsonLd';
+import { getFaqPageSchema } from '@/lib/schema';
 
 interface CalendarFeatureFaqCtaProps {
     t: any;
@@ -28,6 +30,7 @@ export default function CalendarFeatureFaqCta({ t }: CalendarFeatureFaqCtaProps)
 
     return (
         <>
+            <JsonLd data={getFaqPageSchema(faqs)} />
             {/* SECTION 8: CTA BANNER */}
             <section className="pt-32 pb-40 bg-slate-900 px-6 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_70%)] opacity-30"></div>
@@ -62,11 +65,9 @@ export default function CalendarFeatureFaqCta({ t }: CalendarFeatureFaqCtaProps)
                                     <span>{faq.q}</span>
                                     <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={20} />
                                 </button>
-                                {openFaq === idx && (
-                                    <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                         {faq.a}
                                     </div>
-                                )}
                             </div>
                         ))}
                     </div>

@@ -81,7 +81,7 @@ export default function ChangelogPage() {
                                     <div className="flex items-center gap-4 border-b border-gray-200 pb-6">
                                         <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl font-black">2.4</div>
                                         <div>
-                                            <h4 className="font-black text-gray-900 text-xl">{t('cl_mockup_title')}</h4>
+                                            <div className="font-black text-gray-900 text-xl">{t('cl_mockup_title')}</div>
                                             <p className="text-gray-500 text-sm font-medium">{t('cl_mockup_desc')}</p>
                                         </div>
                                     </div>

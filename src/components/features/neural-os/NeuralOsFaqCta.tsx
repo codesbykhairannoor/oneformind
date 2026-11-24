@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import JsonLd from '@/components/seo/JsonLd';
+import { getFaqPageSchema } from '@/lib/schema';
 
 interface NeuralOsFaqCtaProps {
     t: any;
@@ -28,6 +30,7 @@ export default function NeuralOsFaqCta({ t }: NeuralOsFaqCtaProps) {
 
     return (
         <>
+            <JsonLd data={getFaqPageSchema(faqs)} />
             {/* SECTION 7: FINAL CTA */}
             <section className="py-16 sm:py-24 lg:py-32 px-6 text-center relative overflow-hidden bg-white">
                 <div className="max-w-5xl mx-auto">
@@ -68,11 +71,9 @@ export default function NeuralOsFaqCta({ t }: NeuralOsFaqCtaProps) {
                                     <span>{faq.q}</span>
                                     <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={20} />
                                 </button>
-                                {openFaq === idx && (
-                                    <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                         {faq.a}
                                     </div>
-                                )}
                             </div>
                         ))}
                     </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
 
@@ -101,7 +102,7 @@ export default function EvernoteComparePage() {
                                     <div className="flex items-start gap-4">
                                         <div className="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold shrink-0">✕</div>
                                         <div>
-                                            <h4 className="font-bold text-slate-900">{t('evernote_prob_point_1_title')}</h4>
+                                            <h3 className="font-bold text-slate-900">{t('evernote_prob_point_1_title')}</h3>
                                             <p className="text-sm text-slate-500">{t('evernote_prob_point_1_desc')}</p>
                                         </div>
                                     </div>
@@ -222,11 +223,9 @@ export default function EvernoteComparePage() {
                                         <span>{faq.q}</span>
                                         <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-emerald-600' : 'text-slate-400'}`} size={20} />
                                     </button>
-                                    {openFaq === idx && (
-                                        <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                    <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                             {faq.a}
                                         </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
@@ -254,6 +253,12 @@ export default function EvernoteComparePage() {
                         </Link>
                     </div>
                 </section>
+                <CompareGeoSection
+                    slug="evernote"
+                    includeVerdictAndSchema={true}
+                    includeTable={false}
+                    includeFaqSection={true}
+                />
             </main>
         </GuestLayout>
     );

@@ -26,7 +26,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
                                         <div className="absolute -left-16 top-0 w-12 h-12 bg-white rounded-full border-4 border-amber-500 shadow-xl z-10 flex items-center justify-center text-lg">🔥</div>
                                         <div className="bg-slate-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative group hover:scale-105 transition duration-500">
                                             <div className="absolute -inset-2 bg-gradient-to-r from-amber-500 to-transparent rounded-[3rem] -z-10 opacity-20 blur-xl group-hover:opacity-40"></div>
-                                            <h4 className="text-amber-500 uppercase tracking-widest text-xs mb-4">{t('goal_level_moonshot')}</h4>
+                                            <div className="text-amber-500 uppercase tracking-widest text-xs mb-4">{t('goal_level_moonshot')}</div>
                                             <p className="text-2xl italic tracking-tight">{t('goal_moonshot_example')}</p>
                                         </div>
                                     </div>
@@ -36,7 +36,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
                                         <div className="absolute -left-28 top-4 w-16 h-[2px] bg-indigo-500"></div>
                                         <div className="absolute -left-32 top-2 w-8 h-8 bg-white rounded-full border-4 border-indigo-500 shadow-lg z-10 flex items-center justify-center text-xs">⭐</div>
                                         <div className="bg-white border-2 border-indigo-100 p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl transition duration-500">
-                                            <h4 className="text-indigo-600 uppercase tracking-widest text-xs mb-4">{t('goal_milestone_number')}</h4>
+                                            <div className="text-indigo-600 uppercase tracking-widest text-xs mb-4">{t('goal_milestone_number')}</div>
                                             <p className="text-xl text-gray-900 tracking-tight">{t('goal_milestone_example')}</p>
                                             <div className="mt-6 w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                                                 <div className="w-3/4 h-full bg-indigo-500 rounded-full"></div>
@@ -70,7 +70,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
                                 <div className="flex items-center gap-6 p-6 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl transition duration-500 group">
                                     <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-[1.25rem] flex items-center justify-center text-2xl group-hover:rotate-12 transition font-black">🏔️</div>
                                     <div>
-                                        <h4 className="font-black text-gray-900 uppercase tracking-tighter">{t('goal_moonshot_label')}</h4>
+                                        <h3 className="font-black text-gray-900 uppercase tracking-tighter">{t('goal_moonshot_label')}</h3>
                                         <p className="text-xs text-gray-500 leading-relaxed">{t('goal_moonshot_desc')}</p>
                                     </div>
                                 </div>
@@ -135,7 +135,7 @@ export default function GoalFeatureAscentOrbit({ t }: GoalFeatureAscentOrbitProp
                                 <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 hover:shadow-2xl transition duration-500 flex gap-8 items-start group">
                                     <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition font-black">⚡</div>
                                     <div className="text-left">
-                                        <h4 className="text-xl text-gray-900 mb-2 uppercase tracking-tighter">{t('goal_impl_speed_title')}</h4>
+                                        <h3 className="text-xl text-gray-900 mb-2 uppercase tracking-tighter">{t('goal_impl_speed_title')}</h3>
                                         <p className="text-gray-500 font-medium leading-relaxed">{t('goal_impl_speed_desc')}</p>
                                     </div>
                                 </div>

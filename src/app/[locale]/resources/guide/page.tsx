@@ -144,7 +144,7 @@ export default function GuidePage() {
                                             {step}
                                         </div>
                                         <div className="text-center md:text-left space-y-2">
-                                            <h4 className="text-2xl font-black text-gray-900">{t(`guide_start_step_${step}_title`)}</h4>
+                                            <h3 className="text-2xl font-black text-gray-900">{t(`guide_start_step_${step}_title`)}</h3>
                                             <p className="text-gray-500 leading-relaxed">{t(`guide_start_step_${step}_desc`)}</p>
                                         </div>
                                     </div>

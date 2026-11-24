@@ -46,7 +46,7 @@ export default function FinanceFeatureHero({ t }: FinanceFeatureHeroProps) {
                         
                         <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-6 text-left">
                             <div>
-                                <h3 className="font-black text-gray-900 text-2xl mb-1">{t('finance_mockup_title')} 💳</h3>
+                                <div className="font-black text-gray-900 text-2xl mb-1">{t('finance_mockup_title')} 💳</div>
                                 <p className="text-sm text-gray-500">{t('finance_mockup_alert_1')}</p>
                             </div>
                             <div className="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-2xl border border-indigo-100">

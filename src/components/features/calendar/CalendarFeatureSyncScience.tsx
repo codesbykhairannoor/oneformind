@@ -29,7 +29,7 @@ export default function CalendarFeatureSyncScience({ t }: CalendarFeatureSyncSci
                                 <div className="flex gap-6 group">
                                     <div className="w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">💰</div>
                                     <div>
-                                        <h4 className="font-black text-gray-900 uppercase tracking-tighter mb-1">{t('calendar_node_finance_title')}</h4>
+                                        <h3 className="font-black text-gray-900 uppercase tracking-tighter mb-1">{t('calendar_node_finance_title')}</h3>
                                         <p className="text-gray-500 text-sm font-medium">{t('calendar_node_finance_desc')}</p>
                                     </div>
                                 </div>

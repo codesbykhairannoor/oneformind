@@ -32,7 +32,7 @@ export default function ManagementToolsSolutionComparison() {
                                 <div className="grid md:grid-cols-3 gap-6">
                                     <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:-translate-y-1 transition duration-300">
                                         <div className="text-3xl mb-4 font-black">👤</div>
-                                        <h4 className="font-bold text-gray-900">{t('pm_hub_you')}</h4>
+                                        <h3 className="font-bold text-gray-900">{t('pm_hub_you')}</h3>
                                         <div className="mt-4 flex items-center gap-2 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
                                             <span>●</span> Active
                                         </div>

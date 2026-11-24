@@ -1,6 +1,7 @@
 'use client';
 
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import FinanceAppsHero from '@/components/compare/finance-apps/FinanceAppsHero';
 import FinanceAppsProblemCycle from '@/components/compare/finance-apps/FinanceAppsProblemCycle';
 import FinanceAppsSolutionComparison from '@/components/compare/finance-apps/FinanceAppsSolutionComparison';
@@ -14,6 +15,12 @@ export default function FinanceAppsComparePage() {
                 <FinanceAppsProblemCycle />
                 <FinanceAppsSolutionComparison />
                 <FinanceAppsScienceFaqCta />
+                <CompareGeoSection
+                    slug="finance-apps"
+                    includeVerdictAndSchema={true}
+                    includeTable={true}
+                    includeFaqSection={true}
+                />
             </main>
         </GuestLayout>
     );

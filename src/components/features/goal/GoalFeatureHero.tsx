@@ -48,7 +48,7 @@ export default function GoalFeatureHero({ t }: GoalFeatureHeroProps) {
                             
                             <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-6">
                                 <div className="text-left">
-                                    <h3 className="font-black text-gray-900 text-2xl mb-1">{t('goal_mockup_title')} 🏆</h3>
+                                    <div className="font-black text-gray-900 text-2xl mb-1">{t('goal_mockup_title')} 🏆</div>
                                 </div>
                                 <div className="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-2xl border border-indigo-100 flex items-center gap-3">
                                     <span className="text-2xl">⚡</span>

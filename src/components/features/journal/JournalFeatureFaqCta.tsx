@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import JsonLd from '@/components/seo/JsonLd';
+import { getFaqPageSchema } from '@/lib/schema';
 
 interface JournalFeatureFaqCtaProps {
     t: any;
@@ -28,6 +30,7 @@ export default function JournalFeatureFaqCta({ t }: JournalFeatureFaqCtaProps) {
 
     return (
         <>
+            <JsonLd data={getFaqPageSchema(faqs)} />
             {/* SECTION 8: CTA BANNER */}
             <section className="py-14 sm:py-20 lg:py-28 bg-gray-50 px-6 relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-100 rounded-full opacity-50 pointer-events-none"></div>
@@ -63,11 +66,9 @@ export default function JournalFeatureFaqCta({ t }: JournalFeatureFaqCtaProps) {
                                     <span>{faq.q}</span>
                                     <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={20} />
                                 </button>
-                                {openFaq === idx && (
-                                    <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                         {faq.a}
                                     </div>
-                                )}
                             </div>
                         ))}
                     </div>

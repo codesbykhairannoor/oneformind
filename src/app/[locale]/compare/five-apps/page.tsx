@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
 
@@ -82,7 +83,7 @@ export default function FiveAppsComparePage() {
                                     <div className="w-24 h-24 bg-indigo-600 rounded-[2rem] flex items-center justify-center text-4xl mx-auto mb-8 shadow-2xl shadow-indigo-200 ring-8 ring-indigo-50 font-black">
                                         <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 4H4v7h7V4zm0 9H4v7h7v-7zm9-9h-7v7h7V4zm0 9h-7v7h7v-7z"/></svg>
                                     </div>
-                                    <h3 className="font-black text-2xl text-slate-900 mb-2">{t('five_mockup_title')}</h3>
+                                    <div className="font-black text-2xl text-slate-900 mb-2">{t('five_mockup_title')}</div>
                                     <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-8">{t('five_mockup_desc')}</p>
                                     
                                     <div className="flex items-center justify-center gap-2 bg-indigo-50 py-2 px-4 rounded-full inline-flex">
@@ -144,7 +145,7 @@ export default function FiveAppsComparePage() {
                         <div className="w-full bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 w-full h-2 bg-gradient-to-r from-rose-400 to-orange-400 left-0"></div>
                             
-                            <h4 className="text-xs uppercase tracking-widest text-slate-400 mb-8">The App Stack Graveyard</h4>
+                            <h3 className="text-xs uppercase tracking-widest text-slate-400 mb-8">The App Stack Graveyard</h3>
                             
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                 {Object.entries({'Planner Premium': '$9.99', 'Habit Gold': '$4.99', 'Finance Pro': '$12.99', 'Journal Plus': '$5.99', 'Goal Elite': '$15.99'}).map(([app, price]) => (
@@ -261,7 +262,7 @@ export default function FiveAppsComparePage() {
                                 {[1, 2, 3, 4].map((i) => (
                                     <div key={i} className="grid grid-cols-12 gap-4 items-center group">
                                         <div className="col-span-6 md:col-span-8">
-                                            <h4 className="font-bold text-slate-900 text-sm md:text-base">{t(`five_table_row_${i}_title`)}</h4>
+                                            <h3 className="font-bold text-slate-900 text-sm md:text-base">{t(`five_table_row_${i}_title`)}</h3>
                                             <p className="text-xs text-slate-500 hidden md:block mt-1">{t(`five_table_row_${i}_col_1`)}</p>
                                         </div>
                                         <div className="col-span-3 md:col-span-2 flex justify-center">
@@ -350,11 +351,9 @@ export default function FiveAppsComparePage() {
                                         <span>{faq.q}</span>
                                         <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={20} />
                                     </button>
-                                    {openFaq === idx && (
-                                        <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                    <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                             {faq.a}
                                         </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
@@ -378,6 +377,12 @@ export default function FiveAppsComparePage() {
                         <p className="mt-8 text-xs text-indigo-200 font-bold uppercase tracking-[0.2em] opacity-80">{t('five_cta_sub')}</p>
                     </div>
                 </section>
+                <CompareGeoSection
+                    slug="five-apps"
+                    includeVerdictAndSchema={true}
+                    includeTable={true}
+                    includeFaqSection={true}
+                />
             </main>
         </GuestLayout>
     );

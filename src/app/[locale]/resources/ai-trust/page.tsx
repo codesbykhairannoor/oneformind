@@ -85,7 +85,7 @@ export default function AiTrustPage() {
                                                 The power of Neural OS lies in its ability to find the <strong>Indirect Friction</strong> between modules. For example, it might identify that your spending habits on weekends are directly hindering your 'Travel Goal', or that certain task categories in your Planner correlate with lower sentiment scores in your Journal.
                                             </p>
                                             <div className="bg-indigo-600 p-8 rounded-3xl text-white my-10 shadow-2xl space-y-4">
-                                                <h4 className="text-white font-black text-xl">The Synergy Map:</h4>
+                                                <h3 className="text-white font-black text-xl">The Synergy Map:</h3>
                                                 <ul className="list-none p-0 space-y-3 font-medium">
                                                     <li className="flex items-center gap-3"><span className="w-2 h-2 bg-indigo-300 rounded-full" /> Finance Core → Reward Loop Regulation</li>
                                                     <li className="flex items-center gap-3"><span className="w-2 h-2 bg-indigo-300 rounded-full" /> Journal Sentiment → Procrastination Analysis</li>

@@ -32,12 +32,17 @@ export async function generateMetadata({
     });
   }
 
+  const rawTitle = post.seoTitle || post.title;
+  const conciseTitle = rawTitle.length > 48
+    ? `${rawTitle.slice(0, 47).replace(/\s+\S*$/, '').trim()}`
+    : rawTitle;
+
   return constructPageMetadata({
     locale,
     path: `/resources/blog/${slug}`,
-    title: post.title,
+    title: conciseTitle,
     description: post.excerpt,
-    image: post.image,
+    image: '/og-banner',
   });
 }
 

@@ -44,7 +44,7 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
                                 <div className="flex gap-8 group cursor-default">
                                     <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center text-3xl group-hover:bg-cyan-500 transition duration-500 font-black">📈</div>
                                     <div>
-                                        <h4 className="text-xl mb-2 uppercase tracking-tight group-hover:text-cyan-400 transition font-black">{t('job_insight_1_title')}</h4>
+                                        <h3 className="text-xl mb-2 uppercase tracking-tight group-hover:text-cyan-400 transition font-black">{t('job_insight_1_title')}</h3>
                                         <p className="text-slate-500 font-medium leading-relaxed">{t('job_insight_1_desc')}</p>
                                     </div>
                                 </div>
@@ -135,7 +135,7 @@ export default function JobFeatureValueScience({ t, radarItems = DEFAULT_RADAR_I
                             <div className="grid md:grid-cols-3 gap-8 text-left border-t border-white/10 pt-12">
                                 <div>
                                     <span className="text-[10px] font-mono text-white/40 uppercase block mb-4">Module_01: Architecture</span>
-                                    <h4 className="text-white font-mono text-lg mb-2 font-bold">Systems Thinking</h4>
+                                    <h3 className="text-white font-mono text-lg mb-2 font-bold">Systems Thinking</h3>
                                     <p className="text-white/40 text-xs leading-relaxed font-mono">Optimizing the job search as a multi-stage deterministic framework for predictability.</p>
                                 </div>
                                 <div>

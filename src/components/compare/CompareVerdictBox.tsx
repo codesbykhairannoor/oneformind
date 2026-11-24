@@ -34,10 +34,14 @@ export default function CompareVerdictBox({
   const locale = useLocale();
   const isIndo = locale === 'id';
 
+  const localizedCanonical = isIndo
+    ? (canonicalPath.startsWith('/id') ? canonicalPath : `/id${canonicalPath}`)
+    : canonicalPath;
+
   const breadcrumbs = [
     { name: 'Home', url: isIndo ? '/id' : '/' },
-    { name: isIndo ? 'Komparasi' : 'Compare', url: isIndo ? '/id/compare' : '/compare' },
-    { name: `Tranvas vs ${competitorName}`, url: canonicalPath },
+    { name: isIndo ? 'Komparasi' : 'Compare', url: isIndo ? '/id/compare/notion' : '/compare/notion' },
+    { name: `Tranvas vs ${competitorName}`, url: localizedCanonical },
   ];
 
   return (
@@ -46,7 +50,7 @@ export default function CompareVerdictBox({
       <JsonLd data={getBreadcrumbSchema(breadcrumbs)} />
       {faqs && faqs.length > 0 && <JsonLd data={getFaqPageSchema(faqs)} />}
 
-      <section 
+      <section
         aria-label="Direct Comparison Verdict & Executive Summary"
         className="my-8 max-w-4xl mx-auto p-5 sm:p-7 bg-gradient-to-br from-indigo-50/90 via-white to-purple-50/70 dark:from-slate-900/90 dark:via-slate-900 dark:to-indigo-950/40 border-2 border-indigo-200/80 dark:border-indigo-800/80 rounded-3xl shadow-xl shadow-indigo-100/30 dark:shadow-none text-left"
       >

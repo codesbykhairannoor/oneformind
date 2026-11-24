@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
 
@@ -57,7 +58,7 @@ export default function WalletComparePage() {
                             <div className="relative bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl p-8 w-80 transform rotate-3 hover:rotate-0 transition-transform duration-500">
                                 <div className="text-center mb-6">
                                     <div className="w-16 h-16 mx-auto bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-4 font-black">💸</div>
-                                    <h3 className="font-bold text-slate-900 text-xl">Log Expense</h3>
+                                    <div className="font-bold text-slate-900 text-xl">Log Expense</div>
                                     <p className="text-sm text-slate-400">Feel every transaction.</p>
                                 </div>
                                 <div className="space-y-4">
@@ -252,9 +253,7 @@ export default function WalletComparePage() {
                                         <span>{faq.q}</span>
                                         <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-blue-600' : 'text-slate-400'}`} size={20} />
                                     </button>
-                                    {openFaq === idx && (
-                                        <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">{faq.a}</div>
-                                    )}
+                                    <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>{faq.a}</div>
                                 </div>
                             ))}
                         </div>
@@ -267,6 +266,12 @@ export default function WalletComparePage() {
                     <p style={{ fontSize: '1.15rem', lineHeight: 1.8 }} className="text-slate-500 mb-10 max-w-2xl mx-auto">{t('wallet_cta_desc')}</p>
                     <Link href="/register" className="inline-block bg-blue-600 text-white font-black px-12 py-5 rounded-2xl shadow-[0_15px_30px_rgba(37,99,235,0.3)] hover:scale-105 hover:bg-blue-700 transition-all">{t('wallet_cta_btn')}</Link>
                 </section>
+                <CompareGeoSection
+                    slug="wallet"
+                    includeVerdictAndSchema={true}
+                    includeTable={false}
+                    includeFaqSection={true}
+                />
             </main>
         </GuestLayout>
     );

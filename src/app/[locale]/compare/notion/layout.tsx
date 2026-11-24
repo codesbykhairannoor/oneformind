@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { constructPageMetadata } from '@/lib/seo';
+import { getComparePageMetadata } from '@/lib/compareSeoData';
 
 export async function generateMetadata({
   params,
@@ -7,12 +7,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return constructPageMetadata({
-    locale,
-    path: '/compare/notion',
-    title: 'Tranvas vs Notion',
-    description: 'Compare Tranvas and Notion. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
-  });
+  return getComparePageMetadata('notion', locale);
 }
 
 export default function CompareNotionLayout({ children }: { children: React.ReactNode }) {

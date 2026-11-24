@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import {notFound} from 'next/navigation';
-import {routing} from '@/i18n/routing';
+import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 import { getMessages } from 'next-intl/server';
 import Script from 'next/script';
 import InstantIntlProvider from "@/components/InstantIntlProvider";
@@ -40,8 +40,8 @@ export async function generateMetadata({
   const isId = locale === 'id';
 
   const rootTitle = isId
-    ? 'Tranvas | Life OS Terpadu'
-    : 'Tranvas | The Unified Life OS';
+    ? 'Tranvas | Life OS Terpadu untuk Habit, Planner & Finance'
+    : 'Tranvas | Unified Life OS for Habits, Goals & Finance';
   const rootDesc = isId
     ? 'Tranvas adalah Life Operating System terpadu: satukan Daily Planner, Habit Matrix 28 Hari, Smart Finance, WOOP Goals, Pipeline Karir, dan Jurnal Refleksi dalam satu sistem cerdas.'
     : 'Tranvas is the unified Life Operating System: seamlessly align daily planning, 28-day habit streaks, zero-based budgeting, WOOP goal cascading, career pipeline, and mindful reflections.';
@@ -78,7 +78,7 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
-  
+
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
@@ -124,15 +124,15 @@ export default async function RootLayout({
             gtag('config', 'G-7PNK1P4WZN');
           `}
         </Script>
-          <InstantIntlProvider initialLocale={locale} initialMessages={messages as any}>
-            <AffiliateTracker />
-            <SessionProvider>
-              <SwrProvider>
-                {children}
-                <TranvasDevHud />
-              </SwrProvider>
-            </SessionProvider>
-          </InstantIntlProvider>
+        <InstantIntlProvider initialLocale={locale} initialMessages={messages as any}>
+          <AffiliateTracker />
+          <SessionProvider>
+            <SwrProvider>
+              {children}
+              <TranvasDevHud />
+            </SwrProvider>
+          </SessionProvider>
+        </InstantIntlProvider>
       </body>
     </html>
   );

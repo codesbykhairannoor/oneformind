@@ -201,5 +201,3 @@ func PaymentDuitkuCheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Error(w, fmt.Sprintf(`{"error": "%s"}`, msg), http.StatusBadRequest)
 }
-
-

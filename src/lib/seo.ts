@@ -63,14 +63,9 @@ export function constructPageMetadata({
     : `${BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
 
   return {
-    // For root (cleanPath === ''), use fullTitle.
-    // For subpages, if title already includes "Tranvas" (e.g. "Tranvas vs Notion"), use absolute so Next.js doesn't duplicate it.
-    // Otherwise return cleanTitle so the layout template '%s | Tranvas' applies cleanly.
-    title: cleanPath === ''
-      ? fullTitle
-      : cleanTitle.toLowerCase().includes('tranvas')
-        ? { absolute: cleanTitle }
-        : cleanTitle,
+    // Always use { absolute: fullTitle } so intermediate nested layouts (e.g. /features/layout.tsx)
+    // can NEVER strip "| Tranvas" or duplicate the brand suffix.
+    title: { absolute: fullTitle },
     description: cleanDescription,
     keywords: keywords || [
       'Tranvas',

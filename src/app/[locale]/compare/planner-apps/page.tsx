@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import { Link } from '@/i18n/routing';
 import { ChevronDown, Check, X, Calendar, Clock, Sparkles } from 'lucide-react';
 
@@ -219,11 +220,9 @@ export default function PlannerAppsComparePage() {
                                         <span>{faq.q}</span>
                                         <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={20} />
                                     </button>
-                                    {openFaq === idx && (
-                                        <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                    <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                             {faq.a}
                                         </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
@@ -241,6 +240,12 @@ export default function PlannerAppsComparePage() {
                         </Link>
                     </div>
                 </section>
+                <CompareGeoSection
+                    slug="planner-apps"
+                    includeVerdictAndSchema={true}
+                    includeTable={false}
+                    includeFaqSection={true}
+                />
             </main>
         </GuestLayout>
     );

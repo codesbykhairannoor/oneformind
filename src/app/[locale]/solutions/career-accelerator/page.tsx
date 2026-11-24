@@ -62,7 +62,7 @@ export default function SolutionCareerAcceleratorPage() {
                             <div className="relative bg-white rounded-[2.5rem] shadow-2xl border border-white flex flex-col h-[500px] overflow-hidden transform transition hover:scale-[1.01] duration-500 p-8">
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h4 className="font-black text-slate-900 text-sm">{t('solve_career_mockup_header')}</h4>
+                                        <div className="font-black text-slate-900 text-sm">{t('solve_career_mockup_header')}</div>
                                         <span className="bg-indigo-100 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-full">{t('career_mockup_live')}</span>
                                     </div>
                                     
@@ -169,7 +169,7 @@ export default function SolutionCareerAcceleratorPage() {
                                 {/* Step 1 */}
                                 <div className="bg-white border-2 border-indigo-500 rounded-[2.5rem] p-8 text-center shadow-xl transform md:-translate-y-4 hover:-translate-y-6 transition duration-300 relative">
                                     <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center border-4 border-white font-bold">1</div>
-                                    <h4 className="text-xl text-slate-900 mb-3 mt-4 font-black">{t('solve_career_sol_step_1_title')}</h4>
+                                    <h3 className="text-xl text-slate-900 mb-3 mt-4 font-black">{t('solve_career_sol_step_1_title')}</h3>
                                     <p className="text-slate-500 text-sm leading-relaxed">{t('solve_career_sol_step_1_desc')}</p>
                                 </div>
                                 

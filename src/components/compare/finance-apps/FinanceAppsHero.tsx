@@ -58,7 +58,7 @@ export default function FinanceAppsHero() {
                                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl">💵</div>
                                 <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">{t('finapp_mockup_status')}</span>
                             </div>
-                            <h3 className="font-black text-2xl text-slate-900 mb-2">{t('finapp_mockup_title')}</h3>
+                            <div className="font-black text-2xl text-slate-900 mb-2">{t('finapp_mockup_title')}</div>
                             <p className="text-slate-400 text-sm mb-6">{t('finapp_mockup_desc')}</p>
                             
                             <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">

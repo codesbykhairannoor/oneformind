@@ -73,7 +73,7 @@ export default function SuccessStoriesPage() {
                                 {/* Card Header */}
                                 <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-6">
                                     <div className="text-left">
-                                        <h3 className="font-black text-gray-900 text-2xl mb-1">Featured Story</h3>
+                                        <div className="font-black text-gray-900 text-2xl mb-1">Featured Story</div>
                                         <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">Early Adopter Spotlight</p>
                                     </div>
                                     <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">

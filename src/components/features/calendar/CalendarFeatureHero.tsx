@@ -48,7 +48,7 @@ export default function CalendarFeatureHero({ t }: CalendarFeatureHeroProps) {
                         {/* Left Side: Mini Calendar */}
                         <div className="w-full md:w-1/3 bg-gray-50 rounded-2xl p-6 border border-gray-100 text-left">
                             <div className="flex justify-between items-center mb-6">
-                                <h4 className="font-bold text-gray-900">{t('calendar_mockup_month')}</h4>
+                                <div className="font-bold text-gray-900">{t('calendar_mockup_month')}</div>
                                 <div className="flex gap-2 text-gray-400">
                                     <span className="hover:text-indigo-600 cursor-pointer">◀</span>
                                     <span className="hover:text-indigo-600 cursor-pointer">▶</span>
@@ -79,7 +79,7 @@ export default function CalendarFeatureHero({ t }: CalendarFeatureHeroProps) {
                         <div className="w-full md:w-2/3 flex flex-col text-left">
                             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
                                 <div>
-                                    <h3 className="font-black text-gray-900 text-2xl">{t('calendar_mockup_today')}</h3>
+                                    <div className="font-black text-gray-900 text-2xl">{t('calendar_mockup_today')}</div>
                                     <p className="text-sm text-gray-500">{t('calendar_mockup_date')}</p>
                                 </div>
                                 <div className="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl border border-indigo-100 font-bold text-sm">

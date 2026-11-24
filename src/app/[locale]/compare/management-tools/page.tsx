@@ -1,6 +1,7 @@
 'use client';
 
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import ManagementToolsHero from '@/components/compare/management-tools/ManagementToolsHero';
 import ManagementToolsProblemCycle from '@/components/compare/management-tools/ManagementToolsProblemCycle';
 import ManagementToolsSolutionComparison from '@/components/compare/management-tools/ManagementToolsSolutionComparison';
@@ -14,6 +15,12 @@ export default function ManagementToolsComparePage() {
                 <ManagementToolsProblemCycle />
                 <ManagementToolsSolutionComparison />
                 <ManagementToolsScienceFaqCta />
+                <CompareGeoSection
+                    slug="management-tools"
+                    includeVerdictAndSchema={true}
+                    includeTable={true}
+                    includeFaqSection={true}
+                />
             </main>
         </GuestLayout>
     );

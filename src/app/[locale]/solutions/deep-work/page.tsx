@@ -75,7 +75,7 @@ export default function SolutionDeepWorkPage() {
                                 
                                 <div className="flex-1 w-full space-y-6 z-10">
                                     <div className="flex justify-between items-center border-b border-gray-800 pb-4">
-                                        <h4 className="text-gray-500 font-bold uppercase tracking-widest text-xs">{t('deepwork_mockup_title')}</h4>
+                                        <div className="text-gray-500 font-bold uppercase tracking-widest text-xs">{t('deepwork_mockup_title')}</div>
                                         <span className="w-3 h-3 rounded-full bg-rose-500 animate-pulse shadow-[0_0_10px_#f43f5e]"></span>
                                     </div>
                                     <div className="space-y-4">
@@ -129,7 +129,7 @@ export default function SolutionDeepWorkPage() {
                         <div className="grid md:grid-cols-3 gap-8">
                             <div className="bg-gray-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm text-3xl mb-6 font-black select-none">📱</div>
-                                <h4 className="text-xl font-bold text-gray-900 mb-3">{t('deepwork_prob_1_title')}</h4>
+                                <h3 className="text-xl font-bold text-gray-900 mb-3">{t('deepwork_prob_1_title')}</h3>
                                 <p className="text-gray-500 leading-relaxed font-medium">{t('deepwork_prob_1_desc')}</p>
                             </div>
                             <div className="bg-gray-50 p-5 sm:p-7 lg:p-9 rounded-2xl sm:rounded-3xl border border-gray-100 hover:shadow-xl transition-shadow duration-300">
@@ -156,7 +156,7 @@ export default function SolutionDeepWorkPage() {
                                 <div className="flex gap-4 items-start">
                                     <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shrink-0 mt-1">1</div>
                                     <div>
-                                        <h4 className="text-xl font-bold text-gray-900 mb-2">{t('deepwork_sol_1_title')}</h4>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{t('deepwork_sol_1_title')}</h3>
                                         <p className="text-gray-600 leading-relaxed font-medium">{t('deepwork_sol_1_desc')}</p>
                                     </div>
                                 </div>
@@ -201,7 +201,7 @@ export default function SolutionDeepWorkPage() {
                             <div className="flex gap-6 items-start p-8 rounded-[2rem] bg-indigo-50 border border-indigo-100">
                                 <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl shrink-0 shadow-lg font-black select-none">🍅</div>
                                 <div>
-                                    <h4 className="text-xl font-bold text-indigo-950 mb-2">{t('deepwork_feat_1_title')}</h4>
+                                    <h3 className="text-xl font-bold text-indigo-950 mb-2">{t('deepwork_feat_1_title')}</h3>
                                     <p className="text-indigo-800/70 font-medium">{t('deepwork_feat_1_desc')}</p>
                                 </div>
                             </div>

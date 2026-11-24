@@ -78,7 +78,7 @@ export default function SolutionPersonalGrowthPage() {
                                     <circle cx="50" cy="50" r="46" stroke="#4f46e5" strokeWidth="8" fill="none" strokeDasharray="289" strokeDashoffset="72" className="animate-[dash_2s_ease-out_forwards]" />
                                 </svg>
                                 <span className="text-4xl mb-1 font-black select-none">📖</span>
-                                <h3 className="font-black text-2xl text-gray-900">75%</h3>
+                                <div className="font-black text-2xl text-gray-900">75%</div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{t('growth_mockup_goal_label')}</p>
                             </div>
 
@@ -116,7 +116,7 @@ export default function SolutionPersonalGrowthPage() {
                             {/* Card 1 (Top) */}
                             <div className="absolute w-72 h-80 bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 flex flex-col items-center justify-center text-center transform group-hover:-translate-y-4 transition duration-500 z-10">
                                 <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mb-6 shadow-inner font-black select-none">🏆</div>
-                                <h4 className="font-black text-xl text-gray-900 mb-2">{t('growth_mockup_streak_title')}</h4>
+                                <div className="font-black text-xl text-gray-900 mb-2">{t('growth_mockup_streak_title')}</div>
                                 <p className="text-sm text-gray-500 mb-6">{t('growth_mockup_streak_desc')}</p>
                                 <div className="w-full bg-gray-100 rounded-full h-2">
                                     <div className="bg-indigo-600 h-2 rounded-full w-full"></div>
@@ -264,7 +264,7 @@ export default function SolutionPersonalGrowthPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-bold text-center">
                                     <div>
                                         <span className="block text-2xl mb-2 select-none font-black">🛡️</span>
-                                        <h4 className="font-black text-[10px] uppercase text-indigo-400 tracking-widest">{t('growth_science_point_1')}</h4>
+                                        <h3 className="font-black text-[10px] uppercase text-indigo-400 tracking-widest">{t('growth_science_point_1')}</h3>
                                     </div>
                                     <div>
                                         <span className="block text-2xl mb-2 select-none font-black">👤</span>

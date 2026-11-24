@@ -49,7 +49,7 @@ export default function JobFeatureFunnelMatrix({ t }: JobFeatureFunnelMatrixProp
                                         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
                                         <div className="flex justify-between items-center text-white">
                                             <div>
-                                                <h4 className="text-xs uppercase tracking-widest opacity-70 mb-2">{t('job_funnel_stage_1_label')}</h4>
+                                                <h3 className="text-xs uppercase tracking-widest opacity-70 mb-2">{t('job_funnel_stage_1_label')}</h3>
                                                 <p className="text-2xl tracking-tight font-black">{t('job_funnel_stage_1_title')}</p>
                                             </div>
                                             <span className="text-5xl opacity-30 italic font-black">{t('job_funnel_stage_1_stat')}</span>
@@ -134,7 +134,7 @@ export default function JobFeatureFunnelMatrix({ t }: JobFeatureFunnelMatrixProp
                                 <div className="flex items-start gap-6 group">
                                     <div className="w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition font-black">⚖️</div>
                                     <div>
-                                        <h4 className="font-black text-gray-900 uppercase tracking-tighter mb-2">{t('job_matrix_feature_title')}</h4>
+                                        <h3 className="font-black text-gray-900 uppercase tracking-tighter mb-2">{t('job_matrix_feature_title')}</h3>
                                         <p className="text-gray-500 text-sm font-medium leading-relaxed">{t('job_matrix_feature_desc')}</p>
                                     </div>
                                 </div>

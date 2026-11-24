@@ -82,7 +82,7 @@ export default function HabitFeatureMoodIdentity({ t }: HabitFeatureMoodIdentity
                                 <div className="bg-white p-5 lg:p-6 rounded-2xl shadow-sm border border-gray-100 flex gap-4 lg:gap-6 items-center group hover:bg-orange-600 transition duration-500 hover:shadow-xl hover:scale-[1.02] lg:hover:scale-105 cursor-pointer">
                                     <div className="w-12 h-12 bg-orange-50 rounded-xl flex-shrink-0 flex items-center justify-center text-xl group-hover:bg-white/20 group-hover:text-white transition font-black">🏠</div>
                                     <div>
-                                        <h4 className="font-black text-gray-900 group-hover:text-white transition text-sm lg:text-base">{t('habit_card_1_title')}</h4>
+                                        <h3 className="font-black text-gray-900 group-hover:text-white transition text-sm lg:text-base">{t('habit_card_1_title')}</h3>
                                         <p className="text-gray-500 text-xs lg:text-sm font-medium group-hover:text-orange-100 transition">{t('habit_card_1_desc')}</p>
                                     </div>
                                 </div>

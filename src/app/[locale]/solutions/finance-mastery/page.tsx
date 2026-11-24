@@ -63,7 +63,7 @@ export default function SolutionFinanceMasteryPage() {
                                 <div className="space-y-6">
                                     <div className="p-6 bg-indigo-950 rounded-3xl text-white shadow-xl">
                                         <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-1">{t('finance_mockup_assets')}</p>
-                                        <h3 className="text-3xl font-black">Rp 42.500.000</h3>
+                                        <div className="text-3xl font-black">Rp 42.500.000</div>
                                         <div className="mt-4 flex gap-2">
                                             <span className="px-2 py-1 bg-white/10 rounded-md text-[10px] font-bold">{t('finance_mockup_growth')}</span>
                                         </div>
@@ -82,7 +82,7 @@ export default function SolutionFinanceMasteryPage() {
 
                                     <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                         <div className="flex justify-between items-center mb-3">
-                                            <h4 className="text-[10px] uppercase text-gray-500">{t('finance_mockup_goal')}</h4>
+                                            <div className="text-[10px] uppercase text-gray-500">{t('finance_mockup_goal')}</div>
                                             <span className="text-indigo-600 text-[10px] font-bold">75%</span>
                                         </div>
                                         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -157,7 +157,7 @@ export default function SolutionFinanceMasteryPage() {
                                 </h2>
                                 <div className="space-y-8">
                                     <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
-                                        <h4 className="text-xl font-bold text-indigo-400 mb-2">{t('solve_finance_sol_feat_1_title')}</h4>
+                                        <h3 className="text-xl font-bold text-indigo-400 mb-2">{t('solve_finance_sol_feat_1_title')}</h3>
                                         <p className="text-slate-400">{t('solve_finance_sol_feat_1_desc')}</p>
                                     </div>
                                     <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">

@@ -24,16 +24,16 @@ export default function CustomAppsSolutionComparison() {
                         <div className="grid lg:grid-cols-2 gap-16 items-center">
                             <div>
                                 <div className="bg-indigo-50 rounded-3xl p-8 mb-8 border border-indigo-100">
-                                    <h4 className="font-bold text-indigo-900 mb-2 flex items-center gap-2">
+                                    <h3 className="font-bold text-indigo-900 mb-2 flex items-center gap-2">
                                         💡 {t('blank_sol_box_title')}
-                                    </h4>
+                                    </h3>
                                     <p className="text-indigo-800/70 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: t.raw('blank_sol_box_desc') }} />
                                 </div>
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4 group">
                                         <div className="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-xl group-hover:scale-110 transition">💰</div>
                                         <div>
-                                            <h5 className="font-bold text-gray-900">{t('blank_hub_finance')}</h5>
+                                            <h4 className="font-bold text-gray-900">{t('blank_hub_finance')}</h4>
                                             <p className="text-sm text-gray-400">Automated tracking</p>
                                         </div>
                                     </div>

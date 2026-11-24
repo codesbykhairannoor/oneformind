@@ -124,7 +124,7 @@ export default function CommunityPage() {
                                             {g.id}
                                         </div>
                                         <div className="space-y-3">
-                                            <h4 className="text-2xl font-black text-slate-900 mb-3">{g.title}</h4>
+                                            <h3 className="text-2xl font-black text-slate-900 mb-3">{g.title}</h3>
                                             <p className="text-slate-500 text-lg leading-relaxed opacity-80">{g.desc}</p>
                                         </div>
                                     </div>
@@ -145,7 +145,7 @@ export default function CommunityPage() {
                                             <span className="px-5 py-2 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest border border-indigo-100">{t('comm_event_badge')}</span>
                                             <span className="text-sm font-bold text-slate-300">{t('comm_event_date')}</span>
                                         </div>
-                                        <h4 className="text-3xl text-slate-900 mb-8 group-hover:text-indigo-600 transition font-black">{t(`comm_event_${e}`)}</h4>
+                                        <h3 className="text-3xl text-slate-900 mb-8 group-hover:text-indigo-600 transition font-black">{t(`comm_event_${e}`)}</h3>
                                         <a href="#" className="inline-flex items-center gap-3 text-lg font-black text-slate-900 group-hover:gap-6 transition-all duration-300">
                                             {t('comm_event_cta')} <ArrowRight size={18} />
                                         </a>
@@ -206,7 +206,7 @@ export default function CommunityPage() {
                         <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-16 z-10 text-center">{t('com_global_desc')}</p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 w-full text-center z-10">
                             <div>
-                                <h4 className="text-7xl text-indigo-400 mb-2 font-black">10k+</h4>
+                                <h3 className="text-7xl text-indigo-400 mb-2 font-black">10k+</h3>
                                 <p className="text-xl font-medium">{t('com_stat1')}</p>
                             </div>
                             <div>

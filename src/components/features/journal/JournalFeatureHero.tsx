@@ -53,7 +53,7 @@ export default function JournalFeatureHero({ t }: JournalFeatureHeroProps) {
                             
                             <div className="flex justify-between items-start mt-4 mb-6">
                                 <div>
-                                    <h3 className="font-black text-gray-900 text-3xl mb-2">{t('journal_mockup_title')}</h3>
+                                    <div className="font-black text-gray-900 text-3xl mb-2">{t('journal_mockup_title')}</div>
                                     <p className="text-sm font-bold text-indigo-500 flex items-center gap-2">
                                         <span>📅 {t('journal_mockup_date')}</span>
                                     </p>

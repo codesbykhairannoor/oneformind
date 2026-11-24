@@ -7,14 +7,15 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const isId = locale === 'id';
   return constructPageMetadata({
     locale,
     path: '/resources/blog',
-    title: 'Blog',
-    description: 'Actionable articles, mental models, and deep dives on personal productivity, habit science, financial clarity, and intentional living.',
+    title: isId ? "Blog Produktivitas, Atomic Habits & Finance OS" : "Productivity, Atomic Habits & Finance OS Blog",
+    description: isId ? "Panduan berbasis sains tentang atomic habits, deep work 90 menit, zero-based personal finance, dan membangun Second Brain aktif." : "Evidence-based guides on atomic habits, 90-minute deep work, zero-based personal finance, and building an actionable Second Brain.",
   });
 }
 
-export default function BlogResourceLayout({ children }: { children: React.ReactNode }) {
+export default function BlogLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

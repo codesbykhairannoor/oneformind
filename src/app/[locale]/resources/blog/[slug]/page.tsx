@@ -241,10 +241,10 @@ export default function DynamicBlogPostPage() {
 
                     {section.callout && (
                       <div className={`p-5 sm:p-6 rounded-2xl border text-sm sm:text-base my-6 ${section.callout.type === 'tip'
-                          ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
-                          : section.callout.type === 'important'
-                            ? 'bg-amber-50/70 border-amber-200 text-amber-950'
-                            : 'bg-indigo-50/70 border-indigo-200 text-indigo-950 italic'
+                        ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+                        : section.callout.type === 'important'
+                          ? 'bg-amber-50/70 border-amber-200 text-amber-950'
+                          : 'bg-indigo-50/70 border-indigo-200 text-indigo-950 italic'
                         }`}>
                         <div className="flex items-start gap-3">
                           <span className="shrink-0 mt-0.5">
@@ -293,11 +293,11 @@ export default function DynamicBlogPostPage() {
                         <span>{faq.q}</span>
                         <ChevronDown className={`transform transition-transform shrink-0 ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={18} />
                       </button>
-                      {openFaq === idx && (
-                        <div className="px-6 pb-6 text-slate-600 text-sm leading-relaxed border-t border-slate-200/60 pt-4">
-                          {faq.a}
-                        </div>
-                      )}
+                      <div
+                        className={`px-6 pb-6 text-slate-600 text-sm leading-relaxed border-t border-slate-200/60 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}
+                      >
+                        {faq.a}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -355,8 +355,8 @@ export default function DynamicBlogPostPage() {
                       key={section.id}
                       href={`#${section.id}`}
                       className={`block text-xs font-bold py-1.5 px-3 rounded-lg transition-all ${activeId === section.id
-                          ? 'bg-indigo-600 text-white font-black translate-x-1 shadow-sm'
-                          : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-100'
+                        ? 'bg-indigo-600 text-white font-black translate-x-1 shadow-sm'
+                        : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-100'
                         }`}
                     >
                       {section.title}

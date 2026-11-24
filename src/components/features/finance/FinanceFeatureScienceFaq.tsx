@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { ChevronDown } from 'lucide-react';
+import JsonLd from '@/components/seo/JsonLd';
+import { getFaqPageSchema } from '@/lib/schema';
 
 interface FinanceFeatureScienceFaqProps {
     t: any;
@@ -28,6 +30,7 @@ export default function FinanceFeatureScienceFaq({ t }: FinanceFeatureScienceFaq
 
     return (
         <>
+            <JsonLd data={getFaqPageSchema(faqs)} />
             {/* SECTION 6: THE SUCCESS QUOTE */}
             <section className="py-14 sm:py-20 lg:py-28 bg-white bg-pattern-grid relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center">
@@ -88,7 +91,7 @@ export default function FinanceFeatureScienceFaq({ t }: FinanceFeatureScienceFaq
                             <div className="bg-slate-950/80 border border-slate-800 p-6 rounded-3xl flex items-center gap-4 hover:border-amber-500/40 transition">
                                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold">1</div>
                                 <div>
-                                    <h4 className="font-bold text-white text-base">{t('finance_science_pillar1')}</h4>
+                                    <h3 className="font-bold text-white text-base">{t('finance_science_pillar1')}</h3>
                                     <p className="text-slate-400 text-xs mt-0.5">Partitioning funds into rigid psychological envelopes.</p>
                                 </div>
                             </div>
@@ -149,11 +152,9 @@ export default function FinanceFeatureScienceFaq({ t }: FinanceFeatureScienceFaq
                                     <span>{faq.q}</span>
                                     <ChevronDown className={`transform transition-transform ${openFaq === idx ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} size={20} />
                                 </button>
-                                {openFaq === idx && (
-                                    <div className="px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+                                <div className={`px-8 pb-8 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4 ${openFaq === idx ? 'block' : 'hidden'}`}>
                                         {faq.a}
                                     </div>
-                                )}
                             </div>
                         ))}
                     </div>

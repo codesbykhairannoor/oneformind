@@ -12,6 +12,7 @@ export interface BlogSection {
 export interface BlogPost {
   slug: string;
   title: string;
+  seoTitle?: string;
   subtitle: string;
   excerpt: string;
   category: string;
@@ -36,6 +37,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'mastering-atomic-habits-in-daily-life',
     title: 'Mastering Atomic Habits: How Small 1% Improvements Compounding Every Day',
+    seoTitle: 'Mastering Atomic Habits: 1% Daily Compounding',
     subtitle: 'The behavioral psychology behind habit stacking, identity transformation, and friction reduction.',
     excerpt: 'Learn the exact psychological framework behind habit stacking, identity shift, and friction reduction.',
     category: 'Methodology',
@@ -124,6 +126,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'deep-work-framework-for-modern-professionals',
     title: 'The Deep Work Blueprint: Eliminating Context Switching for Peak Focus',
+    seoTitle: 'Deep Work Blueprint: 90-Minute Focus Blocks',
     subtitle: 'How to structure your day into uninterrupted 90-minute focus blocks without burning out.',
     excerpt: 'How to structure your day into uninterrupted 90-minute focus blocks without burning out.',
     category: 'Focus',
@@ -208,6 +211,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'financial-clarity-with-tranvas-finance-os',
     title: 'Financial Peace of Mind: Bridging Daily Spending with Long-Term Wealth',
+    seoTitle: 'Zero-Based Budgeting Inside Your Life OS',
     subtitle: 'A zero-based budgeting system built inside your productivity workflow to eliminate money anxiety.',
     excerpt: 'A zero-based budgeting system built inside your productivity workflow to eliminate money anxiety.',
     category: 'Finance OS',
@@ -289,6 +293,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'building-a-second-brain-for-personal-knowledge',
     title: 'Building a Second Brain: Organising Notes, Insights, and Ideas Effortlessly',
+    seoTitle: 'Building a Second Brain with CODE Framework',
     subtitle: 'Stop forgetting great ideas. Transform your digital journal into an active knowledge retrieval hub.',
     excerpt: 'Stop forgetting great ideas. Transform your digital journal into an active knowledge retrieval hub.',
     category: 'Second Brain',
@@ -372,6 +377,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'why-habit-and-finance-in-one-app-beats-notion',
     title: 'Why Habit & Finance in One App Beats Notion Templates',
+    seoTitle: 'Why Unified Habit & Finance Beats Notion',
     subtitle: 'Modern high performers spend too much time connecting fragmented tools. Here is why an integrated Life OS creates lasting consistency.',
     excerpt: 'Modern high performers spend too much time connecting fragmented tools. Here is why an integrated Life OS creates lasting consistency.',
     category: 'Architecture',

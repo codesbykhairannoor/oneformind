@@ -68,7 +68,7 @@ export default function FinanceAppsProblemCycle() {
                     </div>
 
                     <div className="order-1 lg:order-2 relative h-[500px] flex flex-col items-center justify-center bg-slate-50 rounded-[3rem] border border-slate-100 animate-in slide-in-from-right-12 fade-in duration-1000 delay-200">
-                        <h4 className="absolute top-8 text-xs uppercase tracking-widest text-slate-400 text-center w-full">Your "Automated" Reality</h4>
+                        <h3 className="absolute top-8 text-xs uppercase tracking-widest text-slate-400 text-center w-full">Your "Automated" Reality</h3>
                         
                         <div className="relative w-48 h-48 rounded-full shadow-inner border-8 border-white mb-8" style={{ background: 'conic-gradient(#f43f5e 0% 30%, #e2e8f0 30% 100%)' }}>
                             <div className="absolute inset-4 bg-slate-50 rounded-full flex items-center justify-center shadow-lg">

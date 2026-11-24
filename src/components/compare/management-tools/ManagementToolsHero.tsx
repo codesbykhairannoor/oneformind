@@ -54,7 +54,7 @@ export default function ManagementToolsHero() {
                                 <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl">🎯</div>
                                 <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">{t('pm_mockup_status')}</span>
                             </div>
-                            <h3 className="font-black text-2xl text-gray-900 mb-2">{t('pm_mockup_title')}</h3>
+                            <div className="font-black text-2xl text-gray-900 mb-2">{t('pm_mockup_title')}</div>
                             <p className="text-gray-400 text-sm mb-6">{t('pm_mockup_desc')}</p>
                             
                             <div className="space-y-4">

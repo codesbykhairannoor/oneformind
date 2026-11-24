@@ -74,7 +74,7 @@ export default function SolutionAtomicSystemPage() {
                             <div className="bg-slate-50 rounded-[2rem] p-8 md:p-12 border border-gray-100 overflow-hidden relative text-left flex flex-col md:flex-row gap-8 items-center">
                                 
                                 <div className="flex-1 space-y-4 z-10">
-                                    <h4 className="font-black text-gray-900 text-2xl">{t('atomic_mockup_title')}</h4>
+                                    <div className="font-black text-gray-900 text-2xl">{t('atomic_mockup_title')}</div>
                                     <p className="text-gray-500 font-medium">{t('atomic_mockup_desc')}</p>
                                     <div className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
                                         <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
@@ -219,7 +219,7 @@ export default function SolutionAtomicSystemPage() {
                                     <div className="flex flex-wrap gap-4">
                                         <div className="px-5 py-3 bg-white/5 rounded-2xl border border-white/5 hover:border-indigo-500/50 transition">
                                             <span className="text-[10px] text-indigo-400 uppercase tracking-widest block mb-1 font-bold">{t('atomic_science_reagent_1')}</span>
-                                            <h4 className="font-bold text-slate-300">{t('atomic_science_topic_1')}</h4>
+                                            <h3 className="font-bold text-slate-300">{t('atomic_science_topic_1')}</h3>
                                         </div>
                                         <div className="px-5 py-3 bg-white/5 rounded-2xl border border-white/5 hover:border-purple-500/50 transition">
                                             <span className="text-[10px] text-purple-400 uppercase tracking-widest block mb-1 font-bold">{t('atomic_science_reagent_2')}</span>

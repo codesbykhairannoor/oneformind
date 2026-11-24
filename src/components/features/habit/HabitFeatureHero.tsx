@@ -46,7 +46,7 @@ export default function HabitFeatureHero({ t }: HabitFeatureHeroProps) {
                         
                         <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-6 text-left">
                             <div>
-                                <h3 className="font-black text-gray-900 text-2xl mb-1">{t('habit_mockup_title')} ☀️</h3>
+                                <div className="font-black text-gray-900 text-2xl mb-1">{t('habit_mockup_title')} ☀️</div>
                             </div>
                             <div className="bg-green-50 text-green-700 px-4 py-2 rounded-2xl border border-green-100 flex items-center gap-3">
                                 <span className="text-2xl">🔥</span>

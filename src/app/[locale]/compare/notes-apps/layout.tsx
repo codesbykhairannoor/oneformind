@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { constructPageMetadata } from '@/lib/seo';
+import { getComparePageMetadata } from '@/lib/compareSeoData';
 
 export async function generateMetadata({
   params,
@@ -7,14 +7,9 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return constructPageMetadata({
-    locale,
-    path: '/compare/notes-apps',
-    title: 'Tranvas vs Notes Apps',
-    description: 'Compare Tranvas and Notes Apps. See feature differences, habit tracking, daily planning, pricing, and why Tranvas is the unified Life OS.',
-  });
+  return getComparePageMetadata('notes-apps', locale);
 }
 
-export default function CompareNotesappsLayout({ children }: { children: React.ReactNode }) {
+export default function CompareNotesAppsLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

@@ -27,7 +27,7 @@ export default function CalendarFeatureLayeredPulse({ t }: CalendarFeatureLayere
                                 <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl transition duration-500 group relative overflow-hidden">
                                     <div className="absolute right-0 top-0 w-2 h-full bg-blue-500 opacity-0 group-hover:opacity-100 transition"></div>
                                     <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition font-black">💼</div>
-                                    <h4 className="text-xl text-gray-900 mb-2 uppercase tracking-tighter">{t('calendar_layered_feature_1_title')}</h4>
+                                    <h3 className="text-xl text-gray-900 mb-2 uppercase tracking-tighter">{t('calendar_layered_feature_1_title')}</h3>
                                     <p className="text-sm text-gray-500 leading-relaxed">{t('calendar_layered_feature_1_desc')}</p>
                                 </div>
                                 <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl transition duration-500 group relative overflow-hidden">
@@ -111,7 +111,7 @@ export default function CalendarFeatureLayeredPulse({ t }: CalendarFeatureLayere
                                         <div className="w-20 h-20 bg-rose-500 text-white rounded-[2rem] flex items-center justify-center text-4xl relative z-10 shadow-2xl shadow-rose-500/40 transform group-hover:rotate-12 transition group-hover:scale-110 font-black">!</div>
                                     </div>
                                     <div>
-                                        <h4 className="text-3xl text-white mb-2 font-black">{t('calendar_pulse_item_1_title')}</h4>
+                                        <h3 className="text-3xl text-white mb-2 font-black">{t('calendar_pulse_item_1_title')}</h3>
                                         <p className="text-rose-400 uppercase tracking-[0.2em] text-[11px] bg-rose-500/10 inline-block px-3 py-1 rounded-full border border-rose-500/20">{t('calendar_pulse_item_1_status')}</p>
                                     </div>
                                 </div>

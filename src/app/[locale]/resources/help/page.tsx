@@ -120,9 +120,9 @@ export default function HelpPage() {
                                             <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-[1.5rem] flex items-center justify-center mb-10 group-hover:scale-110 group-hover:rotate-6 transition duration-500 border border-indigo-100 opacity-70 group-hover:opacity-100">
                                                 <IconComponent size={32} />
                                             </div>
-                                            <h3 className="text-2xl font-black text-slate-900 mb-4 group-hover:text-indigo-600 transition">
+                                            <div className="text-2xl font-black text-slate-900 mb-4 group-hover:text-indigo-600 transition">
                                                 {t(`${cat.key}_title`)}
-                                            </h3>
+                                            </div>
                                             <p className="text-slate-500 text-sm leading-relaxed">
                                                 {t(`${cat.key}_desc`)}
                                             </p>
@@ -280,7 +280,7 @@ export default function HelpPage() {
                             </div>
                             <div className="flex flex-col md:flex-row justify-center gap-16">
                                 <div className="space-y-2">
-                                    <h4 className="text-6xl text-emerald-400 font-black">99.9%</h4>
+                                    <h3 className="text-6xl text-emerald-400 font-black">99.9%</h3>
                                     <p className="text-lg font-bold">{t('hlp_sla1')}</p>
                                 </div>
                                 <div className="space-y-2">

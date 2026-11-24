@@ -60,7 +60,7 @@ export default function JournalFeatureEditorialNebula({ t }: JournalFeatureEdito
                                     {/* Content */}
                                     <div className="relative z-10 text-center">
                                         <span className="text-8xl mb-6 block group-hover:scale-125 transition duration-700 drop-shadow-2xl font-black select-none">✨</span>
-                                        <h4 className="text-3xl font-black text-gray-800 mb-2">{t('journal_nebula_harmony')}</h4>
+                                        <h3 className="text-3xl font-black text-gray-800 mb-2">{t('journal_nebula_harmony')}</h3>
                                         <p className="text-gray-500 uppercase tracking-[0.35em] text-xs font-bold">{t('journal_nebula_sentiment')}</p>
                                     </div>
 
@@ -90,7 +90,7 @@ export default function JournalFeatureEditorialNebula({ t }: JournalFeatureEdito
                                 <div className="flex items-start gap-8 p-8 rounded-[2.5rem] bg-white hover:shadow-2xl transition duration-500 group border border-gray-100">
                                     <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-3xl shrink-0 group-hover:rotate-12 transition font-black select-none">🔮</div>
                                     <div>
-                                        <h4 className="text-xl text-gray-900 mb-2 font-black">{t('journal_nebula_feature_1_title')}</h4>
+                                        <h3 className="text-xl text-gray-900 mb-2 font-black">{t('journal_nebula_feature_1_title')}</h3>
                                         <p className="text-gray-500 font-medium">{t('journal_nebula_feature_1_desc')}</p>
                                     </div>
                                 </div>

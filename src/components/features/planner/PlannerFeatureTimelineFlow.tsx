@@ -52,7 +52,7 @@ export default function PlannerFeatureTimelineFlow({ t }: PlannerFeatureTimeline
                                                 <span className="text-[11px] text-indigo-600 uppercase tracking-[0.2em] font-bold">{t('planner_timeline_time_1')}</span>
                                                 <span className="text-[10px] bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full uppercase font-bold">{t('planner_timeline_card_1_badge')}</span>
                                             </div>
-                                            <h4 className="text-xl text-gray-900 mb-2 font-black">{t('planner_timeline_card_1_title')}</h4>
+                                            <h3 className="text-xl text-gray-900 mb-2 font-black">{t('planner_timeline_card_1_title')}</h3>
                                             <p className="text-sm text-gray-500 leading-relaxed">{t('planner_timeline_card_1_desc')}</p>
                                         </div>
                                     </div>

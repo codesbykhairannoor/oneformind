@@ -66,8 +66,8 @@ export async function POST(req: NextRequest) {
         if (
             userId &&
             (eventName === 'order_created' ||
-             eventName === 'subscription_payment_success' ||
-             eventName === 'subscription_created')
+                eventName === 'subscription_payment_success' ||
+                eventName === 'subscription_created')
         ) {
             try {
                 const { createClient } = await import('@supabase/supabase-js');

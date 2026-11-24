@@ -26,7 +26,7 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
                     <div className="grid sm:grid-cols-3 gap-8 text-left">
                         <div className="bg-indigo-900/40 p-8 rounded-[2rem] border border-indigo-800/50 hover:bg-indigo-800/40 transition">
                             <div className="text-3xl mb-6 bg-indigo-800/50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border border-indigo-700/50 font-black">🔒</div>
-                            <h4 className="text-white font-bold text-xl mb-3">{t('finance_privacy_point_1_title')}</h4>
+                            <h3 className="text-white font-bold text-xl mb-3">{t('finance_privacy_point_1_title')}</h3>
                             <p className="text-indigo-300">{t('finance_privacy_point_1_desc')}</p>
                         </div>
                         <div className="bg-indigo-900/40 p-8 rounded-[2rem] border border-indigo-800/50 hover:bg-indigo-800/40 transition">
@@ -64,7 +64,7 @@ export default function FinanceFeaturePrivacyTrajectory({ t }: FinanceFeaturePri
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[4rem] group-hover:scale-110 transition duration-700"></div>
                             <div className="relative z-10">
                                 <span className="text-emerald-500 text-4xl mb-6 block font-black">📈</span>
-                                <h4 className="text-gray-400 uppercase tracking-widest text-[11px] mb-2">{t('finance_stat_projection_title')}</h4>
+                                <h3 className="text-gray-400 uppercase tracking-widest text-[11px] mb-2">{t('finance_stat_projection_title')}</h3>
                                 <p className="text-4xl text-gray-900 tabular-nums font-black">{t('finance_stat_projection_val')}</p>
                                 <div className="mt-6 w-full h-1 bg-emerald-100 rounded-full">
                                     <div className="w-2/3 h-full bg-emerald-500 rounded-full animate-in slide-in-from-left duration-1000"></div>

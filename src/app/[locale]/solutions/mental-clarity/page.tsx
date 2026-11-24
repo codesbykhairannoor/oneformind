@@ -62,7 +62,7 @@ export default function SolutionMentalClarityPage() {
                             <div className="relative bg-white rounded-[2.5rem] shadow-2xl border border-white flex flex-col h-[500px] overflow-hidden transform transition hover:scale-[1.01] duration-500 p-8">
                                 <div className="flex-grow flex flex-col justify-center">
                                     <div className="text-center mb-8">
-                                        <h4 className="font-serif italic text-2xl text-gray-800 mb-2">"{t('mental_mockup_quote')}"</h4>
+                                        <div className="font-serif italic text-2xl text-gray-800 mb-2">"{t('mental_mockup_quote')}"</div>
                                         <p className="text-xs uppercase tracking-widest text-gray-400 font-bold">{t('mental_mockup_source')}</p>
                                     </div>
                                     
@@ -138,7 +138,7 @@ export default function SolutionMentalClarityPage() {
                                     <li className="flex items-start gap-4">
                                         <span className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/20 text-sm font-bold mt-1">1</span>
                                         <div>
-                                            <h4 className="font-bold text-white text-base">{t('solve_mental_sol_step_1_title')}</h4>
+                                            <h3 className="font-bold text-white text-base">{t('solve_mental_sol_step_1_title')}</h3>
                                             <p className="text-xs md:text-sm text-slate-400 mt-1">{t('solve_mental_sol_step_1_desc')}</p>
                                         </div>
                                     </li>
@@ -274,7 +274,7 @@ export default function SolutionMentalClarityPage() {
                             <div className="space-y-8">
                                 <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-right transform hover:-translate-x-2 transition">
                                     <span className="block text-[10px] text-indigo-400 uppercase tracking-widest mb-1 font-bold">Process_01</span>
-                                    <h4 className="font-bold text-gray-900">{t('mental_science_process_1_title')}</h4>
+                                    <h3 className="font-bold text-gray-900">{t('mental_science_process_1_title')}</h3>
                                 </div>
                                 <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-right transform hover:-translate-x-2 transition">
                                     <span className="block text-[10px] text-purple-400 uppercase tracking-widest mb-1 font-bold">Process_02</span>

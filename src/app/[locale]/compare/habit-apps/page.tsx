@@ -1,6 +1,7 @@
 'use client';
 
 import GuestLayout from '@/components/GuestLayout';
+import CompareGeoSection from '@/components/compare/CompareGeoSection';
 import HabitAppsHero from '@/components/compare/habit-apps/HabitAppsHero';
 import HabitAppsProblemCycle from '@/components/compare/habit-apps/HabitAppsProblemCycle';
 import HabitAppsSolutionComparison from '@/components/compare/habit-apps/HabitAppsSolutionComparison';
@@ -14,6 +15,12 @@ export default function HabitAppsComparePage() {
                 <HabitAppsProblemCycle />
                 <HabitAppsSolutionComparison />
                 <HabitAppsScienceFaqCta />
+                <CompareGeoSection
+                    slug="habit-apps"
+                    includeVerdictAndSchema={true}
+                    includeTable={true}
+                    includeFaqSection={true}
+                />
             </main>
         </GuestLayout>
     );
