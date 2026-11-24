@@ -1,8 +1,7 @@
 package main
 
 import (
-	"encoding/base64"
-	"encoding/json"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,19 +9,16 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"database/sql"
 
 	handler "tranvas-api/api"
 	"tranvas-api/backend/shareddb"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-// Single shared DB pool — used by AuthMiddleware AND all handlers.
-// No more duplicate pools (was: dbMain=50 + shareddb=20 = 70 total connections).
 var dbMain *sql.DB
 var (
 	userCacheMutex sync.RWMutex
@@ -39,8 +35,7 @@ type cacheEntry struct {
 
 var (
 	apiCacheMutex sync.RWMutex
-	// map[userID]map[requestURI]cacheEntry
-	apiCache = make(map[string]map[string]cacheEntry)
+	apiCache      = make(map[string]map[string]cacheEntry)
 )
 
 type responseRecorder struct {
@@ -61,15 +56,13 @@ func (rw *responseRecorder) WriteHeader(statusCode int) {
 
 func CacheMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Only run for authenticated users
-		userId := r.URL.Query().Get("userId")
+		userId := r.Header.Get("X-User-Id")
 		if userId == "" {
 			next.ServeHTTP(w, r)
 			return
 		}
 
 		if r.Method != http.MethodGet {
-			// Mutation request. Invalidate all cache for this user to ensure freshness.
 			apiCacheMutex.Lock()
 			delete(apiCache, userId)
 			apiCacheMutex.Unlock()
@@ -77,16 +70,14 @@ func CacheMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// It's a GET request. Check cache.
-		cacheKey := r.URL.RequestURI() // Includes path and ALL query params
-		
+		cacheKey := r.URL.RequestURI()
+
 		apiCacheMutex.RLock()
 		userCacheMap, userExists := apiCache[userId]
 		if userExists {
 			entry, entryExists := userCacheMap[cacheKey]
 			if entryExists && time.Now().Before(entry.ExpiresAt) {
 				apiCacheMutex.RUnlock()
-				// Cache HIT - Serve from RAM
 				for k, v := range entry.Headers {
 					for _, val := range v {
 						w.Header().Add(k, val)
@@ -100,16 +91,14 @@ func CacheMiddleware(next http.Handler) http.Handler {
 		}
 		apiCacheMutex.RUnlock()
 
-		// Cache MISS. Record the response.
 		recorder := &responseRecorder{
 			ResponseWriter: w,
-			statusCode:     http.StatusOK, // Default
+			statusCode:     http.StatusOK,
 		}
 
 		w.Header().Set("X-Cache", "MISS")
 		next.ServeHTTP(recorder, r)
 
-		// Save to cache if successful
 		if recorder.statusCode >= 200 && recorder.statusCode < 300 {
 			headersCopy := make(http.Header)
 			for k, v := range w.Header() {
@@ -122,7 +111,7 @@ func CacheMiddleware(next http.Handler) http.Handler {
 				Body:       append([]byte(nil), recorder.body...),
 				StatusCode: recorder.statusCode,
 				Headers:    headersCopy,
-				ExpiresAt:  time.Now().Add(5 * time.Minute), // Cache duration 5 minutes
+				ExpiresAt:  time.Now().Add(5 * time.Minute),
 			}
 
 			apiCacheMutex.Lock()
@@ -134,45 +123,15 @@ func CacheMiddleware(next http.Handler) http.Handler {
 		}
 	})
 }
-// --- END GLOBAL CACHE SYSTEM ---
-
-// parseJWTClaimsUnsafe extracts claims from a JWT without verifying the signature.
-// This is safe because:
-// 1. The token was issued by Supabase Auth (trusted IdP).
-// 2. Next.js already authenticated the session via supabase.auth.getSession() before forwarding.
-// 3. This is an internal service-to-service call (Next.js → Go backend), not exposed to the public.
-func parseJWTClaimsUnsafe(tokenString string) (jwt.MapClaims, error) {
-	parts := strings.Split(tokenString, ".")
-	if len(parts) != 3 {
-		return nil, fmt.Errorf("invalid JWT structure")
-	}
-	// Decode the payload (middle part) — base64url without padding
-	payload := parts[1]
-	// Add padding if needed
-	switch len(payload) % 4 {
-	case 2:
-		payload += "=="
-	case 3:
-		payload += "="
-	}
-	decoded, err := base64.URLEncoding.DecodeString(payload)
-	if err != nil {
-		// Try RawURLEncoding (no padding)
-		decoded, err = base64.RawURLEncoding.DecodeString(parts[1])
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode JWT payload: %v", err)
-		}
-	}
-	var claims jwt.MapClaims
-	if err := json.Unmarshal(decoded, &claims); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JWT claims: %v", err)
-	}
-	return claims, nil
-}
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Exclude public callbacks/webhooks from requiring Auth token
+		// Always strip client-supplied identity parameters before authentication
+		r.Header.Del("X-User-Id")
+		q := r.URL.Query()
+		q.Del("userId")
+		r.URL.RawQuery = q.Encode()
+
 		route := r.URL.Query().Get("route")
 		if route == "payment-duitku-callback" {
 			next.ServeHTTP(w, r)
@@ -180,105 +139,58 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			http.Error(w, `{"error": "Missing Authorization header"}`, http.StatusUnauthorized)
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || parts[0] != "Bearer" || strings.TrimSpace(parts[1]) == "" {
+			http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 			return
 		}
 
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			http.Error(w, `{"error": "Invalid Authorization header format"}`, http.StatusUnauthorized)
+		email, displayName, err := shareddb.VerifySupabaseToken(parts[1])
+		if err != nil || email == "" {
+			http.Error(w, `{"error": "Unauthorized: Invalid or expired token"}`, http.StatusUnauthorized)
 			return
 		}
 
-		tokenString := parts[1]
-
-		// Parse claims without signature verification to support both HS256 and ES256
-		// (Supabase Google OAuth uses ES256; email/password uses HS256)
-		claims, err := parseJWTClaimsUnsafe(tokenString)
-		if err != nil {
-			log.Printf("JWT Claims Parse Error: %v\n", err)
-			http.Error(w, `{"error": "Invalid token"}`, http.StatusUnauthorized)
+		if dbMain == nil {
+			http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
 			return
 		}
 
-		// Basic sanity check — must have a sub claim
-		if _, hasSub := claims["sub"]; !hasSub {
-			log.Printf("JWT missing sub claim")
-			http.Error(w, `{"error": "Invalid token"}`, http.StatusUnauthorized)
-			return
-		}
+		userCacheMutex.RLock()
+		cachedID, exists := userCache[strings.ToLower(email)]
+		userCacheMutex.RUnlock()
 
-		// Suppress unused import warning
-		_ = base64.StdEncoding
-
-		// claims is already jwt.MapClaims - use it directly
-		{
-			var email string
-			if e, ok := claims["email"].(string); ok {
-				email = e
+		var internalID int
+		if exists {
+			internalID = cachedID
+		} else {
+			err := dbMain.QueryRow(`SELECT id FROM "users" WHERE LOWER(email) = LOWER($1)`, email).Scan(&internalID)
+			if err == sql.ErrNoRows {
+				_ = dbMain.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, displayName, email).Scan(&internalID)
 			}
-
-			log.Printf("AuthMiddleware: email=%q dbMain=%v", email, dbMain != nil)
-
-			if email != "" && dbMain != nil {
-				// Check in-memory cache first
-				userCacheMutex.RLock()
-				cachedID, exists := userCache[email]
-				userCacheMutex.RUnlock()
-
-				var internalID int
-				if exists {
-					internalID = cachedID
-				} else {
-					err := dbMain.QueryRow(`SELECT id FROM "users" WHERE email = $1`, email).Scan(&internalID)
-					if err == sql.ErrNoRows {
-						name := email
-						if rawMeta, ok := claims["user_metadata"].(map[string]interface{}); ok {
-							if n, ok := rawMeta["name"].(string); ok && n != "" {
-								name = n
-							} else if fn, ok := rawMeta["full_name"].(string); ok && fn != "" {
-								name = fn
-							}
-						}
-						
-						errInsert := dbMain.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
-						if errInsert != nil {
-							log.Printf("AuthMiddleware: Error creating auto user: %v", errInsert)
-						}
-					}
-
-					if internalID > 0 {
-						// Save to cache
-						userCacheMutex.Lock()
-						userCache[email] = internalID
-						userCacheMutex.Unlock()
-					}
-				}
-
-				if internalID > 0 {
-					q := r.URL.Query()
-					q.Set("userId", fmt.Sprintf("%d", internalID))
-					r.URL.RawQuery = q.Encode()
-				} else {
-					log.Printf("AuthMiddleware: Could not resolve integer userId for email=%q", email)
-					http.Error(w, `{"error": "Could not resolve user. Please try again."}`, http.StatusInternalServerError)
-					return
-				}
-			} else {
-				log.Printf("AuthMiddleware: email empty or dbMain nil, cannot resolve userId")
-				http.Error(w, `{"error": "Could not resolve user. Please try again."}`, http.StatusInternalServerError)
-				return
+			if internalID > 0 {
+				userCacheMutex.Lock()
+				userCache[strings.ToLower(email)] = internalID
+				userCacheMutex.Unlock()
 			}
 		}
+
+		if internalID <= 0 {
+			http.Error(w, `{"error": "Could not resolve user"}`, http.StatusUnauthorized)
+			return
+		}
+
+		idStr := fmt.Sprintf("%d", internalID)
+		r.Header.Set("X-User-Id", idStr)
+		q = r.URL.Query()
+		q.Set("userId", idStr)
+		r.URL.RawQuery = q.Encode()
 
 		next.ServeHTTP(w, r)
 	})
 }
 
 func main() {
-	// Pre-warm the single shared DB pool at startup.
-	// This ensures the first real user request doesn't wait for pool init.
 	log.Println("Pre-warming shared DB connection pool...")
 	dbMain = shareddb.Get()
 	if dbMain != nil {
@@ -290,27 +202,24 @@ func main() {
 	}
 
 	r := chi.NewRouter()
-
-	// A good base middleware stack
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	// Basic CORS setup
+	// Strictly restrict CORS origins (never allow wildcard https://* with credentials)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedOrigins:   []string{"https://tranvas.com", "https://www.tranvas.com", "https://*.vercel.app", "http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User-Id"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
 
-	// Define our protected routes under /api
 	r.Group(func(r chi.Router) {
 		r.Use(AuthMiddleware)
-		r.Use(CacheMiddleware) // <-- apply cache middleware AFTER auth
+		r.Use(CacheMiddleware)
 		r.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
 			handler.Handler(w, r)
 		})
@@ -319,7 +228,6 @@ func main() {
 		})
 	})
 
-	// Health check endpoint
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
 	})

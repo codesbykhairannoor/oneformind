@@ -151,15 +151,34 @@ async function run() {
     serverLeak ? 'Disable X-Powered-By.' : ''
   );
 
-  // --- NUCLEI-STYLE SENSITIVE ENDPOINT & SECURITY.TXT PROBES ---
+  // --- NUCLEI-STYLE SENSITIVE ENDPOINT, PAYMENT EXPLOIT & URL INJECTION PROBES ---
   const securityProbes = [
     { path: '/api/debug-habits', expectBlocked: true, label: 'Debug API Endpoint Exposure (/api/debug-habits)' },
     { path: '/.env', expectBlocked: true, label: 'Dotenv Exposure (/.env)' },
     { path: '/.git/config', expectBlocked: true, label: 'Git Metadata Exposure (/.git/config)' },
     { path: '/api/user', expectAuth: true, label: 'Unauthenticated User API (/api/user)' },
     { path: '/api/affiliates/admin/overview', expectAuth: true, label: 'Unauthenticated Admin API (/api/affiliates/admin/overview)' },
+    { path: '/api?route=user&userId=1', expectAuth: true, label: 'URL Injection IDOR Probe (/api?route=user&userId=1)' },
+    { path: '/api?route=finance-transactions&userId=1', expectAuth: true, label: 'URL Injection Finance Probe (/api?route=finance-transactions&userId=1)' },
+    { path: '/api/affiliates/cron/release-escrow', expectBlocked: true, label: 'Unauthenticated Cron Escrow Endpoint' },
     { path: '/.well-known/security.txt', expectExists: true, label: 'RFC 9116 Security Disclosure (/.well-known/security.txt)' },
   ];
+
+  // Active exploit simulation: Forged unsigned JWT, Free Payment Upgrade POST, Unsigned LemonSqueezy Webhook POST, Referral Hijack POST
+  const forgedJwt = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJmYWtlIiwiZW1haWwiOiJhZG1pbkB0cmFudmFzLmNvbSJ9.forgedsig';
+  const [forgedApiRes, forgedNextRes, freeUpgradeRes, forgedLsRes, refHijackRes] = await Promise.all([
+    fetchSafe(`${TARGET}/api?route=user`, { headers: { Authorization: `Bearer ${forgedJwt}` } }),
+    fetchSafe(`${TARGET}/api/user`, { headers: { Authorization: `Bearer ${forgedJwt}` } }),
+    fetch(`${TARGET}/api/payment/upgrade`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${forgedJwt}` }, body: JSON.stringify({ plan: 'legendary' }) }).then(r => ({ status: r.status })).catch(() => ({ status: 0 })),
+    fetch(`${TARGET}/api/payment/lemonsqueezy/webhook`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meta: { event_name: 'order_created', custom_data: { user_id: '1' } }, data: { attributes: { total: 1500 } } }) }).then(r => ({ status: r.status })).catch(() => ({ status: 0 })),
+    fetch(`${TARGET}/api/affiliates/register-referral`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: '00000000-0000-0000-0000-000000000001', ref_code: 'HACKED' }) }).then(r => ({ status: r.status })).catch(() => ({ status: 0 })),
+  ]);
+
+  record('security', [401, 403].includes(forgedApiRes.status) ? 'pass' : 'fail', 'Forged Unsigned JWT Blocked on Go /api', `HTTP ${forgedApiRes.status}`, ![401, 403].includes(forgedApiRes.status) ? 'CRITICAL: Go /api accepted forged unsigned JWT!' : '');
+  record('security', [401, 403].includes(forgedNextRes.status) ? 'pass' : 'fail', 'Forged Unsigned JWT Blocked on Next.js /api/user', `HTTP ${forgedNextRes.status}`, ![401, 403].includes(forgedNextRes.status) ? 'CRITICAL: Next.js /api/user accepted forged unsigned JWT!' : '');
+  record('security', [401, 403, 404, 405].includes(freeUpgradeRes.status) ? 'pass' : 'fail', 'Free Self-Upgrade Exploit Blocked (/api/payment/upgrade)', `HTTP ${freeUpgradeRes.status}`, ![401, 403, 404, 405].includes(freeUpgradeRes.status) ? 'CRITICAL: /api/payment/upgrade allows free plan upgrade!' : '');
+  record('security', [401, 403, 503].includes(forgedLsRes.status) ? 'pass' : 'fail', 'Unsigned LemonSqueezy Webhook Rejected (Fail-Closed)', `HTTP ${forgedLsRes.status}`, ![401, 403, 503].includes(forgedLsRes.status) ? 'CRITICAL: LemonSqueezy webhook accepted unsigned payload!' : '');
+  record('security', [401, 403].includes(refHijackRes.status) ? 'pass' : 'fail', 'Unauthenticated Referral Hijacking Blocked (/api/affiliates/register-referral)', `HTTP ${refHijackRes.status}`, ![401, 403].includes(refHijackRes.status) ? 'CRITICAL: register-referral allows unauthenticated user_id spoofing!' : '');
 
   const probeResults = await Promise.all(securityProbes.map(p => fetchSafe(`${TARGET}${p.path}`)));
   securityProbes.forEach((p, idx) => {

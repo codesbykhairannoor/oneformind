@@ -9,18 +9,22 @@ export async function POST(req: NextRequest) {
         const signature = req.headers.get('x-signature') || '';
         const webhookSecret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET || '';
 
-        // Verify webhook signature if secret is configured
-        if (webhookSecret) {
-            if (!signature) {
-                return NextResponse.json({ error: 'Missing x-signature header' }, { status: 401 });
-            }
-            const hmac = crypto.createHmac('sha256', webhookSecret);
-            const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8');
-            const signatureBuffer = Buffer.from(signature, 'utf8');
+        // SECURITY CRITICAL (FAIL-CLOSED): Never process webhooks if signing secret is unconfigured
+        if (!webhookSecret) {
+            console.error('LEMONSQUEEZY_WEBHOOK_SECRET is not configured');
+            return NextResponse.json({ error: 'Webhook verification not configured' }, { status: 503 });
+        }
 
-            if (digest.length !== signatureBuffer.length || !crypto.timingSafeEqual(digest, signatureBuffer)) {
-                return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-            }
+        if (!signature) {
+            return NextResponse.json({ error: 'Missing x-signature header' }, { status: 401 });
+        }
+
+        const hmac = crypto.createHmac('sha256', webhookSecret);
+        const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8');
+        const signatureBuffer = Buffer.from(signature, 'utf8');
+
+        if (digest.length !== signatureBuffer.length || !crypto.timingSafeEqual(digest, signatureBuffer)) {
+            return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
         }
 
         const payload = JSON.parse(rawBody);
@@ -30,14 +34,12 @@ export async function POST(req: NextRequest) {
         const userId = customData.user_id || payload?.meta?.user_id;
         const userEmail = attributes.user_email || attributes.customer_email;
 
-        const proto = req.headers.get('x-forwarded-proto') || 'http';
-        const host = req.headers.get('host');
-        const apiBase = process.env.NEXT_PUBLIC_API_URL
-            ? process.env.NEXT_PUBLIC_API_URL
-            : `${proto}://${host}/api`;
+        const apiBase =
+            process.env.NEXT_PUBLIC_API_URL ||
+            `${(process.env.APP_URL || 'https://tranvas.com').replace(/\/$/, '')}/api`;
         const goUrl = `${apiBase}?route=payment-lemonsqueezy-webhook`;
 
-        // Forward event to backend for user subscription status synchronization
+        // Forward verified event to backend for user subscription status synchronization
         try {
             await fetch(goUrl, {
                 cache: 'no-store',
@@ -60,7 +62,7 @@ export async function POST(req: NextRequest) {
             console.warn('Backend webhook forward notice:', fetchErr);
         }
 
-        // Record 60% affiliate commission for eligible referrals
+        // Record affiliate commission ONLY after valid HMAC verification
         if (
             userId &&
             (eventName === 'order_created' ||
@@ -71,20 +73,22 @@ export async function POST(req: NextRequest) {
                 const { createClient } = await import('@supabase/supabase-js');
                 const supabaseAdmin = createClient(
                     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
                 );
                 const { recordAffiliateCommission } = await import('@/lib/affiliate/affiliate-service');
-                const rawTotal = attributes.total || attributes.subtotal_usd || 1500;
+                const rawTotal = attributes.total || attributes.subtotal_usd || 0;
                 const txAmount = typeof rawTotal === 'number' && rawTotal > 100 ? rawTotal / 100 : Number(rawTotal);
 
-                await recordAffiliateCommission(supabaseAdmin, {
-                    referredUserId: userId,
-                    gateway: 'lemonsqueezy',
-                    transactionId: String(payload.data?.id || `ls_${Date.now()}`),
-                    planName: attributes.variant_name || attributes.product_name || 'architect',
-                    transactionAmount: txAmount || 15.0,
-                    currency: attributes.currency || 'USD',
-                });
+                if (txAmount > 0) {
+                    await recordAffiliateCommission(supabaseAdmin, {
+                        referredUserId: userId,
+                        gateway: 'lemonsqueezy',
+                        transactionId: String(payload.data?.id || `ls_${Date.now()}`),
+                        planName: attributes.variant_name || attributes.product_name || 'architect',
+                        transactionAmount: txAmount,
+                        currency: attributes.currency || 'USD',
+                    });
+                }
             } catch (affErr) {
                 console.warn('Lemon Squeezy affiliate reward notice:', affErr);
             }

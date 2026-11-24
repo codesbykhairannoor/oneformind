@@ -6,28 +6,23 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     try {
-        const body = await req.json();
-        const refCode = body.ref_code;
-        const referredUserId = body.user_id;
+        const supabase = await createClient();
+        // SECURITY: Require verified authenticated session and NEVER allow attributing arbitrary user_ids (blocks IDOR)
+        const { data: { user }, error: authErr } = await supabase.auth.getUser();
+        if (authErr || !user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const body = await req.json().catch(() => ({}));
+        const refCode = typeof body.ref_code === 'string'
+            ? body.ref_code.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '')
+            : '';
 
         if (!refCode) {
-            return NextResponse.json({ success: false, message: 'No ref code provided' });
+            return NextResponse.json({ success: false, message: 'No valid ref code provided' }, { status: 400 });
         }
 
-        const supabase = await createClient();
-        
-        // If user_id is not passed, check current session
-        let targetUserId = referredUserId;
-        if (!targetUserId) {
-            const { data: { session } } = await supabase.auth.getSession();
-            targetUserId = session?.user?.id;
-        }
-
-        if (!targetUserId) {
-            return NextResponse.json({ error: 'User ID required for referral attribution' }, { status: 400 });
-        }
-
-        const result = await recordSignupReferral(supabase, targetUserId, refCode);
+        const result = await recordSignupReferral(supabase, user.id, refCode);
         return NextResponse.json(result);
     } catch (error: any) {
         console.error('Register referral error:', error);

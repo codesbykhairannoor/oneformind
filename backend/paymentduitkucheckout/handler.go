@@ -120,12 +120,13 @@ func PaymentDuitkuCheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	hash.Write([]byte(signatureStr))
 	signature := hex.EncodeToString(hash.Sum(nil))
 
-	origin := r.Header.Get("origin")
+	rawOrigin := r.Header.Get("origin")
+	origin := os.Getenv("APP_URL")
 	if origin == "" {
-		origin = os.Getenv("APP_URL")
-		if origin == "" {
-			origin = "https://tranvas.com"
-		}
+		origin = "https://tranvas.com"
+	}
+	if rawOrigin == "https://tranvas.com" || rawOrigin == "https://www.tranvas.com" || rawOrigin == "http://localhost:3000" {
+		origin = rawOrigin
 	}
 
 	appUrl := os.Getenv("APP_URL")

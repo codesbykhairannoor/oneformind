@@ -2,13 +2,10 @@ package handler
 
 import (
 	"database/sql"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"tranvas-api/backend/calendar"
@@ -37,77 +34,57 @@ import (
 	"tranvas-api/backend/user"
 )
 
-// parseJWTClaimsUnsafe extracts claims without signature verification
-// Supporting both HS256 (email) and ES256 (Google OAuth) Supabase tokens
-func parseJWTClaimsUnsafe(tokenString string) (jwt.MapClaims, error) {
-	parts := strings.Split(tokenString, ".")
-	if len(parts) != 3 {
-		return nil, fmt.Errorf("invalid JWT structure")
-	}
-	payload := parts[1]
-	switch len(payload) % 4 {
-	case 2:
-		payload += "=="
-	case 3:
-		payload += "="
-	}
-	decoded, err := base64.URLEncoding.DecodeString(payload)
-	if err != nil {
-		decoded, err = base64.RawURLEncoding.DecodeString(parts[1])
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode JWT payload: %v", err)
-		}
-	}
-	var claims jwt.MapClaims
-	if err := json.Unmarshal(decoded, &claims); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JWT claims: %v", err)
-	}
-	return claims, nil
-}
-
 func Handler(w http.ResponseWriter, r *http.Request) {
-	// 1. Authenticate and Map User ID (if not already set by AuthMiddleware)
-	if r.URL.Query().Get("userId") == "" {
-		authHeader := r.Header.Get("Authorization")
-		if authHeader != "" {
-			parts := strings.Split(authHeader, " ")
-			if len(parts) == 2 && parts[0] == "Bearer" {
-				claims, err := parseJWTClaimsUnsafe(parts[1])
-				if err == nil {
-					var email string
-					if e, ok := claims["email"].(string); ok {
-						email = e
-					}
-
-					if email != "" {
-						db := shareddb.Get()
-						if db != nil {
-							var internalID int
-							errDB := db.QueryRow(`SELECT id FROM "users" WHERE LOWER(email) = LOWER($1)`, email).Scan(&internalID)
-							if errDB == sql.ErrNoRows {
-								name := email
-								if rawMeta, ok := claims["user_metadata"].(map[string]interface{}); ok {
-									if n, ok := rawMeta["name"].(string); ok && n != "" {
-										name = n
-									} else if fn, ok := rawMeta["full_name"].(string); ok && fn != "" {
-										name = fn
-									}
-								}
-								db.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, name, email).Scan(&internalID)
-							}
-							if internalID > 0 {
-								q := r.URL.Query()
-								q.Set("userId", fmt.Sprintf("%d", internalID))
-								r.URL.RawQuery = q.Encode()
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	route := r.URL.Query().Get("route")
+
+	// SECURITY CRITICAL: Always strip any client-supplied X-User-Id header or userId query param
+	// to completely prevent horizontal privilege escalation / IDOR via URL parameter injection.
+	r.Header.Del("X-User-Id")
+	q := r.URL.Query()
+	q.Del("userId")
+	r.URL.RawQuery = q.Encode()
+
+	// Only verified signed payment webhooks may bypass Bearer authentication.
+	if route != "payment-duitku-callback" {
+		authHeader := r.Header.Get("Authorization")
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || parts[0] != "Bearer" || strings.TrimSpace(parts[1]) == "" {
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+			return
+		}
+
+		email, displayName, err := shareddb.VerifySupabaseToken(parts[1])
+		if err != nil || email == "" {
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, `{"error": "Unauthorized: Invalid or expired token"}`, http.StatusUnauthorized)
+			return
+		}
+
+		db := shareddb.Get()
+		if db == nil {
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, `{"error": "Database connection not available"}`, http.StatusServiceUnavailable)
+			return
+		}
+
+		var internalID int
+		errDB := db.QueryRow(`SELECT id FROM "users" WHERE LOWER(email) = LOWER($1)`, email).Scan(&internalID)
+		if errDB == sql.ErrNoRows {
+			_ = db.QueryRow(`INSERT INTO "users" (name, email, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id`, displayName, email).Scan(&internalID)
+		}
+		if internalID <= 0 {
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, `{"error": "Unauthorized: Could not resolve user"}`, http.StatusUnauthorized)
+			return
+		}
+
+		idStr := fmt.Sprintf("%d", internalID)
+		r.Header.Set("X-User-Id", idStr)
+		q = r.URL.Query()
+		q.Set("userId", idStr)
+		r.URL.RawQuery = q.Encode()
+	}
 
 	switch route {
 	case "calendar":

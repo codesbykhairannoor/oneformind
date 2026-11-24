@@ -15,17 +15,18 @@ export default function CoachMessageList({
     isLoading,
     onEditMessage,
 }: CoachMessageListProps) {
+    // SECURITY: Pure React bold-markdown parser (zero dangerouslySetInnerHTML, 100% immune to XSS)
     const renderMarkdown = (content: string) => {
         if (!content) return null;
         const paragraphs = content.split('\n\n');
         return paragraphs.map((p, i) => {
-            const formatted = p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            const parts = p.split(/\*\*(.*?)\*\*/g);
             return (
-                <p 
-                    key={i} 
-                    className="mb-3 last:mb-0 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: formatted }}
-                />
+                <p key={i} className="mb-3 last:mb-0 leading-relaxed whitespace-pre-wrap">
+                    {parts.map((segment, idx) =>
+                        idx % 2 === 1 ? <strong key={idx}>{segment}</strong> : <React.Fragment key={idx}>{segment}</React.Fragment>
+                    )}
+                </p>
             );
         });
     };
@@ -43,7 +44,7 @@ export default function CoachMessageList({
                                     )}
                                     <span className="font-medium">{msg.content}</span>
                                 </div>
-                                <button 
+                                <button
                                     type="button"
                                     onClick={() => onEditMessage(index)}
                                     className="absolute -left-8 top-2 w-6 h-6 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-indigo-500 flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all hover:scale-110"

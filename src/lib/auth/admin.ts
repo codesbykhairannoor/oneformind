@@ -1,5 +1,7 @@
 /**
  * Administrator Authorization Helper
+ * SECURITY: Never trust client-writable `user_metadata` (editable via supabase.auth.updateUser).
+ * Only trust explicit email allowlists and server/service-role-only `app_metadata`.
  */
 
 export const DEFAULT_ADMIN_EMAILS = [
@@ -18,8 +20,8 @@ export function isAdminUser(userOrEmail?: any): boolean {
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // Check environment variable configuration
-    const rawEnv = process.env.NEXT_PUBLIC_ADMIN_EMAILS || process.env.ADMIN_EMAILS || '';
+    // 1. Check server environment variable configuration
+    const rawEnv = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || '';
     const envAdmins = rawEnv
         .split(',')
         .map(e => e.trim().toLowerCase())
@@ -28,10 +30,10 @@ export function isAdminUser(userOrEmail?: any): boolean {
     if (envAdmins.includes(cleanEmail)) return true;
     if (DEFAULT_ADMIN_EMAILS.includes(cleanEmail)) return true;
 
-    // Check metadata role
+    // 2. Check server-controlled app_metadata ONLY (NEVER user_metadata)
     if (typeof userOrEmail === 'object') {
-        const role = userOrEmail?.user_metadata?.role || userOrEmail?.role;
-        if (role === 'admin' || role === 'superadmin' || userOrEmail?.user_metadata?.is_admin === true) {
+        const appRole = userOrEmail?.app_metadata?.role;
+        if (appRole === 'admin' || appRole === 'superadmin' || userOrEmail?.app_metadata?.is_admin === true) {
             return true;
         }
     }

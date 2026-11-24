@@ -6,18 +6,22 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
+    const { data: { user }, error: userErr } = await supabase.auth.getUser();
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
+    if (userErr || !user || !session?.access_token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await req.text();
-    const proto = req.headers.get('x-forwarded-proto') || 'http';
-    const host = req.headers.get('host');
-    const apiBase = process.env.NEXT_PUBLIC_API_URL
-      ? process.env.NEXT_PUBLIC_API_URL
-      : `${proto}://${host}/api`;
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_URL ||
+      `${(process.env.APP_URL || 'https://tranvas.com').replace(/\/$/, '')}/api`;
     const goUrl = `${apiBase}?route=payment-paypal-checkout`;
+
+    const rawOrigin = req.headers.get('origin') || '';
+    const safeOrigin = /^https:\/\/(?:www\.)?tranvas\.com$|^http:\/\/localhost(?::\d+)?$/i.test(rawOrigin)
+      ? rawOrigin
+      : (process.env.APP_URL || 'https://tranvas.com');
 
     const goRes = await fetch(goUrl, {
       cache: 'no-store',
@@ -25,14 +29,14 @@ export async function POST(req: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${session.access_token}`,
-        'Origin': req.headers.get('origin') || process.env.APP_URL || 'https://tranvas.com',
+        'Origin': safeOrigin,
       },
       body,
     });
 
     if (!goRes.ok) {
       const text = await goRes.text();
-      throw new Error(`Go backend returned ${goRes.status}: ${text}`);
+      return NextResponse.json({ error: text || 'PayPal checkout failed' }, { status: goRes.status });
     }
 
     const data = await goRes.json();
@@ -42,4 +46,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
-
