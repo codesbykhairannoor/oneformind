@@ -103,7 +103,15 @@ export const proxy = async (req: NextRequest) => {
   // 2. Pass intlResponse to Supabase updateSession to sync cookies and handle auth redirects safely
   const finalResponse = await updateSession(req, intlResponse);
 
-  // 3. Always include Accept in Vary so CDNs separate HTML vs Markdown representations cleanly
+  // 3. Ensure authenticated sessions are never CDN-cached, and include Accept in Vary for public routes
+  const hasAuthCookie =
+    req.cookies.has('sb-access-token') ||
+    req.cookies.getAll().some((c) => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
+  if (hasAuthCookie) {
+    finalResponse.headers.set('CDN-Cache-Control', 'private, no-store');
+    finalResponse.headers.set('Vercel-CDN-Cache-Control', 'private, no-store');
+  }
+
   const existingVary = finalResponse.headers.get('vary');
   if (!existingVary) {
     finalResponse.headers.set('vary', 'Accept');

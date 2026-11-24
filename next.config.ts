@@ -47,6 +47,8 @@ const nextConfig: NextConfig = {
                 source: '/',
                 headers: [
                     { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vercel-CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
                     { key: 'Vary', value: 'Accept' },
                 ],
             },
@@ -54,6 +56,8 @@ const nextConfig: NextConfig = {
                 source: '/id',
                 headers: [
                     { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vercel-CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
                     { key: 'Vary', value: 'Accept' },
                 ],
             },
@@ -62,6 +66,8 @@ const nextConfig: NextConfig = {
                 source: '/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company|affiliates)/:subpath*',
                 headers: [
                     { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vercel-CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
                     { key: 'Vary', value: 'Accept' },
                 ],
             },
@@ -70,6 +76,8 @@ const nextConfig: NextConfig = {
                 source: '/id/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company|affiliates)/:subpath*',
                 headers: [
                     { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vercel-CDN-Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
                     { key: 'Vary', value: 'Accept' },
                 ],
             },
