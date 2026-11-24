@@ -26,7 +26,7 @@ export function constructPageMetadata({
   title,
   description,
   keywords,
-  image = '/icon.png',
+  image = '/og-banner',
   noIndex = false,
 }: PageMetadataOptions): Metadata {
   // Normalize path: empty string for root, otherwise leading slash without trailing slash
@@ -101,9 +101,15 @@ export function constructPageMetadata({
       images: [
         {
           url: absoluteImageUrl,
+          width: 1200,
+          height: 630,
+          alt: fullTitle,
+        },
+        {
+          url: `${BASE_URL}/icon.png`,
           width: 512,
           height: 512,
-          alt: fullTitle,
+          alt: 'Tranvas Logo',
         },
       ],
     },

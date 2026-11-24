@@ -115,6 +115,6 @@ export const proxy = async (req: NextRequest) => {
 };
 
 export const config = {
-  // Match all pathnames except api, _next, static files
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+  // Match all pathnames except api, _next, _vercel, og-banner, .well-known, and static files
+  matcher: ['/((?!api|_next|_vercel|og-banner|\\.well-known|.*\\..*).*)']
 };

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
-import { getMessages } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import Script from 'next/script';
 import InstantIntlProvider from "@/components/InstantIntlProvider";
 import SwrProvider from "@/components/SwrProvider";
@@ -82,6 +82,9 @@ export default async function RootLayout({
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
+
+  // Enable static rendering / ISR edge caching for public marketing pages
+  setRequestLocale(locale);
 
   const messages = await getMessages();
 

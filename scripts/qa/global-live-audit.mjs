@@ -362,7 +362,7 @@ async function run() {
   );
 
   // Validate all links inside live llms.txt!
-  const llmsUrls = [...new Set([...llmsRes.text.matchAll(/https:\/\/tranvas\.com[^\s)\]>"]+/g)].map(m => m[0]))];
+  const llmsUrls = [...new Set([...llmsRes.text.matchAll(/https:\/\/tranvas\.com[^\s)\]>'"`]+/g)].map(m => m[0].replace(/[.,;:]+$/, '')))];
   const llmsUrlChecks = await Promise.all(llmsUrls.map(u => fetchSafe(u)));
   const brokenLlmsUrls = llmsUrlChecks.filter(r => r.status !== 200);
   record(
@@ -372,18 +372,65 @@ async function run() {
     brokenLlmsUrls.length === 0
       ? `All ${llmsUrls.length}/${llmsUrls.length} URLs in llms.txt are 200 OK`
       : `BROKEN/REDIRECT in llms.txt: ${brokenLlmsUrls.map(r => `${r.url} -> ${r.status}`).join(', ')}`,
-    brokenLlmsUrls.length > 0 ? 'Fix broken or auth-gated URLs in public/llms.txt (e.g. /study might redirect to /login!).' : ''
+    brokenLlmsUrls.length > 0 ? 'Fix broken or auth-gated URLs in public/llms.txt.' : ''
   );
 
-  // Check Content Negotiation (Accept: text/markdown) - Global Agentic Web Standard!
-  const mdProbe = await fetchSafe(`${TARGET}/`, { headers: { Accept: 'text/markdown' } });
-  const supportsMarkdownNeg = (mdProbe.headers['content-type'] || '').includes('markdown');
+  // Check Content Negotiation (Accept: text/markdown) + Vary: Accept on HTML + Agentic 404
+  const [mdProbe, md404Probe, oauthRes, oauthAuthRes, openApiRes, ogBannerRes] = await Promise.all([
+    fetchSafe(`${TARGET}/`, { headers: { Accept: 'text/markdown' } }),
+    fetchSafe(`${TARGET}/__tranvas-audit-404-probe`, { headers: { Accept: 'text/markdown' } }),
+    fetchSafe(`${TARGET}/.well-known/oauth-protected-resource`),
+    fetchSafe(`${TARGET}/.well-known/oauth-authorization-server`),
+    fetchSafe(`${TARGET}/openapi.json`),
+    fetchSafe(`${TARGET}/og-banner`),
+  ]);
+  const supportsMarkdownNeg = (mdProbe.headers['content-type'] || '').includes('markdown') && (mdProbe.headers['vary'] || '').toLowerCase().includes('accept');
+  const htmlHasVaryAccept = (root.headers['vary'] || '').toLowerCase().includes('accept');
   record(
     'llm',
-    supportsMarkdownNeg ? 'pass' : 'warn',
-    'Agentic Content Negotiation (Accept: text/markdown)',
-    `Content-Type returned: ${mdProbe.headers['content-type'] || 'unknown'}`,
-    !supportsMarkdownNeg ? 'Modern AI agents (Vercel is-agentic standard, Cloudflare Markdown for Agents) love Accept: text/markdown returning clean markdown or redirecting to /llms.txt.' : ''
+    supportsMarkdownNeg && htmlHasVaryAccept ? 'pass' : 'warn',
+    'Agentic Content Negotiation (Accept: text/markdown + Vary: Accept)',
+    `MD CT: ${mdProbe.headers['content-type']} (Vary: ${mdProbe.headers['vary']}) | HTML Vary: ${root.headers['vary']}`,
+    !(supportsMarkdownNeg && htmlHasVaryAccept) ? 'Ensure both Markdown and HTML responses emit Vary: Accept.' : ''
+  );
+  const agent404Ok = md404Probe.status === 404 && (md404Probe.headers['content-type'] || '').includes('markdown');
+  record(
+    'llm',
+    agent404Ok ? 'pass' : 'warn',
+    'Agent-Friendly Markdown 404 Response',
+    `HTTP ${md404Probe.status} | CT: ${md404Probe.headers['content-type']}`
+  );
+  record(
+    'llm',
+    oauthRes.status === 200 && oauthRes.text.includes('scopes_supported') ? 'pass' : 'warn',
+    'RFC 9728 OAuth Protected Resource & Scopes (/.well-known/oauth-protected-resource)',
+    `HTTP ${oauthRes.status}`
+  );
+  record(
+    'llm',
+    oauthAuthRes.status === 200 && oauthAuthRes.text.includes('authorization_endpoint') ? 'pass' : 'warn',
+    'RFC 8414 OAuth Authorization Server Metadata (/.well-known/oauth-authorization-server)',
+    `HTTP ${oauthAuthRes.status}`
+  );
+  record(
+    'llm',
+    openApiRes.status === 200 && openApiRes.text.includes('"openapi"') ? 'pass' : 'warn',
+    'OpenAPI 3.1 Machine-Readable Spec (/openapi.json)',
+    `HTTP ${openApiRes.status}`
+  );
+  record(
+    'seo',
+    ogBannerRes.status === 200 && (ogBannerRes.headers['content-type'] || '').includes('image/') ? 'pass' : 'warn',
+    'Live 1200x630 OpenGraph Banner Endpoint (/og-banner)',
+    `HTTP ${ogBannerRes.status} | CT: ${ogBannerRes.headers['content-type']}`
+  );
+  const rootSetsCookie = Boolean(root.headers['set-cookie']);
+  record(
+    'performance_infra',
+    !rootSetsCookie ? 'pass' : 'warn',
+    'No Anonymous Set-Cookie Blocking CDN Edge Cache',
+    rootSetsCookie ? `Set-Cookie emitted: ${root.headers['set-cookie']}` : 'Clean (no Set-Cookie on anonymous public HTML)',
+    rootSetsCookie ? 'Disable server Set-Cookie on anonymous public marketing routes so Vercel/Cloudflare CDN caches HTML.' : ''
   );
 
   // Check PWA Manifest & RSS Feed

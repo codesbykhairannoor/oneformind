@@ -53,13 +53,6 @@ export function getSoftwareApplicationSchema(locale: string = 'en') {
       availability: 'https://schema.org/InStock',
       category: 'Personal Life Operating System',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '1240',
-      bestRating: '5',
-      worstRating: '1',
-    },
     featureList: [
       'Time-blocked Daily Planner with Eisenhower Matrix',
       '28-Day Habit Streaks based on Atomic Habits',

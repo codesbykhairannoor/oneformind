@@ -43,17 +43,34 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Marketing/public pages (English/default): edge cache 1 hour, serve stale up to 1 day
-                source: '/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company)?/:subpath*',
+                // Root English & Indonesian landing pages: edge cache 1 hour, serve stale up to 1 day + Vary: Accept for Markdown negotiation
+                source: '/',
                 headers: [
                     { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vary', value: 'Accept' },
+                ],
+            },
+            {
+                source: '/id',
+                headers: [
+                    { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vary', value: 'Accept' },
+                ],
+            },
+            {
+                // Marketing/public pages (English/default): edge cache 1 hour, serve stale up to 1 day
+                source: '/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company|affiliates)/:subpath*',
+                headers: [
+                    { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vary', value: 'Accept' },
                 ],
             },
             {
                 // Marketing/public pages (Indonesian /id prefix): edge cache 1 hour, serve stale up to 1 day
-                source: '/id/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company)?/:subpath*',
+                source: '/id/:path(features|solutions|resources|pricing|compare|about|contact|blog|changelog|security|company|affiliates)/:subpath*',
                 headers: [
                     { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
+                    { key: 'Vary', value: 'Accept' },
                 ],
             },
             {

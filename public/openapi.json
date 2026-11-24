@@ -1,0 +1,126 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Tranvas Life OS API",
+    "version": "1.0.0",
+    "description": "Authenticated REST API powering the 8 unified Life Operating System modules in Tranvas (Daily Planner, 28-Day Habit Matrix, Zero-Based Finance, WOOP Goals, Career Pipeline, Mindful Journal, Academic Study, and Unified Calendar). Enforces strict multi-tenant Row Level Security (RLS).",
+    "contact": {
+      "name": "Tranvas Engineering",
+      "url": "https://tranvas.com/resources/api",
+      "email": "support@tranvas.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://tranvas.com",
+      "description": "Tranvas Production API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "oauth2": {
+        "type": "oauth2",
+        "description": "OAuth 2.0 Authorization Code Flow with PKCE (S256) backed by Tranvas / Supabase Auth.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://tranvas.com/.well-known/oauth-authorization-server",
+            "tokenUrl": "https://tranvas.com/.well-known/oauth-authorization-server",
+            "scopes": {
+              "profile:read": "Read authenticated user profile metadata",
+              "tasks:read": "Read daily planner tasks and time blocks",
+              "tasks:write": "Create, update, and complete daily tasks",
+              "habits:read": "Read habit definitions, streaks, and 28-day matrix logs",
+              "habits:write": "Toggle habit completions, rest days, and micro-notes",
+              "finance:read": "Read budgets, transactions, assets, and savings",
+              "finance:write": "Record income, expenses, and budget envelopes",
+              "goals:read": "Read WOOP goals and cascading milestones",
+              "goals:write": "Create and update WOOP goals and milestone progress",
+              "journals:read": "Read private markdown journal entries",
+              "journals:write": "Create and edit daily gratitude and reflection logs",
+              "calendar:read": "Read unified calendar events and schedules",
+              "calendar:write": "Create and reschedule unified calendar events"
+            }
+          }
+        }
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    { "oauth2": ["profile:read"] },
+    { "bearerAuth": [] }
+  ],
+  "paths": {
+    "/api/user": {
+      "get": {
+        "summary": "Get authenticated user profile",
+        "security": [{ "oauth2": ["profile:read"] }],
+        "responses": {
+          "200": { "description": "Authenticated user profile" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/planner/tasks": {
+      "get": {
+        "summary": "List daily planner tasks",
+        "security": [{ "oauth2": ["tasks:read"] }],
+        "responses": { "200": { "description": "List of tasks" }, "401": { "description": "Unauthorized" } }
+      },
+      "post": {
+        "summary": "Create a planner task",
+        "security": [{ "oauth2": ["tasks:write"] }],
+        "responses": { "201": { "description": "Task created" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/habits": {
+      "get": {
+        "summary": "List user habits and 28-day matrix logs",
+        "security": [{ "oauth2": ["habits:read"] }],
+        "responses": { "200": { "description": "List of habits" }, "401": { "description": "Unauthorized" } }
+      },
+      "post": {
+        "summary": "Create a new habit",
+        "security": [{ "oauth2": ["habits:write"] }],
+        "responses": { "201": { "description": "Habit created" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/finance/transactions": {
+      "get": {
+        "summary": "List zero-based finance transactions",
+        "security": [{ "oauth2": ["finance:read"] }],
+        "responses": { "200": { "description": "List of transactions" }, "401": { "description": "Unauthorized" } }
+      },
+      "post": {
+        "summary": "Log a new income or expense transaction",
+        "security": [{ "oauth2": ["finance:write"] }],
+        "responses": { "201": { "description": "Transaction recorded" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/goals": {
+      "get": {
+        "summary": "List WOOP goals and pace metrics",
+        "security": [{ "oauth2": ["goals:read"] }],
+        "responses": { "200": { "description": "List of goals" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/journals": {
+      "get": {
+        "summary": "List mindful reflection journal entries",
+        "security": [{ "oauth2": ["journals:read"] }],
+        "responses": { "200": { "description": "List of journal entries" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/calendar": {
+      "get": {
+        "summary": "List unified calendar events",
+        "security": [{ "oauth2": ["calendar:read"] }],
+        "responses": { "200": { "description": "List of calendar events" }, "401": { "description": "Unauthorized" } }
+      }
+    }
+  }
+}
