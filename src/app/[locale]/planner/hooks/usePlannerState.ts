@@ -94,16 +94,22 @@ export function usePlannerState() {
         const yesterdayObj = new Date(y, m - 1, d - 1);
         const yesterdayStr = `${yesterdayObj.getFullYear()}-${String(yesterdayObj.getMonth() + 1).padStart(2, '0')}-${String(yesterdayObj.getDate()).padStart(2, '0')}`;
 
+        let isMounted = true;
+        const controller = new AbortController();
+
         const loadAll = async () => {
             try {
                 const [tasksRes, dailyRes, yesterdayRes] = await Promise.all([
-                    fetch(`/api/planner/tasks?date=${selectedDate}`, { cache: 'no-store' }),
-                    fetch(`/api/planner/daily?date=${selectedDate}`, { cache: 'no-store' }),
-                    fetch(`/api/planner/tasks?date=${yesterdayStr}`, { cache: 'no-store' }),
+                    fetch(`/api/planner/tasks?date=${selectedDate}`, { cache: 'no-store', signal: controller.signal }),
+                    fetch(`/api/planner/daily?date=${selectedDate}`, { cache: 'no-store', signal: controller.signal }),
+                    fetch(`/api/planner/tasks?date=${yesterdayStr}`, { cache: 'no-store', signal: controller.signal }),
                 ]);
+
+                if (!isMounted || controller.signal.aborted) return;
 
                 if (tasksRes.ok) {
                     const data = await tasksRes.json();
+                    if (!isMounted) return;
                     taskCrud.setTasks(Array.isArray(data) ? data.map((t: any) => ({
                         id: t.id,
                         date: normalizeDate(t.date),
@@ -118,6 +124,7 @@ export function usePlannerState() {
 
                 if (dailyRes.ok) {
                     const dailyData = await dailyRes.json();
+                    if (!isMounted) return;
                     daily.setAllDaily(dailyData);
                 }
 
@@ -129,6 +136,7 @@ export function usePlannerState() {
                         setShowRolloverBanner(false);
                     } else {
                         const yData = await yesterdayRes.json();
+                        if (!isMounted) return;
                         if (Array.isArray(yData)) {
                             const unfinished = yData.filter((t: any) => !(t.isCompleted || t.completed));
                             if (unfinished.length > 0) {
@@ -151,16 +159,24 @@ export function usePlannerState() {
                     }
                 }
             } catch (error) {
-                console.error('Failed to load planner data:', error);
+                // Ignore aborts / Firefox navigation-cancelled NetworkErrors when unmounting or changing dates
+                if (!isMounted || controller.signal.aborted) return;
+                if (error instanceof DOMException && error.name === 'AbortError') return;
+                if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+                console.warn('Failed to load planner data:', error);
             } finally {
-                setIsLoaded(true);
+                if (isMounted) setIsLoaded(true);
             }
         };
 
         loadAll();
 
         const clockInterval = setInterval(() => setNow(new Date()), 60000);
-        return () => clearInterval(clockInterval);
+        return () => {
+            isMounted = false;
+            controller.abort();
+            clearInterval(clockInterval);
+        };
     }, [selectedDate]);
 
     // Reactively compute scheduled habits from rawHabits (Virtual Projection)

@@ -89,6 +89,35 @@ const DEFAULT_MODULES: Record<ModuleKey, boolean> = {
     goal: true,
 };
 
+// Deduplicate concurrent /api/user sync calls across multiple mounted consumers
+// (Sidebar, MobileNav, Page hooks) and cache briefly to avoid redundant requests & nav-abort NetworkErrors.
+let sharedUserSettingsPromise: Promise<any | null> | null = null;
+let cachedUserSettingsData: any | null = null;
+let cachedUserSettingsAt = 0;
+const USER_SETTINGS_CACHE_TTL_MS = 15_000;
+
+function fetchSharedUserSettings(): Promise<any | null> {
+    const now = Date.now();
+    if (cachedUserSettingsData && now - cachedUserSettingsAt < USER_SETTINGS_CACHE_TTL_MS) {
+        return Promise.resolve(cachedUserSettingsData);
+    }
+    if (!sharedUserSettingsPromise) {
+        sharedUserSettingsPromise = fetch('/api/user', { credentials: 'same-origin' })
+            .then(async (res) => {
+                if (!res.ok) return null;
+                const data = await res.json();
+                cachedUserSettingsData = data;
+                cachedUserSettingsAt = Date.now();
+                return data;
+            })
+            .catch(() => null)
+            .finally(() => {
+                sharedUserSettingsPromise = null;
+            });
+    }
+    return sharedUserSettingsPromise;
+}
+
 export function useActiveModules() {
     const { data: session, status } = useSession();
     const [modules, setModules] = useState<Record<string, boolean>>(DEFAULT_MODULES);
@@ -159,34 +188,33 @@ export function useActiveModules() {
         };
     }, []);
 
-    // Sync from API on session ready
+    // Sync from API on session ready (deduplicated across all mounted consumers)
     useEffect(() => {
         if (status !== 'authenticated') return;
 
         let isMounted = true;
         const fetchUserSettings = async () => {
             try {
-                const res = await fetch('/api/user');
-                if (!res.ok) return;
-                const data = await res.json();
-                if (isMounted && data?.settings) {
-                    if (data.settings.modules && typeof data.settings.modules === 'object') {
-                        const updated: Record<string, boolean> = { ...DEFAULT_MODULES };
-                        ALL_MODULE_KEYS.forEach(k => {
-                            if (typeof data.settings.modules[k] === 'boolean') {
-                                updated[k] = data.settings.modules[k];
-                            }
-                        });
-                        setModules(updated);
-                    }
-                    if (data.settings.tabs_activated_at) {
-                        setActivatedAt(data.settings.tabs_activated_at);
-                    } else if (data.createdAt) {
-                        setActivatedAt(data.createdAt);
-                    }
+                const data = await fetchSharedUserSettings();
+                if (!isMounted || !data?.settings) return;
+                if (data.settings.modules && typeof data.settings.modules === 'object') {
+                    const updated: Record<string, boolean> = { ...DEFAULT_MODULES };
+                    ALL_MODULE_KEYS.forEach(k => {
+                        if (typeof data.settings.modules[k] === 'boolean') {
+                            updated[k] = data.settings.modules[k];
+                        }
+                    });
+                    setModules(updated);
+                }
+                if (data.settings.tabs_activated_at) {
+                    setActivatedAt(data.settings.tabs_activated_at);
+                } else if (data.createdAt) {
+                    setActivatedAt(data.createdAt);
                 }
             } catch (error) {
-                console.error('Failed to sync active modules from server:', error);
+                if (!isMounted) return;
+                if (error instanceof DOMException && error.name === 'AbortError') return;
+                console.warn('Failed to sync active modules from server:', error);
             }
         };
 
@@ -250,7 +278,9 @@ export function useActiveModules() {
             console.error('Failed to write local modules:', e);
         }
 
-        // API update
+        // API update (invalidate shared cache so future mounts fetch fresh state)
+        cachedUserSettingsData = null;
+        cachedUserSettingsAt = 0;
         setIsSaving(true);
         try {
             await fetch('/api/user', {

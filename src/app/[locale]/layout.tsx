@@ -24,8 +24,7 @@ export const viewport: Viewport = {
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap", // PERF: Use font-display:swap to prevent invisible text during font load
+  display: "swap", // PERF: Variable font (1 woff2 instead of 5) + font-display:swap
 });
 
 import { constructPageMetadata } from "@/lib/seo";
@@ -100,7 +99,7 @@ export default async function RootLayout({
                   document.documentElement.classList.remove('dark');
                 }
                 var p = window.location.pathname;
-                if (/\/(dashboard|planner|habits|finance|goals|jobs|journal|study|calendar|settings|profile|coach)(\/|$)/.test(p)) {
+                if (new RegExp('^/(?:[a-z]{2}/)?(dashboard|planner|habits|finance|goals|jobs|journal|study|calendar|settings|profile|coach)(?:/|$)').test(p)) {
                   document.documentElement.classList.add('app-authenticated');
                 }
               } catch (e) {}
@@ -115,13 +114,20 @@ export default async function RootLayout({
         <JsonLd data={getWebSiteSchema(locale)} />
       </head>
       <body className="selection:bg-indigo-100 selection:text-indigo-700 font-sans min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100" suppressHydrationWarning>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7PNK1P4WZN" strategy="afterInteractive" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-7PNK1P4WZN"
+          strategy="afterInteractive"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-7PNK1P4WZN');
+            gtag('config', 'G-7PNK1P4WZN', {
+              cookie_expires: 34560000,
+              cookie_flags: 'SameSite=Lax;Secure'
+            });
           `}
         </Script>
         <InstantIntlProvider initialLocale={locale} initialMessages={messages as any}>
